@@ -6,30 +6,18 @@
     android:layout_height="match_parent"
     tools:context=".GreetingActivity">
 
-    <EditText
-        android:id="@+id/editTextTextPersonName"
-        android:layout_width="118dp"
-        android:layout_height="55dp"
-        android:layout_marginStart="92dp"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="@string/hello"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:autofillHints="name"
-        tools:ignore="LabelFor" />
 
-    <EditText
+    <TextView
         android:id="@+id/greetingName"
-        android:layout_width="112dp"
-        android:layout_height="56dp"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello"
+        android:textAlignment="center"
+        android:textColor="#7700FF"
+        android:textSize="34sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.204"
-        app:layout_constraintStart_toEndOf="@+id/editTextTextPersonName"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

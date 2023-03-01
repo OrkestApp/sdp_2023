@@ -36,6 +36,7 @@ class MainActivity : AppCompatActivity() {
     private fun signOut() {
         auth.signOut()
         val intent = Intent(this, SignIn::class.java)
+        //comment the next two lines for testing
         FirebaseAuth.getInstance().signOut()
         GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN).revokeAccess()
         startActivity(intent)

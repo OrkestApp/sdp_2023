@@ -1,15 +1,21 @@
 package com.github.emilehreich.bootcamp
 
-import androidx.appcompat.app.AppCompatActivity
+import android.location.Address
+import android.location.Geocoder
 import android.os.Bundle
-
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.github.emilehreich.bootcamp.databinding.ActivityMapsBinding
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import com.github.emilehreich.bootcamp.databinding.ActivityMapsBinding
+import java.util.*
+
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -40,9 +46,45 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+        //Setting zoom controls and limits
+        mMap.uiSettings.isZoomControlsEnabled = true
+        mMap.setMinZoomPreference(8.0f)
+        mMap.setMaxZoomPreference(17.0f)
+
+        val EPFL = LatLng(46.520536, 6.568318)
+
+        //Extract EPFL's address
+        val geocoder = Geocoder(applicationContext, Locale.getDefault())
+        val addresses: List<Address>? = geocoder.getFromLocation(EPFL.latitude, EPFL.longitude, 1)
+        val address: String = addresses!![0].getAddressLine(0)
+
+        // Add a marker at EPFL and move the camera
+        mMap.addMarker(MarkerOptions()
+            .position(EPFL)
+            .title("EPFL")
+            .draggable(true)
+            .snippet(address)
+            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)))
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(EPFL))
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(EPFL, 15f)) //Set zoom level
+
+        //Add a marker at Satellite
+        val Satellite = LatLng(46.520544, 6.567825)
+        mMap.addMarker(MarkerOptions()
+            .position(Satellite)
+            .title("Satellite")
+            .draggable(true)
+            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE)))
+
+        //Add a click listener for our marker
+        mMap.setOnMarkerClickListener { marker: Marker ->
+            //Displaying a toast message on clicking on marker
+            Toast.makeText(applicationContext, "Coordinates of " + marker.title + " : " + marker.position.latitude + ", " + marker.position.longitude, Toast.LENGTH_SHORT).show()
+            //keeps the marker's title on top of the icon
+            false
+        }
     }
+
+
+
 }

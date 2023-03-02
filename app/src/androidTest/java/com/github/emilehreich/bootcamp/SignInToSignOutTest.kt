@@ -39,6 +39,32 @@ class SignInToSignOutTest {
 
     @Test
     fun testSignIn() {
+
+        Intents.init()
+
+        // Click the sign-in button
+        onView(withId(R.id.btn_sign_in)).perform(click())
+
+        // Wait for the email selection dialog to appear
+        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+        val emailSelector = By.textContains("evgueni.rousselot@gmail.com")
+        device.wait(Until.hasObject(emailSelector), 10000)
+
+        // Click on the email address that you want to sign in with
+        val email = device.findObject(emailSelector)
+        email.click()
+
+        // Wait for the app to transition to the MainActivity
+        val mainActivitySelector = By.res("com.example.myapplication", "activity_main")
+        device.wait(Until.hasObject(mainActivitySelector), 10000)
+
+        // Verify that the sign-in activity is finished and the main activity is launched
+        intended(hasComponent(hasClassName(MainActivity::class.java.name)))
+
+        Intents.release()
+
+
+        /*
         Intents.init()
 
         // Click the sign-in button
@@ -68,7 +94,7 @@ class SignInToSignOutTest {
 
         intended(hasComponent(hasClassName(SignIn::class.java.name)))
 
-        Intents.release()
+        Intents.release()*/
     }
 
 

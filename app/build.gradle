@@ -2,6 +2,8 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'jacoco'
+    id("com.google.dagger.hilt.android")
+    id 'kotlin-kapt'
 }
 
 android {
@@ -52,6 +54,9 @@ dependencies {
 
     implementation 'com.google.code.gson:gson:2.8.7'
 
+    implementation("com.google.dagger:hilt-android:2.44")
+    kapt("com.google.dagger:hilt-android-compiler:2.44")
+
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
@@ -60,6 +65,11 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.5.2'
     androidTestImplementation 'androidx.test:rules:1.5.0'
     androidTestImplementation 'androidx.test:core-ktx:1.1.0'
+
+    // For instrumented tests using Hilt.
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.44")
+    // ...with Kotlin.
+    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.44")
 }
 
 tasks.withType(Test) {
@@ -94,4 +104,8 @@ task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest', 'crea
 
 connectedCheck {
     finalizedBy jacocoTestReport
+}
+
+kapt {
+    correctErrorTypes = true
 }

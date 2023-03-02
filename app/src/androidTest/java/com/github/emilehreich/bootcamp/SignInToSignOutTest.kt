@@ -29,6 +29,7 @@ import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.matcher.ComponentNameMatchers.hasClassName
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 
 
 class SignInToSignOutTest {
@@ -60,6 +61,12 @@ class SignInToSignOutTest {
 
         // Verify that the sign-in activity is finished and the main activity is launched
         intended(hasComponent(hasClassName(MainActivity::class.java.name)))
+
+        onView(withId(R.id.btn_sign_out)).perform(click())
+
+        Thread.sleep(5000)
+
+        intended(hasComponent(hasClassName(SignIn::class.java.name)))
 
         Intents.release()
     }

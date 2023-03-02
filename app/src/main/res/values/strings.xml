@@ -2,4 +2,7 @@
     <string name="app_name">Bootcamp</string>
     <string name="hello">Hello</string>
     <string name="your_name">Your Name</string>
+
+    <string name="BoredTitle">Are you bored?</string>
+    <string name="BoredButton">Find something to do!</string>
 </resources>

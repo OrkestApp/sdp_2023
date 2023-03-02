@@ -16,7 +16,7 @@ import com.google.firebase.auth.GoogleAuthProvider
 class SignIn : AppCompatActivity() {
 
     private lateinit var googleSignInClient: GoogleSignInClient
-    private lateinit var auth: FirebaseAuth
+    lateinit var auth: FirebaseAuth
     private lateinit var btnSignIn: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,7 +62,7 @@ class SignIn : AppCompatActivity() {
     }
 
     @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == RC_SIGN_IN) {
@@ -77,7 +77,7 @@ class SignIn : AppCompatActivity() {
     }
 
     companion object {
-        private const val RC_SIGN_IN = 9001
+        const val RC_SIGN_IN = 9001
     }
 
 }

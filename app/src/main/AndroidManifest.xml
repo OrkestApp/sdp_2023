@@ -15,9 +15,6 @@
             android:name=".ApiActivity"
             android:exported="false" />
         <activity
-            android:name=".BoredActivity"
-            android:exported="false" />
-        <activity
             android:name=".GreetingActivity"
             android:exported="false" />
         <activity

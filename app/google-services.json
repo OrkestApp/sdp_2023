@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "848736319584",
+    "project_id": "bootcamp-f89cb",
+    "storage_bucket": "bootcamp-f89cb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:848736319584:android:466c49e4897b23bb16ab05",
+        "android_client_info": {
+          "package_name": "com.github.emilehreich.bootcamp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "848736319584-4tu8got5v33akg26e7acp17vodkd1uuo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.emilehreich.bootcamp",
+            "certificate_hash": "594ba81e5e4d34c48ce0308a566141bf78f32b3f"
+          }
+        },
+        {
+          "client_id": "848736319584-orfg0o1bbb6sakk2jabmrg7ls7o4bhqq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC4KQEqd_PsTz1MdMGl66ajNDLMWRbJhns"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "848736319584-k2llmeas5hbh24c0d407s263ep22qbgh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

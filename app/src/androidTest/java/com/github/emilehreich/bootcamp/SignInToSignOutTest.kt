@@ -53,10 +53,13 @@ class SignInToSignOutTest {
             // Click on the email address that you want to sign in with
             val email = device.findObject(emailSelector)
             email.click()
+
+            // Wait for the app to transition to the MainActivity
+            Thread.sleep(5000)
         }
 
         // Verify that the sign-in activity is finished and the main activity is launched
-        //intended(hasComponent(hasClassName(MainActivity::class.java.name)))
+        intended(hasComponent(hasClassName(MainActivity::class.java.name)))
 
         Intents.release()
     }

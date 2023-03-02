@@ -1,10 +1,17 @@
 package com.github.emilehreich.bootcamp
 
+import android.content.Intent
+import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextReplacement
 import androidx.test.espresso.Espresso.*
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.Intents.init
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtra
@@ -21,23 +28,16 @@ import org.junit.runner.RunWith
 class MainActivityTest {
 
     @get:Rule
-    val activityScenarioRule = ActivityScenarioRule(MainActivity::class.java)
+    val composeTestRule = createAndroidComposeRule<MainActivity>()
+
 
     @Test
-    fun testWritingOfName() {
-        onView(ViewMatchers.withId(R.id.mainText)).perform(ViewActions.replaceText("Steve"))
-        closeSoftKeyboard()
-        onView(withText("Steve")).check(matches(isDisplayed()))
-    }
-
-    @Test
-    fun testStartButton() {
+    fun testFireIntent() {
         Intents.init()
 
-        onView(withId(R.id.mainText)).perform(ViewActions.replaceText("Steve"))
-        closeSoftKeyboard()
+        composeTestRule.onNode(hasText("Enter Here")).performTextReplacement("Steve")
+        composeTestRule.onNode(hasText("Next") and hasClickAction()).performClick()
 
-        onView(withId(R.id.mainButton)).perform(click())
         intended(
             allOf(
                 hasComponent(GreetingActivity::class.java.name),

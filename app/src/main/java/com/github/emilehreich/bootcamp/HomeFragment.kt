@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 
 /**
- * Fragment to display the app's home page
+ * Fragment to display the app's home page which contains: TODO
  */
 class HomeFragment : Fragment(R.layout.fragment_home) {
 

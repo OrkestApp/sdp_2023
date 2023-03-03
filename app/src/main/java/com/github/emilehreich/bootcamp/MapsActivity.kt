@@ -33,18 +33,14 @@ class MapsActivity : AppCompatActivity() {
             mMap.moveCamera(CameraUpdateFactory.newLatLng(EPFL))
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(EPFL, 15f)) //Set zoom level
             mMap.setOnMarkerClickListener { marker: Marker -> //Add a click listener for our marker
-                Toast.makeText( //Displaying a toast message on clicking on marker
-                    applicationContext,
-                    "Coordinates of " + marker.title + " : " + marker.position.latitude + ", " + marker.position.longitude,
+                Toast.makeText(applicationContext, "Coordinates of " + marker.title + " : " + marker.position.latitude + ", " + marker.position.longitude,
                     Toast.LENGTH_SHORT
                 ).show()
                 false//keeps the marker's title on top of the icon
             }
 
             viewModel.markers.observe(this) { markers -> // Observe the list of markers and add them to the map
-                markers.forEach { marker ->
-                    mMap.addMarker(marker) }
-            }
+                markers.forEach { marker -> mMap.addMarker(marker) } }
         }
 
         viewModel = ViewModelProvider(this)[MapsViewModel::class.java] // Set up the ViewModel

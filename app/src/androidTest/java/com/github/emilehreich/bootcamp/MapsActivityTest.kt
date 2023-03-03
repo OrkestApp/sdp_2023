@@ -23,8 +23,7 @@ class MockMapsActivity {
 
     // Define a function to simulate the behavior of fetchMarkers
     fun simulateFetchMarkers() {
-        // Make a network request or query a local database to get the list of markers
-        val markers = listOf(
+        val markers = listOf( // Make a network request or query a local database to get the list of markers
             MarkerOptions()
                 .title("EPFL")
                 .position(LatLng(46.520536, 6.568318))
@@ -44,20 +43,6 @@ class MockMapsActivity {
 
 @RunWith(JUnit4::class)
 class MapsActivityTest {
-
-    val markers = listOf(
-        MarkerOptions()
-            .title("EPFL")
-            .position(LatLng(46.520536, 6.568318))
-            .draggable(true)
-            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)),
-        MarkerOptions()
-            .title("Satellite")
-            .position(LatLng(46.520544, 6.567825))
-            .draggable(true)
-            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE))
-    )
-
 
     @get:Rule
     val activityRule = ActivityScenarioRule(MapsActivity::class.java)

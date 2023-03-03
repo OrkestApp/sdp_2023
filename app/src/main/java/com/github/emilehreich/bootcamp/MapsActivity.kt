@@ -1,6 +1,5 @@
 package com.github.emilehreich.bootcamp
 
-
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -12,63 +11,43 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 
-
 class MapsActivity : AppCompatActivity() {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
     lateinit var viewModel: MapsViewModel
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Set up view binding
-        binding = ActivityMapsBinding.inflate(layoutInflater)
+        binding = ActivityMapsBinding.inflate(layoutInflater) // Set up view binding
         setContentView(binding.root)
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.map) as SupportMapFragment
-        //mapFragment.getMapAsync(this)
+        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         mapFragment.getMapAsync { googleMap ->
             mMap = googleMap
-
-            //Setting zoom controls and limits
-            mMap.uiSettings.isZoomControlsEnabled = true
+            mMap.uiSettings.isZoomControlsEnabled = true //Setting zoom controls and limits
             mMap.setMinZoomPreference(8.0f)
             mMap.setMaxZoomPreference(17.0f)
 
             val EPFL = LatLng(46.520536, 6.568318)
-
             mMap.moveCamera(CameraUpdateFactory.newLatLng(EPFL))
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(EPFL, 15f)) //Set zoom level
-
-            //Add a click listener for our marker
-            mMap.setOnMarkerClickListener { marker: Marker ->
-                //Displaying a toast message on clicking on marker
-                Toast.makeText(
+            mMap.setOnMarkerClickListener { marker: Marker -> //Add a click listener for our marker
+                Toast.makeText( //Displaying a toast message on clicking on marker
                     applicationContext,
                     "Coordinates of " + marker.title + " : " + marker.position.latitude + ", " + marker.position.longitude,
                     Toast.LENGTH_SHORT
                 ).show()
-                //keeps the marker's title on top of the icon
-                false
+                false//keeps the marker's title on top of the icon
             }
 
-            // Observe the list of markers and add them to the map
-            viewModel.markers.observe(this) { markers ->
+            viewModel.markers.observe(this) { markers -> // Observe the list of markers and add them to the map
                 markers.forEach { marker ->
-                    mMap.addMarker(marker)
-                }
+                    mMap.addMarker(marker) }
             }
         }
 
-        // Set up the ViewModel
-        viewModel = ViewModelProvider(this)[MapsViewModel::class.java]
-
-        // Fetch the list of markers
-        viewModel.fetchMarkers()
+        viewModel = ViewModelProvider(this)[MapsViewModel::class.java] // Set up the ViewModel
+        viewModel.fetchMarkers() // Fetch the list of markers
     }
-
 }

@@ -18,20 +18,20 @@ open class MapsViewModel: ViewModel() {
     fun fetchMarkers() {
         // Make a network request or query a local database to get the list of markers
         val markers = listOf(
-            MarkerOptions()
-                .title("EPFL")
-                .position(LatLng(46.520536, 6.568318))
-                .draggable(true)
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)),
-            MarkerOptions()
-                .title("Satellite")
-                .position(LatLng(46.520544, 6.567825))
-                .draggable(true)
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE))
+            createMarker("EPFL", LatLng(46.520536, 6.568318), BitmapDescriptorFactory.HUE_CYAN ),
+            createMarker("Satellite", LatLng(46.520544, 6.567825), BitmapDescriptorFactory.HUE_ROSE )
         )
 
         // Update the LiveData object with the list of markers
         _markers.postValue(markers)
+    }
+
+    private fun createMarker(name: String, coordinates: LatLng, color: Float): MarkerOptions {
+        return MarkerOptions()
+            .title(name)
+            .position(coordinates)
+            .draggable(true)
+            .icon(BitmapDescriptorFactory.defaultMarker(color))
     }
 }
 

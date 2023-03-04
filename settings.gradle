@@ -12,9 +12,8 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "Bootcamp"
+rootProject.name = "Orkest"
 include ':app'
-
 
 ext.isCiServer = System.getenv().containsKey("CIRRUS_CI")
 ext.isMasterBranch = System.getenv()["CIRRUS_BRANCH"] == "main"
@@ -30,3 +29,4 @@ buildCache {
         push = isMasterBranch
     }
 }
+

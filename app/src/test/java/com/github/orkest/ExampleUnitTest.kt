@@ -1,4 +1,4 @@
-package com.github.emilehreich.bootcamp
+package com.github.orkest
 
 import org.junit.Test
 

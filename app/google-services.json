@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "246922870066",
+    "firebase_url": "https://sdp-orkest-firebase-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "sdp-orkest-firebase",
+    "storage_bucket": "sdp-orkest-firebase.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:246922870066:android:e68fe5b7600f994086ab2b",
+        "android_client_info": {
+          "package_name": "com.github.emilehreich.bootcamp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "246922870066-40susbucotmjrlbf3ht7fuar5d3l4qjf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDwoYq0TiA_exk3yxaNCnEhoy1ew2tI5OA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "246922870066-40susbucotmjrlbf3ht7fuar5d3l4qjf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:246922870066:android:75f933bb04fd1c9f86ab2b",
+        "android_client_info": {
+          "package_name": "com.github.orkest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "246922870066-40susbucotmjrlbf3ht7fuar5d3l4qjf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDwoYq0TiA_exk3yxaNCnEhoy1ew2tI5OA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "246922870066-40susbucotmjrlbf3ht7fuar5d3l4qjf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

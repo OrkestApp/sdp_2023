@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_feed"
+        android:icon="@drawable/icons8_audio_wave2_100"
+        android:title="Home"
+        android:visible="true" />
+
+    <item
+        android:id="@+id/navigation_search"
+        android:icon="@drawable/icons8_search"
+        android:title="Search " />
+    <item
+        android:id="@+id/navigation_dashboard"
+        android:icon="@drawable/icons8_music_library_100"
+        android:title="@string/title_dashboard" />
+
+    <item
+        android:id="@+id/navigation_notifications"
+        android:icon="@drawable/icons8_test_account_100"
+        android:title="Profile" />
+
+</menu>

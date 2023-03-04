@@ -1,5 +1,6 @@
 <resources>
-    <string name="app_name">Bootcamp</string>
-    <string name="hello">Hello</string>
-    <string name="your_name">Your Name</string>
+    <string name="app_name">Orkest</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
 </resources>

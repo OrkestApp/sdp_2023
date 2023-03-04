@@ -30,7 +30,6 @@ class MapsActivity : AppCompatActivity() {
             mMap.setMaxZoomPreference(17.0f)
 
             val EPFL = LatLng(46.520536, 6.568318)
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(EPFL))
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(EPFL, 15f)) //Set zoom level
             mMap.setOnMarkerClickListener { marker: Marker -> //Add a click listener for our marker
                 Toast.makeText(applicationContext, "Coordinates of " + marker.title + " : " + marker.position.latitude + ", " + marker.position.longitude,

@@ -15,7 +15,7 @@ class GreetingActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val name = intent.getStringExtra("name")
         setContent{
-            Text(text = "Welcome $name")
+            Text(text = "PROFILE $name")
         }
 
     }

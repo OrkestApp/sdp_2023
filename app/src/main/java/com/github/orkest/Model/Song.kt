@@ -1,4 +1,4 @@
-package com.github.orkest.DataModel
+package com.github.orkest.Model
 
 /**
  * Data class to represent a song

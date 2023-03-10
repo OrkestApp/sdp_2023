@@ -1,4 +1,4 @@
-package com.github.orkest.DataModel
+package com.github.orkest.Model
 
 /**
  * Data class representing a user and its various attributes

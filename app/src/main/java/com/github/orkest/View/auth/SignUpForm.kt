@@ -1,4 +1,4 @@
-package com.github.orkest.ui.auth
+package com.github.orkest.View.auth
 
 import android.annotation.SuppressLint
 import android.widget.RadioGroup
@@ -21,9 +21,9 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.github.orkest.DataModel.Providers
-import com.github.orkest.ui.theme.Teal200
-import com.github.orkest.ui.theme.White
+import com.github.orkest.Model.Providers
+import com.github.orkest.View.theme.Teal200
+import com.github.orkest.View.theme.White
 
 
 // Needs to be initialized in the main activity and called as a callback function

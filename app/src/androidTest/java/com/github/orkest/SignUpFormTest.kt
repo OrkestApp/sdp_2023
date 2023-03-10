@@ -7,9 +7,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.test.espresso.matcher.ViewMatchers.assertThat
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import com.github.orkest.DataModel.Providers
-import com.github.orkest.ui.auth.AuthViewModel
-import com.github.orkest.ui.auth.SignUpForm
+import com.github.orkest.Model.Providers
+import com.github.orkest.View.auth.AuthViewModel
+import com.github.orkest.View.auth.SignUpForm
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

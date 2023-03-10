@@ -1,4 +1,4 @@
-package com.github.orkest.DataModel
+package com.github.orkest.Model
 
 enum class Providers(val value:String) {
     SPOTIFY("Spotify"),

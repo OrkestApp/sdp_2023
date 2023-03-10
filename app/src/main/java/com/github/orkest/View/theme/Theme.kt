@@ -1,4 +1,4 @@
-package com.github.orkest.ui.theme
+package com.github.orkest.View.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme

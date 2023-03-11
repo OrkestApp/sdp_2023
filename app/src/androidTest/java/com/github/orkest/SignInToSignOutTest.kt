@@ -43,7 +43,7 @@ class SignInToSignOutTest {
         Intents.init()
 
         // Click the sign-in button
-        onView(withId(R.id.btn_sign_in)).perform(click())
+        onView(withId(R.id.)).perform(click())
 
         // Wait for the email selection dialog to appear
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
@@ -70,7 +70,7 @@ class SignInToSignOutTest {
         // Verify that the sign-in activity is finished and the main activity is launched
         intended(hasComponent(hasClassName(MainActivity::class.java.name)))
 
-        onView(withId(R.id.btn_sign_out)).perform(click())
+        onView(withId(R.id.button_sign_out)).perform(click())
 
         Thread.sleep(5000)
 

@@ -30,7 +30,7 @@ class SignOutToSignInTest {
     fun signOutToSignInTest() {
         val materialButton = onView(
             allOf(
-                withId(R.id.btn_sign_out), withText("SIGN_OUT"),
+                withId(R.id.button_sign_out), withText("SIGN OUT"),
                 childAtPosition(
                     childAtPosition(
                         withId(android.R.id.content),
@@ -45,7 +45,7 @@ class SignOutToSignInTest {
 
         val button = onView(
             allOf(
-                withId(R.id.btn_sign_in), withText("Sign in with Google"),
+                withId(R.id.), withText("Sign in with Google"),
                 withParent(withParent(IsInstanceOf.instanceOf(android.view.ViewGroup::class.java))),
                 isDisplayed()
             )

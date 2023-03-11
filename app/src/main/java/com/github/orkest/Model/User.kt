@@ -13,7 +13,7 @@ package com.github.orkest.Model
 data class User(var username: String = "",
                 var mail: String ="",
                 var serviceProvider: String ="",
-                var profile: Profile? = null,
+                var profile: Profile = Profile(username), //TODO: Check if objects are passed by value or ref in Kotlin
                 var sharedWithMe : List<Song> = ArrayList(),
                 var followers: List<String> = ArrayList(),
                 var following : List<String> = ArrayList())

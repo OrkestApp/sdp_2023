@@ -13,9 +13,9 @@ package com.github.orkest.Model
  *
  */
 data class Profile (var username: String,
-                    var profilePictureId: Int,
-                    var bio: String,
-                    var nbFollowers: Int,
-                    var nbFollowing: Int,
-                    var favoriteSongs: List<Song>,
-                    var sharedMusic: List<Song>)
+                    var profilePictureId: Int = -1,
+                    var bio: String = "",
+                    var nbFollowers: Int = 0,
+                    var nbFollowing: Int = 0,
+                    var favoriteSongs: List<Song> = ArrayList(),
+                    var sharedMusic: List<Song> = ArrayList())

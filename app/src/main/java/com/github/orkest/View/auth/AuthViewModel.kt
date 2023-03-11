@@ -31,8 +31,6 @@ class AuthViewModel: ViewModel() {
 
     fun updateUsername(value:TextFieldValue){
         username.value = value
-        //TODO: Check that the username is unique and add it to the database,
-        // Publish error
     }
 
     fun updateBio(value:TextFieldValue){
@@ -42,8 +40,6 @@ class AuthViewModel: ViewModel() {
     fun updateProvider(provider:Providers){
         selectedProvider.value = provider
     }
-
-
 
 
 

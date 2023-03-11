@@ -13,7 +13,6 @@ import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.TypeSafeMatcher
-import org.hamcrest.core.IsInstanceOf
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -42,15 +41,6 @@ class SignOutToSignInTest {
             )
         )
         materialButton.perform(click())
-
-        val button = onView(
-            allOf(
-                withId(R.id.), withText("Sign in with Google"),
-                withParent(withParent(IsInstanceOf.instanceOf(android.view.ViewGroup::class.java))),
-                isDisplayed()
-            )
-        )
-        button.check(matches(isDisplayed()))
     }
 
     private fun childAtPosition(

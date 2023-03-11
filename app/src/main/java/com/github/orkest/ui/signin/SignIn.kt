@@ -33,11 +33,18 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
 
+/**
+ * A login screen that offers login via Google with Firebase
+ * @see [GoogleSignInFirebase](https://firebase.google.com/docs/auth/android/firebaseui?hl=fr)
+ */
 class SignIn : ComponentActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var googleSignInClient: GoogleSignInClient
 
+    /**
+     * Launches the Google Sign In Intent
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -60,13 +67,13 @@ class SignIn : ComponentActivity() {
 
         googleSignInClient = GoogleSignIn.getClient(this, gso)
 
-
         // Initialize Firebase Auth
         auth = Firebase.auth
-
-
     }
 
+    /**
+     * Composable for the Sign In Button
+     */
     @Composable
     fun SignInButton() {
         Button(
@@ -74,12 +81,13 @@ class SignIn : ComponentActivity() {
             colors = ButtonDefaults.buttonColors(backgroundColor = Color.Yellow))
         {
             Text("Sign in with Google",
-                Modifier.testTag("yourTestTag")
-            )
-
+            Modifier.testTag("Sign in with Google"))
         }
     }
 
+    /**
+     * Composable for the Logo Image
+     */
     @Composable
     fun LogoImage() {
         Image(
@@ -87,13 +95,9 @@ class SignIn : ComponentActivity() {
             contentDescription = "logo")
     }
 
-    override fun onStart() {
-        super.onStart()
-        // Check if user is signed in (non-null) and update UI accordingly.
-        val currentUser = auth.currentUser
-        //updateUI(currentUser)
-    }
-
+    /**
+     * The launcher called when the Sign In Button is clicked on
+     */
     private var activityResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if(result.resultCode == RESULT_OK){
@@ -110,11 +114,17 @@ class SignIn : ComponentActivity() {
             }
     }
 
+    /**
+     * the Sign In function when the the button is clicked on
+     */
     private fun signIn() {
         val signInIntent = googleSignInClient.signInIntent
         activityResultLauncher.launch(signInIntent)
     }
 
+    /**
+     * Checking with Firebase the credentials and the oauth technology
+     */
     private fun firebaseAuthWithGoogle(idToken: String) {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
         auth.signInWithCredential(credential)
@@ -132,6 +142,9 @@ class SignIn : ComponentActivity() {
             }
     }
 
+    /**
+     * Changes the intent depending on the user's credentials
+     */
     private fun updateUI(user: FirebaseUser?) {
         if (user != null) {
             Log.d(TAG, "User is not null")
@@ -144,9 +157,11 @@ class SignIn : ComponentActivity() {
         }
     }
 
+    /**
+     * Companion object for the TAG
+     */
     companion object {
-        private const val TAG = "GoogleActivity"
-        private const val RC_SIGN_IN = 9001
+        private const val TAG = "Google_Sign_In_Activity"
     }
 
 

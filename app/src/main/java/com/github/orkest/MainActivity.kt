@@ -3,19 +3,7 @@ package com.github.orkest
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
-import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -24,7 +12,6 @@ import com.github.orkest.databinding.ActivityMainBinding
 import com.github.orkest.ui.signin.SignIn
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 
@@ -54,24 +41,30 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
+        //my xml button for testing the sign out function
         auth = FirebaseAuth.getInstance()
 
         btnSignOut = findViewById(R.id.button_sign_out)
         btnSignOut.setOnClickListener {
             signOut()
         }
+        //
 
     }
 
+    /**
+     * Signs out the user from the app and Google while caching the user's data
+     */
     private fun signOut() {
         val intent = Intent(this, SignIn::class.java)
         auth.signOut()
-        GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut()
+        //uncomment if un-caching is needed
+        //GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut()
         startActivity(intent)
         finish()
     }
 
-    /*
+    /* for later use
     @Composable
     fun SignOutButton() {
         Button(

@@ -123,6 +123,18 @@ dependencies {
     //noinspection GradleDependency
     debugImplementation("androidx.compose.ui:ui-test-manifest:$compose_version")
 
+
+
+    // Test rules and transitive dependencies:
+    //noinspection GradleDependency
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:$compose_version")
+    // Needed for createAndroidComposeRule, but not createComposeRule:
+    //noinspection GradleDependency
+    debugImplementation("androidx.compose.ui:ui-test-manifest:$compose_version")
+    androidTestImplementation 'androidx.test:rules:1.5.0'
+    androidTestImplementation 'androidx.test:runner:1.5.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+
 }
 
 tasks.withType(Test) {

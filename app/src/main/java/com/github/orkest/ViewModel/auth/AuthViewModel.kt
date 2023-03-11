@@ -17,26 +17,46 @@ class AuthViewModel: ViewModel() {
     private val bio = mutableStateOf(TextFieldValue())
     private val selectedProvider = mutableStateOf(Providers.SPOTIFY)
 
+    /**
+     * Returns the current value of the username to be displayed on the view
+     */
     fun getUsername(): TextFieldValue{
         return username.value
     }
 
+    /**
+     * Return the current value of the profile description of the user
+     * to be displayed on the view
+     */
     fun getBio():TextFieldValue{
         return bio.value
     }
 
+    /**
+     * Returns the Provider of the user to display on the view (of type Enum Providers)
+     */
     fun getProvider():Providers{
         return selectedProvider.value
     }
 
+    /**
+     * Updates the value of the username after the user set it on the view
+     */
     fun updateUsername(value:TextFieldValue){
         username.value = value
     }
 
+    /**
+     * Updates the value of the bio after the user set it on the view
+     */
     fun updateBio(value:TextFieldValue){
         bio.value = value
     }
-
+    
+    /**
+     * Updates the value of the provider of the user after the user
+     * set it on the view
+     */
     fun updateProvider(provider:Providers){
         selectedProvider.value = provider
     }

@@ -13,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.github.orkest.View.theme.OrkestTheme
 import androidx.navigation.compose.composable
+import com.github.orkest.ViewModel.auth.AuthViewModel
 
 class AuthActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

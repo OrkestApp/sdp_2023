@@ -1,9 +1,7 @@
 package com.github.orkest.View.auth
 
 import android.annotation.SuppressLint
-import android.widget.RadioGroup
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -15,15 +13,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextIndent
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.github.orkest.Model.Providers
-import com.github.orkest.View.theme.Teal200
 import com.github.orkest.View.theme.White
+import com.github.orkest.ViewModel.auth.AuthViewModel
 
 
 // Needs to be initialized in the main activity and called as a callback function

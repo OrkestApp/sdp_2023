@@ -2,13 +2,9 @@ package com.github.orkest
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.test.espresso.matcher.ViewMatchers.assertThat
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import com.github.orkest.Model.Providers
-import com.github.orkest.View.auth.AuthViewModel
+import com.github.orkest.ViewModel.auth.AuthViewModel
 import com.github.orkest.View.auth.SignUpForm
 import org.junit.Before
 import org.junit.Rule

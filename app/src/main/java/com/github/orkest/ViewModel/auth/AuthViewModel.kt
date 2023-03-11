@@ -1,15 +1,19 @@
 package com.github.orkest.ViewModel.auth
 
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import com.github.orkest.Model.Providers
 import com.github.orkest.Model.User
+import com.google.android.gms.tasks.Task
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import java.util.concurrent.CompletableFuture
 
 
 class AuthViewModel: ViewModel() {
+
+    var db = Firebase.firestore
 
     private var user = User()
 
@@ -61,6 +65,51 @@ class AuthViewModel: ViewModel() {
         selectedProvider.value = provider
     }
 
+
+    /**
+     * Called once the user finished inputting its credentials
+     * Returns a Future that completes with :
+     * True if the user has been successfully added to the database,
+     * False if the username already exists in the database
+     */
+    fun createUser(): CompletableFuture<Boolean> {
+
+        //Updates the user's credentials
+        user.username = username.value.text
+        user.profile.username = user.username
+        user.profile.bio = bio.value.text
+        user.serviceProvider = selectedProvider.value.value
+
+        //Computes the path to store the user in : Users/firstLetter of its username
+        val firstLetter = username.value.text[0]
+        val path = "Users/$firstLetter"
+
+        val future = CompletableFuture<Boolean>()
+
+        //Checks if the database already contains a user with the same username
+        db.collection(path)
+            .document(user.username).get()
+            .addOnSuccessListener { //TODO: Handle failure too
+                if (it != null) {
+                    future.complete(false)
+                } else {
+                    //If no user with the same username was found, add the user to the database
+                    pushUser(path)
+                        .addOnSuccessListener { future.complete(true) }
+                }
+            }
+
+        return future
+    }
+
+    //TODO: handle concurrency
+    /**
+     * Adds the newly created user to the database
+     */
+    private fun pushUser(path : String): Task<Void> {
+        return db.collection(path).document(user.username)
+            .set(user)
+    }
 
 
 

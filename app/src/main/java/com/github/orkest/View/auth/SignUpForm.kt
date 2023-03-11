@@ -108,7 +108,15 @@ fun SignUpForm(navController: NavController, viewModel: AuthViewModel) {
 
                 Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
                     Button(
-                        onClick = {},
+                        onClick = { viewModel.createUser()
+                            .whenComplete { result, exception ->
+                                if(result) {
+                                    //Launches intent to the main Activity
+                                } else {
+                                    //Displays error
+                                }
+                            }
+                        },
                         shape = RoundedCornerShape(50.dp),
                         modifier = Modifier
                             .fillMaxWidth()

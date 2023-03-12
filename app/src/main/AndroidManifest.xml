@@ -11,6 +11,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Orkest"
         tools:targetApi="31">
+
+        <!-- "adjustResize": to be able to scroll on the screen -->
+        <activity
+            android:windowSoftInputMode="adjustResize"
+            android:name=".View.EditProfileActivity"
+            android:exported="false"
+            android:label="@string/title_activity_edit_profile"
+            android:theme="@style/Theme.Orkest" />
         <activity
             android:name=".View.MainActivity"
             android:exported="true"

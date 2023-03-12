@@ -42,12 +42,15 @@ class EditProfileActivity : ComponentActivity() {
     }
 }
 
+/**
+ * Function generating the screen
+ */
 @Composable
 fun editProfileSetting(content: @Composable () -> Unit) {
     OrkestTheme {
         // A surface container using the 'background' color from the theme
         Surface(
-            //modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
             content()
@@ -55,6 +58,9 @@ fun editProfileSetting(content: @Composable () -> Unit) {
     }
 }
 
+/**
+ * Principal function in which we build the general structure of the activity
+ */
 @Composable
 fun EditProfileScreen() {
     Column(modifier = Modifier.fillMaxHeight()){
@@ -64,6 +70,13 @@ fun EditProfileScreen() {
     }
 }
 
+/**
+ * Top part of the screen, containing:
+ * - "cancel" button on the top left to stop editing changes and returning to profile screen
+ * - "save" button saving changes to database, updating profile screen and returning to it
+ * - current profile picture
+ * - "edit picture" button to modify picture
+ */
 @Composable
 fun topBar() {
     Column(
@@ -75,33 +88,34 @@ fun topBar() {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp),
+            // this spaces out the "cancel" and "save" buttons
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // button to cancel editing and return to profile screen
+            // "cancel" clickable text (button)
             Text(
                 text = "Cancel",
                 modifier = Modifier.clickable { /* TODO */ }
             )
 
-            // button to update profile
+            // "save" clickable text (button)
             Text(
                 text = "Save",
                 modifier = Modifier.clickable { /* TODO */ }
             )
         }
+        // profile pic and edit button
         EditProfileImage()
     }
 }
 
+/**
+ * The larger part of the screen containing the fields to modify textual information
+ */
 @Composable
 fun mainBody() {
-
-    val nameAndDefault: HashMap<String, String> =
-        hashMapOf("Name" to "default name", "Username" to "default username")
-    for((n, def) in nameAndDefault) {
-        NameSection(name = n, default = def)
-    }
-    Bio()
+    EditNameSection(name = "Name", default = "default name")
+    EditNameSection(name = "Username", default = "default username")
+    EditBio()
 }
 
 /**
@@ -140,15 +154,19 @@ fun EditProfileImage() {
                 modifier = Modifier.wrapContentSize(),
                 contentScale = ContentScale.Crop)
         }
+        // clickable Text offering the possibility to change profile pic
         Text(
             text = "edit picture",
             modifier = Modifier.clickable { launcher.launch("image/*") })
     }
 }
 
+/**
+ * fields to modify small text data such as name and username
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NameSection(name: String, default: String) {
+fun EditNameSection(name: String, default: String) {
     var modifyName by rememberSaveable { mutableStateOf(default) }
     Row(
         modifier = Modifier
@@ -168,9 +186,12 @@ fun NameSection(name: String, default: String) {
     }
 }
 
+/**
+ * function creating the field to modify the bio of the user
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Bio() {
+fun EditBio() {
     var bio by rememberSaveable { mutableStateOf("Description") }
     Row(
         modifier = Modifier

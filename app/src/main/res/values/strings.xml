@@ -7,4 +7,5 @@
     <string name="SearchPage">SearchPage</string>
     <string name="ProfilePage">Profile</string>
     <string name="PlaylistPage">Playlist</string>
+    <string name="title_activity_edit_profile">EditProfileActivity</string>
 </resources>

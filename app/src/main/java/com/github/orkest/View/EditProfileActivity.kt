@@ -3,25 +3,27 @@ package com.github.orkest.View
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.orkest.View.ui.theme.OrkestTheme
+import com.github.orkest.R
 
 class EditProfileActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             editProfileSetting {
-                mainContent(listOf("Name", "Username", "Bio"))
+                EditProfileScreen(listOf("Name", "Username", "Bio"))
             }
         }
     }
@@ -41,20 +43,52 @@ fun editProfileSetting(content: @Composable () -> Unit) {
 }
 
 @Composable
-fun mainContent(listSections: List<String>) {
+fun EditProfileScreen(listSections: List<String>) {
     Column(modifier = Modifier.fillMaxHeight()){
         editProfilePic()
         Divider()
         for(section in listSections) {
             Section(name = section)
-            Divider()
+        }
+    }
+}
+
+@Composable
+fun topBar() {
+    Column(
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+            .padding(8.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            // button to cancel editing and return to profile screen
+            Text(
+                text = "Cancel",
+                modifier = Modifier.clickable { /* TODO */ }
+            )
+
+            // button to update profile
+            Text(
+                text = "Save",
+                modifier = Modifier.clickable { /* TODO */ }
+            )
         }
     }
 }
 
 @Composable
 fun editProfilePic() {
-    Surface() {
+    Column(modifier = Modifier,
+        verticalArrangement = Arrangement.Center) {
+        Image(
+            painter = painterResource(id = R.drawable.blank_profile_pic),
+            contentDescription = stringResource(id = R.string.HomePage)
+        )
         Button(onClick = { }) {
             /*TODO*/
             Text(text = "edit profile")
@@ -74,6 +108,6 @@ fun Section(name: String) {
 @Composable
 fun DefaultPreview() {
     editProfileSetting {
-        mainContent(listOf("Name", "Username", "Bio"))
+        EditProfileScreen(listOf("Name", "Username", "Bio"))
     }
 }

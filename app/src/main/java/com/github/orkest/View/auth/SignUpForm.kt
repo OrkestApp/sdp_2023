@@ -86,7 +86,7 @@ fun SignUpForm(navController: NavController, viewModel: AuthViewModel) {
 
                 Spacer(modifier = Modifier.height(15.dp))
 
-                // Box with button to choose the service provider
+                // Box with button to choose the service provider from a dropDownMenu
                 Box {
                     Button(
                         colors= ButtonDefaults.buttonColors(backgroundColor = Color(217,217,217)),

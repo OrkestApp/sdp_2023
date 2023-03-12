@@ -11,7 +11,7 @@ import com.google.firebase.ktx.Firebase
 import java.util.concurrent.CompletableFuture
 
 
-class AuthViewModel: ViewModel() {
+open class AuthViewModel: ViewModel() {
 
     var db = Firebase.firestore
 
@@ -72,13 +72,10 @@ class AuthViewModel: ViewModel() {
      * True if the user has been successfully added to the database,
      * False if the username already exists in the database
      */
-    fun createUser(): CompletableFuture<Boolean> {
+    open fun createUser(): CompletableFuture<Boolean> {
 
         //Updates the user's credentials
-        user.username = username.value.text
-        user.profile.username = user.username
-        user.profile.bio = bio.value.text
-        user.serviceProvider = selectedProvider.value.value
+        updateUser()
 
         //Computes the path to store the user in : Users/firstLetter of its username
         val firstLetter = username.value.text[0]
@@ -102,6 +99,16 @@ class AuthViewModel: ViewModel() {
         return future
     }
 
+    /**
+     * Updates the user's credentials after validation
+     */
+    private fun updateUser(){
+        user.username = username.value.text
+        user.profile.username = user.username
+        user.profile.bio = bio.value.text
+        user.serviceProvider = selectedProvider.value.value
+    }
+
     //TODO: handle concurrency
     /**
      * Adds the newly created user to the database
@@ -110,8 +117,4 @@ class AuthViewModel: ViewModel() {
         return db.collection(path).document(user.username)
             .set(user)
     }
-
-
-
-
 }

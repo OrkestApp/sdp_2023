@@ -3,7 +3,6 @@ package com.github.orkest.ViewModel.profile
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
-import org.w3c.dom.Text
 
 class ProfileViewModel : ViewModel() {
 

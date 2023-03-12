@@ -8,6 +8,9 @@ import androidx.compose.foundation.text.ClickableText
 //import androidx.compose.material3.Text
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,38 +45,26 @@ class ProfileTopInterface(viewModel: ProfileViewModel) {
 
     @Composable
     fun Description(viewModel: ProfileViewModel){
-        TextField(
-            value =  viewModel.getBio(),
-            onValueChange = { viewModel.updateBio(it) },
-            label = { Text(
+        Text(
                 text = "bio",
-                fontSize = fontSize) }
-        )
+                fontSize = fontSize)
     }
 
     @Composable
     fun NbFollowers(viewModel: ProfileViewModel){
-        TextField(
-            value = viewModel.getNbFollowers(),
-            onValueChange = { viewModel.updateNbFollowers(it) },
-            label = { ClickableText(
+        ClickableText(
                 text = AnnotatedString(/*if (nb > 1) "$nb\nfollowers" else "$nb\nfollower"*/ "3"),
                 onClick = {},
                 style = TextStyle( fontSize = fontSize )
-            )}
         )
     }
 
     @Composable
     fun NbFollowings(viewModel: ProfileViewModel){
-        TextField(
-            value = viewModel.getNbFollowings(),
-            onValueChange = { viewModel.updateNbFollowings(it) },
-            label = { ClickableText(
+        ClickableText(
                 text = AnnotatedString(/*if (nb > 1) "$nb\nfollowers" else "$nb\nfollower"*/ "4"),
                 onClick = {},
                 style = TextStyle( fontSize = fontSize )
-            )}
         )
     }
 
@@ -93,9 +84,9 @@ class ProfileTopInterface(viewModel: ProfileViewModel) {
     }
 
     @Composable
-    fun ProfilePicture(viewModel: ProfileViewModel){
+    fun ProfilePicture(profilePictureId: Int){
         Image(
-            painter = painterResource(id = viewModel.getProfilePictureId().text.toInt()),
+            painter = painterResource(id = profilePictureId),
             contentDescription = "Profile picture",
             modifier = Modifier
                 .width((3 * topInterfaceHeight) / 4)
@@ -106,13 +97,19 @@ class ProfileTopInterface(viewModel: ProfileViewModel) {
 
     @Composable
     fun TopInterfaceStructure(viewModel: ProfileViewModel) {
+        val username by viewModel.getUsername().observeAsState("")
+        val bio by viewModel.getBio().observeAsState("")
+        val nbFollowers by viewModel.getNbFollowers().observeAsState(-1)
+        val nbFollowings by viewModel.getNbFollowings().observeAsState(-1)
+        val profilePictureId by viewModel.getProfilePictureId().observeAsState(-1)
+
         Column{
             Row(Modifier.height(IntrinsicSize.Min)){//allows to make fillMaxHeight relatively
                 Column(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    ProfilePicture(viewModel)
+                    ProfilePicture(profilePictureId)
                 }
 
                 //Add a horizontal space between the image and the column
@@ -122,13 +119,13 @@ class ProfileTopInterface(viewModel: ProfileViewModel) {
                     Modifier.fillMaxHeight(),
                     verticalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    Row{ UserName(viewModel) }
+                    Row{ UserName(username) }
                     Row{
                         //Separate followers/followings in an even way
-                        Column(modifier = Modifier.weight(1f)) { NbFollowers(viewModel) }
-                        Column(modifier = Modifier.weight(1f)) { NbFollowings(viewModel) }
+                        Column(modifier = Modifier.weight(1f)) { NbFollowers(nbFollowers) }
+                        Column(modifier = Modifier.weight(1f)) { NbFollowings(nbFollowings) }
                     }
-                    Row{ Description(viewModel) }
+                    Row{ Description(bio) }
                 }
             }
 
@@ -136,6 +133,35 @@ class ProfileTopInterface(viewModel: ProfileViewModel) {
 
             Row(){
                 EditButton() {}
+            }
+
+        }
+
+        LaunchedEffect(Unit){
+            viewModel.getUsername().observeForever { username ->
+                username?.let {
+                    // Update the UI with the new username
+                }
+            }
+            viewModel.getBio().observeForever { bio ->
+                bio?.let {
+                    // Update the UI with the new bio
+                }
+            }
+            viewModel.getNbFollowers().observeForever { nbFollowers ->
+                nbFollowers?.let {
+                    // Update the UI with the new nbFollowers
+                }
+            }
+            viewModel.getNbFollowings().observeForever { nbFollowings ->
+                nbFollowings?.let {
+                    // Update the UI with the new nbFollowings
+                }
+            }
+            viewModel.getProfilePictureId().observeForever { profilePictureId ->
+                profilePictureId?.let {
+                    // Update the UI with the new profilePictureId
+                }
             }
 
         }

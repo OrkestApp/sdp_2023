@@ -1,54 +1,101 @@
 package com.github.orkest.ViewModel.profile
 
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.text.input.TextFieldValue
+import android.content.ContentValues.TAG
+import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 class ProfileViewModel : ViewModel() {
 
-    private val username = mutableStateOf(TextFieldValue())
-    private val bio = mutableStateOf(TextFieldValue())
-    private val nbFollowers = mutableStateOf(TextFieldValue())
-    private val nbFollowings = mutableStateOf(TextFieldValue())
-    private val profilePictureId = mutableStateOf(TextFieldValue())
+    private var uid: String = FirebaseAuth.getInstance().currentUser?.uid ?: throw Exception("User is not authenticated")
 
-    fun getUsername(): TextFieldValue{
-        return username.value
+    private val db = Firebase.firestore
+    private val profileData = db.collection("users").document(uid)
+                                .collection("profile").document("profile_data")
+
+    private val username = MutableLiveData<String>()
+    private val bio = MutableLiveData<String>()
+    private val nbFollowers = MutableLiveData<Int>()
+    private val nbFollowings = MutableLiveData<Int>()
+    private val profilePictureId = MutableLiveData<Int>()
+
+    init {
+        loadUserData()
     }
 
-    fun getBio(): TextFieldValue{
-        return bio.value
+    private fun loadUserData() {
+        profileData.get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    username.value = document.getString("username")
+                    bio.value = document.getString("bio")
+                    nbFollowers.value = document.getLong("nb_followers")?.toInt() ?: -1
+                    nbFollowings.value = document.getLong("nb_followings")?.toInt() ?: -1
+                    profilePictureId.value = document.getLong("profile_picture_id")?.toInt() ?: -1
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.w(TAG, "Error getting user data", e)
+            }
     }
 
-    fun getNbFollowers(): TextFieldValue{
-        return nbFollowers.value
+    fun getUsername(): LiveData<String> = username
+    fun getBio(): LiveData<String> = bio
+    fun getNbFollowers(): LiveData<Int> = nbFollowers
+    fun getNbFollowings(): LiveData<Int> = nbFollowings
+    fun getProfilePictureId(): LiveData<Int> = profilePictureId
+
+    fun updateUsername(value: String) {
+        profileData.update("username", value)
+            .addOnSuccessListener {
+                username.value = value
+            }
+            .addOnFailureListener { e ->
+                Log.w(TAG, "Error updating username", e)
+            }
     }
 
-    fun getNbFollowings(): TextFieldValue{
-        return nbFollowings.value
+    fun updateBio(value: String) {
+        profileData.update("bio", value)
+            .addOnSuccessListener {
+                bio.value = value
+            }
+            .addOnFailureListener { e ->
+                Log.w(TAG, "Error updating bio", e)
+            }
     }
 
-    fun getProfilePictureId(): TextFieldValue{
-        return profilePictureId.value
+    fun updateNbFollowers(value: Int) {
+        profileData.update("nb_followers", value)
+            .addOnSuccessListener {
+                nbFollowers.value = value
+            }
+            .addOnFailureListener { e ->
+                Log.w(TAG, "Error updating nbFollowers", e)
+            }
     }
 
-    fun updateUsername(value: TextFieldValue){
-        username.value = value
+    fun updateNbFollowings(value: Int) {
+        profileData.update("nb_followings", value)
+            .addOnSuccessListener {
+                nbFollowings.value = value
+            }
+            .addOnFailureListener { e ->
+                Log.w(TAG, "Error updating nbFollowings", e)
+            }
     }
 
-    fun updateBio(value: TextFieldValue){
-        bio.value = value
-    }
-
-    fun updateNbFollowers(value: TextFieldValue){
-        nbFollowers.value = value
-    }
-
-    fun updateNbFollowings(value: TextFieldValue){
-        nbFollowings.value = value
-    }
-
-    fun updateProfilePictureId(value: TextFieldValue){
-        profilePictureId.value = value
+    fun updateProfilePictureId(value: Int) {
+        profileData.update("profile_picture_id", value)
+            .addOnSuccessListener {
+                profilePictureId.value = value
+            }
+            .addOnFailureListener { e ->
+                Log.w(TAG, "Error updating profilePictureId", e)
+            }
     }
 }

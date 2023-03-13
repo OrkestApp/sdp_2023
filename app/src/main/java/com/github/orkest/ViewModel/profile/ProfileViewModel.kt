@@ -24,8 +24,30 @@ class ProfileViewModel : ViewModel() {
     private val profilePictureId = MutableLiveData<Int>()
 
     init {
-        loadUserData()
+        profileData.addSnapshotListener { snapshot, e ->
+            if (e != null) {
+                Log.w(TAG, "Listen failed.", e)
+                return@addSnapshotListener
+            }
+
+            if (snapshot != null && snapshot.exists()) {
+                // Update the data in the ProfileViewModel
+                username.value = snapshot.getString("username")
+                bio.value = snapshot.getString("bio")
+                nbFollowers.value = snapshot.getLong("nb_followers")?.toInt() ?: -1
+                nbFollowings.value = snapshot.getLong("nb_followings")?.toInt() ?: -1
+                profilePictureId.value = snapshot.getLong("profile_picture_id")?.toInt() ?: -1
+            } else {
+                Log.d(TAG, "Current data: null")
+            }
+        }
     }
+
+    fun getUsername(): LiveData<String> = username
+    fun getBio(): LiveData<String> = bio
+    fun getNbFollowers(): LiveData<Int> = nbFollowers
+    fun getNbFollowings(): LiveData<Int> = nbFollowings
+    fun getProfilePictureId(): LiveData<Int> = profilePictureId
 
     private fun loadUserData() {
         profileData.get()
@@ -43,11 +65,7 @@ class ProfileViewModel : ViewModel() {
             }
     }
 
-    fun getUsername(): LiveData<String> = username
-    fun getBio(): LiveData<String> = bio
-    fun getNbFollowers(): LiveData<Int> = nbFollowers
-    fun getNbFollowings(): LiveData<Int> = nbFollowings
-    fun getProfilePictureId(): LiveData<Int> = profilePictureId
+
 
     fun updateUsername(value: String) {
         profileData.update("username", value)

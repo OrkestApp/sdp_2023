@@ -12,16 +12,7 @@
         android:theme="@style/Theme.Orkest"
         tools:targetApi="31">
         <activity
-<<<<<<< Updated upstream
-            android:name=".MainActivity"
-=======
-            android:name=".ProfileActivity"
-            android:exported="false"
-            android:label="@string/title_activity_profile"
-            android:theme="@style/Theme.Orkest" />
-        <activity
             android:name=".View.MainActivity"
->>>>>>> Stashed changes
             android:exported="true"
             android:label="@string/app_name">
             <intent-filter>

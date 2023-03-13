@@ -7,10 +7,8 @@ import androidx.compose.foundation.text.ClickableText
 //import androidx.compose.material3.Button
 //import androidx.compose.material3.Text
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,7 +22,7 @@ import androidx.compose.ui.unit.times
 import com.github.orkest.DataModel.Profile
 import com.github.orkest.ViewModel.profile.ProfileViewModel
 
-class ProfileTopInterface(viewModel: ProfileViewModel) {
+class ProfileTopInterface() {
 
     private val topInterfaceHeight = 150.dp
     private val separator = 10.dp
@@ -32,37 +30,34 @@ class ProfileTopInterface(viewModel: ProfileViewModel) {
     private val smallFontSize = 12.sp
 
     @Composable
-    fun UserName(viewModel: ProfileViewModel){
-        TextField(
-            value = viewModel.getUsername(),
-            onValueChange = { viewModel.updateUsername(it)},
-            label = { Text(
-                text = "name",
-                fontWeight = FontWeight.Bold,
-                fontSize = fontSize ) }
+    fun UserName(username: String){
+        Text(
+            text = username,
+            fontWeight = FontWeight.Bold,
+            fontSize = fontSize
         )
     }
 
     @Composable
-    fun Description(viewModel: ProfileViewModel){
+    fun Description(bio: String){
         Text(
-                text = "bio",
-                fontSize = fontSize)
+            text = bio,
+            fontSize = fontSize)
     }
 
     @Composable
-    fun NbFollowers(viewModel: ProfileViewModel){
+    fun NbFollowers(nb: Int){
         ClickableText(
-                text = AnnotatedString(/*if (nb > 1) "$nb\nfollowers" else "$nb\nfollower"*/ "3"),
+                text = AnnotatedString(if (nb > 1) "$nb\nfollowers" else "$nb\nfollower"),
                 onClick = {},
                 style = TextStyle( fontSize = fontSize )
         )
     }
 
     @Composable
-    fun NbFollowings(viewModel: ProfileViewModel){
+    fun NbFollowings(nb: Int){
         ClickableText(
-                text = AnnotatedString(/*if (nb > 1) "$nb\nfollowers" else "$nb\nfollower"*/ "4"),
+                text = AnnotatedString(if (nb > 1) "$nb\nfollowers" else "$nb\nfollower"),
                 onClick = {},
                 style = TextStyle( fontSize = fontSize )
         )
@@ -97,19 +92,13 @@ class ProfileTopInterface(viewModel: ProfileViewModel) {
 
     @Composable
     fun TopInterfaceStructure(viewModel: ProfileViewModel) {
-        val username by viewModel.getUsername().observeAsState("")
-        val bio by viewModel.getBio().observeAsState("")
-        val nbFollowers by viewModel.getNbFollowers().observeAsState(-1)
-        val nbFollowings by viewModel.getNbFollowings().observeAsState(-1)
-        val profilePictureId by viewModel.getProfilePictureId().observeAsState(-1)
-
         Column{
             Row(Modifier.height(IntrinsicSize.Min)){//allows to make fillMaxHeight relatively
                 Column(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    ProfilePicture(profilePictureId)
+                    viewModel.getProfilePictureId().value?.let { ProfilePicture(it) }
                 }
 
                 //Add a horizontal space between the image and the column
@@ -119,13 +108,13 @@ class ProfileTopInterface(viewModel: ProfileViewModel) {
                     Modifier.fillMaxHeight(),
                     verticalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    Row{ UserName(username) }
+                    Row{ viewModel.getUsername().value?.let { UserName(it) } }
                     Row{
                         //Separate followers/followings in an even way
-                        Column(modifier = Modifier.weight(1f)) { NbFollowers(nbFollowers) }
-                        Column(modifier = Modifier.weight(1f)) { NbFollowings(nbFollowings) }
+                        Column(modifier = Modifier.weight(1f)) { viewModel.getNbFollowers().value?.let { NbFollowers(it) } }
+                        Column(modifier = Modifier.weight(1f)) { viewModel.getNbFollowings().value?.let { NbFollowings(it) } }
                     }
-                    Row{ Description(bio) }
+                    Row{ viewModel.getBio().value?.let { Description(it) } }
                 }
             }
 
@@ -137,34 +126,7 @@ class ProfileTopInterface(viewModel: ProfileViewModel) {
 
         }
 
-        LaunchedEffect(Unit){
-            viewModel.getUsername().observeForever { username ->
-                username?.let {
-                    // Update the UI with the new username
-                }
-            }
-            viewModel.getBio().observeForever { bio ->
-                bio?.let {
-                    // Update the UI with the new bio
-                }
-            }
-            viewModel.getNbFollowers().observeForever { nbFollowers ->
-                nbFollowers?.let {
-                    // Update the UI with the new nbFollowers
-                }
-            }
-            viewModel.getNbFollowings().observeForever { nbFollowings ->
-                nbFollowings?.let {
-                    // Update the UI with the new nbFollowings
-                }
-            }
-            viewModel.getProfilePictureId().observeForever { profilePictureId ->
-                profilePictureId?.let {
-                    // Update the UI with the new profilePictureId
-                }
-            }
 
-        }
 
     }
 

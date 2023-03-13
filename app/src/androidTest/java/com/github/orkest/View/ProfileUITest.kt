@@ -1,17 +1,17 @@
-package com.github.orkest
+package com.github.orkest.View
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.lifecycle.MutableLiveData
 import com.github.orkest.View.profile.ProfileActivity
 import com.github.orkest.ViewModel.profile.ProfileViewModel
 import com.github.orkest.ui.theme.OrkestTheme
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.orkest.R
 import com.github.orkest.View.profile.topProfile
 import org.junit.runner.RunWith
 
@@ -23,7 +23,7 @@ class ProfileUITest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ProfileActivity>()
 
-    private lateinit var viewModel: ProfileViewModel
+    private var viewModel: ProfileViewModel = ProfileViewModel()
 
     init{
         viewModel.username = MutableLiveData("testUser")
@@ -32,6 +32,8 @@ class ProfileUITest {
         viewModel.nbFollowings = MutableLiveData(20)
         viewModel.profilePictureId = MutableLiveData(R.drawable.profile_picture)
     }
+
+
 
     @Test
     fun testProfileScreenDisplayed() {

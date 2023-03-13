@@ -5,13 +5,16 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.github.orkest.DataModel.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import java.util.concurrent.CompletableFuture
 
 class ProfileViewModel : ViewModel() {
 
     private var uid: String = FirebaseAuth.getInstance().currentUser?.uid ?: throw Exception("User is not authenticated")
+
 
     private val db = Firebase.firestore
     private val profileData = db.collection("users").document(uid)
@@ -116,4 +119,6 @@ class ProfileViewModel : ViewModel() {
                 Log.w(TAG, "Error updating profilePictureId", e)
             }
     }
+
+    
 }

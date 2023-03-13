@@ -9,13 +9,15 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.BackdropScaffoldState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,9 +29,16 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import com.github.orkest.View.ui.theme.OrkestTheme
 import com.github.orkest.R
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.sp
+import androidx.compose.material.Scaffold
+import androidx.compose.material.ScaffoldState
+import androidx.compose.material.rememberScaffoldState
+import androidx.compose.runtime.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 class EditProfileActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,6 +86,7 @@ fun EditProfileScreen() {
  * - current profile picture
  * - "edit picture" button to modify picture
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun topBar() {
     Column(
@@ -103,10 +113,47 @@ fun topBar() {
                 modifier = Modifier.clickable { /* TODO */ }
             )
         }
+
+        val notifSettingsItem = MenuItem(id = "notifications", title = "Notifications", icon = Icons.Default.Notifications)
+        val privacyItem = MenuItem(id = "privacySettings", title = "Privacy", icon = Icons.Default.Phone)
+        val helpItem = MenuItem(id = "help", title = "Help", icon = Icons.Default.Info)
+
+        val items = listOf(notifSettingsItem, privacyItem, helpItem)
+
+        MenuDrawer(items = items, onItemClick = { println("Gah Dayum") })
+
+
+
+        /*
+        onItemClick = {
+            when(it.id) {
+                "notifications" -> navigateToNotifs()
+                ...
+            }
+        }
+         */
         // profile pic and edit button
         EditProfileImage()
     }
 }
+
+/*
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopBar(scope: CoroutineScope, scaffoldState: ScaffoldState) {
+    TopAppBar(
+        title = { Text(text = "TOP BARRRRR", fontSize = 18.sp) },
+        navigationIcon = {
+            IconButton(onClick = { }) {
+                LaunchedEffect(scaffoldState.drawerState.open()) {
+
+                }
+            }
+        }
+    )
+}
+*/
+
 
 /**
  * The larger part of the screen containing the fields to modify textual information
@@ -198,7 +245,9 @@ fun EditBio() {
             .padding(8.dp),
         verticalAlignment = Alignment.Top
     ) {
-        Text(text = "Bio:", modifier = Modifier.width(100.dp).padding(top = 8.dp))
+        Text(text = "Bio:", modifier = Modifier
+            .width(100.dp)
+            .padding(top = 8.dp))
         TextField(
             value = bio,
             onValueChange = { bio = it },
@@ -211,6 +260,41 @@ fun EditBio() {
         )
     }
 }
+
+
+@Composable
+fun MenuDrawer(
+    items: List<MenuItem>,
+    modifier: Modifier = Modifier,
+    itemTextStyle: TextStyle = TextStyle(fontSize = 18.sp),
+    onItemClick: (MenuItem) -> Unit
+) {
+    Column(modifier) {
+        for(item in items) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        onItemClick(item)
+                    }
+                    .padding(10.dp)
+            ) {
+                Icon(
+                    imageVector = item.icon,
+                    contentDescription = item.contentDescription
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(
+                    text = item.title,
+                    style = itemTextStyle,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+
+    }
+}
+
 
 @Preview(showBackground = true)
 @Composable

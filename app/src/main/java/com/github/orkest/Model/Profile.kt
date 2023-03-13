@@ -1,4 +1,4 @@
-package com.github.orkest.DataModel
+package com.github.orkest.Model
 
 /**
  * Data class representing attributes of the user displayed in his profile
@@ -13,9 +13,9 @@ package com.github.orkest.DataModel
  *
  */
 data class Profile (var username: String,
-                    var profilePictureId: Int,
-                    var bio: String,
-                    var nbFollowers: Int,
-                    var nbFollowing: Int,
-                    var favoriteSongs: List<Song>,
-                    var sharedMusic: List<Song>)
+                    var profilePictureId: Int = -1,
+                    var bio: String = "",
+                    var nbFollowers: Int = 0,
+                    var nbFollowing: Int = 0,
+                    var favoriteSongs: List<Song> = ArrayList(),
+                    var sharedMusic: List<Song> = ArrayList())

@@ -19,6 +19,7 @@ container:
 
 install_script:
   - gcloud components install cloud-firestore-emulator
+  - gcloud components install beta
 
 check_android_task:
   name: Run Android tests

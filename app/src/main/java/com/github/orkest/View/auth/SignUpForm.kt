@@ -43,10 +43,12 @@ fun SignUpForm(navController: NavController, viewModel: AuthViewModel) {
     }
 
     Scaffold(
+        //Creates the top bar
         topBar = {
             TopAppBar(
                 title = { Text(text = "Create Your Profile") },
             )},
+        
         content = {
             Column(
                 modifier = Modifier.padding(20.dp),

@@ -77,16 +77,17 @@ open class AuthViewModel: ViewModel() {
         //Updates the user's credentials
         updateUser()
 
-        //Computes the path to store the user in : users-firstLetter of its username
+        // Computes the path to store the user in : user/user-firstLetter/users
+        // user-firstletter is a document containing a subcollection which contains the users's documents
         val firstLetter = username.value.text[0].uppercase()
-        val path = "users-$firstLetter"
+        val path = "user/user-$firstLetter/users"
 
         val future = CompletableFuture<Boolean>()
 
         //Checks if the database already contains a user with the same username
         db.collection(path)
             .document(user.username).get()
-            .addOnSuccessListener { //TODO: Handle failure too
+            .addOnSuccessListener {
                 if (it.data != null) {
                     println(it)
                     future.complete(false)
@@ -96,6 +97,7 @@ open class AuthViewModel: ViewModel() {
                         .addOnSuccessListener { future.complete(true) }
                 }
             }
+            //Propagates the exception in case of another exception
             .addOnFailureListener{
                 future.completeExceptionally(it)
             }
@@ -113,7 +115,6 @@ open class AuthViewModel: ViewModel() {
         user.serviceProvider = selectedProvider.value.value
     }
 
-    //TODO: handle concurrency
     /**
      * Adds the newly created user to the database
      */

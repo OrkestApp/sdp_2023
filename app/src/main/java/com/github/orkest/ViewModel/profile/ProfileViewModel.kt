@@ -17,11 +17,11 @@ class ProfileViewModel : ViewModel() {
     private val profileData = db.collection("users").document(uid)
                                 .collection("profile").document("profile_data")
 
-    private val username = MutableLiveData<String>()
-    private val bio = MutableLiveData<String>()
-    private val nbFollowers = MutableLiveData<Int>()
-    private val nbFollowings = MutableLiveData<Int>()
-    private val profilePictureId = MutableLiveData<Int>()
+     var username = MutableLiveData<String>()
+     var bio = MutableLiveData<String>()
+     var nbFollowers = MutableLiveData<Int>()
+     var nbFollowings = MutableLiveData<Int>()
+     var profilePictureId = MutableLiveData<Int>()
 
     init {
         profileData.addSnapshotListener { snapshot, e ->

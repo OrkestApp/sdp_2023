@@ -57,7 +57,6 @@ check_android_task:
   screen_record_background_script:
     for n in $(seq 1 20); do adb exec-out screenrecord --time-limit=180 --output-format=h264 - > $n.h264; done
   check_script:
-    - curl -v -X DELETE "http://localhost:8080/emulator/v1/projects/sdp-orkest-firebase/databases/(default)/documents"
     - ./gradlew check connectedCheck
     
   report_codeclimate_script: |

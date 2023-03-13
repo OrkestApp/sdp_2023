@@ -24,46 +24,57 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 
 class NavigationBar {
 
-    companion object{
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    fun CreateNavigationBar(navController :NavHostController){
-        Scaffold(
-            bottomBar = {
-                BottomNavigation(backgroundColor = Color.White ) {
-                    val navBackStackEntry by navController.currentBackStackEntryAsState()
-                    val currentDestination = navBackStackEntry?.destination
-                    NavigationBarClasses.listOfNavigationItems.forEach { item ->
-                        BottomNavigationItem(
-                            icon = { Icon(painter = painterResource(id = item.iconId), "",Modifier.size(25.dp))},
-                            label = { Text(stringResource(item.resourceId)) },
-                            selected = currentDestination?.hierarchy?.any { it.route == item.route } == true,
-                            onClick = {
-                                navController.navigate(item.route) {
-                                    // Pop up to the start destination of the graph to
-                                    // avoid building up a large stack of destinations
-                                    // on the back stack as users select items
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
+    companion object {
+        @OptIn(ExperimentalMaterial3Api::class)
+        @Composable
+        fun CreateNavigationBar(navController: NavHostController) {
+            Scaffold(
+                bottomBar = {
+                    BottomNavigation(backgroundColor = Color.White) {
+                        val navBackStackEntry by navController.currentBackStackEntryAsState()
+                        val currentDestination = navBackStackEntry?.destination
+                        NavigationBarClasses.listOfNavigationItems.forEach { item ->
+                            BottomNavigationItem(
+                                icon = {
+                                    Icon(
+                                        painter = painterResource(id = item.iconId),
+                                        "",
+                                        Modifier.size(25.dp)
+                                    )
+                                },
+                                label = { Text(stringResource(item.resourceId)) },
+                                selected = currentDestination?.hierarchy?.any { it.route == item.route } == true,
+                                onClick = {
+                                    navController.navigate(item.route) {
+                                        // Pop up to the start destination of the graph to
+                                        // avoid building up a large stack of destinations
+                                        // on the back stack as users select items
+                                        popUpTo(navController.graph.findStartDestination().id) {
+                                            saveState = true
+                                        }
+                                        // Avoid multiple copies of the same destination when
+                                        // reselecting the same item
+                                        launchSingleTop = true
+                                        // Restore state when reselecting a previously selected item
+                                        restoreState = true
                                     }
-                                    // Avoid multiple copies of the same destination when
-                                    // reselecting the same item
-                                    launchSingleTop = true
-                                    // Restore state when reselecting a previously selected item
-                                    restoreState = true
                                 }
-                            }
-                        )
+                            )
+                        }
                     }
                 }
-            }
-        ){padding ->
-            NavHost(navController= navController, startDestination = "HomePage", Modifier.padding(padding)) {
-                composable("HomePage"){ Text(text = "Feed") } // TODO REPLACE BY THE COMPOSABLE FUNCTION OF WHAT YOU WANT TO SHOW WHEN BUTTON IS PRESSED
-                composable("SearchPage"){ Text(text = "Search") }
-                composable("PlaylistPage"){ Text(text = "Playlist")}
-                composable("ProfilePage"){ Text(text = "Profile")}
+            ) { padding ->
+                NavHost(
+                    navController = navController,
+                    startDestination = "HomePage",
+                    Modifier.padding(padding)
+                ) {
+                    composable("HomePage") { Text(text = "Feed") } // TODO REPLACE BY THE COMPOSABLE FUNCTION OF WHAT YOU WANT TO SHOW WHEN BUTTON IS PRESSED
+                    composable("SearchPage") { Text(text = "Search") }
+                    composable("PlaylistPage") { Text(text = "Playlist") }
+                    composable("ProfilePage") { Text(text = "Profile") }
+                }
             }
         }
     }
-}}
+}

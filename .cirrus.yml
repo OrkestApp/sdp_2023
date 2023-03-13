@@ -7,8 +7,7 @@ container:
   memory: 16G
   kvm: true
 
-install_script:
-  -  curl -sL firebase.tools | bash
+
 
 check_android_task:
   name: Run Android tests
@@ -28,6 +27,8 @@ check_android_task:
       -no-window
       -camera-back none
     
+  install_script:
+    curl -sL firebase.tools | bash
   assemble_instrumented_tests_script: |
     chmod +x gradlew
     ./gradlew assembleDebugAndroidTest
@@ -47,8 +48,7 @@ check_android_task:
   screen_record_background_script:
     for n in $(seq 1 20); do adb exec-out screenrecord --time-limit=180 --output-format=h264 - > $n.h264; done
   check_script:
-    - 'firebase emulators:start --only firestore'
-    - ./gradlew check connectedCheck
+    firebase emulators:start --only firestore --host-port=localhost:8080 './gradlew check connectedCheck'
     
   report_codeclimate_script: |
     export JACOCO_SOURCE_PATH=app/src/main/java/

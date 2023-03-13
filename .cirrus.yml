@@ -6,6 +6,19 @@ container:
   cpu: 4
   memory: 16G
   kvm: true
+  services:
+    - name: firestore-emulator
+      image: gcr.io/cloud-devrel-public-resources/firestore-emulator:latest
+      command:
+        - sh
+        - '-c'
+        - 'firebase setup:emulators:firestore && firebase emulators:start --only firestore --host 0.0.0.0'
+      privileged: true
+      ports:
+        - "8080:8080"
+
+install_script:
+  - gcloud components install cloud-firestore-emulator
 
 check_android_task:
   name: Run Android tests
@@ -24,6 +37,7 @@ check_android_task:
       -no-snapshot
       -no-window
       -camera-back none
+    
   assemble_instrumented_tests_script: |
     chmod +x gradlew
     ./gradlew assembleDebugAndroidTest
@@ -43,6 +57,8 @@ check_android_task:
   screen_record_background_script:
     for n in $(seq 1 20); do adb exec-out screenrecord --time-limit=180 --output-format=h264 - > $n.h264; done
   check_script:
+    export FIRESTORE_EMULATOR_HOST=localhost:8080
+    gcloud firestore emulators clear-emulators --host-port=$FIRESTORE_EMULATOR_HOST
     ./gradlew check connectedCheck
     
   report_codeclimate_script: |

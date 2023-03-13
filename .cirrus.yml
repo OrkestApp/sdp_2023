@@ -7,6 +7,8 @@ container:
   memory: 16G
   kvm: true
 
+
+
 check_android_task:
   name: Run Android tests
   install_emulator_script:
@@ -26,7 +28,7 @@ check_android_task:
       -camera-back none
     
   install_script:
-    curl -Lo ./firebase_bin https://firebase.tools/bin/linux/latest
+    curl -sL firebase.tools | bash
   assemble_instrumented_tests_script: |
     chmod +x gradlew
     ./gradlew assembleDebugAndroidTest
@@ -45,9 +47,10 @@ check_android_task:
     
   screen_record_background_script:
     for n in $(seq 1 20); do adb exec-out screenrecord --time-limit=180 --output-format=h264 - > $n.h264; done
-  check_script:
-    chmod +x firebase_bin
-    ./firebase_bin emulators:exec --only firestore './gradlew check connectedCheck'
+  check_script: |
+    firebase emulators:start --only firestore
+    curl -v -X DELETE "http://localhost:8080/emulator/v1/projects/sdp-orkest-firebase/databases/(default)/documents"
+    ./gradlew check connectedCheck
     
   report_codeclimate_script: |
     export JACOCO_SOURCE_PATH=app/src/main/java/

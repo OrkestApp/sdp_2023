@@ -77,9 +77,9 @@ open class AuthViewModel: ViewModel() {
         //Updates the user's credentials
         updateUser()
 
-        //Computes the path to store the user in : Users/firstLetter of its username
-        val firstLetter = username.value.text[0]
-        val path = "Users/$firstLetter"
+        //Computes the path to store the user in : users-firstLetter of its username
+        val firstLetter = username.value.text[0].uppercase()
+        val path = "users-$firstLetter"
 
         val future = CompletableFuture<Boolean>()
 
@@ -87,13 +87,17 @@ open class AuthViewModel: ViewModel() {
         db.collection(path)
             .document(user.username).get()
             .addOnSuccessListener { //TODO: Handle failure too
-                if (it != null) {
+                if (it.data != null) {
+                    println(it)
                     future.complete(false)
                 } else {
                     //If no user with the same username was found, add the user to the database
                     pushUser(path)
                         .addOnSuccessListener { future.complete(true) }
                 }
+            }
+            .addOnFailureListener{
+                future.completeExceptionally(it)
             }
 
         return future

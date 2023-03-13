@@ -10,9 +10,10 @@ package com.github.orkest.Model
  * followers (List<String>) : List of the usernames of the users following this instance
  * following (List<String>) : List of the usernames of the users followed by this instance
  */
-data class User(var username: String,
-                var mail: String,
-                var profile: Profile,
-                var sharedWithMe : List<Song>,
-                var followers: List<String>,
-                var following : List<String>)
+data class User(var username: String = "",
+                var mail: String ="",
+                var serviceProvider: String ="",
+                var profile: Profile = Profile(username), //TODO: Check if objects are passed by value or ref in Kotlin
+                var sharedWithMe : List<Song> = ArrayList(),
+                var followers: List<String> = ArrayList(),
+                var following : List<String> = ArrayList())

@@ -2,7 +2,7 @@ package com.github.orkest
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import com.github.orkest.ui.signin.SignIn
+import com.github.orkest.View.auth.SignIn
 import org.junit.Rule
 import org.junit.Test
 

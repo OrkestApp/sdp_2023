@@ -1,4 +1,4 @@
-package com.github.orkest.ui.signin
+package com.github.orkest.View.auth
 
 import android.content.Intent
 import android.os.Bundle

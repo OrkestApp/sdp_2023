@@ -25,8 +25,8 @@ import com.github.orkest.View.theme.White
 import com.github.orkest.ViewModel.auth.AuthViewModel
 
 
-// Needs to be initialized in the main activity and called as a callback function
-// after the google authentication sign up returns
+// Needs to be initialized in the auth activity and called as a callback function
+// after the google authentication sign in returns
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun SignUpForm(navController: NavController, viewModel: AuthViewModel) {
@@ -48,7 +48,7 @@ fun SignUpForm(navController: NavController, viewModel: AuthViewModel) {
             TopAppBar(
                 title = { Text(text = "Create Your Profile") },
             )},
-        
+
         content = {
             Column(
                 modifier = Modifier.padding(20.dp),

@@ -19,7 +19,6 @@ container:
 
 install_script:
   - gcloud components install cloud-firestore-emulator
-  - gcloud components install beta
 
 check_android_task:
   name: Run Android tests
@@ -58,8 +57,7 @@ check_android_task:
   screen_record_background_script:
     for n in $(seq 1 20); do adb exec-out screenrecord --time-limit=180 --output-format=h264 - > $n.h264; done
   check_script:
-    - export FIRESTORE_EMULATOR_HOST=localhost:8080
-    - gcloud firestore emulators clear-emulators --host-port=$FIRESTORE_EMULATOR_HOST
+    - curl -v -X DELETE "http://localhost:8080/emulator/v1/projects/sdp-orkest-firebase/databases/(default)/documents"
     - ./gradlew check connectedCheck
     
   report_codeclimate_script: |

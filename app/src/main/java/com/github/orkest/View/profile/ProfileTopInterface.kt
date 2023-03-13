@@ -19,7 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
-import com.github.orkest.DataModel.Profile
+import com.github.orkest.Model.Profile
 import com.github.orkest.ViewModel.profile.ProfileViewModel
 
 class ProfileTopInterface() {

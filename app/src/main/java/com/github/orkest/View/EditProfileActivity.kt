@@ -40,6 +40,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
+const val PADDING_FROM_SCREEN_BORDER = 10
+
 class EditProfileActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -160,7 +162,6 @@ fun TopBar(scope: CoroutineScope, scaffoldState: ScaffoldState) {
  */
 @Composable
 fun mainBody() {
-    EditNameSection(name = "Name", default = "default name")
     EditNameSection(name = "Username", default = "default username")
     EditBio()
 }
@@ -208,6 +209,7 @@ fun EditProfileImage() {
     }
 }
 
+
 /**
  * fields to modify small text data such as name and username
  */
@@ -218,7 +220,7 @@ fun EditNameSection(name: String, default: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 4.dp, end = 4.dp),
+            .padding(start = PADDING_FROM_SCREEN_BORDER.dp, end = PADDING_FROM_SCREEN_BORDER.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(text = "$name:", modifier = Modifier.width(100.dp))
@@ -233,6 +235,7 @@ fun EditNameSection(name: String, default: String) {
     }
 }
 
+
 /**
  * function creating the field to modify the bio of the user
  */
@@ -242,12 +245,13 @@ fun EditBio() {
     var bio by rememberSaveable { mutableStateOf("Description") }
     Row(
         modifier = Modifier
-            .padding(8.dp),
+            .padding(PADDING_FROM_SCREEN_BORDER.dp),
         verticalAlignment = Alignment.Top
     ) {
         Text(text = "Bio:", modifier = Modifier
             .width(100.dp)
-            .padding(top = 8.dp))
+            .padding(top = 8.dp)
+        )
         TextField(
             value = bio,
             onValueChange = { bio = it },
@@ -261,7 +265,7 @@ fun EditBio() {
     }
 }
 
-
+// TODO: transform this into a class since it is something that could be reusable?
 @Composable
 fun MenuDrawer(
     items: List<MenuItem>,

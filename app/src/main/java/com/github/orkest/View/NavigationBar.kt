@@ -21,10 +21,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.github.orkest.View.search.SearchUserView
+import com.github.orkest.ViewModel.search.SearchViewModel
 
 class NavigationBar {
 
+
     companion object {
+        val viewModel = SearchViewModel()
         @OptIn(ExperimentalMaterial3Api::class)
         @Composable
         fun CreateNavigationBar(navController: NavHostController) {
@@ -70,7 +74,7 @@ class NavigationBar {
                     Modifier.padding(padding)
                 ) {
                     composable("HomePage") { Text(text = "Feed") } // TODO REPLACE BY THE COMPOSABLE FUNCTION OF WHAT YOU WANT TO SHOW WHEN BUTTON IS PRESSED
-                    composable("SearchPage") { Text(text = "Search") }
+                    composable("SearchPage") { SearchUserView.SearchUi(viewModel = viewModel) }
                     composable("PlaylistPage") { Text(text = "Playlist") }
                     composable("ProfilePage") { Text(text = "Profile") }
                 }

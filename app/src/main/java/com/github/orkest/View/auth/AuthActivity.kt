@@ -37,8 +37,9 @@ class AuthActivity : ComponentActivity() {
 fun authMain(viewModel: AuthViewModel) {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "signup") {
+    NavHost(navController = navController, startDestination = "signIn") {
         composable("signup") { SignUpForm(navController = navController,viewModel) }
+        composable("signIn") { SignIn(navController)}
     }
 }
 

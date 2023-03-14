@@ -22,112 +22,106 @@ import androidx.compose.ui.unit.times
 import com.github.orkest.Model.Profile
 import com.github.orkest.ViewModel.profile.ProfileViewModel
 
-class ProfileTopInterface() {
+private val topInterfaceHeight = 150.dp
+private val separator = 10.dp
+private val fontSize = 16.sp
+private val smallFontSize = 12.sp
 
-    private val topInterfaceHeight = 150.dp
-    private val separator = 10.dp
-    private val fontSize = 16.sp
-    private val smallFontSize = 12.sp
-
-    @Composable
-    fun UserName(username: String){
-        Text(
-            text = username,
-            fontWeight = FontWeight.Bold,
-            fontSize = fontSize
-        )
-    }
-
-    @Composable
-    fun Description(bio: String){
-        Text(
-            text = bio,
-            fontSize = fontSize)
-    }
-
-    @Composable
-    fun NbFollowers(nb: Int){
-        ClickableText(
-                text = AnnotatedString(if (nb > 1) "$nb\nfollowers" else "$nb\nfollower"),
-                onClick = {},
-                style = TextStyle( fontSize = fontSize )
-        )
-    }
-
-    @Composable
-    fun NbFollowings(nb: Int){
-        ClickableText(
-                text = AnnotatedString(if (nb > 1) "$nb\nfollowers" else "$nb\nfollower"),
-                onClick = {},
-                style = TextStyle( fontSize = fontSize )
-        )
-    }
-
-    @Composable
-    fun EditButton(onClick:() -> Unit){
-        Button(
-            onClick = onClick,
-            modifier = Modifier
-                .height(topInterfaceHeight / 4)
-                .width((3 * topInterfaceHeight) / 4)
-
-        ){
-            Text(
-                text ="Edit Profile",
-                fontSize = smallFontSize)
-        }
-    }
-
-    @Composable
-    fun ProfilePicture(profilePictureId: Int){
-        Image(
-            painter = painterResource(id = profilePictureId),
-            contentDescription = "Profile picture",
-            modifier = Modifier
-                .width((3 * topInterfaceHeight) / 4)
-                .clip(CircleShape)
-        )
-    }
-
-
-    @Composable
-    fun TopInterfaceStructure(viewModel: ProfileViewModel) {
-        Column{
-            Row(Modifier.height(IntrinsicSize.Min)){//allows to make fillMaxHeight relatively
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    viewModel.getProfilePictureId().value?.let { ProfilePicture(it) }
-                }
-
-                //Add a horizontal space between the image and the column
-                Spacer(modifier = Modifier.width(separator))
-
-                Column(
-                    Modifier.fillMaxHeight(),
-                    verticalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    Row{ viewModel.getUsername().value?.let { UserName(it) } }
-                    Row{
-                        //Separate followers/followings in an even way
-                        Column(modifier = Modifier.weight(1f)) { viewModel.getNbFollowers().value?.let { NbFollowers(it) } }
-                        Column(modifier = Modifier.weight(1f)) { viewModel.getNbFollowings().value?.let { NbFollowings(it) } }
-                    }
-                    Row{ viewModel.getBio().value?.let { Description(it) } }
-                }
+@Composable
+fun ProfileTopInterface(viewModel: ProfileViewModel) {
+    Column{
+        Row(Modifier.height(IntrinsicSize.Min)){//allows to make fillMaxHeight relatively
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                viewModel.getProfilePictureId().value?.let { ProfilePicture(it) }
             }
 
-            Spacer(modifier = Modifier.height(separator))
+            //Add a horizontal space between the image and the column
+            Spacer(modifier = Modifier.width(separator))
 
-            Row(){
-                EditButton() {}
+            Column(
+                Modifier.fillMaxHeight(),
+                verticalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Row{ viewModel.getUsername().value?.let { UserName(it) } }
+                Row{
+                    //Separate followers/followings in an even way
+                    Column(modifier = Modifier.weight(1f)) { viewModel.getNbFollowers().value?.let { NbFollowers(it) } }
+                    Column(modifier = Modifier.weight(1f)) { viewModel.getNbFollowings().value?.let { NbFollowings(it) } }
+                }
+                Row{ viewModel.getBio().value?.let { Description(it) } }
             }
-
         }
 
+        Spacer(modifier = Modifier.height(separator))
 
+        Row(){
+            EditButton() {}
+        }
 
     }
-
 }
+
+@Composable
+fun UserName(username: String){
+    Text(
+        text = username,
+        fontWeight = FontWeight.Bold,
+        fontSize = fontSize
+    )
+}
+
+@Composable
+fun Description(bio: String){
+    Text(
+        text = bio,
+        fontSize = fontSize)
+}
+
+@Composable
+fun NbFollowers(nb: Int){
+    ClickableText(
+        text = AnnotatedString(if (nb > 1) "$nb\nfollowers" else "$nb\nfollower"),
+        onClick = {},
+        style = TextStyle( fontSize = fontSize )
+    )
+}
+
+@Composable
+fun NbFollowings(nb: Int){
+    ClickableText(
+        text = AnnotatedString(if (nb > 1) "$nb\nfollowings" else "$nb\nfollowing"),
+        onClick = {},
+        style = TextStyle( fontSize = fontSize )
+    )
+}
+
+@Composable
+fun EditButton(onClick:() -> Unit){
+    Button(
+        onClick = onClick,
+        modifier = Modifier
+            .height(topInterfaceHeight / 4)
+            .width((3 * topInterfaceHeight) / 4)
+
+    ){
+        Text(
+            text ="Edit Profile",
+            fontSize = smallFontSize)
+    }
+}
+
+@Composable
+fun ProfilePicture(profilePictureId: Int){
+    Image(
+        painter = painterResource(id = profilePictureId),
+        contentDescription = "$profilePictureId",
+        modifier = Modifier
+            .width((3 * topInterfaceHeight) / 4)
+            .clip(CircleShape)
+    )
+}
+
+

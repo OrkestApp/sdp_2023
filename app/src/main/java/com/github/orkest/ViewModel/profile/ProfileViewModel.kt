@@ -5,54 +5,44 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.github.orkest.Model.Profile
 import com.github.orkest.Model.User
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.util.concurrent.CompletableFuture
 
-class ProfileViewModel : ViewModel() {
+/**
+ * Displays the profile of the given user
+ */
+open class ProfileViewModel(user: String) : ViewModel() {
 
-    private var uid: String = FirebaseAuth.getInstance().currentUser?.uid ?: throw Exception("User is not authenticated")
 
-
-    private val db = Firebase.firestore
-    private val profileData = db.collection("users").document(uid)
+    val db = Firebase.firestore
+    private val firstLetter = user[0].uppercase()
+    val path = "user/user-$firstLetter/users"
+    val profileData = db.collection(path).document(user)
                                 .collection("profile").document("profile_data")
 
-     var username = MutableLiveData<String>()
-     var bio = MutableLiveData<String>()
-     var nbFollowers = MutableLiveData<Int>()
-     var nbFollowings = MutableLiveData<Int>()
-     var profilePictureId = MutableLiveData<Int>()
+     open var username = MutableLiveData<String>()
+     open var bio = MutableLiveData<String>()
+     open var nbFollowers = MutableLiveData<Int>()
+     open var nbFollowings = MutableLiveData<Int>()
+     open var profilePictureId = MutableLiveData<Int>()
 
+    /**
+     * Executed block everytime an instance of ProfileViewModel() is created
+     */
     init {
-        profileData.addSnapshotListener { snapshot, e ->
-            if (e != null) {
-                Log.w(TAG, "Listen failed.", e)
-                return@addSnapshotListener
-            }
-
-            if (snapshot != null && snapshot.exists()) {
-                // Update the data in the ProfileViewModel
-                username.value = snapshot.getString("username")
-                bio.value = snapshot.getString("bio")
-                nbFollowers.value = snapshot.getLong("nb_followers")?.toInt() ?: -1
-                nbFollowings.value = snapshot.getLong("nb_followings")?.toInt() ?: -1
-                profilePictureId.value = snapshot.getLong("profile_picture_id")?.toInt() ?: -1
-            } else {
-                Log.d(TAG, "Current data: null")
-            }
-        }
+        loadUserData()
+        listenToUserData()
     }
 
-    fun getUsername(): LiveData<String> = username
-    fun getBio(): LiveData<String> = bio
-    fun getNbFollowers(): LiveData<Int> = nbFollowers
-    fun getNbFollowings(): LiveData<Int> = nbFollowings
-    fun getProfilePictureId(): LiveData<Int> = profilePictureId
-
-    private fun loadUserData() {
+    /**
+     * Fetches data from the Firestore document and sets the profile values
+     */
+    fun loadUserData() {
         profileData.get()
             .addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
@@ -68,57 +58,35 @@ class ProfileViewModel : ViewModel() {
             }
     }
 
-
-
-    fun updateUsername(value: String) {
-        profileData.update("username", value)
-            .addOnSuccessListener {
-                username.value = value
+    /**
+     * Listens to the changes in the Firestore document profile_data
+     * and updates the view-model's values
+     */
+    fun listenToUserData(){
+        profileData.addSnapshotListener { snapshot, e ->
+            if (e != null) {
+                Log.w(TAG, "Listen failed.", e)
+                return@addSnapshotListener
             }
-            .addOnFailureListener { e ->
-                Log.w(TAG, "Error updating username", e)
+            if (snapshot != null && snapshot.exists()) {
+                username.value = snapshot.getString("username")
+                bio.value = snapshot.getString("bio")
+                nbFollowers.value = snapshot.getLong("nb_followers")?.toInt() ?: -1
+                nbFollowings.value = snapshot.getLong("nb_followings")?.toInt() ?: -1
+                profilePictureId.value = snapshot.getLong("profile_picture_id")?.toInt() ?: -1
+            } else {
+                Log.d(TAG, "Current data: null")
             }
+        }
     }
 
-    fun updateBio(value: String) {
-        profileData.update("bio", value)
-            .addOnSuccessListener {
-                bio.value = value
-            }
-            .addOnFailureListener { e ->
-                Log.w(TAG, "Error updating bio", e)
-            }
-    }
 
-    fun updateNbFollowers(value: Int) {
-        profileData.update("nb_followers", value)
-            .addOnSuccessListener {
-                nbFollowers.value = value
-            }
-            .addOnFailureListener { e ->
-                Log.w(TAG, "Error updating nbFollowers", e)
-            }
-    }
 
-    fun updateNbFollowings(value: Int) {
-        profileData.update("nb_followings", value)
-            .addOnSuccessListener {
-                nbFollowings.value = value
-            }
-            .addOnFailureListener { e ->
-                Log.w(TAG, "Error updating nbFollowings", e)
-            }
-    }
-
-    fun updateProfilePictureId(value: Int) {
-        profileData.update("profile_picture_id", value)
-            .addOnSuccessListener {
-                profilePictureId.value = value
-            }
-            .addOnFailureListener { e ->
-                Log.w(TAG, "Error updating profilePictureId", e)
-            }
-    }
+    open fun getUsername(): LiveData<String> = username
+    open fun getBio(): LiveData<String> = bio
+    open fun getNbFollowers(): LiveData<Int> = nbFollowers
+    open fun getNbFollowings(): LiveData<Int> = nbFollowings
+    open fun getProfilePictureId(): LiveData<Int> = profilePictureId
 
 
 }

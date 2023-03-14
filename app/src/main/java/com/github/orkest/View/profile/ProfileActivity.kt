@@ -13,9 +13,12 @@ import com.github.orkest.ui.theme.OrkestTheme
 
 class ProfileActivity : ComponentActivity() {
 
+    //TODO create the currentUser's username when signing up
+    private val currentUser = "JohnDoe"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val viewModel = ProfileViewModel()
+        val viewModel = ProfileViewModel(currentUser)
         setContent {
             OrkestTheme {
                 // A surface container using the 'background' color from the theme
@@ -32,13 +35,13 @@ class ProfileActivity : ComponentActivity() {
 
 @Composable
 fun topProfile(viewModel: ProfileViewModel) {
-    ProfileTopInterface().TopInterfaceStructure(viewModel = viewModel)
+    ProfileTopInterface(viewModel = viewModel)
 }
 
 @Preview(showBackground = true)
 @Composable
 fun DefaultProfilePreview() {
     OrkestTheme {
-        topProfile(viewModel = ProfileViewModel())
+        topProfile(viewModel = ProfileViewModel("JohnDoe"))
     }
 }

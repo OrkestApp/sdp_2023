@@ -12,7 +12,7 @@ package com.github.orkest.Model
  * sharedMusic (List<Song>) : The list of all songs shared publicly by the user of this profile
  *
  */
-data class Profile (var username: String,
+data class Profile (var username: String = "",
                     var profilePictureId: Int = -1,
                     var bio: String = "",
                     var nbFollowers: Int = 0,

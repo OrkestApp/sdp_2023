@@ -1,9 +1,5 @@
 package com.github.orkest.View.search
 
-import android.annotation.SuppressLint
-import android.os.Build
-import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,89 +10,88 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-
-import com.github.orkest.R
-import com.github.orkest.ViewModel.search.SearchViewModel
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
+import com.github.orkest.R
+import com.github.orkest.ViewModel.search.SearchViewModel
 import java.util.*
 
 class SearchUserView {
-    companion object{
+    companion object {
 
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-
-
-            /**
-             * @param viewModel use to communicate with the Backend
-             *
-             *This method display the search bar, and support the drawing of the future users that will
-             * be find in the database
-             *
-             * the viewmodel communicate back to the searchUi view using futures
-             */
-    fun SearchUi(viewModel : SearchViewModel) {
-        var text by remember { mutableStateOf("") }
-        var list by remember { mutableStateOf(mutableListOf("")) }
-
-        //Each time the text is updated, this is called
-        // Need to use future to wait for the asynchronous fetch on the database
-        viewModel.searchUserInDatabase(text).thenAccept{
-            list = it
-        }
-
-        Column(modifier = Modifier.fillMaxSize())
-        {
-            OutlinedTextField(
-                value = text,
-                onValueChange = {
-                    text = it
+        @OptIn(ExperimentalMaterial3Api::class)
+        @Composable
 
 
-                }) //This is the search bar
+                /**
+                 * @param viewModel use to communicate with the Backend
+                 *
+                 *This method display the search bar, and support the drawing of the future users that will
+                 * be find in the database
+                 *
+                 * the viewmodel communicate back to the searchUi view using futures
+                 */
+        fun SearchUi(viewModel: SearchViewModel) {
+            //need to use remember because it triggers an action each time
+            var text by remember { mutableStateOf("") }
+            var list by remember { mutableStateOf(mutableListOf("")) }
 
-            // This draw the found users
-            LazyColumn {
-                items(list) { userName ->
-                    createUser(name = userName)
+            //Each time the text is updated, this is called
+            // Need to use future to wait for the asynchronous fetch on the database
+            viewModel.searchUserInDatabase(text).thenAccept {
+                list = it
+            }
+
+            Column(modifier = Modifier.fillMaxSize())
+            {
+                OutlinedTextField(
+                    value = text,
+                    onValueChange = {
+                        text = it
+
+
+                    }) //This is the search bar
+
+                // This draw the found users each time the list is updated
+                LazyColumn {
+                    items(list) { userName ->
+                        createUser(name = userName)
+                    }
                 }
+            }
         }
-    }
-}
 
         /**
          * This encapsulate the drawing of a single user with name @param user
          */
-    @Composable
-    private fun createUser(name :String){
+        @Composable
+        private fun createUser(name: String) {
 
-        Row(modifier = Modifier
-            .padding(all = 8.dp)
-            .clickable { } //TODO the empty brackets need to be replaced by the composable function or fires an intent to the desired profiles
-            .fillMaxSize()) {
-            Image(
-                painter = painterResource(R.drawable.powerrangerblue),
-                contentDescription = "Contact profile picture",
-                modifier = Modifier
-                    // Set image size to 40 dp
-                    .size(40.dp)
-                    // Clip image to be shaped as a circle
-                    .clip(CircleShape)
-            )
+            Row(modifier = Modifier
+                .padding(all = 8.dp)
+                .clickable { } //TODO the empty brackets need to be replaced by the composable function or fires an intent to the desired profiles
+                .fillMaxSize()) {
+                Image(
+                    painter = painterResource(R.drawable.powerrangerblue),
+                    contentDescription = "Contact profile picture",
+                    modifier = Modifier
+                        // Set image size to 40 dp
+                        .size(40.dp)
+                        // Clip image to be shaped as a circle
+                        .clip(CircleShape)
+                )
 
-            // Add a horizontal space between the image and the column
-            Spacer(modifier = Modifier.width(8.dp))
+                // Add a horizontal space between the image and the column
+                Spacer(modifier = Modifier.width(8.dp))
 
-            Column {
-                Text(text = name)
+                Column {
+                    Text(text = name)
 
+                }
             }
-        }
 
+        }
     }
-}}
+}

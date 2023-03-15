@@ -15,17 +15,34 @@ class navigationTabTest {
     val composeTestRule =  createComposeRule()
 
     @Test
-    fun canAccessTheNavigationTabFromMainActivity(){
+    fun canAccessEveryNavigationTabFromMainActivity(){
         composeTestRule.setContent {
             NavigationBar.CreateNavigationBar(navController = rememberNavController())
         }
 
         val searchTabAccess = composeTestRule.onNodeWithText("Search")
-
         searchTabAccess.assertIsDisplayed()
-
         searchTabAccess.performClick()
-
         composeTestRule.onNodeWithText("").assertIsDisplayed()
+
+
+        val profileTab = composeTestRule.onNodeWithText("Profile")
+        profileTab.assertIsDisplayed()
+        profileTab.performClick()
+        composeTestRule.onNodeWithText("Profile tab").assertIsDisplayed()
+
+        val feedTab = composeTestRule.onNodeWithText("Feed")
+        feedTab.assertIsDisplayed()
+        feedTab.performClick()
+        composeTestRule.onNodeWithText("Feed tab").assertIsDisplayed()
+
+        val playlistTab = composeTestRule.onNodeWithText("Playlist")
+        playlistTab.assertIsDisplayed()
+        playlistTab.performClick()
+        composeTestRule.onNodeWithText("Playlist tab").assertIsDisplayed()
+
+
+
+
     }
 }

@@ -26,7 +26,7 @@ class SearchViewModelTest {
         val woman1 = hashMapOf(
             "username" to "Alico"
         )
-        viewModel = SearchViewModel(true)
+        viewModel = SearchViewModel()
         viewModel.db.useEmulator("10.0.2.2", 8080)
         viewModel.db.firestoreSettings = firestoreSettings {
             isPersistenceEnabled = false
@@ -54,16 +54,6 @@ class SearchViewModelTest {
         composeTestRule.onNodeWithText("").performTextReplacement(usernameToType)
         composeTestRule.onNodeWithContentDescription("Contact profile picture").assertIsDisplayed()
     }
-    @Test
-    fun addition_isCorrect() {
-
-        Assert.assertEquals(4, 2 + 2)
-
-
-    }
-
-
-
 
 
 
@@ -71,7 +61,7 @@ class SearchViewModelTest {
     fun theSearchBarCanBeTypedIn(){
 
 
-        val textToType = "DummyString"
+        val textToType = "dummyString"
 
         composeTestRule.onNodeWithText("").performTextInput(textToType)
 
@@ -90,12 +80,11 @@ class SearchViewModelTest {
     fun theViewModelFetchOnlyRetrieveUserThatBeginWithTheArgument(){
 
 
+            val it  = viewModel.searchUserInDatabase("A").get()
+            MatcherAssert.assertThat(mutableListOf("Alico"), `is`(it))
 
-            viewModel.searchUserInDatabase("bo").thenAccept {
-                MatcherAssert.assertThat(mutableListOf("bob", "bobby"), `is`(it))
-            }
-
-
+            val it2 = viewModel.searchUserInDatabase("Z").get()
+            MatcherAssert.assertThat(mutableListOf(),`is` (it2))
 
 
 

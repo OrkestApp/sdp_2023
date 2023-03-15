@@ -30,7 +30,7 @@ class NavigationBar {
 
 
     companion object {
-        private val viewModel = SearchViewModel(false)
+        private val viewModel = SearchViewModel()
         @OptIn(ExperimentalMaterial3Api::class)
         @Composable
         fun CreateNavigationBar(navController: NavHostController) {

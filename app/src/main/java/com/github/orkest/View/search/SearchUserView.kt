@@ -31,6 +31,15 @@ class SearchUserView {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
 
+
+            /**
+             * @param viewModel use to communicate with the Backend
+             *
+             *This method display the search bar, and support the drawing of the future users that will
+             * be find in the database
+             *
+             * the viewmodel communicate back to the searchUi view using futures
+             */
     fun SearchUi(viewModel : SearchViewModel) {
         var text by remember { mutableStateOf("") }
         var list by remember { mutableStateOf(mutableListOf("")) }
@@ -41,7 +50,6 @@ class SearchUserView {
             list = it
         }
 
-
         Column(modifier = Modifier.fillMaxSize())
         {
             OutlinedTextField(
@@ -50,9 +58,9 @@ class SearchUserView {
                     text = it
 
 
-                })
+                }) //This is the search bar
 
-
+            // This draw the found users
             LazyColumn {
                 items(list) { userName ->
                     createUser(name = userName)
@@ -61,12 +69,15 @@ class SearchUserView {
     }
 }
 
+        /**
+         * This encapsulate the drawing of a single user with name @param user
+         */
     @Composable
     private fun createUser(name :String){
 
         Row(modifier = Modifier
             .padding(all = 8.dp)
-            .clickable { }
+            .clickable { } //TODO the empty brackets need to be replaced by the composable function or fires an intent to the desired profiles
             .fillMaxSize()) {
             Image(
                 painter = painterResource(R.drawable.powerrangerblue),

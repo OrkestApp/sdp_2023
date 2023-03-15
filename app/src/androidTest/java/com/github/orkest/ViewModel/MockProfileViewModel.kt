@@ -4,61 +4,17 @@ import android.content.ContentValues
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.test.internal.runner.junit4.statement.UiThreadStatement
 import com.github.orkest.R
 import com.github.orkest.ViewModel.profile.ProfileViewModel
 
 class MockProfileViewModel(user: String) : ProfileViewModel(user) {
 
-
-
-    /**Adding users in the database**/
-    /**==========================================================================================**/
-    init{
-        addJohn()
-        addRebecca()
-    }
-    private fun addJohn() {
-
-        val John = hashMapOf(
-            "username" to "JohnDoe",
-            "bio" to "Hello, I'm John!",
-            "nbFollowers" to 100,
-            "nbFollowings" to 50,
-            "profilePictureId" to R.drawable.profile_picture
-        )
-
-        db.collection("users").document("user-J")
-            .collection("users").document("JohnDoe")
-            .collection("profile").document("profile_data")
-            .set(John)
-            .addOnSuccessListener {
-                Log.d(ContentValues.TAG, "User added successfully")
-            }
-            .addOnFailureListener { e ->
-                Log.w(ContentValues.TAG, "Error adding user", e)
-            }
-
-    }
-    private fun addRebecca(){
-        val Rebecca = hashMapOf(
-            "username" to "RebeccaSmith",
-            "bio" to "What's up guys",
-            "nbFollowers" to 2,
-            "nbFollowings" to 102,
-            "profilePictureId" to 2
-        )
-        db.collection("users").document("user-R")
-            .collection("users").document("RebeccaSmith")
-            .collection("profile").document("profile_data")
-            .set(Rebecca)
-            .addOnSuccessListener {
-                Log.d(ContentValues.TAG, "User added successfully")
-            }
-            .addOnFailureListener { e ->
-                Log.w(ContentValues.TAG, "Error adding user", e)
-            }
-    }
-    /**==========================================================================================**/
+    /**
+     * Tests whether the right values are displayed
+     * Tests whether the right values are displayed
+     * when the values change in the viewmodel
+     */
 
     override var username = MutableLiveData<String>()
     override var bio = MutableLiveData<String>()
@@ -66,63 +22,34 @@ class MockProfileViewModel(user: String) : ProfileViewModel(user) {
     override var nbFollowings = MutableLiveData<Int>()
     override var profilePictureId = MutableLiveData<Int>()
 
-    override fun getUsername(): LiveData<String> = username
-    override fun getBio(): LiveData<String> = bio
-    override fun getNbFollowers(): LiveData<Int> = nbFollowers
-    override fun getNbFollowings(): LiveData<Int> = nbFollowings
-    override fun getProfilePictureId(): LiveData<Int> = profilePictureId
-
-
-
-
-
-    fun updateUsername(value: String) {
-        profileData.update("username", value)
-            .addOnSuccessListener {
-                username.value = value
-            }
-            .addOnFailureListener { e ->
-                Log.w(ContentValues.TAG, "Error updating username", e)
-            }
+    fun setUsername(value: String){
+        username.value = value
     }
 
-    fun updateBio(value: String) {
-        profileData.update("bio", value)
-            .addOnSuccessListener {
-                bio.value = value
-            }
-            .addOnFailureListener { e ->
-                Log.w(ContentValues.TAG, "Error updating bio", e)
-            }
+    fun setBio(value: String){
+        bio.value = value
+    }
+    fun setNbFollowers(value: Int){
+        nbFollowers.value = value
     }
 
-    fun updateNbFollowers(value: Int) {
-        profileData.update("nb_followers", value)
-            .addOnSuccessListener {
-                nbFollowers.value = value
-            }
-            .addOnFailureListener { e ->
-                Log.w(ContentValues.TAG, "Error updating nbFollowers", e)
-            }
+    fun setNbFollowings(value: Int){
+        nbFollowings.value = value
     }
 
-    fun updateNbFollowings(value: Int) {
-        profileData.update("nb_followings", value)
-            .addOnSuccessListener {
-                nbFollowings.value = value
-            }
-            .addOnFailureListener { e ->
-                Log.w(ContentValues.TAG, "Error updating nbFollowings", e)
-            }
+    fun setProfilePictureId(value: Int){
+        profilePictureId.value = value
     }
 
-    fun updateProfilePictureId(value: Int) {
-        profileData.update("profile_picture_id", value)
-            .addOnSuccessListener {
-                profilePictureId.value = value
-            }
-            .addOnFailureListener { e ->
-                Log.w(ContentValues.TAG, "Error updating profilePictureId", e)
-            }
+    fun loadData(username: String, bio: String, nbFollowers: Int, nbFollowings: Int, profilePicture: Int){
+        UiThreadStatement.runOnUiThread {
+            setUsername(username)
+            setProfilePictureId(profilePicture)
+            setBio(bio)
+            setNbFollowers(nbFollowers)
+            setNbFollowings(nbFollowings)
+        }
     }
+
+
 }

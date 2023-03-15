@@ -11,7 +11,6 @@ import kotlinx.coroutines.tasks.await
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import com.github.orkest.R
 import com.google.firebase.firestore.DocumentReference
 
 class ProfileViewModelTest {
@@ -98,29 +97,4 @@ class ProfileViewModelTest {
         assertEquals(2, viewModel.profilePictureId.value)
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * what i need to test:
-     * the right values are displayed in the profile
-     * when values are changed in the database, the profile is updated
-     */
-
-    /**
-     * ce qui pourrait être testé dans le viewmodel
-     * c'est que les valeurs changent correctement
-     * et aussi que les valeurs sont fetched correctement
-     */
 }

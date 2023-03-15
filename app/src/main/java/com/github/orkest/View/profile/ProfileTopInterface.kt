@@ -9,6 +9,7 @@ import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,7 +36,7 @@ fun ProfileTopInterface(viewModel: ProfileViewModel) {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                viewModel.getProfilePictureId().value?.let { ProfilePicture(it) }
+                viewModel.getProfilePictureId().observeAsState().value?.let { ProfilePicture(it) }
             }
 
             //Add a horizontal space between the image and the column
@@ -45,13 +46,13 @@ fun ProfileTopInterface(viewModel: ProfileViewModel) {
                 Modifier.fillMaxHeight(),
                 verticalArrangement = Arrangement.SpaceEvenly
             ) {
-                Row{ viewModel.getUsername().value?.let { UserName(it) } }
+                Row{ viewModel.getUsername().observeAsState().value?.let { UserName(it) } }
                 Row{
                     //Separate followers/followings in an even way
-                    Column(modifier = Modifier.weight(1f)) { viewModel.getNbFollowers().value?.let { NbFollowers(it) } }
-                    Column(modifier = Modifier.weight(1f)) { viewModel.getNbFollowings().value?.let { NbFollowings(it) } }
+                    Column(modifier = Modifier.weight(1f)) { viewModel.getNbFollowers().observeAsState().value?.let { NbFollowers(it) } }
+                    Column(modifier = Modifier.weight(1f)) { viewModel.getNbFollowings().observeAsState().value?.let { NbFollowings(it) } }
                 }
-                Row{ viewModel.getBio().value?.let { Description(it) } }
+                Row{ viewModel.getBio().observeAsState().value?.let { Description(it) } }
             }
         }
 

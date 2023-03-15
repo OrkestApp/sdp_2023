@@ -16,6 +16,6 @@ data class Profile (var username: String = "",
                     var profilePictureId: Int = -1,
                     var bio: String = "",
                     var nbFollowers: Int = 0,
-                    var nbFollowing: Int = 0,
+                    var nbFollowings: Int = 0,
                     var favoriteSongs: List<Song> = ArrayList(),
                     var sharedMusic: List<Song> = ArrayList())

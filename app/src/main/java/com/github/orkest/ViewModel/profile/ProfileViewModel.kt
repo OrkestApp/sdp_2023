@@ -13,16 +13,13 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.util.concurrent.CompletableFuture
 
-/**
- * Displays the profile of the given user
- */
 open class ProfileViewModel(user: String) : ViewModel() {
 
 
-    val db = Firebase.firestore
+    private val db = Firebase.firestore
     private val firstLetter = user[0].uppercase()
     val path = "user/user-$firstLetter/users"
-    val profileData = db.collection(path).document(user)
+    private val profileData = db.collection(path).document(user)
                                 .collection("profile").document("profile_data")
 
      open var username = MutableLiveData<String>()
@@ -80,13 +77,10 @@ open class ProfileViewModel(user: String) : ViewModel() {
         }
     }
 
-
-
     open fun getUsername(): LiveData<String> = username
     open fun getBio(): LiveData<String> = bio
     open fun getNbFollowers(): LiveData<Int> = nbFollowers
     open fun getNbFollowings(): LiveData<Int> = nbFollowings
     open fun getProfilePictureId(): LiveData<Int> = profilePictureId
-
 
 }

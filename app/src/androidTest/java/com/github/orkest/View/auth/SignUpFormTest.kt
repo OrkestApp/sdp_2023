@@ -1,11 +1,16 @@
-package com.github.orkest
+package com.github.orkest.View.auth
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.navigation.compose.rememberNavController
+import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.Intents.intended
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
 import com.github.orkest.Model.Providers
+import com.github.orkest.View.MainActivity
 import com.github.orkest.View.auth.SignUpForm
 import com.github.orkest.ViewModel.auth.AuthViewModel
+import com.github.orkest.ViewModel.auth.MockAuthViewModel
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -15,11 +20,11 @@ class SignUpFormTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private lateinit var viewModel: AuthViewModel
+    private lateinit var viewModel: MockAuthViewModel
     @Before
     fun setup(){
         // Start the app
-        viewModel = AuthViewModel()
+        viewModel = MockAuthViewModel()
         composeTestRule.setContent {
             SignUpForm(navController = rememberNavController(), viewModel)
         }
@@ -103,7 +108,26 @@ class SignUpFormTest {
         composeTestRule.onNodeWithText("Spotify").performClick()
         composeTestRule.onNodeWithText("Service Provider: Spotify").assertIsDisplayed()
         assert(viewModel.getProvider() == Providers.SPOTIFY)
+    }
 
+    @Test
+    fun alreadyExistingUserNameDisplaysError(){
+        composeTestRule.onNodeWithText("Username")
+            .performTextInput(MockAuthViewModel.EXISTING_USER)
 
+        composeTestRule.onNodeWithText("Create Profile").performClick()
+
+        composeTestRule.onNodeWithText("This username already exists!").assertIsDisplayed()
+    }
+
+    @Test
+    fun validUsernameLaunchesMain(){
+        Intents.init()
+        composeTestRule.onNodeWithText("Username")
+            .performTextInput(MockAuthViewModel.VALID_USER)
+
+        composeTestRule.onNodeWithText("Create Profile").performClick()
+        intended((hasComponent(MainActivity::class.java.name)))
+        Intents.release()
     }
 }

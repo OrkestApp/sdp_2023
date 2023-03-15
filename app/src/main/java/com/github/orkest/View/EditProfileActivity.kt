@@ -40,6 +40,9 @@ import androidx.compose.material.DrawerValue
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.lifecycle.ViewModel
+import coil.annotation.ExperimentalCoilApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -47,12 +50,15 @@ import com.github.orkest.ViewModel.auth.AuthViewModel
 
 const val PADDING_FROM_SCREEN_BORDER = 10
 
+var updatedFields = hashMapOf<String, String>("Username" to "", "Bio" to "")
+
 class EditProfileActivity : ComponentActivity() {
+    private val viewModel = AuthViewModel()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             EditProfileSetting {
-                EditProfileScreen()
+                EditProfileScreen(viewModel)
             }
         }
     }
@@ -79,7 +85,7 @@ fun EditProfileSetting(content: @Composable () -> Unit) {
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditProfileScreen() {
+fun EditProfileScreen(viewModel: AuthViewModel) {
 
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
@@ -88,7 +94,13 @@ fun EditProfileScreen() {
     Scaffold(
         // keep track of the state of the scaffold (whether it is opened or closed)
         scaffoldState = scaffoldState,
-        topBar = { TopBar(coroutineScope = coroutineScope, scaffoldState = scaffoldState) },
+        topBar = {
+            TopBar(
+                viewModel = viewModel,
+                coroutineScope = coroutineScope,
+                scaffoldState = scaffoldState
+            )
+                 },
         // The content displayed inside the drawer when you click on the hamburger menu button
         drawerContent = { CreateMenuDrawer() },
 
@@ -100,7 +112,7 @@ fun EditProfileScreen() {
                 // profile pic and edit button
                 EditProfileImage()
                 Divider()
-                MainBody()
+                MainBody(viewModel)
             }
         },
         drawerGesturesEnabled = true
@@ -111,7 +123,7 @@ fun EditProfileScreen() {
 
 @Composable
 fun NavDrawerButton(coroutineScope: CoroutineScope, scaffoldState: ScaffoldState) {
-    IconButton(
+    Button(
         onClick = { coroutineScope.launch {
             if (scaffoldState.drawerState.currentValue == DrawerValue.Closed)
                 scaffoldState.drawerState.open()
@@ -153,7 +165,7 @@ fun CreateMenuDrawer() {
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(coroutineScope: CoroutineScope, scaffoldState: ScaffoldState) {
+fun TopBar(viewModel: AuthViewModel, coroutineScope: CoroutineScope, scaffoldState: ScaffoldState) {
     TopAppBar(
         title = {
             Row(
@@ -173,7 +185,7 @@ fun TopBar(coroutineScope: CoroutineScope, scaffoldState: ScaffoldState) {
                 // "save" clickable text (button)
                 Text(
                     text = "Save",
-                    modifier = Modifier.clickable { /* TODO */ },
+                    modifier = Modifier.clickable { saveAndLeave(viewModel) },
                     fontSize = 20.sp
                 )
             }
@@ -185,21 +197,34 @@ fun TopBar(coroutineScope: CoroutineScope, scaffoldState: ScaffoldState) {
 }
 
 
+/**
+ * Updates the user's data in the database with the new information he entered and
+ * goes back to profile screen
+ */
+fun saveAndLeave(viewModel: AuthViewModel) {
+    viewModel.updateUsername( TextFieldValue(updatedFields["Username"].orEmpty()) )
+    viewModel.updateBio( TextFieldValue(updatedFields["Bio"].orEmpty()) )
+    /* TODO: GO BACK TO PROFILE SCREEN */
+}
 
 /**
  * The larger part of the screen containing the fields to modify textual information
  */
 @Composable
-fun MainBody() {
+fun MainBody(viewModel: AuthViewModel) {
     Column() {
-        EditNameSection(name = "Username", default = "default username")
-        EditBio()
+        val uname = viewModel.getUsername().text
+        val bio = viewModel.getBio().text
+
+        EditNameSection(name = "Username", default = uname)
+        EditBio(initValue = bio)
     }
 }
 
 /**
  * Display current profile picture and an "edit picture" button that is used to choose a new one
  */
+@OptIn(ExperimentalCoilApi::class)
 @Composable
 fun EditProfileImage() {
     val imageUri = rememberSaveable { mutableStateOf("") }
@@ -257,7 +282,11 @@ fun EditNameSection(name: String, default: String) {
         Text(text = "$name:", modifier = Modifier.width(100.dp))
         TextField(
             value = modifyName,
-            onValueChange = { modifyName = it },
+            // update new entered value in the updateFields map
+            onValueChange = {
+                modifyName = it
+                updatedFields[name] = it
+                            },
             colors = TextFieldDefaults.textFieldColors(
                 containerColor = Color.Transparent,
                 textColor = Color.Gray
@@ -272,8 +301,8 @@ fun EditNameSection(name: String, default: String) {
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditBio() {
-    var bio by rememberSaveable { mutableStateOf("Description") }
+fun EditBio(initValue: String) {
+    var bio by rememberSaveable { mutableStateOf(initValue) }
     Row(
         modifier = Modifier
             .padding(PADDING_FROM_SCREEN_BORDER.dp),
@@ -285,7 +314,11 @@ fun EditBio() {
         )
         TextField(
             value = bio,
-            onValueChange = { bio = it },
+            // update new entered value in the updateFields map
+            onValueChange = {
+                bio = it
+                updatedFields["Bio"] = it
+                            },
             colors = TextFieldDefaults.textFieldColors(
                 containerColor = Color.Transparent,
                 textColor = Color.Gray
@@ -335,6 +368,6 @@ fun MenuDrawer(
 @Composable
 fun DefaultPreview() {
     EditProfileSetting {
-        EditProfileScreen()
+        EditProfileScreen(AuthViewModel())
     }
 }

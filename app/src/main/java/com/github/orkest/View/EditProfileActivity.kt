@@ -50,7 +50,7 @@ class EditProfileActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            editProfileSetting {
+            EditProfileSetting {
                 EditProfileScreen()
             }
         }
@@ -61,7 +61,7 @@ class EditProfileActivity : ComponentActivity() {
  * Function generating the screen
  */
 @Composable
-fun editProfileSetting(content: @Composable () -> Unit) {
+fun EditProfileSetting(content: @Composable () -> Unit) {
     OrkestTheme {
         // A surface container using the 'background' color from the theme
         Surface(
@@ -79,57 +79,68 @@ fun editProfileSetting(content: @Composable () -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileScreen() {
+
+    val scaffoldState = rememberScaffoldState()
+    val coroutineScope = rememberCoroutineScope()
+
+
+    Scaffold(
+        // keep track of the state of the scaffold (whether it is opened or closed)
+        scaffoldState = scaffoldState,
+        topBar = { TopBar(coroutineScope = coroutineScope, scaffoldState = scaffoldState) },
+        // The content displayed inside the drawer when you click on the hamburger menu button
+        drawerContent = { CreateMenuDrawer() },
+
+        content = { padding ->
+            Modifier
+                .fillMaxHeight()
+                .padding(padding)
+            Column() {
+                // profile pic and edit button
+                EditProfileImage()
+                Divider()
+                MainBody()
+            }
+        },
+        drawerGesturesEnabled = true
+    )
+
+
+}
+
+@Composable
+fun NavDrawerButton(coroutineScope: CoroutineScope, scaffoldState: ScaffoldState) {
+    IconButton(
+        onClick = { coroutineScope.launch {
+            if (scaffoldState.drawerState.currentValue == DrawerValue.Closed)
+                scaffoldState.drawerState.open()
+            else
+                scaffoldState.drawerState.close()
+        }
+        }
+    ) {
+        Icon(imageVector = Icons.Rounded.Menu, contentDescription = "Drawer Icon")
+    }
+}
+
+@Composable
+fun CreateMenuDrawer() {
     val notifSettingsItem = MenuItem(id = "notificationSettings", title = "Notifications", icon = Icons.Default.Notifications)
     val privacyItem = MenuItem(id = "privacySettings", title = "Privacy", icon = Icons.Default.Phone)
     val helpItem = MenuItem(id = "help", title = "Help", icon = Icons.Default.Info)
 
     val items = listOf(notifSettingsItem, privacyItem, helpItem)
 
-    val scaffoldState = rememberScaffoldState()
-    val coroutineScope = rememberCoroutineScope()
-
-
-    Column(modifier = Modifier.fillMaxHeight()){
-        topBar()
-        IconButton(
-            onClick = { coroutineScope.launch {
-                if(scaffoldState.drawerState.currentValue == DrawerValue.Closed)
-                    scaffoldState.drawerState.open()
-                else
-                    scaffoldState.drawerState.close()
-
-
+    MenuDrawer(
+        items = items,
+        onItemClick = {
+            when(it.id) {
+                "notificationSettings" -> { /* TODO */ }
+                "privacySettings" -> { /* TODO */ }
+                "help" -> { /* TODO */ }
             }
-            }
-        ) {
-            Icon(imageVector = Icons.Rounded.Menu, contentDescription = "Drawer Icon")
         }
-        Scaffold(
-            //...
-            scaffoldState = scaffoldState,
-            drawerContent = {
-                MenuDrawer(
-                    items = items,
-                    onItemClick = {
-                        when(it.id) {
-                            "notificationSettings" -> { /* TODO */ }
-                            "privacySettings" -> { /* TODO */ }
-                            "help" -> { /* TODO */ }
-                        }
-                    }
-                ) 
-                            },
-            content = { padding ->
-                      Modifier.fillMaxHeight().padding(padding)
-                      Divider()
-                      mainBody()
-                      },
-            drawerGesturesEnabled = true
-        )
-
-
-    }
-
+    )
 }
 
 /**
@@ -141,47 +152,35 @@ fun EditProfileScreen() {
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun topBar() {
-    Column(
-        modifier = Modifier
-            .verticalScroll(rememberScrollState())
-            .padding(8.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            // this spaces out the "cancel" and "save" buttons
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            // "cancel" clickable text (button)
-            Text(
-                text = "Cancel",
-                modifier = Modifier.clickable { /* TODO */ }
-            )
+fun TopBar(coroutineScope: CoroutineScope, scaffoldState: ScaffoldState) {
+    TopAppBar(
+        title = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                // this spaces out the "cancel" and "save" buttons
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                // "cancel" clickable text (button)
+                Text(
+                    text = "Cancel",
+                    modifier = Modifier.clickable { /* TODO */ },
+                    fontSize = 20.sp
+                )
 
-            // "save" clickable text (button)
-            Text(
-                text = "Save",
-                modifier = Modifier.clickable { /* TODO */ }
-            )
-        }
-
-
-
-
-
-        /*
-        onItemClick = {
-            when(it.id) {
-                "notifications" -> navigateToNotifs()
-                ...
+                // "save" clickable text (button)
+                Text(
+                    text = "Save",
+                    modifier = Modifier.clickable { /* TODO */ },
+                    fontSize = 20.sp
+                )
             }
+        },
+        navigationIcon = {
+            NavDrawerButton(coroutineScope, scaffoldState)
         }
-         */
-        // profile pic and edit button
-        EditProfileImage()
-    }
+    )
 }
 
 
@@ -190,7 +189,7 @@ fun topBar() {
  * The larger part of the screen containing the fields to modify textual information
  */
 @Composable
-fun mainBody() {
+fun MainBody() {
     Column() {
         EditNameSection(name = "Username", default = "default username")
         EditBio()
@@ -334,7 +333,7 @@ fun MenuDrawer(
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    editProfileSetting {
+    EditProfileSetting {
         EditProfileScreen()
     }
 }

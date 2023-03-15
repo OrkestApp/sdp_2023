@@ -56,6 +56,7 @@ class SearchViewModelTest {
 
 
         val usernameToType = "Alico"
+        composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("").performTextReplacement(usernameToType)
         composeTestRule.onNodeWithContentDescription("Contact profile picture").assertIsDisplayed()
     }
@@ -63,6 +64,7 @@ class SearchViewModelTest {
     @Test
     fun whenFirstLetterOfUsernamesIsTypedDisplayCorrectUsers(){
         val usernameToType = "b"
+        composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("").performTextReplacement(usernameToType)
         composeTestRule.onNodeWithText("bob").assertIsDisplayed()
         composeTestRule.onNodeWithText("Alico").assertDoesNotExist()

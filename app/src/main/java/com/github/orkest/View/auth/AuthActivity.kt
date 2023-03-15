@@ -15,7 +15,17 @@ import com.github.orkest.View.theme.OrkestTheme
 import androidx.navigation.compose.composable
 import com.github.orkest.ViewModel.auth.AuthViewModel
 
+
+/**
+ * Activity for the authentication screen
+ * Necessary to implement the MVVM pattern
+ */
+
 class AuthActivity : ComponentActivity() {
+
+    /**
+     * set the content of the OrkestTheme
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val viewModel = AuthViewModel()
@@ -26,15 +36,18 @@ class AuthActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    authMain(viewModel)
+                    AuthMain(viewModel)
                 }
             }
         }
     }
 }
 
+/**
+ * Launch of the AuthMain composable
+ */
 @Composable
-fun authMain(viewModel: AuthViewModel) {
+fun AuthMain(viewModel: AuthViewModel) {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = "signIn") {
@@ -43,10 +56,13 @@ fun authMain(viewModel: AuthViewModel) {
     }
 }
 
+/**
+ * Composable for the default preview of the OrkestTheme
+ */
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
     OrkestTheme {
-        authMain(AuthViewModel())
+        AuthMain(AuthViewModel())
     }
 }

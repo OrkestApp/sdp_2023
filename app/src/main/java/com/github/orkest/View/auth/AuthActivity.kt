@@ -43,7 +43,18 @@ class AuthActivity : ComponentActivity() {
     }
 }
 
+/**
+ * Launch of the AuthMain composable
+ */
+@Composable
+fun AuthMain(viewModel: AuthViewModel) {
+    val navController = rememberNavController()
 
+    NavHost(navController = navController, startDestination = "signIn") {
+        composable("signup") { SignUpForm(navController = navController,viewModel) }
+        composable("signIn") { SignIn(navController)}
+    }
+}
 
 /**
  * Composable for the default preview of the OrkestTheme

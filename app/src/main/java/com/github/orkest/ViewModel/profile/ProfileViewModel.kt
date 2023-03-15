@@ -9,18 +9,17 @@ import com.github.orkest.Model.Profile
 import com.github.orkest.Model.User
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.util.concurrent.CompletableFuture
 
-open class ProfileViewModel(user: String) : ViewModel() {
+open class ProfileViewModel(private val user: String) : ViewModel() {
 
-
-    private val db = Firebase.firestore
-    private val firstLetter = user[0].uppercase()
-    val path = "user/user-$firstLetter/users"
-    private val profileData = db.collection(path).document(user)
-                                .collection("profile").document("profile_data")
+    var db : FirebaseFirestore = Firebase.firestore
+    private lateinit var profileData : DocumentReference
 
      open var username = MutableLiveData<String>()
      open var bio = MutableLiveData<String>()
@@ -36,11 +35,19 @@ open class ProfileViewModel(user: String) : ViewModel() {
         listenToUserData()
     }
 
+    private fun profileData() : DocumentReference {
+        val firstLetter = user[0].uppercase()
+        val path = "user/user-$firstLetter/users"
+        profileData = db.collection(path).document(user)
+            .collection("profile").document("profile_data")
+        return profileData
+    }
+
     /**
      * Fetches data from the Firestore document and sets the profile values
      */
     fun loadUserData() {
-        profileData.get()
+        profileData().get()
             .addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
                     username.value = document.getString("username")
@@ -60,7 +67,7 @@ open class ProfileViewModel(user: String) : ViewModel() {
      * and updates the view-model's values
      */
     fun listenToUserData(){
-        profileData.addSnapshotListener { snapshot, e ->
+        profileData().addSnapshotListener { snapshot, e ->
             if (e != null) {
                 Log.w(TAG, "Listen failed.", e)
                 return@addSnapshotListener

@@ -12,30 +12,27 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.ktx.firestoreSettings
+import org.junit.BeforeClass
 
 class ProfileViewModelTest {
-
-    private lateinit var db: FirebaseFirestore
     private val testUser = "testuser"
-    private lateinit var viewModel: ProfileViewModel
     private lateinit var path: DocumentReference
-
+    companion object{
+        private lateinit var viewModel: ProfileViewModel
+        @BeforeClass
+        @JvmStatic
+        fun setupEmulator(){
+            viewModel = ProfileViewModel("testuser")
+            viewModel.db.useEmulator("10.0.2.2", 8080)
+            viewModel.db.firestoreSettings = firestoreSettings {
+                isPersistenceEnabled = false
+            }
+        }
+    }
     @Before
     fun setUp() {
-        // Initialize FirebaseApp with the emulator's host and port
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val settings = FirebaseFirestoreSettings.Builder()
-            .setHost("10.0.2.2:8080") // Use the emulator's host and port
-            .setSslEnabled(false) // Emulator doesn't support SSL
-            .setPersistenceEnabled(false) // Disable persistence for testing
-            .build()
-        FirebaseApp.initializeApp(context)
-        db = FirebaseFirestore.getInstance()
-        db.firestoreSettings = settings
-
-        //setup the viewmodel with the testUser
-        viewModel = ProfileViewModel(testUser)
-        path = db.collection("user/user-T/users")
+        path = viewModel.db.collection("user/user-T/users")
             .document(testUser)
             .collection("profile")
             .document("profile_data")
@@ -51,6 +48,7 @@ class ProfileViewModelTest {
                 .await()
         }
     }
+
 
     @After
     fun tearDown() {

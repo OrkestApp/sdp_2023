@@ -43,6 +43,7 @@ import androidx.compose.ui.draw.scale
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import com.github.orkest.ViewModel.auth.AuthViewModel
 
 const val PADDING_FROM_SCREEN_BORDER = 10
 
@@ -58,7 +59,7 @@ class EditProfileActivity : ComponentActivity() {
 }
 
 /**
- * Function generating the screen
+ * Function generating the screen, takes as function the Composable modeling the screen
  */
 @Composable
 fun EditProfileSetting(content: @Composable () -> Unit) {

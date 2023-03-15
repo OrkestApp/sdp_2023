@@ -34,8 +34,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
 import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
+import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material.DrawerValue
 import androidx.compose.runtime.*
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -72,13 +76,60 @@ fun editProfileSetting(content: @Composable () -> Unit) {
 /**
  * Principal function in which we build the general structure of the activity
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileScreen() {
+    val notifSettingsItem = MenuItem(id = "notificationSettings", title = "Notifications", icon = Icons.Default.Notifications)
+    val privacyItem = MenuItem(id = "privacySettings", title = "Privacy", icon = Icons.Default.Phone)
+    val helpItem = MenuItem(id = "help", title = "Help", icon = Icons.Default.Info)
+
+    val items = listOf(notifSettingsItem, privacyItem, helpItem)
+
+    val scaffoldState = rememberScaffoldState()
+    val coroutineScope = rememberCoroutineScope()
+
+
     Column(modifier = Modifier.fillMaxHeight()){
         topBar()
-        Divider()
-        mainBody()
+        IconButton(
+            onClick = { coroutineScope.launch {
+                if(scaffoldState.drawerState.currentValue == DrawerValue.Closed)
+                    scaffoldState.drawerState.open()
+                else
+                    scaffoldState.drawerState.close()
+
+
+            }
+            }
+        ) {
+            Icon(imageVector = Icons.Rounded.Menu, contentDescription = "Drawer Icon")
+        }
+        Scaffold(
+            //...
+            scaffoldState = scaffoldState,
+            drawerContent = {
+                MenuDrawer(
+                    items = items,
+                    onItemClick = {
+                        when(it.id) {
+                            "notificationSettings" -> { /* TODO */ }
+                            "privacySettings" -> { /* TODO */ }
+                            "help" -> { /* TODO */ }
+                        }
+                    }
+                ) 
+                            },
+            content = { padding ->
+                      Modifier.fillMaxHeight().padding(padding)
+                      Divider()
+                      mainBody()
+                      },
+            drawerGesturesEnabled = true
+        )
+
+
     }
+
 }
 
 /**
@@ -116,13 +167,7 @@ fun topBar() {
             )
         }
 
-        val notifSettingsItem = MenuItem(id = "notifications", title = "Notifications", icon = Icons.Default.Notifications)
-        val privacyItem = MenuItem(id = "privacySettings", title = "Privacy", icon = Icons.Default.Phone)
-        val helpItem = MenuItem(id = "help", title = "Help", icon = Icons.Default.Info)
 
-        val items = listOf(notifSettingsItem, privacyItem, helpItem)
-
-        MenuDrawer(items = items, onItemClick = { println("Gah Dayum") })
 
 
 
@@ -139,22 +184,6 @@ fun topBar() {
     }
 }
 
-/*
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TopBar(scope: CoroutineScope, scaffoldState: ScaffoldState) {
-    TopAppBar(
-        title = { Text(text = "TOP BARRRRR", fontSize = 18.sp) },
-        navigationIcon = {
-            IconButton(onClick = { }) {
-                LaunchedEffect(scaffoldState.drawerState.open()) {
-
-                }
-            }
-        }
-    )
-}
-*/
 
 
 /**
@@ -162,8 +191,10 @@ fun TopBar(scope: CoroutineScope, scaffoldState: ScaffoldState) {
  */
 @Composable
 fun mainBody() {
-    EditNameSection(name = "Username", default = "default username")
-    EditBio()
+    Column() {
+        EditNameSection(name = "Username", default = "default username")
+        EditBio()
+    }
 }
 
 /**

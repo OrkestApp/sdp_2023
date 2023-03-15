@@ -22,8 +22,8 @@ import org.junit.runner.RunWith
 class SignOutToSignInTest {
 
     @Rule
-    @JvmField
-    var mActivityScenarioRule = ActivityScenarioRule(MainActivity::class.java)
+    //@JvmField
+    //var mActivityScenarioRule = ActivityScenarioRule(MainActivity::class.java)
 
     @Test
     fun signOutToSignInTest() {

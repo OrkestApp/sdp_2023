@@ -206,6 +206,9 @@ dependencies {
     // Needed for createAndroidComposeRule, but not createComposeRule:
     debugImplementation("androidx.compose.ui:ui-test-manifest:$compose_version")
 
+
+    implementation "androidx.navigation:navigation-compose:2.6.0-alpha07"
+
 }
 
 tasks.withType(Test) {

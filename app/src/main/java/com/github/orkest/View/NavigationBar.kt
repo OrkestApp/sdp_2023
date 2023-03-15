@@ -23,12 +23,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.github.orkest.View.search.SearchUserView
 import com.github.orkest.ViewModel.search.SearchViewModel
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 class NavigationBar {
 
 
     companion object {
-        val viewModel = SearchViewModel()
+        private val viewModel = SearchViewModel(false)
         @OptIn(ExperimentalMaterial3Api::class)
         @Composable
         fun CreateNavigationBar(navController: NavHostController) {

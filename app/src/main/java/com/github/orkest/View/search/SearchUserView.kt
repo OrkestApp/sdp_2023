@@ -35,12 +35,11 @@ class SearchUserView {
         var text by remember { mutableStateOf("") }
         var list by remember { mutableStateOf(mutableListOf("")) }
 
-        fun callBack(users:MutableList<String>) {
-            list = users
-
+        //Each time the text is updated, this is called
+        // Need to use future to wait for the asynchronous fetch on the database
+        viewModel.searchUserInDatabase(text).thenAccept{
+            list = it
         }
-        viewModel.searchUserInDatabase(text,  ::callBack)
-
 
 
         Column(modifier = Modifier.fillMaxSize())

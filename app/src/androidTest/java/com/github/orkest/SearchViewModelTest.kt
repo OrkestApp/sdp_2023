@@ -73,18 +73,20 @@ class SearchViewModelTest {
     @Test
     fun whenFirstLettersOfUsernamesIsTypedDisplayCorrectUsers(){
 
-        var usernameToType = "o"
-        composeTestRule.onNodeWithText("").performTextReplacement(usernameToType) //fake fetch
-        composeTestRule.waitForIdle()
 
-         usernameToType = "A"
-        composeTestRule.onNodeWithText("o").performTextReplacement(usernameToType)
-        composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithText("bobby").assertDoesNotExist()
+
+        var usernameToType = "Al"
+        composeTestRule.onNodeWithText("").performTextReplacement(usernameToType)
+        composeTestRule.waitUntil{
+            composeTestRule.onAllNodesWithText("Alico").fetchSemanticsNodes().size ==1
+        } //Timeout after 1s
+        composeTestRule.onNodeWithText("Alico").assertIsDisplayed()
 
         usernameToType = "bo"
-        composeTestRule.onNodeWithText("A").performTextReplacement(usernameToType)
-        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Al").performTextReplacement(usernameToType)
+        composeTestRule.waitUntil{
+            composeTestRule.onAllNodesWithText("bobby").fetchSemanticsNodes().size ==1
+        } //Timeout after 1 s
         composeTestRule.onNodeWithText("bobby").assertIsDisplayed()
 
 

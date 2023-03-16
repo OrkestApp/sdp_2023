@@ -27,7 +27,6 @@ check_android_task:
     
   download_firebase_emulator_script: |
     curl -Lo ./firebase_bin https://firebase.tools/bin/linux/latest
-
   assemble_instrumented_tests_script: |
     chmod +x gradlew
     ./gradlew assembleDebugAndroidTest

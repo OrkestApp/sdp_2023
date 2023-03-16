@@ -9,6 +9,8 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
 
 open class ProfileViewModel(private val user: String) : ViewModel() {
 
@@ -21,10 +23,16 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
     open var nbFollowings = MutableLiveData<Int>()
     open var profilePictureId = MutableLiveData<Int>()
 
+    init{
+
+        setupListener()
+    }
+
     /**
      * To call everytime an instance of ProfileViewModel() is created
      */
     fun setupListener(){
+
         loadUserData()
         listenToUserData()
     }
@@ -40,18 +48,19 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
      */
     private fun loadUserData() {
         userDocument(user).get()
-            .addOnSuccessListener { document ->
-                if (document != null && document.exists()) {
-                    val user = document.toObject(User::class.java)
-                    if(user != null){
-                        userProfile.profile = user.profile
-                    }
+        .addOnSuccessListener { document ->
+            if (document != null && document.exists()) {
+                val user = document.toObject(User::class.java)
+                if (user != null) {
+                    userProfile.profile = user.profile
                 }
             }
-            .addOnFailureListener { e ->
-                Log.w(TAG, "Error getting user data", e)
-            }
+        }
+        .addOnFailureListener { e ->
+            Log.w(TAG, "Error getting user data", e)
+        }
     }
+
 
     /**
      * Listens to the changes in the Firestore document profile_data

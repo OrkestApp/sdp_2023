@@ -17,7 +17,7 @@ class navigationTabTest {
     @Test
     fun canAccessEveryNavigationTabFromMainActivity(){
         composeTestRule.setContent {
-            NavigationBar.CreateNavigationBar(navController = rememberNavController())
+            NavigationBar.CreateNavigationBar(navController = rememberNavController(),"")
         }
 
         val searchTabAccess = composeTestRule.onNodeWithText("Search")

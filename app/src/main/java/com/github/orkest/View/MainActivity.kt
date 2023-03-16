@@ -17,7 +17,12 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            NavigationBar.CreateNavigationBar(navController = rememberNavController())
+            val extras = intent.extras
+            var user = ""
+            if (extras != null){
+                user = extras.getString("username").toString()
+            }
+            NavigationBar.CreateNavigationBar(navController = rememberNavController(), user)
         }
     }
 }

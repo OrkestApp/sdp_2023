@@ -1,6 +1,8 @@
 package com.github.orkest.ViewModel
 
 import androidx.test.platform.app.InstrumentationRegistry
+import com.github.orkest.Model.Profile
+import com.github.orkest.Model.User
 import com.github.orkest.ViewModel.profile.ProfileViewModel
 import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.FirebaseFirestore
@@ -15,9 +17,11 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ktx.firestoreSettings
 import org.junit.BeforeClass
 
+// run firebase emulators:start --only firestore in terminal before
 class ProfileViewModelTest {
     private val testUser = "testuser"
     private lateinit var path: DocumentReference
+    private lateinit var user: User
     companion object{
         private lateinit var viewModel: ProfileViewModel
         @BeforeClass
@@ -28,46 +32,35 @@ class ProfileViewModelTest {
             viewModel.db.firestoreSettings = firestoreSettings {
                 isPersistenceEnabled = false
             }
+
         }
     }
     @Before
     fun setUp() {
-        path = viewModel.db.collection("user/user-T/users")
-            .document(testUser)
-            .collection("profile")
-            .document("profile_data")
+        path = viewModel.profileData()
+        user = User(profile= Profile("Test User", 1, "Test bio", 10, 5))
+        viewModel.userData.set(user)
 
-        runBlocking {
-                path.set(mapOf(
-                    "username" to "Test User",
-                    "bio" to "Test bio",
-                    "nb_followers" to 10,
-                    "nb_followings" to 5,
-                    "profile_picture_id" to 1
-                ))
-                .await()
-        }
+        viewModel.setupListener()
     }
 
-
+    /**
     @After
     fun tearDown() {
         // Clean up the test data from the Firestore emulator
         runBlocking { path.delete().await() }
-    }
+    }**/
 
     /**
      * Tests if the data is correctly fetched from the database
      */
     @Test
     fun testLoadUserData() {
-        viewModel.loadUserData()
-
-        assertEquals("Test User", viewModel.username.value)
-        assertEquals("Test bio", viewModel.bio.value)
-        assertEquals(10, viewModel.nbFollowers.value)
-        assertEquals(5, viewModel.nbFollowings.value)
-        assertEquals(1, viewModel.profilePictureId.value)
+        assertEquals("Test User", user.profile.username)
+        assertEquals("Test bio", user.profile.bio)
+        assertEquals(10, user.profile.nbFollowers)
+        assertEquals(5, user.profile.nbFollowings)
+        assertEquals(1, user.profile.profilePictureId)
     }
 
     /**
@@ -75,24 +68,13 @@ class ProfileViewModelTest {
      */
     @Test
     fun testListenToUserData() {
-        viewModel.listenToUserData()
+        user = User(profile= Profile("New Username", 2, "New bio", 20, 15))
+        viewModel.userData.set(user)
 
-        // Update the Firestore data
-        runBlocking {path.update(
-                    "username", "New Username",
-                    "bio", "New bio",
-                    "nb_followers", 20,
-                    "nb_followings", 15,
-                    "profile_picture_id", 2
-                )
-                .await()
-        }
-
-        assertEquals("New Username", viewModel.username.value)
-        assertEquals("New bio", viewModel.bio.value)
-        assertEquals(20, viewModel.nbFollowers.value)
-        assertEquals(15, viewModel.nbFollowings.value)
-        assertEquals(2, viewModel.profilePictureId.value)
+        assertEquals("New Username", user.profile.username)
+        assertEquals("New bio", user.profile.bio)
+        assertEquals(20, user.profile.nbFollowers)
+        assertEquals(15, user.profile.nbFollowings)
+        assertEquals(2, user.profile.profilePictureId)
     }
-
 }

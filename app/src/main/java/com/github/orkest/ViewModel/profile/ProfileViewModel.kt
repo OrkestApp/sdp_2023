@@ -20,6 +20,8 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
 
     var db : FirebaseFirestore = Firebase.firestore
     private lateinit var profileData : DocumentReference
+    lateinit var userData : DocumentReference
+    private var userProfile = User()
 
      open var username = MutableLiveData<String>()
      open var bio = MutableLiveData<String>()
@@ -28,33 +30,33 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
      open var profilePictureId = MutableLiveData<Int>()
 
     /**
-     * Executed block everytime an instance of ProfileViewModel() is created
+     * To execute everytime an instance of ProfileViewModel() is created
      */
-    init {
+    fun setupListener(){
         loadUserData()
         listenToUserData()
     }
 
-    private fun profileData() : DocumentReference {
+    fun profileData() : DocumentReference {
         val firstLetter = user[0].uppercase()
         val path = "user/user-$firstLetter/users"
-        profileData = db.collection(path).document(user)
-            .collection("profile").document("profile_data")
-        return profileData
+        userData = db.collection(path).document(user)
+        /**profileData = db.collection(path).document(user)
+            .collection("profile").document("profile_data")**/
+        return userData
     }
 
     /**
      * Fetches data from the Firestore document and sets the profile values
      */
-    fun loadUserData() {
+    private fun loadUserData() {
         profileData().get()
             .addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
-                    username.value = document.getString("username")
-                    bio.value = document.getString("bio")
-                    nbFollowers.value = document.getLong("nb_followers")?.toInt() ?: -1
-                    nbFollowings.value = document.getLong("nb_followings")?.toInt() ?: -1
-                    profilePictureId.value = document.getLong("profile_picture_id")?.toInt() ?: -1
+                    val profile = document.toObject(Profile::class.java)
+                    if(profile != null){
+                        userProfile.profile = profile
+                    }
                 }
             }
             .addOnFailureListener { e ->
@@ -66,21 +68,18 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
      * Listens to the changes in the Firestore document profile_data
      * and updates the view-model's values
      */
-    fun listenToUserData(){
+     fun listenToUserData(){
         profileData().addSnapshotListener { snapshot, e ->
             if (e != null) {
                 Log.w(TAG, "Listen failed.", e)
                 return@addSnapshotListener
             }
             if (snapshot != null && snapshot.exists()) {
-                username.value = snapshot.getString("username")
-                bio.value = snapshot.getString("bio")
-                nbFollowers.value = snapshot.getLong("nb_followers")?.toInt() ?: -1
-                nbFollowings.value = snapshot.getLong("nb_followings")?.toInt() ?: -1
-                profilePictureId.value = snapshot.getLong("profile_picture_id")?.toInt() ?: -1
-            } else {
-                Log.d(TAG, "Current data: null")
-            }
+                val profile = snapshot.toObject(Profile::class.java)
+                if(profile != null){
+                    userProfile.profile = profile
+                }
+            } else { Log.d(TAG, "Current data: null") }
         }
     }
 

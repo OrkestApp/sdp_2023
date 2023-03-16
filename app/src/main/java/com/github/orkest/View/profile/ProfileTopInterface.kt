@@ -30,6 +30,9 @@ private val smallFontSize = 12.sp
 
 @Composable
 fun ProfileTopInterface(viewModel: ProfileViewModel) {
+
+    viewModel.setupListener()
+
     Column{
         Row(Modifier.height(IntrinsicSize.Min)){//allows to make fillMaxHeight relatively
             Column(

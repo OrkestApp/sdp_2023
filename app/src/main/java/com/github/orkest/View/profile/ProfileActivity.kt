@@ -11,10 +11,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.github.orkest.ViewModel.profile.ProfileViewModel
 import com.github.orkest.ui.theme.OrkestTheme
 
-class ProfileActivity : ComponentActivity() {
+class ProfileActivity(currentUser: String) : ComponentActivity() {
 
     //TODO create the currentUser's username when signing up
-    private val currentUser = "JohnDoe"
+    private val currentUser = currentUser
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

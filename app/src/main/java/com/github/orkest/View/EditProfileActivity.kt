@@ -27,7 +27,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
-import com.github.orkest.View.ui.theme.OrkestTheme
 import com.github.orkest.R
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -40,6 +39,7 @@ import androidx.compose.material.DrawerValue
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import com.github.orkest.View.theme.OrkestTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -201,6 +201,7 @@ fun MainBody() {
  * Display current profile picture and an "edit picture" button that is used to choose a new one
  */
 @Composable
+@OptIn(coil.annotation.ExperimentalCoilApi::class)
 fun EditProfileImage() {
     val imageUri = rememberSaveable { mutableStateOf("") }
     val painter = rememberImagePainter(
@@ -260,7 +261,7 @@ fun EditNameSection(name: String, default: String) {
             onValueChange = { modifyName = it },
             colors = TextFieldDefaults.textFieldColors(
                 containerColor = Color.Transparent,
-                textColor = Color.Gray
+                //textColor = Color.Gray
             )
         )
     }
@@ -288,7 +289,7 @@ fun EditBio() {
             onValueChange = { bio = it },
             colors = TextFieldDefaults.textFieldColors(
                 containerColor = Color.Transparent,
-                textColor = Color.Gray
+                //textColor = Color.Gray
             ),
             singleLine = false,
             modifier = Modifier.height(150.dp)

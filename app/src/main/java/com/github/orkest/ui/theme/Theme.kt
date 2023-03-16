@@ -38,6 +38,7 @@ private val LightColorScheme = lightColorScheme(
 )
 
 @Composable
+@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 fun OrkestTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+

@@ -69,6 +69,7 @@ class SearchViewModelTest {
 
 
     @Test
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
     fun whenMockUserUsernameIsTypedProfilePicIsDisplayed() = runTest{
 
 

@@ -74,13 +74,11 @@ class SearchViewModelTest {
 
         var usernameToType = "Al"
         composeTestRule.onNodeWithText("").performTextReplacement(usernameToType)
-        composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("Alico").assertIsDisplayed()
         composeTestRule.onNodeWithText("bobby").assertDoesNotExist()
 
         usernameToType = "b"
         composeTestRule.onNodeWithText("Al").performTextReplacement(usernameToType)
-        composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("bobby").assertIsDisplayed()
 
 

@@ -1,4 +1,4 @@
-package com.github.orkest.View
+package com.github.orkest.View.profile
 
 import androidx.compose.ui.test.assertIsDisplayed
 import com.github.orkest.ui.theme.OrkestTheme
@@ -11,9 +11,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.orkest.Model.Profile
 import com.github.orkest.R
 import com.github.orkest.View.profile.topProfile
-import com.github.orkest.ViewModel.MockProfileViewModel
+import com.github.orkest.ViewModel.profile.MockProfileViewModel
 import org.junit.runner.RunWith
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import org.junit.Before
 
 

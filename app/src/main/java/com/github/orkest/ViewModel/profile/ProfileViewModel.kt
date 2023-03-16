@@ -2,7 +2,6 @@ package com.github.orkest.ViewModel.profile
 
 import android.content.ContentValues.TAG
 import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.github.orkest.Model.User
@@ -23,7 +22,7 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
     open var profilePictureId = MutableLiveData<Int>()
 
     /**
-     * To execute everytime an instance of ProfileViewModel() is created
+     * To call everytime an instance of ProfileViewModel() is created
      */
     fun setupListener(){
         loadUserData()

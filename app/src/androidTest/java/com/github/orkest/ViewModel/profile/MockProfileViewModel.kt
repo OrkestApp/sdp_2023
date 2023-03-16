@@ -1,4 +1,4 @@
-package com.github.orkest.ViewModel
+package com.github.orkest.ViewModel.profile
 
 import android.content.ContentValues
 import android.util.Log

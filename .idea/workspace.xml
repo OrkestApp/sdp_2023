@@ -10,6 +10,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b77309cf-0706-4fbf-86dc-44d80da37f3a" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/androidTest/java/com/github/orkest/SearchViewModelTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/androidTest/java/com/github/orkest/SearchViewModelTest.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -238,10 +239,10 @@
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="theViewModelFetchOnlyRetrieveUserThatBeginWithTheArgument()" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
+    <configuration name="whenFirstLetterOfUsernamesIsTypedDisplayCorrectUsers()" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
       <module name="Orkest.app.androidTest" />
       <option name="TESTING_TYPE" value="3" />
-      <option name="METHOD_NAME" value="theViewModelFetchOnlyRetrieveUserThatBeginWithTheArgument" />
+      <option name="METHOD_NAME" value="whenFirstLetterOfUsernamesIsTypedDisplayCorrectUsers" />
       <option name="CLASS_NAME" value="com.github.orkest.SearchViewModelTest" />
       <option name="PACKAGE_NAME" value="" />
       <option name="TEST_NAME_REGEX" value="" />
@@ -291,10 +292,10 @@
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="whenFirstLetterOfUsernamesIsTypedDisplayCorrectUsers()" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
+    <configuration name="whenFirstLettersOfUsernamesIsTypedDisplayCorrectUsers()" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
       <module name="Orkest.app.androidTest" />
       <option name="TESTING_TYPE" value="3" />
-      <option name="METHOD_NAME" value="whenFirstLetterOfUsernamesIsTypedDisplayCorrectUsers" />
+      <option name="METHOD_NAME" value="whenFirstLettersOfUsernamesIsTypedDisplayCorrectUsers" />
       <option name="CLASS_NAME" value="com.github.orkest.SearchViewModelTest" />
       <option name="PACKAGE_NAME" value="" />
       <option name="TEST_NAME_REGEX" value="" />
@@ -400,10 +401,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Android Instrumented Tests.SearchViewModelTest" />
+        <item itemvalue="Android Instrumented Tests.whenFirstLettersOfUsernamesIsTypedDisplayCorrectUsers()" />
         <item itemvalue="Android Instrumented Tests.whenFirstLetterOfUsernamesIsTypedDisplayCorrectUsers()" />
         <item itemvalue="Android Instrumented Tests.canAccessEveryNavigationTabFromMainActivity()" />
         <item itemvalue="Android Instrumented Tests.whenMockUserUsernameIsTypedIsDisplayed()" />
-        <item itemvalue="Android Instrumented Tests.theViewModelFetchOnlyRetrieveUserThatBeginWithTheArgument()" />
       </list>
     </recent_temporary>
   </component>

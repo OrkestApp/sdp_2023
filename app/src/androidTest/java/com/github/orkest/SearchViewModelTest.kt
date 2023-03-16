@@ -49,6 +49,8 @@ class SearchViewModelTest {
         future2.get()
         future3.get()
 
+        Thread.sleep(1000)
+
 
     }}
     
@@ -73,16 +75,18 @@ class SearchViewModelTest {
     @Test
     fun whenFirstLettersOfUsernamesIsTypedDisplayCorrectUsers(){
 
-        var usernameToType = "Al"
-        composeTestRule.onNodeWithText("").performTextReplacement(usernameToType)
-        composeTestRule.waitForIdle()
-        val alico = composeTestRule.onNodeWithText("Alico")
-        alico.assertIsDisplayed()
+        var usernameToType = "o"
+        composeTestRule.onNodeWithText("").performTextReplacement(usernameToType) //fake fetch
+
+         usernameToType = "A"
+        composeTestRule.onNodeWithText("o").performTextReplacement(usernameToType)
+
+        composeTestRule.onNodeWithText("Alico").assertIsDisplayed()
         composeTestRule.onNodeWithText("bobby").assertDoesNotExist()
 
         usernameToType = "b"
         composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithText("Al").performTextReplacement(usernameToType)
+        composeTestRule.onNodeWithText("A").performTextReplacement(usernameToType)
         composeTestRule.onNodeWithText("bobby").assertIsDisplayed()
 
 

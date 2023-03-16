@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import com.github.orkest.Model.Profile
+import com.github.orkest.R
 import com.github.orkest.ViewModel.profile.ProfileViewModel
 
 private val topInterfaceHeight = 150.dp
@@ -28,6 +29,10 @@ private val separator = 10.dp
 private val fontSize = 16.sp
 private val smallFontSize = 12.sp
 
+/**
+ * The top interface of the user's profile displaying the user's information
+ * username, bio, number of followers, number of followings, profile picture
+ */
 @Composable
 fun ProfileTopInterface(viewModel: ProfileViewModel) {
 
@@ -39,23 +44,23 @@ fun ProfileTopInterface(viewModel: ProfileViewModel) {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                viewModel.getProfilePictureId().observeAsState().value?.let { ProfilePicture(it) }
+                 ProfilePicture(viewModel.profilePictureId.observeAsState().value)
             }
 
-            //Add a horizontal space between the image and the column
+            //Add a horizontal space between the image and the user's info
             Spacer(modifier = Modifier.width(separator))
 
             Column(
                 Modifier.fillMaxHeight(),
                 verticalArrangement = Arrangement.SpaceEvenly
             ) {
-                Row{ viewModel.getUsername().observeAsState().value?.let { UserName(it) } }
+                Row{ UserName(viewModel.username.observeAsState().value) }
                 Row{
                     //Separate followers/followings in an even way
-                    Column(modifier = Modifier.weight(1f)) { viewModel.getNbFollowers().observeAsState().value?.let { NbFollowers(it) } }
-                    Column(modifier = Modifier.weight(1f)) { viewModel.getNbFollowings().observeAsState().value?.let { NbFollowings(it) } }
+                    Column(modifier = Modifier.weight(1f)) { NbFollowers(number(viewModel.nbFollowers.observeAsState().value)) }
+                    Column(modifier = Modifier.weight(1f)) { NbFollowings(number(viewModel.nbFollowings.observeAsState().value)) }
                 }
-                Row{ viewModel.getBio().observeAsState().value?.let { Description(it) } }
+                Row{ Description(viewModel.bio.observeAsState().value) }
             }
         }
 
@@ -64,24 +69,29 @@ fun ProfileTopInterface(viewModel: ProfileViewModel) {
         Row(){
             EditButton() {}
         }
-
     }
 }
 
 @Composable
-fun UserName(username: String){
+fun UserName(username: String?){
     Text(
-        text = username,
+        text = username ?: "Unknown user",
         fontWeight = FontWeight.Bold,
         fontSize = fontSize
     )
 }
 
 @Composable
-fun Description(bio: String){
+fun Description(bio: String?){
     Text(
-        text = bio,
+        text = bio ?: "Description",
         fontSize = fontSize)
+}
+
+//Returns default int if the observer is null
+//Here because of warning regarding the workload of the composable functions
+fun number(nb: Int?): Int{
+    return nb ?: 0
 }
 
 @Composable
@@ -118,10 +128,11 @@ fun EditButton(onClick:() -> Unit){
 }
 
 @Composable
-fun ProfilePicture(profilePictureId: Int){
+fun ProfilePicture(profilePictureId: Int?){
+    val picture = profilePictureId ?: R.drawable.profile_picture
     Image(
-        painter = painterResource(id = profilePictureId),
-        contentDescription = "$profilePictureId",
+        painter = painterResource(id = picture),
+        contentDescription = "$picture",
         modifier = Modifier
             .width((3 * topInterfaceHeight) / 4)
             .clip(CircleShape)

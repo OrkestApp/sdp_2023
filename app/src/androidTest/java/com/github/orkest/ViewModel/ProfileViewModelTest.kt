@@ -16,29 +16,19 @@ import org.junit.BeforeClass
 class ProfileViewModelTest {
 
     private var testUserName: String = "testUser"
-    private lateinit var path: DocumentReference
+    private var testBio = "This is my bio"
+    private var testNbFollowers = 10
+    private var testNbFollowings = 2
+    private var testProfilePicture = 45
+
     private lateinit var user: User
+    private var viewModel: ProfileViewModel = ProfileViewModel(testUserName)
 
-    companion object{
-        private lateinit var viewModel: ProfileViewModel
-        @BeforeClass
-        @JvmStatic
-        fun setupEmulator(){
-            viewModel = ProfileViewModel("testUser")
-            try {
-                viewModel.db.useEmulator("10.0.2.2", 8080)
-                viewModel.db.firestoreSettings = firestoreSettings {
-                    isPersistenceEnabled = false
-                }
-            } catch(_: IllegalStateException){ }
 
-        }
-    }
     @Before
     fun setUp() {
-        path = viewModel.userDocument(testUserName)
         runBlocking {
-            user = User(profile = Profile(testUserName, 1, "Test bio", 10, 5))
+            user = User(profile = Profile(testUserName, testProfilePicture, testBio, testNbFollowers, testNbFollowings))
             viewModel.userDocument(testUserName).set(user).await()
         }
         viewModel.setupListener()
@@ -54,14 +44,13 @@ class ProfileViewModelTest {
     /**
      * Tests if the data is correctly fetched from the database
      */
-
     @Test
     fun testLoadUserData() {
         assertEquals(testUserName, user.profile.username)
-        assertEquals("Test bio", user.profile.bio)
-        assertEquals(10, user.profile.nbFollowers)
-        assertEquals(5, user.profile.nbFollowings)
-        assertEquals(1, user.profile.profilePictureId)
+        assertEquals(testBio, user.profile.bio)
+        assertEquals(testNbFollowers, user.profile.nbFollowers)
+        assertEquals(testNbFollowings, user.profile.nbFollowings)
+        assertEquals(testProfilePicture, user.profile.profilePictureId)
     }
 
     /**
@@ -72,7 +61,7 @@ class ProfileViewModelTest {
         val newUsername = "newUsername"
         runBlocking {
             user = User(profile = Profile(newUsername, 2, "New bio", 20, 15))
-            viewModel.userDocument(newUsername).set(user).await()
+            viewModel.userDocument(testUserName).set(user).await()
         }
 
         assertEquals(newUsername, user.profile.username)
@@ -82,8 +71,93 @@ class ProfileViewModelTest {
         assertEquals(2, user.profile.profilePictureId)
     }
 
-    //if a user changes their username, on a besoin de le supprimer de user_LETTRE
-    // A faire avec roman
-    // Quand on change spécifiquement le username, alors on applique une méthode précise
-    //Pas moi qui m'occupe de ça though
+    @Test
+    fun onlyProfilePictureIdGetsUpdated(){
+        val newProfilePicture = 928
+        runBlocking {
+            user.profile.profilePictureId = newProfilePicture
+            viewModel.userDocument(testUserName).set(user).await()
+        }
+        assertEquals(newProfilePicture, user.profile.profilePictureId)
+        assertEquals(testUserName, user.profile.username)
+        assertEquals(testBio, user.profile.bio)
+        assertEquals(testNbFollowers, user.profile.nbFollowers)
+        assertEquals(testNbFollowings, user.profile.nbFollowings)
+    }
+
+    @Test
+    fun onlyBioGetsUpdated(){
+        val newBio = "My new bio"
+        runBlocking {
+            user.profile.bio = newBio
+            viewModel.userDocument(testUserName).set(user).await()
+        }
+        assertEquals(newBio, user.profile.bio)
+        assertEquals(testUserName, user.profile.username)
+        assertEquals(testNbFollowers, user.profile.nbFollowers)
+        assertEquals(testNbFollowings, user.profile.nbFollowings)
+        assertEquals(testProfilePicture, user.profile.profilePictureId)
+    }
+
+    @Test
+    fun onlyNbFollowersGetsUpdated(){
+        val newNbFollowers = 32
+        runBlocking {
+            user.profile.nbFollowers = newNbFollowers
+            viewModel.userDocument(testUserName).set(user).await()
+        }
+        assertEquals(testBio, user.profile.bio)
+        assertEquals(testUserName, user.profile.username)
+        assertEquals(newNbFollowers, user.profile.nbFollowers)
+        assertEquals(testNbFollowings, user.profile.nbFollowings)
+        assertEquals(testProfilePicture, user.profile.profilePictureId)
+    }
+
+    @Test
+    fun onlyNbFollowingsGetsUpdated(){
+        val newNbFollowings = 0
+        runBlocking {
+            user.profile.nbFollowings = newNbFollowings
+            viewModel.userDocument(testUserName).set(user).await()
+        }
+        assertEquals(testBio, user.profile.bio)
+        assertEquals(testUserName, user.profile.username)
+        assertEquals(testNbFollowers, user.profile.nbFollowers)
+        assertEquals(newNbFollowings, user.profile.nbFollowings)
+        assertEquals(testProfilePicture, user.profile.profilePictureId)
+    }
+
+    @Test
+    fun testUserDocument() {
+        val documentReference = viewModel.userDocument("testUser")
+        assertEquals(documentReference.path, "user/user-T/users/testUser")
+    }
+
+    /**
+     * If a user changes their username, the path will change as well.
+     * The ProfileViewModel will have to be called with the new username as a parameter
+     */
+    @Test
+    fun onlyUsernameChanges(){
+        val newUsername = "newUsername"
+        val newViewModel = ProfileViewModel(newUsername)
+        runBlocking {
+            user = User(profile = Profile(newUsername, 2, "New bio", 20, 15))
+            newViewModel.userDocument(newUsername).set(user).await()
+        }
+        newViewModel.setupListener()
+
+        assertEquals(newUsername, user.profile.username)
+        assertEquals("New bio", user.profile.bio)
+        assertEquals(20, user.profile.nbFollowers)
+        assertEquals(15, user.profile.nbFollowings)
+        assertEquals(2, user.profile.profilePictureId)
+    }
+
+
+
+
+
+    //if a user changes their username, on a besoin de le supprimer de user_LETTRE et le mettre dans user_NOUVELLE_LETTRE
+
 }

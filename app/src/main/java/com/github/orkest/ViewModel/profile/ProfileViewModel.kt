@@ -14,15 +14,13 @@ import com.google.firebase.ktx.Firebase
 open class ProfileViewModel(private val user: String) : ViewModel() {
 
     var db : FirebaseFirestore = Firebase.firestore
-    private lateinit var profileData : DocumentReference
-    lateinit var userData : DocumentReference
     private var userProfile = User()
 
-     open var username = MutableLiveData<String>()
-     open var bio = MutableLiveData<String>()
-     open var nbFollowers = MutableLiveData<Int>()
-     open var nbFollowings = MutableLiveData<Int>()
-     open var profilePictureId = MutableLiveData<Int>()
+    open var username = MutableLiveData<String>()
+    open var bio = MutableLiveData<String>()
+    open var nbFollowers = MutableLiveData<Int>()
+    open var nbFollowings = MutableLiveData<Int>()
+    open var profilePictureId = MutableLiveData<Int>()
 
     /**
      * To execute everytime an instance of ProfileViewModel() is created
@@ -60,7 +58,7 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
      * Listens to the changes in the Firestore document profile_data
      * and updates the view-model's values
      */
-     fun listenToUserData(){
+     private fun listenToUserData(){
         userDocument(user).addSnapshotListener { snapshot, e ->
             if (e != null) {
                 Log.w(TAG, "Listen failed.", e)
@@ -75,10 +73,5 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
         }
     }
 
-    open fun getUsername(): LiveData<String> = username
-    open fun getBio(): LiveData<String> = bio
-    open fun getNbFollowers(): LiveData<Int> = nbFollowers
-    open fun getNbFollowings(): LiveData<Int> = nbFollowings
-    open fun getProfilePictureId(): LiveData<Int> = profilePictureId
 
 }

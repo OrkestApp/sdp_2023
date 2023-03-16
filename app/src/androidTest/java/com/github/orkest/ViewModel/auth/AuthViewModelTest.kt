@@ -15,25 +15,12 @@ import org.junit.Test
 // To run these tests twice, you must clear the database or restart it before running them again
 class AuthViewModelTest {
 
-    companion object {
-        private lateinit var auth: AuthViewModel
+    private var auth: AuthViewModel = AuthViewModel()
 
-        private const val name = "Steve123"
-        private const val bio = "bio"
-        private val provider = Providers.DEEZER
+    private val name = "Steve123"
+    private val bio = "bio"
+    private val provider = Providers.DEEZER
 
-        @BeforeClass
-        @JvmStatic
-        fun setupEmulator() {
-            auth = AuthViewModel()
-            try{
-            auth.db.useEmulator("10.0.2.2", 8080)
-            auth.db.firestoreSettings = firestoreSettings {
-                isPersistenceEnabled = false
-            }
-            } catch (_: IllegalStateException){ }
-        }
-    }
 
     @Before
     fun setup(){

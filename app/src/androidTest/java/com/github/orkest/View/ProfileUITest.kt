@@ -21,13 +21,14 @@ import org.junit.Before
 class ProfileUITest {
 
     private var viewModel: MockProfileViewModel = MockProfileViewModel("JohnSmith")
+    private  lateinit  var John: Profile
 
     @get:Rule
     val composeTestRule = createComposeRule()
 
     @Before
     fun setup() {
-        val John = Profile(
+        John = Profile(
             "JohnSmith",
             R.drawable.profile_picture,
             "I like everything",
@@ -51,10 +52,10 @@ class ProfileUITest {
     @Test
     fun profileScreen_displaysRightValues() {
 
-        composeTestRule.onNodeWithText("JohnSmith").assertIsDisplayed()
-        composeTestRule.onNodeWithText("I like everything").assertIsDisplayed()
-        composeTestRule.onNodeWithText("10\nfollowers").assertIsDisplayed()
-        composeTestRule.onNodeWithText("2\nfollowings").assertIsDisplayed()
+        composeTestRule.onNodeWithText(John.username).assertIsDisplayed()
+        composeTestRule.onNodeWithText(John.bio).assertIsDisplayed()
+        composeTestRule.onNodeWithText("${John.nbFollowers}\nfollowers").assertIsDisplayed()
+        composeTestRule.onNodeWithText("${John.nbFollowings}\nfollowings").assertIsDisplayed()
         composeTestRule.onNodeWithContentDescription("${R.drawable.profile_picture}").assertIsDisplayed()
     }
 
@@ -73,6 +74,36 @@ class ProfileUITest {
         composeTestRule.onNodeWithText("$newNbFollowers\nfollowers").assertIsDisplayed()
         composeTestRule.onNodeWithText("$newNbFollowings\nfollowings").assertIsDisplayed()
         composeTestRule.onNodeWithContentDescription("$newProfilePictureId").assertIsDisplayed()
+    }
+
+    @Test
+    fun loadData_withNullProfilePictureId() {
+        viewModel.setProfilePictureId(null)
+        composeTestRule.onNodeWithContentDescription("${R.drawable.profile_picture}").assertIsDisplayed()
+    }
+
+    @Test
+    fun loadData_withNullUsername(){
+        viewModel.setUsername(null)
+        composeTestRule.onNodeWithText("Unknown user").assertIsDisplayed()
+    }
+
+    @Test
+    fun loadData_withNullNbFollowers(){
+        viewModel.setNbFollowers(null)
+        composeTestRule.onNodeWithText("${0}\nfollower").assertIsDisplayed()
+    }
+
+    @Test
+    fun loadData_withNullNbFollowings(){
+        viewModel.setNbFollowings(null)
+        composeTestRule.onNodeWithText("${0}\nfollowing").assertIsDisplayed()
+    }
+
+    @Test
+    fun loadData_withNullDescription(){
+        viewModel.setBio(null)
+        composeTestRule.onNodeWithText("Description").assertIsDisplayed()
     }
 
 }

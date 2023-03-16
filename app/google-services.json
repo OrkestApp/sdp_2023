@@ -8,35 +8,6 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:246922870066:android:e68fe5b7600f994086ab2b",
-        "android_client_info": {
-          "package_name": "com.github.emilehreich.bootcamp"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "246922870066-40susbucotmjrlbf3ht7fuar5d3l4qjf.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyDwoYq0TiA_exk3yxaNCnEhoy1ew2tI5OA"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "246922870066-40susbucotmjrlbf3ht7fuar5d3l4qjf.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
         "mobilesdk_app_id": "1:246922870066:android:75f933bb04fd1c9f86ab2b",
         "android_client_info": {
           "package_name": "com.github.orkest"
@@ -44,7 +15,15 @@
       },
       "oauth_client": [
         {
-          "client_id": "246922870066-40susbucotmjrlbf3ht7fuar5d3l4qjf.apps.googleusercontent.com",
+          "client_id": "246922870066-gu6rktlblii2dqt2j7o3hcpu53sf2umq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.orkest",
+            "certificate_hash": "594ba81e5e4d34c48ce0308a566141bf78f32b3f"
+          }
+        },
+        {
+          "client_id": "246922870066-dp4vn9i2ttfjgs95ivudl53h7lsn4ro8.apps.googleusercontent.com",
           "client_type": 3
         }
       ],

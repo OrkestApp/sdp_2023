@@ -27,7 +27,7 @@ class SearchViewModelTest {
             "username" to "Alico"
         )
         val man1 = hashMapOf(
-            "username" to "bob"
+            "username" to "Arthur"
         )
         val man2 = hashMapOf(
             "username" to "bobby"
@@ -37,8 +37,8 @@ class SearchViewModelTest {
         viewModel.db.firestoreSettings = firestoreSettings {
             isPersistenceEnabled = false
         }
-        viewModel.db.collection("user/user-A/users").document("users").set(woman1)
-        //viewModel.db.collection("user/user-B/users").document("users").set(man1)
+        viewModel.db.collection("user/user-A/users").document("Alico").set(woman1)
+        viewModel.db.collection("user/user-A/users").document("Arthur").set(man1)
 
 
     }}
@@ -93,7 +93,7 @@ class SearchViewModelTest {
 
 
             val it  = viewModel.searchUserInDatabase("A").get()
-            MatcherAssert.assertThat(mutableListOf("Alico"), `is`(it))
+            MatcherAssert.assertThat(mutableListOf("Alico","Arthur"), `is`(it))
 
             val it2 = viewModel.searchUserInDatabase("Z").get()
             MatcherAssert.assertThat(mutableListOf(),`is` (it2))

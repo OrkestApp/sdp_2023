@@ -11,13 +11,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.github.orkest.ViewModel.profile.ProfileViewModel
 import com.github.orkest.ui.theme.OrkestTheme
 
-class ProfileActivity(currentUser: String) : ComponentActivity() {
+class ProfileActivity() : ComponentActivity() {
 
     //TODO create the currentUser's username when signing up
-    private val currentUser = currentUser
+    private lateinit var  currentUser : String
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        currentUser = intent.getStringExtra("username").toString()
         val viewModel = ProfileViewModel(currentUser)
         setContent {
             OrkestTheme {

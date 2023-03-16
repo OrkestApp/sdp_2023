@@ -12,6 +12,8 @@
         android:theme="@style/Theme.Orkest"
         tools:targetApi="31">
 
+        <activity android:name=".View.profile.ProfileActivity" />
+
         <!-- "adjustResize": to be able to scroll on the screen -->
         <activity
             android:windowSoftInputMode="adjustResize"

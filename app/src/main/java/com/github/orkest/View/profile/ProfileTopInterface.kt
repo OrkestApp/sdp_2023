@@ -75,7 +75,7 @@ fun ProfileTopInterface(viewModel: ProfileViewModel) {
 @Composable
 fun UserName(username: String?){
     Text(
-        text = username ?: "Unknown user",
+        text = username ?: "",
         fontWeight = FontWeight.Bold,
         fontSize = fontSize
     )

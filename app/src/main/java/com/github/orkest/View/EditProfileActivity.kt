@@ -1,5 +1,7 @@
 package com.github.orkest.View
 
+import android.app.LocalActivityManager
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -39,6 +41,8 @@ import androidx.compose.material.DrawerValue
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.platform.LocalContext
+import com.github.orkest.View.profile.ProfileActivity
 import com.github.orkest.View.theme.OrkestTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
@@ -52,7 +56,7 @@ class EditProfileActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             EditProfileSetting {
-                EditProfileScreen()
+                EditProfileScreen(this)
             }
         }
     }
@@ -79,7 +83,7 @@ fun EditProfileSetting(content: @Composable () -> Unit) {
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditProfileScreen() {
+fun EditProfileScreen(activity: ComponentActivity) {
 
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
@@ -88,7 +92,7 @@ fun EditProfileScreen() {
     Scaffold(
         // keep track of the state of the scaffold (whether it is opened or closed)
         scaffoldState = scaffoldState,
-        topBar = { TopBar(coroutineScope = coroutineScope, scaffoldState = scaffoldState) },
+        topBar = { TopBar(activity, coroutineScope = coroutineScope, scaffoldState = scaffoldState) },
         // The content displayed inside the drawer when you click on the hamburger menu button
         drawerContent = { CreateMenuDrawer() },
 
@@ -153,7 +157,8 @@ fun CreateMenuDrawer() {
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(coroutineScope: CoroutineScope, scaffoldState: ScaffoldState) {
+fun TopBar(activity: ComponentActivity, coroutineScope: CoroutineScope, scaffoldState: ScaffoldState) {
+
     TopAppBar(
         title = {
             Row(
@@ -166,7 +171,7 @@ fun TopBar(coroutineScope: CoroutineScope, scaffoldState: ScaffoldState) {
                 // "cancel" clickable text (button)
                 Text(
                     text = "Cancel",
-                    modifier = Modifier.clickable { /* TODO */ },
+                    modifier = Modifier.clickable {activity.finish() },
                     fontSize = 20.sp
                 )
 
@@ -332,10 +337,10 @@ fun MenuDrawer(
 }
 
 
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    EditProfileSetting {
-        EditProfileScreen()
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun DefaultPreview() {
+//    EditProfileSetting {
+//        EditProfileScreen()
+//    }
+//}

@@ -9,6 +9,7 @@ import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert
 import org.junit.*
+import java.util.concurrent.CompletableFuture
 
 class SearchViewModelTest {
 
@@ -37,9 +38,16 @@ class SearchViewModelTest {
         viewModel.db.firestoreSettings = firestoreSettings {
             isPersistenceEnabled = false
         }
-        viewModel.db.collection("user/user-A/users").document("Alico").set(woman1)
-        viewModel.db.collection("user/user-A/users").document("Arthur").set(man1)
-        //viewModel.db.collection("user/user-B/users").document("bobby").set(man2)
+        val future1 = CompletableFuture<Any>()
+        val future2 = CompletableFuture<Any>()
+        val future3 = CompletableFuture<Any>()
+        viewModel.db.collection("user/user-A/users").document("Alico").set(woman1).addOnSuccessListener { future1.complete(1) }
+        viewModel.db.collection("user/user-A/users").document("Arthur").set(man1).addOnSuccessListener { future2.complete(2) }
+        viewModel.db.collection("user/user-B/users").document("bobby").set(man2).addOnSuccessListener { future3.complete(3) }
+
+        future1.get()
+        future2.get()
+        future3.get()
 
 
     }}
@@ -68,12 +76,12 @@ class SearchViewModelTest {
         composeTestRule.onNodeWithText("").performTextReplacement(usernameToType)
         composeTestRule.onNodeWithText("Alico").assertIsDisplayed()
         composeTestRule.onNodeWithText("bobby").assertDoesNotExist()
-        /*
+
         usernameToType = "b"
         composeTestRule.onNodeWithText("A").performTextReplacement(usernameToType)
         composeTestRule.onNodeWithText("bobby").assertIsDisplayed()
 
-         */
+
     }
 
 

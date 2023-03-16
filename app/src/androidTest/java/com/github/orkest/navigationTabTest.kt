@@ -1,5 +1,6 @@
 package com.github.orkest
 
+import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -17,7 +18,7 @@ class navigationTabTest {
     @Test
     fun canAccessEveryNavigationTabFromMainActivity(){
         composeTestRule.setContent {
-            NavigationBar.CreateNavigationBar(navController = rememberNavController())
+            NavigationBar.CreateNavigationBar(navController = rememberNavController(),"")
         }
 
         val searchTabAccess = composeTestRule.onNodeWithText("Search")
@@ -28,8 +29,7 @@ class navigationTabTest {
 
         val profileTab = composeTestRule.onNodeWithText("Profile")
         profileTab.assertIsDisplayed()
-        profileTab.performClick()
-        composeTestRule.onNodeWithText("Profile tab").assertIsDisplayed()
+        profileTab.assertHasClickAction()
 
         val feedTab = composeTestRule.onNodeWithText("Feed")
         feedTab.assertIsDisplayed()

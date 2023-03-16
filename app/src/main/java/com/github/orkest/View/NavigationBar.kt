@@ -21,7 +21,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.github.orkest.View.profile.ProfileTopInterface
 import com.github.orkest.View.search.SearchUserView
+import com.github.orkest.ViewModel.profile.ProfileViewModel
 import com.github.orkest.ViewModel.search.SearchViewModel
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -33,7 +35,8 @@ class NavigationBar {
         private val viewModel = SearchViewModel()
         @OptIn(ExperimentalMaterial3Api::class)
         @Composable
-        fun CreateNavigationBar(navController: NavHostController) {
+        fun CreateNavigationBar(navController: NavHostController, currentUser: String) {
+
             Scaffold(
                 bottomBar = {
                     BottomNavigation(backgroundColor = Color.White) {
@@ -78,7 +81,7 @@ class NavigationBar {
                     composable("HomePage") { Text(text = "Feed tab") } // TODO REPLACE BY THE COMPOSABLE FUNCTION OF WHAT YOU WANT TO SHOW WHEN BUTTON IS PRESSED
                     composable("SearchPage") { SearchUserView.SearchUi(viewModel = viewModel) }
                     composable("PlaylistPage") { Text(text = "Playlist tab") }
-                    composable("ProfilePage") { Text(text = "Profile tab") }
+                    composable("ProfilePage") { ProfileTopInterface(viewModel = ProfileViewModel(user = currentUser)) }
                 }
             }
         }

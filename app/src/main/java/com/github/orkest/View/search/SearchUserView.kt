@@ -1,5 +1,6 @@
 package com.github.orkest.View.search
 
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,9 +13,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
 import com.github.orkest.R
+import com.github.orkest.View.profile.ProfileActivity
 import com.github.orkest.ViewModel.search.SearchViewModel
 import java.util.*
 
@@ -68,10 +72,13 @@ class SearchUserView {
          */
         @Composable
         private fun createUser(name: String) {
-
+            val context = LocalContext.current
             Row(modifier = Modifier
                 .padding(all = 8.dp)
-                .clickable { } //TODO the empty brackets need to be replaced by the composable function or fires an intent to the desired profiles
+                .clickable { val intent = Intent(context,ProfileActivity::class.java)
+                    intent.putExtra("username",name)
+                    context.startActivity(intent)
+                } //TODO the empty brackets need to be replaced by the composable function or fires an intent to the desired profiles
                 .fillMaxSize()) {
                 Image(
                     painter = painterResource(R.drawable.powerrangerblue),

@@ -5,16 +5,11 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.github.orkest.Model.Profile
 import com.github.orkest.Model.User
-import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import java.util.concurrent.CompletableFuture
 
 open class ProfileViewModel(private val user: String) : ViewModel() {
 
@@ -37,25 +32,22 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
         listenToUserData()
     }
 
-    fun profileData() : DocumentReference {
-        val firstLetter = user[0].uppercase()
+    fun userDocument(username: String) : DocumentReference {
+        val firstLetter = username[0].uppercase()
         val path = "user/user-$firstLetter/users"
-        userData = db.collection(path).document(user)
-        /**profileData = db.collection(path).document(user)
-            .collection("profile").document("profile_data")**/
-        return userData
+        return db.collection(path).document(username)
     }
 
     /**
      * Fetches data from the Firestore document and sets the profile values
      */
     private fun loadUserData() {
-        profileData().get()
+        userDocument(user).get()
             .addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
-                    val profile = document.toObject(Profile::class.java)
-                    if(profile != null){
-                        userProfile.profile = profile
+                    val user = document.toObject(User::class.java)
+                    if(user != null){
+                        userProfile.profile = user.profile
                     }
                 }
             }
@@ -69,15 +61,15 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
      * and updates the view-model's values
      */
      fun listenToUserData(){
-        profileData().addSnapshotListener { snapshot, e ->
+        userDocument(user).addSnapshotListener { snapshot, e ->
             if (e != null) {
                 Log.w(TAG, "Listen failed.", e)
                 return@addSnapshotListener
             }
             if (snapshot != null && snapshot.exists()) {
-                val profile = snapshot.toObject(Profile::class.java)
-                if(profile != null){
-                    userProfile.profile = profile
+                val user = snapshot.toObject(User::class.java)
+                if(user != null){
+                    userProfile.profile = user.profile
                 }
             } else { Log.d(TAG, "Current data: null") }
         }

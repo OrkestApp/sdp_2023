@@ -18,50 +18,69 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.*
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import com.github.orkest.View.search.SearchUserView
+import com.github.orkest.ViewModel.search.SearchViewModel
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 class NavigationBar {
 
-    companion object{
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    fun CreateNavigationBar(navController :NavHostController){
-        Scaffold(
-            bottomBar = {
-                BottomNavigation(backgroundColor = Color.White ) {
-                    val navBackStackEntry by navController.currentBackStackEntryAsState()
-                    val currentDestination = navBackStackEntry?.destination
-                    NavigationBarClasses.listOfNavigationItems.forEach { item ->
-                        BottomNavigationItem(
-                            icon = { Icon(painter = painterResource(id = item.iconId), "",Modifier.size(25.dp))},
-                            label = { Text(stringResource(item.resourceId)) },
-                            selected = currentDestination?.hierarchy?.any { it.route == item.route } == true,
-                            onClick = {
-                                navController.navigate(item.route) {
-                                    // Pop up to the start destination of the graph to
-                                    // avoid building up a large stack of destinations
-                                    // on the back stack as users select items
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
+
+    companion object {
+        private val viewModel = SearchViewModel()
+        @OptIn(ExperimentalMaterial3Api::class)
+        @Composable
+        fun CreateNavigationBar(navController: NavHostController) {
+            Scaffold(
+                bottomBar = {
+                    BottomNavigation(backgroundColor = Color.White) {
+                        val navBackStackEntry by navController.currentBackStackEntryAsState()
+                        val currentDestination = navBackStackEntry?.destination
+                        NavigationBarClasses.listOfNavigationItems.forEach { item ->
+                            BottomNavigationItem(
+                                icon = {
+                                    Icon(
+                                        painter = painterResource(id = item.iconId),
+                                        "",
+                                        Modifier.size(25.dp)
+                                    )
+                                },
+                                label = { Text(stringResource(item.resourceId)) },
+                                selected = currentDestination?.hierarchy?.any { it.route == item.route } == true,
+                                onClick = {
+                                    navController.navigate(item.route) {
+                                        // Pop up to the start destination of the graph to
+                                        // avoid building up a large stack of destinations
+                                        // on the back stack as users select items
+                                        popUpTo(navController.graph.findStartDestination().id) {
+                                            saveState = true
+                                        }
+                                        // Avoid multiple copies of the same destination when
+                                        // reselecting the same item
+                                        launchSingleTop = true
+                                        // Restore state when reselecting a previously selected item
+                                        restoreState = true
                                     }
-                                    // Avoid multiple copies of the same destination when
-                                    // reselecting the same item
-                                    launchSingleTop = true
-                                    // Restore state when reselecting a previously selected item
-                                    restoreState = true
                                 }
-                            }
-                        )
+                            )
+                        }
                     }
                 }
-            }
-        ){padding ->
-            NavHost(navController= navController, startDestination = "HomePage", Modifier.padding(padding)) {
-                composable("HomePage"){ Text(text = "Feed") } // TODO REPLACE BY THE COMPOSABLE FUNCTION OF WHAT YOU WANT TO SHOW WHEN BUTTON IS PRESSED
-                composable("SearchPage"){ Text(text = "Search") }
-                composable("PlaylistPage"){ Text(text = "Playlist")}
-                composable("ProfilePage"){ Text(text = "Profile")}
+            ) { padding ->
+                NavHost(
+                    navController = navController,
+                    startDestination = "HomePage",
+                    Modifier.padding(padding)
+                ) {
+                    composable("HomePage") { Text(text = "Feed tab") } // TODO REPLACE BY THE COMPOSABLE FUNCTION OF WHAT YOU WANT TO SHOW WHEN BUTTON IS PRESSED
+                    composable("SearchPage") { SearchUserView.SearchUi(viewModel = viewModel) }
+                    composable("PlaylistPage") { Text(text = "Playlist tab") }
+                    composable("ProfilePage") { Text(text = "Profile tab") }
+                }
             }
         }
     }
-}}
+}

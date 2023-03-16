@@ -15,22 +15,35 @@
       <change beforePath="$PROJECT_DIR$/app/src/androidTest/java/com/github/orkest/ViewModel/MockProfileViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/androidTest/java/com/github/orkest/ViewModel/profile/MockProfileViewModel.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/androidTest/java/com/github/orkest/ViewModel/ProfileViewModelTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/androidTest/java/com/github/orkest/ViewModel/profile/ProfileViewModelTest.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/github/orkest/ViewModel/profile/ProfileViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/github/orkest/ViewModel/profile/ProfileViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/androidTest/java/com/github/orkest/ViewModel/auth/AuthViewModelTest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/androidTest/java/com/github/orkest/ViewModel/auth/AuthViewModelTest.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[C:\Users\anejj\.android\avd\Pixel_2_API_33.avd]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[/home/zermelo/.android/avd/Pixel_6_Pro_API_33.avd]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
     </projectState>
   </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <task path="$PROJECT_DIR$">
+          <activation />
+        </task>
+        <projects_view />
+      </state>
+    </system>
+  </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Kotlin Data Class" />
+        <option value="Kotlin File" />
+        <option value="Class" />
         <option value="Kotlin Class" />
       </list>
     </option>
@@ -51,6 +64,8 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;ScreenRecorder.SavePath&quot;: &quot;/home/zermelo/Downloads/device-2023-03-16-083927.webm&quot;,
     &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
     &quot;com.google.services.firebase.aqiPopupShown&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;/home/zermelo/Documents/code/SDP/sdp_2023&quot;
@@ -61,12 +76,10 @@
       <recent name="com.github.orkest.DataModel" />
     </key>
     <key name="MoveKotlinTopLevelDeclarationsDialog.RECENTS_KEY">
-      <recent name="com.github.orkest.View.profile" />
-      <recent name="com.github.orkest.ViewModel.profile" />
       <recent name="com.github.orkest" />
     </key>
   </component>
-  <component name="RunManager" selected="Android Instrumented Tests.testGetUsername()">
+  <component name="RunManager" selected="Android Instrumented Tests.SearchViewModelTest">
     <configuration name="app" type="AndroidRunConfigurationType" factoryName="Android App">
       <module name="Orkest.app.main" />
       <option name="DEPLOY" value="true" />
@@ -125,11 +138,11 @@
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="ProfileUITest" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
+    <configuration name="SearchViewModelTest" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
       <module name="Orkest.app.androidTest" />
       <option name="TESTING_TYPE" value="2" />
       <option name="METHOD_NAME" value="" />
-      <option name="CLASS_NAME" value="com.github.orkest.View.ProfileUITest" />
+      <option name="CLASS_NAME" value="com.github.orkest.SearchViewModelTest" />
       <option name="PACKAGE_NAME" value="" />
       <option name="TEST_NAME_REGEX" value="" />
       <option name="INSTRUMENTATION_RUNNER_CLASS" value="" />
@@ -178,11 +191,11 @@
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="getUsernameReturnsRightValue()" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
+    <configuration name="canAccessEveryNavigationTabFromMainActivity()" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
       <module name="Orkest.app.androidTest" />
       <option name="TESTING_TYPE" value="3" />
-      <option name="METHOD_NAME" value="getUsernameReturnsRightValue" />
-      <option name="CLASS_NAME" value="com.github.orkest.ViewModel.ProfileViewModelTest" />
+      <option name="METHOD_NAME" value="canAccessEveryNavigationTabFromMainActivity" />
+      <option name="CLASS_NAME" value="com.github.orkest.navigationTabTest" />
       <option name="PACKAGE_NAME" value="" />
       <option name="TEST_NAME_REGEX" value="" />
       <option name="INSTRUMENTATION_RUNNER_CLASS" value="" />
@@ -231,11 +244,11 @@
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="loadData_withNullProfilePictureId()" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
+    <configuration name="whenFirstLetterOfUsernamesIsTypedDisplayCorrectUsers()" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
       <module name="Orkest.app.androidTest" />
       <option name="TESTING_TYPE" value="3" />
-      <option name="METHOD_NAME" value="loadData_withNullProfilePictureId" />
-      <option name="CLASS_NAME" value="com.github.orkest.View.ProfileUITest" />
+      <option name="METHOD_NAME" value="whenFirstLetterOfUsernamesIsTypedDisplayCorrectUsers" />
+      <option name="CLASS_NAME" value="com.github.orkest.SearchViewModelTest" />
       <option name="PACKAGE_NAME" value="" />
       <option name="TEST_NAME_REGEX" value="" />
       <option name="INSTRUMENTATION_RUNNER_CLASS" value="" />
@@ -284,11 +297,11 @@
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="testGetUsername()" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
+    <configuration name="whenFirstLettersOfUsernamesIsTypedDisplayCorrectUsers()" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
       <module name="Orkest.app.androidTest" />
       <option name="TESTING_TYPE" value="3" />
-      <option name="METHOD_NAME" value="testGetUsername" />
-      <option name="CLASS_NAME" value="com.github.orkest.ViewModel.ProfileViewModelTest" />
+      <option name="METHOD_NAME" value="whenFirstLettersOfUsernamesIsTypedDisplayCorrectUsers" />
+      <option name="CLASS_NAME" value="com.github.orkest.SearchViewModelTest" />
       <option name="PACKAGE_NAME" value="" />
       <option name="TEST_NAME_REGEX" value="" />
       <option name="INSTRUMENTATION_RUNNER_CLASS" value="" />
@@ -337,11 +350,11 @@
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="testUserDocument()" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
+    <configuration name="whenMockUserUsernameIsTypedIsDisplayed()" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
       <module name="Orkest.app.androidTest" />
       <option name="TESTING_TYPE" value="3" />
-      <option name="METHOD_NAME" value="testUserDocument" />
-      <option name="CLASS_NAME" value="com.github.orkest.ViewModel.ProfileViewModelTest" />
+      <option name="METHOD_NAME" value="whenMockUserUsernameIsTypedIsDisplayed" />
+      <option name="CLASS_NAME" value="com.github.orkest.SearchViewModelTest" />
       <option name="PACKAGE_NAME" value="" />
       <option name="TEST_NAME_REGEX" value="" />
       <option name="INSTRUMENTATION_RUNNER_CLASS" value="" />

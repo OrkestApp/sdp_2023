@@ -49,8 +49,6 @@ class SearchViewModelTest {
         future2.get()
         future3.get()
 
-        Thread.sleep(1000)
-
 
     }}
     
@@ -63,7 +61,7 @@ class SearchViewModelTest {
 
 
     @Test
-    fun whenMockUserUsernameIsTypedIsDisplayed() = runTest{
+    fun whenMockUserUsernameIsTypedProfilePicIsDisplayed() = runTest{
 
 
         val usernameToType = "Alico"

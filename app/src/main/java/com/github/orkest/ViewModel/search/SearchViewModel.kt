@@ -31,10 +31,6 @@ class SearchViewModel() : ViewModel() {
         }
 
 
-
-        //TODO change the database collection to the actual letter when it will be setup
-
-
         db.collection("user/user-${user[0].uppercase()}/users")
             .get()
             .addOnSuccessListener { result ->

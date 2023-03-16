@@ -10,7 +10,9 @@ import com.spotify.android.appremote.api.Connector.ConnectionListener
 import com.spotify.android.appremote.api.SpotifyAppRemote
 import com.spotify.protocol.types.PlayerState
 
-
+/**
+ * Activity used to test the Spotify API (DEMO ONLY)
+ */
 class MainActivity2 : AppCompatActivity() {
     private var mSpotifyAppRemote: SpotifyAppRemote? = null
     override fun onCreate(savedInstanceState: Bundle?) {

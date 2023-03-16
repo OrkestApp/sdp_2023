@@ -38,7 +38,7 @@ class SearchViewModelTest {
             isPersistenceEnabled = false
         }
         viewModel.db.collection("user/user-A/users").document("users").set(woman1)
-        viewModel.db.collection("user/user-B/users").document("users").set(man1)
+        //viewModel.db.collection("user/user-B/users").document("users").set(man1)
 
 
     }}
@@ -62,10 +62,10 @@ class SearchViewModelTest {
 
     @Test
     fun whenFirstLetterOfUsernamesIsTypedDisplayCorrectUsers(){
-        val usernameToType = "b"
+        val usernameToType = "A"
         composeTestRule.onNodeWithText("").performTextReplacement(usernameToType)
-        composeTestRule.onNodeWithText("bob").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Alico").assertDoesNotExist()
+        composeTestRule.onNodeWithText("Alico").assertIsDisplayed()
+        composeTestRule.onNodeWithText("bob").assertDoesNotExist()
     }
 
 

@@ -3,6 +3,7 @@ package com.github.orkest
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import com.github.orkest.View.search.SearchUserView
+import com.github.orkest.ViewModel.auth.AuthViewModelTest
 import com.github.orkest.ViewModel.search.SearchViewModel
 import com.google.firebase.firestore.ktx.firestoreSettings
 import kotlinx.coroutines.test.runTest
@@ -34,10 +35,17 @@ class SearchViewModelTest {
             "username" to "bobby"
         )
         viewModel = SearchViewModel()
-        viewModel.db.useEmulator("10.0.2.2", 8080)
-        viewModel.db.firestoreSettings = firestoreSettings {
-            isPersistenceEnabled = false
+        try {
+            viewModel.db.useEmulator("10.0.2.2", 8080)
+            viewModel.db.firestoreSettings = firestoreSettings {
+                isPersistenceEnabled = false
+            }
         }
+        catch (_: java.lang.IllegalStateException){
+
+        }
+
+
         val future1 = CompletableFuture<Any>()
         val future2 = CompletableFuture<Any>()
         val future3 = CompletableFuture<Any>()

@@ -21,7 +21,7 @@ class EditProfileTest {
     @Before
     fun setup(){
         composeTestRule.setContent {
-            EditProfileScreen()
+            EditProfileScreen(EditProfileActivity())
         }
     }
 

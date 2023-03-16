@@ -136,7 +136,7 @@ fun SignUpForm(navController: NavController, viewModel: AuthViewModel) {
                                 if(result) {
                                     //Launches intent to the main Activity
                                     val intent = Intent(context, MainActivity::class.java)
-                                    // TODO: Next see if needed to send the user's data as an Extra
+                                    intent.putExtra("username",viewModel.getUsername().text)
                                     context.startActivity(intent)
                                 } else {
                                     //Displays error

@@ -3,10 +3,24 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+    <string name="title_activity_signing_in">SigningIn</string>
+    <string name="title_activity_sign_in">SignIn</string>
+    <string name="sign_out">sign_out</string>
+    <string name="sign_in_with_google">sign_in_with_google</string>
     <string name="title_activity_sign_up_form">SignUpForm</string>
     <string name="title_activity_auth">AuthActivity</string>
     <string name="HomePage">Feed</string>
-    <string name="SearchPage">SearchPage</string>
+    <string name="SearchPage">Search</string>
     <string name="ProfilePage">Profile</string>
     <string name="PlaylistPage">Playlist</string>
+    <string name="title_activity_edit_profile">EditProfileActivity</string>
 </resources>

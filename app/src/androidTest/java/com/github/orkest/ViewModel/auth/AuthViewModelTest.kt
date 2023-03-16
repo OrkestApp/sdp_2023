@@ -26,10 +26,17 @@ class AuthViewModelTest {
         @JvmStatic
         fun setupEmulator() {
             auth = AuthViewModel()
-            auth.db.useEmulator("10.0.2.2", 8080)
-            auth.db.firestoreSettings = firestoreSettings {
-                isPersistenceEnabled = false
+            try {
+                auth.db.useEmulator("10.0.2.2", 8080)
+                auth.db.firestoreSettings = firestoreSettings {
+                    isPersistenceEnabled = false
+                }
             }
+            catch (_: java.lang.IllegalStateException){
+
+            }
+
+
         }
     }
 

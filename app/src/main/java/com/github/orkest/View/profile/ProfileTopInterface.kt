@@ -1,5 +1,6 @@
 package com.github.orkest.View.profile
 
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -13,6 +14,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
@@ -20,8 +22,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
+import androidx.navigation.NavController
 import com.github.orkest.Model.Profile
 import com.github.orkest.R
+import com.github.orkest.View.EditProfileActivity
+import com.github.orkest.View.MainActivity
 import com.github.orkest.ViewModel.profile.ProfileViewModel
 
 private val topInterfaceHeight = 150.dp
@@ -36,6 +41,7 @@ private val smallFontSize = 12.sp
 @Composable
 fun ProfileTopInterface(viewModel: ProfileViewModel) {
 
+    val context = LocalContext.current
     viewModel.setupListener()
 
     Column{
@@ -67,7 +73,10 @@ fun ProfileTopInterface(viewModel: ProfileViewModel) {
         Spacer(modifier = Modifier.height(separator))
 
         Row(){
-            EditButton() {}
+            EditButton {
+                val intent = Intent(context, EditProfileActivity::class.java)
+                context.startActivity(intent)
+            }
         }
     }
 }

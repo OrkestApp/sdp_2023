@@ -66,6 +66,7 @@ class SearchViewModelTest {
 
         val usernameToType = "Alico"
         composeTestRule.onNodeWithText("").performTextReplacement(usernameToType)
+        composeTestRule.waitForIdle()
         composeTestRule.onNodeWithContentDescription("Contact profile picture").assertIsDisplayed()
     }
 
@@ -74,10 +75,12 @@ class SearchViewModelTest {
 
         var usernameToType = "Al"
         composeTestRule.onNodeWithText("").performTextReplacement(usernameToType)
+        composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("Alico").assertIsDisplayed()
         composeTestRule.onNodeWithText("bobby").assertDoesNotExist()
 
         usernameToType = "b"
+        composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("Al").performTextReplacement(usernameToType)
         composeTestRule.onNodeWithText("bobby").assertIsDisplayed()
 

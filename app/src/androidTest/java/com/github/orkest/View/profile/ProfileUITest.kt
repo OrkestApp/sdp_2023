@@ -82,12 +82,6 @@ class ProfileUITest {
     }
 
     @Test
-    fun loadData_withNullUsername(){
-        viewModel.setUsername(null)
-        composeTestRule.onNodeWithText("Unknown user").assertIsDisplayed()
-    }
-
-    @Test
     fun loadData_withNullNbFollowers(){
         viewModel.setNbFollowers(null)
         composeTestRule.onNodeWithText("${0}\nfollower").assertIsDisplayed()

@@ -75,8 +75,12 @@ class SearchViewModelTest {
 
         val usernameToType = "Alico"
         composeTestRule.onNodeWithText("").performTextReplacement(usernameToType)
-        composeTestRule.waitForIdle()
+        composeTestRule.waitUntil{
+            composeTestRule.onAllNodesWithText("Alico").fetchSemanticsNodes().size ==2
+        }
+
         composeTestRule.onNodeWithContentDescription("Contact profile picture").assertIsDisplayed()
+
     }
 
     @Test

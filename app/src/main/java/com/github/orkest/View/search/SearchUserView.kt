@@ -16,7 +16,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat.startActivity
 import com.github.orkest.R
 import com.github.orkest.View.profile.ProfileActivity
 import com.github.orkest.ViewModel.search.SearchViewModel

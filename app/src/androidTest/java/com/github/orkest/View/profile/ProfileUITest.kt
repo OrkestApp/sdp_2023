@@ -75,6 +75,7 @@ class ProfileUITest {
         composeTestRule.onNodeWithText("$newNbFollowers\nfollowers").assertIsDisplayed()
         composeTestRule.onNodeWithText("$newNbFollowings\nfollowings").assertIsDisplayed()
         composeTestRule.onNodeWithContentDescription("$newProfilePictureId").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Sign Out").assertIsDisplayed()
     }
 
     @Test

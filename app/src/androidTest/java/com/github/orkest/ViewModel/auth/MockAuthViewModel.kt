@@ -7,6 +7,7 @@ class MockAuthViewModel : AuthViewModel() {
     companion object {
         val EXISTING_USER = "exists"
         val VALID_USER = "valid"
+        val NO_PERMISSIONS = "no_permissions"
     }
 
 
@@ -20,6 +21,20 @@ class MockAuthViewModel : AuthViewModel() {
 
         if (username == VALID_USER)
             future.complete((true))
+
+        return future
+    }
+
+    @Override
+    override fun signInUser(): CompletableFuture<Boolean> {
+        val future = CompletableFuture<Boolean>()
+        val username = getCurrentUsername().text
+
+        if (username == EXISTING_USER)
+            future.complete(true)
+
+        if (username == NO_PERMISSIONS)
+            future.complete((false))
 
         return future
     }

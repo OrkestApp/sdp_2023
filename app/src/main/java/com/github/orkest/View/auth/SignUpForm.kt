@@ -168,7 +168,7 @@ fun SignUpForm(navController: NavController, viewModel: AuthViewModel) {
                 )
 
                 AnimatedVisibility(visible = userDoesntExist.value){
-                    Text(text = "This Current Username doesnt exist!",
+                    Text(text = "No permissions for this user!",
                         color = Color.Red,
                         modifier = Modifier.width(280.dp))
                 }

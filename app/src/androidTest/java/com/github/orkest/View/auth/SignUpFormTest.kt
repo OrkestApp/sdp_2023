@@ -37,6 +37,9 @@ class SignUpFormTest {
         composeTestRule.onNodeWithText("Profile Description").assertIsDisplayed()
         composeTestRule.onNodeWithText("Service Provider: Spotify").assertIsDisplayed()
         composeTestRule.onNodeWithText("Create Profile").assertIsDisplayed()
+
+        composeTestRule.onNodeWithText("Current Username").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Sign In").assertIsDisplayed()
     }
 
     @Test
@@ -45,6 +48,9 @@ class SignUpFormTest {
         composeTestRule.onNodeWithText("Profile Description").assert(hasClickAction())
         composeTestRule.onNodeWithText("Service Provider: Spotify").assert(hasClickAction())
         composeTestRule.onNodeWithText("Create Profile").assert(hasClickAction())
+
+        composeTestRule.onNodeWithText("Current Username").assert(hasClickAction())
+        composeTestRule.onNodeWithText("Sign In").assert(hasClickAction())
     }
 
     @Test
@@ -129,5 +135,26 @@ class SignUpFormTest {
         composeTestRule.onNodeWithText("Create Profile").performClick()
         intended((hasComponent(MainActivity::class.java.name)))
         Intents.release()
+    }
+
+    @Test
+    fun existingUsernameLaunchesMain(){
+        Intents.init()
+        composeTestRule.onNodeWithText("Current Username")
+            .performTextInput(MockAuthViewModel.EXISTING_USER)
+
+        composeTestRule.onNodeWithText("Sign In").performClick()
+        intended((hasComponent(MainActivity::class.java.name)))
+        Intents.release()
+    }
+
+    @Test
+    fun noPermissionDisplaysError(){
+        composeTestRule.onNodeWithText("Current Username")
+            .performTextInput(MockAuthViewModel.NO_PERMISSIONS)
+
+        composeTestRule.onNodeWithText("Sign In").performClick()
+
+        composeTestRule.onNodeWithText("No permissions for this user!").assertIsDisplayed()
     }
 }

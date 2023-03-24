@@ -74,15 +74,24 @@ open class AuthViewModel: ViewModel() {
      */
     open fun createUser(): CompletableFuture<Boolean> {
 
+        val future = CompletableFuture<Boolean>()
+
+
         //Updates the user's credentials
-        updateUser()
+        try {
+            updateUser()
+        } catch (e: Exception) {
+             future.completeExceptionally(e)
+             return future
+        }
+
+        //TODO: Add Preconditions on updateUsser: like empty username ..
 
         // Computes the path to store the user in : user/user-firstLetter/users
         // user-firstletter is a document containing a subcollection which contains the users's documents
         val firstLetter = username.value.text[0].uppercase()
         val path = "user/user-$firstLetter/users"
 
-        val future = CompletableFuture<Boolean>()
 
         //Checks if the database already contains a user with the same username
         db.collection(path)
@@ -99,7 +108,8 @@ open class AuthViewModel: ViewModel() {
             }
             //Propagates the exception in case of another exception
             .addOnFailureListener{
-                future.completeExceptionally(it)
+                future.completeExceptionally(
+                    Exception("Sorry, something went wrong ... Please check your Internet connection"))
             }
 
         return future
@@ -109,6 +119,7 @@ open class AuthViewModel: ViewModel() {
      * Updates the user's credentials after validation
      */
     private fun updateUser(){
+        if (username.value.text.isEmpty()) throw Exception("Username cannot be empty")
         user.username = username.value.text
         user.profile.username = user.username
         user.profile.bio = bio.value.text

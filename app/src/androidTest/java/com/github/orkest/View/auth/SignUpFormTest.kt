@@ -26,7 +26,7 @@ class SignUpFormTest {
         // Start the app
         viewModel = MockAuthViewModel()
         composeTestRule.setContent {
-            SignUpForm(navController = rememberNavController(), viewModel)
+            SignUpForm( viewModel)
         }
     }
 

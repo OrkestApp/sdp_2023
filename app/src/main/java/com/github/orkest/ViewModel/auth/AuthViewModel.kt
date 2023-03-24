@@ -30,6 +30,10 @@ open class AuthViewModel: ViewModel() {
         return username.value
     }
 
+    fun getCurrentUsername(): TextFieldValue{
+        return currentUsername.value
+    }
+
     /**
      * Return the current value of the profile description of the user
      * to be displayed on the view
@@ -50,6 +54,10 @@ open class AuthViewModel: ViewModel() {
      */
     fun updateUsername(value:TextFieldValue){
         username.value = value
+    }
+
+    fun updateCurrentUsername(value:TextFieldValue){
+        currentUsername.value = value
     }
 
     /**

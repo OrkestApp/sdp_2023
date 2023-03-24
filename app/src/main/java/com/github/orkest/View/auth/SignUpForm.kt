@@ -42,6 +42,10 @@ fun SignUpForm(navController: NavController, viewModel: AuthViewModel) {
         mutableStateOf(false)
     }
 
+    val userDoesntExist = remember {
+        mutableStateOf(false)
+    }
+
     Scaffold(
         //Creates the top bar
         topBar = {
@@ -159,11 +163,11 @@ fun SignUpForm(navController: NavController, viewModel: AuthViewModel) {
 
                 TextField(
                     label = { Text(text = "Current Username") },
-                    value = viewModel.getUsername(),
-                    onValueChange = { viewModel.updateUsername(it) }
+                    value = viewModel.getCurrentUsername(),
+                    onValueChange = { viewModel.updateCurrentUsername(it) }
                 )
 
-                AnimatedVisibility(visible = userExists.value){
+                AnimatedVisibility(visible = userDoesntExist.value){
                     Text(text = "This Current Username doesnt exist!",
                         color = Color.Red,
                         modifier = Modifier.width(280.dp))
@@ -179,11 +183,11 @@ fun SignUpForm(navController: NavController, viewModel: AuthViewModel) {
                                     if(result) {
                                         //Launches intent to the main Activity
                                         val intent = Intent(context, MainActivity::class.java)
-                                        intent.putExtra("username",viewModel.getUsername().text)
+                                        intent.putExtra("username",viewModel.getCurrentUsername().text)
                                         context.startActivity(intent)
                                     } else {
                                         //Displays error
-                                        userExists.value = false
+                                        userDoesntExist.value = true
                                     }
                                    }
                         },

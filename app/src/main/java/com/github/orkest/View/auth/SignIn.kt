@@ -3,6 +3,7 @@ package com.github.orkest.View.auth
 import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.getIntent
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.material.Button
@@ -129,10 +130,12 @@ fun signIn(activityResultLauncher: ActivityResultLauncher<Intent>,
  * Changes the intent depending on the user's credentials
  */
 private fun updateUI(user: FirebaseUser?, navController: NavController) {
+
     if (user != null) {
         Log.d(TAG, "User is not null")
         navController.navigate("signup")
     } else {
         Log.d(TAG, "User is null")
     }
+
 }

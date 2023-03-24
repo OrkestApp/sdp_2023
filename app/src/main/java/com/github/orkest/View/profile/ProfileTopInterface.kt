@@ -90,9 +90,10 @@ fun ProfileTopInterface(viewModel: ProfileViewModel) {
             SignOutButton {
                 val auth = FirebaseAuth.getInstance()
                 val intent = Intent(context, AuthActivity::class.java)
+                intent.putExtra("username",viewModel.username.value)
                 auth.signOut()
                 //uncomment if un-caching is needed
-                //GoogleSignIn.getClient(context, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut()
+                GoogleSignIn.getClient(context, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut()
                 context.startActivity(intent)
             }
         }

@@ -127,7 +127,6 @@ fun SignUpForm(navController: NavController, viewModel: AuthViewModel) {
 
                 Spacer(modifier = Modifier.height(15.dp))
 
-
                 //Button to confirm choices
                 Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
                     Button(
@@ -154,6 +153,51 @@ fun SignUpForm(navController: NavController, viewModel: AuthViewModel) {
                         )
                     }
                 }
+
+                Spacer(modifier = Modifier.height(15.dp))
+
+
+                TextField(
+                    label = { Text(text = "Current Username") },
+                    value = viewModel.getUsername(),
+                    onValueChange = { viewModel.updateUsername(it) }
+                )
+
+                AnimatedVisibility(visible = userExists.value){
+                    Text(text = "This Current Username doesnt exist!",
+                        color = Color.Red,
+                        modifier = Modifier.width(280.dp))
+                }
+
+                Spacer(modifier = Modifier.height(15.dp))
+
+                //sign in button
+                Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
+                    Button(
+                        onClick = { viewModel.signInUser()
+                                    .whenComplete { result, _ ->
+                                    if(result) {
+                                        //Launches intent to the main Activity
+                                        val intent = Intent(context, MainActivity::class.java)
+                                        intent.putExtra("username",viewModel.getUsername().text)
+                                        context.startActivity(intent)
+                                    } else {
+                                        //Displays error
+                                        userExists.value = false
+                                    }
+                                   }
+                        },
+                        shape = RoundedCornerShape(50.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp)
+                    ) {
+                        Text(text = "Sign In",
+                            style = TextStyle(fontSize = 20.sp)
+                        )
+                    }
+                }
+
             }
         })
 }

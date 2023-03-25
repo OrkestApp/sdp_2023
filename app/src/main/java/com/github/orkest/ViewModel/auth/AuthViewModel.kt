@@ -68,19 +68,15 @@ open class AuthViewModel: ViewModel() {
 
     /**
      * Called once the user finished inputting its credentials
-     * Returns a Future that completes with :
-     * True if the user has been successfully added to the database,
-     * False if the username already exists in the database
+     * Returns a Future that completes with True if the user has been successfully added to the database,
+     * False if it already exists, and an exception if an error occurred
      */
     open fun createUser(): CompletableFuture<Boolean> {
 
         val future = CompletableFuture<Boolean>()
 
-        //Updates the user's credentials
-        //If an exception is raised it is transmitted through the future
-        try {
-            updateUser()
-        } catch (e: Exception) {
+        //Updates the user's credentials and transmits any exception through the future
+        try { updateUser() } catch (e: Exception) {
              future.completeExceptionally(e)
              return future
         }
@@ -90,26 +86,21 @@ open class AuthViewModel: ViewModel() {
         val firstLetter = username.value.text[0].uppercase()
         val path = "user/user-$firstLetter/users"
 
-
         //Checks if the database already contains a user with the same username
         db.collection(path)
-            .document(user.username).get()
-            .addOnSuccessListener {
+            .document(user.username).get().addOnSuccessListener {
                 if (it.data != null) {
                     println(it)
                     future.complete(false)
                 } else {
                     //If no user with the same username was found, add the user to the database
-                    pushUser(path)
-                        .addOnSuccessListener { future.complete(true) }
+                    pushUser(path).addOnSuccessListener { future.complete(true) }
                 }
-            }
-            //Propagates the exception in case of another exception
+            } //Propagates the exception in case of another exception
             .addOnFailureListener{
                 future.completeExceptionally(
-                    Exception("Sorry, something went wrong ... Please check your Internet connection"))
+                Exception("Sorry, something went wrong ... Please check your Internet connection"))
             }
-
         return future
     }
 

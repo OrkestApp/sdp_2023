@@ -76,16 +76,14 @@ open class AuthViewModel: ViewModel() {
 
         val future = CompletableFuture<Boolean>()
 
-
         //Updates the user's credentials
+        //If an exception is raised it is transmitted through the future
         try {
             updateUser()
         } catch (e: Exception) {
              future.completeExceptionally(e)
              return future
         }
-
-        //TODO: Add Preconditions on updateUsser: like empty username ..
 
         // Computes the path to store the user in : user/user-firstLetter/users
         // user-firstletter is a document containing a subcollection which contains the users's documents

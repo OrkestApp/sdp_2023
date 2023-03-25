@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -250,6 +251,7 @@ private fun providerButtonContent(viewModel: AuthViewModel, expanded: MutableSta
             .width(280.dp)
             .height(50.dp)
             .background(Color.Gray)
+            .testTag("providerButton")
     ) {
         // Logo of the provider
         Image(
@@ -306,7 +308,9 @@ private fun dropDownMenu(viewModel: AuthViewModel, expanded: MutableState<Boolea
                 onClick = {
                     viewModel.updateProvider(option)
                     expanded.value = false
-                }
+                },
+                modifier = Modifier
+                    .testTag("option ${option.value}")
             ) {
                 // Logo of the provider
                 Image(
@@ -323,6 +327,7 @@ private fun dropDownMenu(viewModel: AuthViewModel, expanded: MutableState<Boolea
                 Text(text = option.value,
                     modifier = Modifier
                         .padding(start = 20.dp))
+
             }
         }
     }

@@ -21,6 +21,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.github.orkest.View.feed.FeedActivity
 import com.github.orkest.View.profile.ProfileTopInterface
 import com.github.orkest.View.search.SearchUserView
 import com.github.orkest.ViewModel.profile.ProfileViewModel
@@ -78,7 +79,7 @@ class NavigationBar {
                     startDestination = "HomePage",
                     Modifier.padding(padding)
                 ) {
-                    composable("HomePage") { Text(text = "Feed tab") } // TODO REPLACE BY THE COMPOSABLE FUNCTION OF WHAT YOU WANT TO SHOW WHEN BUTTON IS PRESSED
+                    composable("HomePage") { FeedActivity() } // TODO REPLACE BY THE COMPOSABLE FUNCTION OF WHAT YOU WANT TO SHOW WHEN BUTTON IS PRESSED
                     composable("SearchPage") { SearchUserView.SearchUi(viewModel = viewModel) }
                     composable("PlaylistPage") { Text(text = "Playlist tab") }
                     composable("ProfilePage") { ProfileTopInterface(viewModel = ProfileViewModel(user = currentUser)) }

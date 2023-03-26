@@ -68,39 +68,40 @@ open class AuthViewModel: ViewModel() {
 
     /**
      * Called once the user finished inputting its credentials
-     * Returns a Future that completes with True if the user has been successfully added to the database,
-     * False if it already exists, and an exception if an error occurred
+     * Returns a Future that completes with :
+     * True if the user has been successfully added to the database,
+     * False if the username already exists in the database
      */
     open fun createUser(): CompletableFuture<Boolean> {
 
-        val future = CompletableFuture<Boolean>()
-
-        //Updates the user's credentials and transmits any exception through the future
-        try { updateUser() } catch (e: Exception) {
-             future.completeExceptionally(e)
-             return future
-        }
+        //Updates the user's credentials
+        updateUser()
 
         // Computes the path to store the user in : user/user-firstLetter/users
         // user-firstletter is a document containing a subcollection which contains the users's documents
         val firstLetter = username.value.text[0].uppercase()
         val path = "user/user-$firstLetter/users"
 
+        val future = CompletableFuture<Boolean>()
+
         //Checks if the database already contains a user with the same username
         db.collection(path)
-            .document(user.username).get().addOnSuccessListener {
+            .document(user.username).get()
+            .addOnSuccessListener {
                 if (it.data != null) {
                     println(it)
                     future.complete(false)
                 } else {
                     //If no user with the same username was found, add the user to the database
-                    pushUser(path).addOnSuccessListener { future.complete(true) }
+                    pushUser(path)
+                        .addOnSuccessListener { future.complete(true) }
                 }
-            } //Propagates the exception in case of another exception
-            .addOnFailureListener{
-                future.completeExceptionally(
-                Exception("Sorry, something went wrong ... Please check your Internet connection"))
             }
+            //Propagates the exception in case of another exception
+            .addOnFailureListener{
+                future.completeExceptionally(it)
+            }
+
         return future
     }
 
@@ -108,7 +109,6 @@ open class AuthViewModel: ViewModel() {
      * Updates the user's credentials after validation
      */
     private fun updateUser(){
-        if (username.value.text.isEmpty()) throw Exception("Username cannot be empty")
         user.username = username.value.text
         user.profile.username = user.username
         user.profile.bio = bio.value.text

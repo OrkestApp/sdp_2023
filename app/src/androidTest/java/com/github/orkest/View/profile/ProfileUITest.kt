@@ -1,6 +1,7 @@
 package com.github.orkest.View.profile
 
 import androidx.compose.ui.test.assertIsDisplayed
+import com.github.orkest.ui.theme.OrkestTheme
 import org.junit.Rule
 import org.junit.Test
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -10,7 +11,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.orkest.Model.Profile
 import com.github.orkest.R
 import com.github.orkest.View.profile.topProfile
-import com.github.orkest.View.theme.OrkestTheme
 import com.github.orkest.ViewModel.profile.MockProfileViewModel
 import org.junit.runner.RunWith
 import org.junit.Before

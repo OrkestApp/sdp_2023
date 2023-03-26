@@ -57,14 +57,4 @@ class AuthViewModelTest {
         //Adding 2 times the same user should return false
         assert(auth.createUser().get() == false)
     }
-
-    @Test
-    fun createWithEmptyUsernameThrowsException() {
-        auth.updateUsername(TextFieldValue(""))
-        try {
-            auth.createUser().get()
-        } catch (e: Exception) {
-            assert(e.message!!.contains("Username cannot be empty"))
-        }
-    }
 }

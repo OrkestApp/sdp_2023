@@ -337,10 +337,10 @@ fun MenuDrawer(
 }
 
 
-//@Preview(showBackground = true)
-//@Composable
-//fun DefaultPreview() {
-//    EditProfileSetting {
-//        EditProfileScreen()
-//    }
-//}
+@Preview(showBackground = true)
+@Composable
+fun DefaultPreview() {
+    EditProfileSetting {
+        EditProfileScreen(EditProfileActivity())
+    }
+}

@@ -22,16 +22,36 @@ class ProfileActivity() : ComponentActivity() {
         currentUser = intent.getStringExtra("username").toString()
         val viewModel = ProfileViewModel(currentUser)
         setContent {
-            OrkestTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    topProfile(viewModel = viewModel)
-                }
+            ProfileActivitySetting {
+                ProfileActivityScreen(viewModel = viewModel)
             }
         }
+    }
+}
+
+@Composable
+fun ProfileActivitySetting(content: @Composable () -> Unit) {
+    OrkestTheme {
+        // A surface container using the 'background' color from the theme
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            content()
+        }
+
+    }
+}
+
+@Composable
+fun ProfileActivityScreen(viewModel: ProfileViewModel) {
+    Column() {
+        topProfile(viewModel = viewModel)
+        Divider()
+        favoriteSongs()
+        Text(text="AHHHHHHHHHHHH")
+        Divider()
+        favoriteArtists()
     }
 }
 
@@ -40,10 +60,22 @@ fun topProfile(viewModel: ProfileViewModel) {
     ProfileTopInterface(viewModel = viewModel)
 }
 
+@Composable
+fun favoriteSongs() {
+    
+}
+
+@Composable
+fun favoriteArtists() {
+    
+}
+
+
+
 @Preview(showBackground = true)
 @Composable
 fun DefaultProfilePreview() {
-    OrkestTheme {
-        topProfile(viewModel = ProfileViewModel("JohnDoe"))
+    ProfileActivitySetting {
+        ProfileActivityScreen(viewModel = ProfileViewModel("JohnDoe"))
     }
 }

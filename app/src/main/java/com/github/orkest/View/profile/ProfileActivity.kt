@@ -129,7 +129,7 @@ fun favoriteArtists() {
 }
 
 @Composable
-fun <T> placeholders (title: String, items: List<T>){
+fun <T> placeholders (title: String, items: List<T>, select: () -> Unit = { } ){
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -137,7 +137,7 @@ fun <T> placeholders (title: String, items: List<T>){
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(title)
-        IconButton(onClick = { }) {
+        IconButton(onClick = { /* TODO ADD ABILITY TO ADD SONGS + ARTISTS */ }) {
             Icon(imageVector = Icons.Outlined.Add, contentDescription = "Add Button")
         }
     }

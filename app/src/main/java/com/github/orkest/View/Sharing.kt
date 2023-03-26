@@ -1,6 +1,7 @@
 package com.github.orkest.View
 
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -13,11 +14,32 @@ import com.spotify.protocol.types.PlayerState
 /**
  * Activity used to test the Spotify API (DEMO ONLY)
  */
-class MainActivity2 : AppCompatActivity() {
+class Sharing : AppCompatActivity() {
     private var mSpotifyAppRemote: SpotifyAppRemote? = null
     override fun onCreate(savedInstanceState: Bundle?) {
+        when (intent?.action) {
+            Intent.ACTION_SEND -> {
+                if ("text/plain" == intent.type) {
+                    Log.d("Debug", "got text")
+                    handleSendText(intent) // Handle text being sent
+                } else if (intent.type?.startsWith("image/") == true) {
+                    Log.d("Debug", "got image")
+                    handleSendImage(intent) // Handle single image being sent
+                }
+            }
+        }
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main2)
+        setContentView(R.layout.sharing)
+    }
+
+    private fun handleSendImage(intent: Intent) {
+        Log.d("Debug", "Image received")
+    }
+
+    private fun handleSendText(intent: Intent) {
+        intent.getStringExtra(Intent.EXTRA_TEXT)?.let {
+            Log.d("Sharing", "Text received: $it")
+        }
     }
 
     override fun onStart() {

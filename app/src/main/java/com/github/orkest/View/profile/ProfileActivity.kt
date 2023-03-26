@@ -23,6 +23,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -137,7 +139,8 @@ fun <T> placeholders (title: String, items: List<T>, select: () -> Unit = { } ){
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(title)
-        IconButton(onClick = { /* TODO ADD ABILITY TO ADD SONGS + ARTISTS */ }) {
+        IconButton(
+            onClick = { /* TODO ADD ABILITY TO ADD SONGS + ARTISTS */ }) {
             Icon(imageVector = Icons.Outlined.Add, contentDescription = "Add Button")
         }
     }

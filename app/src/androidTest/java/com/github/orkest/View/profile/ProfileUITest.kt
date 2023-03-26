@@ -1,12 +1,14 @@
 package com.github.orkest.View.profile
 
-import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.*
 import com.github.orkest.ui.theme.OrkestTheme
 import org.junit.Rule
 import org.junit.Test
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithContentDescription
-import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.orkest.Model.Profile
 import com.github.orkest.R
@@ -61,6 +63,28 @@ class ProfileUITest {
 
         composeTestRule.onNodeWithText("Favorite Songs").assertIsDisplayed()
         composeTestRule.onNodeWithText("Favorite Artists").assertIsDisplayed()
+    }
+
+    @Test
+    fun navigationDrawerComponentsDisplayOnScreen() {
+        // drawer elements displayed when opening the drawer
+        composeTestRule.onNodeWithContentDescription("Drawer Icon").performClick()
+        composeTestRule.onNodeWithText("Notifications").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Privacy").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Help").assertIsDisplayed()
+
+        // elements not displayed when closing the drawer
+        composeTestRule.onNodeWithContentDescription("Drawer Icon").performClick()
+        composeTestRule.onNodeWithText("Notifications").assertIsNotDisplayed()
+        composeTestRule.onNodeWithText("Privacy").assertIsNotDisplayed()
+        composeTestRule.onNodeWithText("Help").assertIsNotDisplayed()
+    }
+
+    @Test
+    fun addFavoriteSongsAndArtistsButtonsAreDisplayedAndClickable() {
+        val numAddButtons = composeTestRule.onAllNodesWithContentDescription("Add Button").fetchSemanticsNodes().size
+        assert(numAddButtons == 2)
+        composeTestRule.onAllNodesWithContentDescription("Add Button").assertAll(hasClickAction())
     }
 
     @Test

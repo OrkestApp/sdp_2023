@@ -60,13 +60,14 @@ fun ProfileTopInterface(viewModel: ProfileViewModel) {
                 Modifier.fillMaxHeight(),
                 verticalArrangement = Arrangement.SpaceEvenly
             ) {
-                Row{ UserName(viewModel.username.observeAsState().value) }
-                Row{
+                UserName(viewModel.username.observeAsState().value)
+                Row (                ){
                     //Separate followers/followings in an even way
-                    Column(modifier = Modifier.weight(1f)) { NbFollowers(number(viewModel.nbFollowers.observeAsState().value)) }
-                    Column(modifier = Modifier.weight(1f)) { NbFollowings(number(viewModel.nbFollowings.observeAsState().value)) }
+                    NbFollowers(number(viewModel.nbFollowers.observeAsState().value))
+                    Spacer(modifier = Modifier.width(80.dp))
+                    NbFollowings(number(viewModel.nbFollowings.observeAsState().value))
                 }
-                Row{ Description(viewModel.bio.observeAsState().value) }
+                Description(viewModel.bio.observeAsState().value)
             }
         }
 
@@ -84,7 +85,7 @@ fun ProfileTopInterface(viewModel: ProfileViewModel) {
 @Composable
 fun UserName(username: String?){
     Text(
-        text = username ?: "",
+        text = username ?: "AH",
         fontWeight = FontWeight.Bold,
         fontSize = fontSize
     )

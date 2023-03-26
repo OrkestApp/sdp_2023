@@ -43,7 +43,9 @@ class ProfileUITest {
         )
 
         composeTestRule.setContent {
-            OrkestTheme { topProfile(viewModel = viewModel) }
+            ProfileActivitySetting {
+                ProfileActivityScreen(ProfileActivity(), viewModel = viewModel)
+            }
         }
     }
 
@@ -56,6 +58,9 @@ class ProfileUITest {
         composeTestRule.onNodeWithText("${John.nbFollowers}\nfollowers").assertIsDisplayed()
         composeTestRule.onNodeWithText("${John.nbFollowings}\nfollowings").assertIsDisplayed()
         composeTestRule.onNodeWithContentDescription("${R.drawable.profile_picture}").assertIsDisplayed()
+
+        composeTestRule.onNodeWithText("Favorite Songs").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Favorite Artists").assertIsDisplayed()
     }
 
     @Test
@@ -98,5 +103,7 @@ class ProfileUITest {
         viewModel.setBio(null)
         composeTestRule.onNodeWithText("Description").assertIsDisplayed()
     }
+
+
 
 }

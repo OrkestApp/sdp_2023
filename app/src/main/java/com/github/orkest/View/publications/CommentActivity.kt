@@ -4,16 +4,24 @@ package com.github.orkest.View
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.semantics.Role.Companion.Image
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import coil.compose.rememberImagePainter
+import com.github.orkest.R
 import com.github.orkest.View.theme.OrkestTheme
 
 
@@ -41,18 +49,36 @@ fun CommentSetting(content: @Composable () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommentScreen(post: ComponentActivity) {
+    Column() {
+        Surface(modifier = Modifier.height(600.dp)) {
+            Comments()
+        }
+        var modifyName by rememberSaveable { mutableStateOf("tqt") }
+        TextField(
+            value = modifyName,
+            onValueChange = { modifyName = it },
+            colors = TextFieldDefaults.textFieldColors(
+                containerColor = Color.Transparent
+            )
+        )
+    }
+
+}
+
+@Composable
+fun Comments() {
     val comments = (1..30).map { "Item $it" }
     LazyColumn {
-        itemsIndexed(comments) { _, comment ->
+        itemsIndexed(comments) { index, comment ->
             Divider()
             CommentBox(
-                profilePic ="",
-                username = "Roman",
+                profilePic = "",
+                username = "Roman ${index}",
                 comment = comment
             )
-            Divider()
         }
     }
 }
@@ -63,13 +89,29 @@ fun CommentBox(profilePic: String, username: String, comment: String) {
         modifier = Modifier
             .fillMaxWidth()
     ) {
-        Row() {
-            //Icon(painter = profilePic, contentDescription = )
+        Row {
+            displayProfilePic()
             Column() {
-                Text(text = username)
+                Text(text = username, fontWeight = FontWeight.Bold)
                 Text(text = comment)
             }
         }
+    }
+}
+
+@Composable
+fun displayProfilePic() {
+    Card(
+        shape = CircleShape,
+        modifier = Modifier
+            .padding(8.dp)
+            .size(50.dp)
+    ) {
+        val imageUri = rememberSaveable { mutableStateOf("") }
+        val painter = rememberImagePainter(
+            imageUri.value.ifEmpty { R.drawable.blank_profile_pic }
+        )
+        Image(painter = painter, contentDescription = "tqt")
     }
 }
 

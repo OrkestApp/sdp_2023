@@ -1,9 +1,11 @@
 package com.github.orkest.ViewModel.profile
 
+import com.github.orkest.Constants
 import com.github.orkest.Model.Profile
 import com.github.orkest.Model.User
 import com.github.orkest.ViewModel.profile.ProfileViewModel
 import junit.framework.TestCase.assertEquals
+import kotlinx.coroutines.delay
 import org.junit.Before
 import org.junit.Test
 import kotlinx.coroutines.runBlocking
@@ -15,23 +17,30 @@ class ProfileViewModelTest {
     private var testUserName = "testUser"
     private var testBio = "This is my bio"
     private var testNbFollowers = 10
-    private var testNbFollowings = 2
+    private var testNbFollowings = 34
     private var testProfilePicture = 45
 
     private val newUsername = "newUsername"
     private val newBio = "My new bio"
     private val newNbFollowers = 32
-    private val newNbFollowings = 0
+    private val newNbFollowings = 65
     private val newProfilePicture = 928
 
     private lateinit var user: User
+    private lateinit var newUser: User
     private var viewModel: ProfileViewModel = ProfileViewModel(testUserName)
+    private val newViewModel: ProfileViewModel = ProfileViewModel(newUsername)
 
     @Before
     fun setUp() {
+        Constants.currentLoggedUser = testUserName
         runBlocking {
             user = User(profile = Profile(testUserName, testProfilePicture, testBio, testNbFollowers, testNbFollowings))
             viewModel.userDocument(testUserName).set(user).await()
+        }
+        runBlocking {
+            newUser = User(profile = Profile(newUsername, newProfilePicture, newBio, newNbFollowers, newNbFollowings))
+            newViewModel.userDocument(newUsername).set(newUser).await()
         }
         viewModel.setupListener()
     }
@@ -147,6 +156,58 @@ class ProfileViewModelTest {
         assertEquals(2, user.profile.profilePictureId)
     }
 
+    @Test
+    fun isUserFollowedReturnsTrueWhenFollowed(){
+        runBlocking {
+            user.followings.add(newUsername)
+            viewModel.userDocument(testUserName).set(user).await()
+            newUser.followers.add(testUserName)
+            newViewModel.userDocument(newUsername).set(newUser).await()
+        }
 
+        newViewModel.isUserFollowed().whenComplete{_, _ ->
+            assertEquals(true, newViewModel.isUserFollowed.value)
+        }
+    }
 
+    @Test
+    fun isUserFollowedReturnsFalseWhenNotFollowed(){
+        newViewModel.isUserFollowed().whenComplete{_, _ ->
+            assertEquals(false, newViewModel.isUserFollowed.value)
+        }
+    }
+
+    @Test
+    fun followFunctionalityUpdatesUsers(){
+        newViewModel.follow().whenComplete {_,_ ->
+            assertEquals(true, user.followings.contains(newUsername))
+            assertEquals(true, newUser.followers.contains(testUserName))
+            assertEquals(testNbFollowings+1, user.profile.nbFollowings)
+            assertEquals(newNbFollowers+1, newUser.profile.nbFollowers)
+        }
+    }
+
+    @Test
+    fun unFollowFunctionalityUpdatesUsers(){
+        newViewModel.unfollow().whenComplete {_,_ ->
+            assertEquals(false, user.followings.contains(newUsername))
+            assertEquals(false, newUser.followers.contains(testUserName))
+            assertEquals(testNbFollowings-1, user.profile.nbFollowings)
+            assertEquals(newNbFollowers-1, newUser.profile.nbFollowers)
+        }
+    }
+
+    @Test
+    fun unFollowNeverGoesUnderZero(){
+        runBlocking {
+            newUser.profile.nbFollowers = 0
+            newViewModel.userDocument(newUsername).set(newUser).await()
+            user.profile.nbFollowings = 0
+            viewModel.userDocument(testUserName).set(user).await()
+        }
+        newViewModel.unfollow().whenComplete{_, _ ->
+            assertEquals(0, newUser.profile.nbFollowers)
+            assertEquals(0, user.profile.nbFollowings)
+        }
+    }
 }

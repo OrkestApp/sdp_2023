@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.github.orkest.Constants
 import com.github.orkest.Model.Providers
 import com.github.orkest.View.MainActivity
 import com.github.orkest.View.theme.White
@@ -136,6 +137,7 @@ fun SignUpForm(navController: NavController, viewModel: AuthViewModel) {
                                 if(result) {
                                     //Launches intent to the main Activity
                                     val intent = Intent(context, MainActivity::class.java)
+                                    Constants.currentLoggedUser = viewModel.getUsername().text
                                     intent.putExtra("username",viewModel.getUsername().text)
                                     context.startActivity(intent)
                                 } else {

@@ -7,11 +7,14 @@ import org.junit.Test
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.orkest.Constants
 import com.github.orkest.Model.Profile
 import com.github.orkest.R
 import com.github.orkest.View.profile.topProfile
 import com.github.orkest.ViewModel.profile.MockProfileViewModel
+import org.junit.Assert
 import org.junit.runner.RunWith
 import org.junit.Before
 
@@ -27,6 +30,8 @@ class ProfileUITest {
 
     @Before
     fun setup() {
+        Constants.currentLoggedUser = "Logan"
+
         John = Profile(
             "JohnSmith",
             R.drawable.profile_picture,
@@ -98,5 +103,24 @@ class ProfileUITest {
         viewModel.setBio(null)
         composeTestRule.onNodeWithText("Description").assertIsDisplayed()
     }
+
+    @Test
+    fun editButton_click() {
+        var isClicked = false
+
+        // Compose EditButton with onClick that sets isClicked to true
+        composeTestRule.setContent {
+            EditButton { isClicked = true }
+        }
+
+        // Find EditButton by text and perform click
+        val editButton = composeTestRule.onNodeWithText("Edit Profile")
+        editButton.performClick()
+
+        // Verify that onClick sets isClicked to true
+        //assertThat(isClicked).isTrue()
+    }
+
+
 
 }

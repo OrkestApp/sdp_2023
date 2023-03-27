@@ -28,6 +28,7 @@ class SignUpFormTest {
         composeTestRule.setContent {
             SignUpForm(navController = rememberNavController(), viewModel)
         }
+        composeTestRule.waitForIdle()
     }
 
     @Test
@@ -54,11 +55,16 @@ class SignUpFormTest {
 
     @Test
     fun inputFieldsUpdateViewAndViewModelWhenInput(){
+        composeTestRule.waitUntil{
+            composeTestRule.onAllNodesWithText("Username").fetchSemanticsNodes().size ==1
+        }
         composeTestRule.onNodeWithText("Username").performTextInput("Steve")
         composeTestRule.onNodeWithText("Steve").assertIsDisplayed()
-        //This has to be put after we check the view to be sure we didn't check this info too soon
+        //his has to be put after we check the view to be sure we didn't check this info too soon
         assert(viewModel.getUsername().text == "Steve")
-
+        composeTestRule.waitUntil{
+            composeTestRule.onAllNodesWithText("Profile Description").fetchSemanticsNodes().size ==1
+        }
         composeTestRule.onNodeWithText("Profile Description").performTextInput("bio")
         composeTestRule.onNodeWithText("bio").assertIsDisplayed()
         assert(viewModel.getBio().text == "bio")

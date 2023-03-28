@@ -2,10 +2,8 @@ package com.github.orkest.ViewModel.profile
 
 import android.content.ContentValues.TAG
 import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.github.orkest.Constants
 import com.github.orkest.Model.Profile
 import com.github.orkest.Model.User
@@ -13,9 +11,6 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.tasks.await
 import java.util.concurrent.CompletableFuture
 
 open class ProfileViewModel(private val user: String) : ViewModel() {
@@ -31,7 +26,8 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
 
     lateinit var future : CompletableFuture<Profile>
 
-
+    //sets initial value to false while waiting for the future to complete
+    open val isUserFollowed = MutableLiveData(false)
 
     init{ setupListener() }
 
@@ -48,7 +44,12 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
             nbFollowings.value = it.nbFollowings
             //profilePictureId.value = it.profilePictureId
         }
+
         listenToUserData()
+
+        isUserFollowed().thenAccept {
+            isUserFollowed.value = it
+        }
     }
 
     fun userDocument(username: String) : DocumentReference {
@@ -102,18 +103,16 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
      * Function only called when visiting the profile of another user
      * Checks whether the current logged in user follows this account
      */
-
-    open val _isUserFollowed = MutableLiveData<Boolean>()
-    var isUserFollowed: LiveData<Boolean> = _isUserFollowed
     open fun isUserFollowed(): CompletableFuture<Boolean>{
         val future = CompletableFuture<Boolean>()
         userDocument(user).get()
             .addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
                     val user = document.toObject(User::class.java)
-                    if (user != null) {
-                        _isUserFollowed.postValue(user.followers.contains(Constants.currentLoggedUser))
+                    if (user != null && user.followers.contains(Constants.currentLoggedUser)) {
                         future.complete(true)
+                    } else{
+                        future.complete(false)
                     }
                 }
             }
@@ -126,6 +125,7 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
         var userUpdated = false
         var currentUserUpdated = false
 
+        //Updates the data of the user whose profile is displayed
         userDocument(user).get()
             .addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
@@ -133,7 +133,6 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
                     if (user != null) {
                         user.profile.nbFollowers += 1
                         user.followers.add(Constants.currentLoggedUser)
-                        _isUserFollowed.postValue(true)
                         userUpdated = true
                     }
                 }
@@ -142,6 +141,7 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
                 Log.w(TAG, "Error getting user data", e)
             }
 
+        //updates the data of the current logged-in user
         userDocument(Constants.currentLoggedUser).get()
             .addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
@@ -154,9 +154,10 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
                 }
             }
             .addOnFailureListener { e ->
-                Log.w(TAG, "Error getting user data", e)
+                Log.w(TAG, "Error getting current user data", e)
             }
 
+        //Both updates must be successful
         futureFollow.complete(userUpdated && currentUserUpdated)
         return futureFollow
     }
@@ -166,6 +167,7 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
         var userUpdated = false
         var currentUserUpdated = false
 
+        //updates the data of the user whose profile is displayed
         userDocument(user).get()
             .addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
@@ -173,7 +175,6 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
                     if (user != null) {
                         if (user.profile.nbFollowers > 0) user.profile.nbFollowers -= 1
                         user.followers.remove(Constants.currentLoggedUser)
-                        _isUserFollowed.postValue(false)
                         userUpdated = true
                     }
                 }
@@ -182,6 +183,7 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
                 Log.w(TAG, "Error getting user data", e)
             }
 
+        //updates the data of the current logged in user
         userDocument(Constants.currentLoggedUser).get()
             .addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
@@ -194,12 +196,12 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
                 }
             }
             .addOnFailureListener { e ->
-                Log.w(TAG, "Error getting user data", e)
+                Log.w(TAG, "Error getting current user data", e)
             }
 
+        //Both updates must be successful
         futureFollow.complete(userUpdated && currentUserUpdated)
         return futureFollow
     }
-
 
 }

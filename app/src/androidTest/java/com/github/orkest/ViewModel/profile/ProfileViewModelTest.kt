@@ -3,9 +3,7 @@ package com.github.orkest.ViewModel.profile
 import com.github.orkest.Constants
 import com.github.orkest.Model.Profile
 import com.github.orkest.Model.User
-import com.github.orkest.ViewModel.profile.ProfileViewModel
 import junit.framework.TestCase.assertEquals
-import kotlinx.coroutines.delay
 import org.junit.Before
 import org.junit.Test
 import kotlinx.coroutines.runBlocking

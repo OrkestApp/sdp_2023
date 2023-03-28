@@ -9,27 +9,21 @@ import androidx.compose.foundation.text.ClickableText
 //import androidx.compose.material3.Text
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
-import androidx.navigation.NavController
 import com.github.orkest.Constants
-import com.github.orkest.Model.Profile
 import com.github.orkest.R
 import com.github.orkest.View.EditProfileActivity
-import com.github.orkest.View.MainActivity
 import com.github.orkest.ViewModel.profile.ProfileViewModel
 
 private val topInterfaceHeight = 150.dp
@@ -77,7 +71,7 @@ fun ProfileTopInterface(viewModel: ProfileViewModel) {
 
 
         Row {
-            if(viewModel.username.equals(Constants.currentLoggedUser)) {
+            if(viewModel.username.value == Constants.currentLoggedUser) {
                 EditButton {
                     val intent = Intent(context, EditProfileActivity::class.java)
                     context.startActivity(intent)
@@ -91,18 +85,18 @@ fun ProfileTopInterface(viewModel: ProfileViewModel) {
 
 @Composable
 fun FollowButton(viewModel: ProfileViewModel){
-    val isUserFollowed = viewModel._isUserFollowed.observeAsState(false)
+    val isUserFollowed = viewModel.isUserFollowed.observeAsState(false)
     val buttonText = if (isUserFollowed.value) "Unfollow" else "Follow"
 
     Button(onClick = {
         if (isUserFollowed.value) {
             viewModel.unfollow().whenComplete { _, _ ->
-                viewModel._isUserFollowed.value = false
+                viewModel.isUserFollowed.value = false
             }
         }
         else {
             viewModel.follow().whenComplete{_,_ ->
-                viewModel._isUserFollowed.value = true
+                viewModel.isUserFollowed.value = true
             }
         }
     },

@@ -1,6 +1,6 @@
 package com.github.orkest.View.profile
 
-import androidx.compose.runtime.livedata.observeAsState
+
 import androidx.compose.ui.test.assertIsDisplayed
 import com.github.orkest.ui.theme.OrkestTheme
 import org.junit.Rule
@@ -27,6 +27,7 @@ import java.util.concurrent.CompletableFuture
 class ProfileUITest {
 
     private var viewModel: MockProfileViewModel = MockProfileViewModel("JohnSmith")
+    private var newViewModel: MockProfileViewModel = MockProfileViewModel("newUser")
     private  lateinit  var John: Profile
 
     @get:Rule
@@ -34,32 +35,18 @@ class ProfileUITest {
 
     @Before
     fun setup() {
+        Constants.currentLoggedUser = "JohnSmith"
 
+        John = Profile("JohnSmith", R.drawable.profile_picture, "I like everything", 10, 2)
+        viewModel.loadData(John.username, John.bio, John.nbFollowers, John.nbFollowings, John.profilePictureId)
 
-        John = Profile(
-            "JohnSmith",
-            R.drawable.profile_picture,
-            "I like everything",
-            10,
-            2
-        )
-        viewModel.loadData(
-            John.username,
-            John.bio,
-            John.nbFollowers,
-            John.nbFollowings,
-            John.profilePictureId
-        )
-
-        composeTestRule.setContent {
-            OrkestTheme { topProfile(viewModel = viewModel) }
-        }
+        val newUser = Profile("newUser", R.drawable.profile_picture,"",1,1)
+        newViewModel.loadData(newUser.username,newUser.bio,newUser.nbFollowers,newUser.nbFollowings,newUser.profilePictureId)
     }
-
 
     @Test
     fun profileScreen_displaysRightValues() {
-
+        composeTestRule.setContent { OrkestTheme { topProfile(viewModel = viewModel) } }
         composeTestRule.onNodeWithText(John.username).assertIsDisplayed()
         composeTestRule.onNodeWithText(John.bio).assertIsDisplayed()
         composeTestRule.onNodeWithText("${John.nbFollowers}\nfollowers").assertIsDisplayed()
@@ -69,6 +56,9 @@ class ProfileUITest {
 
     @Test
     fun profileScreen_updatesWhenValuesChangedInDatabase() {
+        composeTestRule.setContent {
+            OrkestTheme { topProfile(viewModel = viewModel) }
+        }
         val newUsername = "Mike"
         val newBio = "New Bio"
         val newNbFollowers = 1000
@@ -86,37 +76,41 @@ class ProfileUITest {
 
     @Test
     fun loadData_withNullProfilePictureId() {
+        composeTestRule.setContent { OrkestTheme { topProfile(viewModel = viewModel) } }
         viewModel.setProfilePictureId(null)
         composeTestRule.onNodeWithContentDescription("${R.drawable.profile_picture}").assertIsDisplayed()
     }
 
     @Test
     fun loadData_withNullNbFollowers(){
+        composeTestRule.setContent { OrkestTheme { topProfile(viewModel = viewModel) } }
         viewModel.setNbFollowers(null)
         composeTestRule.onNodeWithText("${0}\nfollower").assertIsDisplayed()
     }
 
     @Test
     fun loadData_withNullNbFollowings(){
+        composeTestRule.setContent { OrkestTheme { topProfile(viewModel = viewModel) } }
         viewModel.setNbFollowings(null)
         composeTestRule.onNodeWithText("${0}\nfollowing").assertIsDisplayed()
     }
 
     @Test
     fun loadData_withNullDescription(){
+        composeTestRule.setContent { OrkestTheme { topProfile(viewModel = viewModel) } }
         viewModel.setBio(null)
         composeTestRule.onNodeWithText("Description").assertIsDisplayed()
     }
 
     @Test
     fun editButton_isDisplayed_when_Current_Profile_Displayed(){
-        Constants.currentLoggedUser = "JohnSmith"
+        composeTestRule.setContent { OrkestTheme { topProfile(viewModel = viewModel) } }
         composeTestRule.onNodeWithText("Edit Profile").assertIsDisplayed()
     }
 
     @Test
     fun followButton_click_updates_to_unfollow() {
-        Constants.currentLoggedUser = "New User"
+        composeTestRule.setContent { OrkestTheme { topProfile(viewModel = newViewModel) } }
         val button = composeTestRule.onNodeWithText("Follow")
 
         button.performClick()
@@ -125,8 +119,8 @@ class ProfileUITest {
 
     @Test
     fun unfollowButton_click_updates_to_follow() {
-        Constants.currentLoggedUser = "New User"
-        UiThreadStatement.runOnUiThread {viewModel._isUserFollowed.value = true}
+        composeTestRule.setContent { OrkestTheme { topProfile(viewModel = newViewModel) } }
+        newViewModel.setIsUserFollowed(true)
         val button = composeTestRule.onNodeWithText("Unfollow")
 
         button.performClick()

@@ -103,9 +103,9 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
      * Checks whether the current logged in user follows this account
      */
 
-    private val _isUserFollowed = MutableLiveData<Boolean>()
+    open val _isUserFollowed = MutableLiveData<Boolean>()
     var isUserFollowed: LiveData<Boolean> = _isUserFollowed
-    fun isUserFollowed(): CompletableFuture<Boolean>{
+    open fun isUserFollowed(): CompletableFuture<Boolean>{
         val future = CompletableFuture<Boolean>()
         userDocument(user).get()
             .addOnSuccessListener { document ->
@@ -121,7 +121,7 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
         return future
     }
 
-    fun follow(): CompletableFuture<Boolean>{
+    open fun follow(): CompletableFuture<Boolean>{
         val futureFollow =CompletableFuture<Boolean>()
         var userUpdated = false
         var currentUserUpdated = false
@@ -133,6 +133,7 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
                     if (user != null) {
                         user.profile.nbFollowers += 1
                         user.followers.add(Constants.currentLoggedUser)
+                        _isUserFollowed.postValue(true)
                         userUpdated = true
                     }
                 }
@@ -160,7 +161,7 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
         return futureFollow
     }
 
-    fun unfollow(): CompletableFuture<Boolean>{
+    open fun unfollow(): CompletableFuture<Boolean>{
         val futureFollow =CompletableFuture<Boolean>()
         var userUpdated = false
         var currentUserUpdated = false
@@ -172,6 +173,7 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
                     if (user != null) {
                         if (user.profile.nbFollowers > 0) user.profile.nbFollowers -= 1
                         user.followers.remove(Constants.currentLoggedUser)
+                        _isUserFollowed.postValue(false)
                         userUpdated = true
                     }
                 }

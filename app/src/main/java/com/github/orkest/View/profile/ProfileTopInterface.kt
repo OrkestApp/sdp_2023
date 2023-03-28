@@ -75,8 +75,7 @@ fun ProfileTopInterface(viewModel: ProfileViewModel) {
 
         Spacer(modifier = Modifier.height(separator))
 
-        viewModel.isUserFollowed()
-        val isUserFollowed by viewModel.isUserFollowed.observeAsState(false)
+
         Row {
             if(viewModel.username.equals(Constants.currentLoggedUser)) {
                 EditButton {
@@ -84,35 +83,39 @@ fun ProfileTopInterface(viewModel: ProfileViewModel) {
                     context.startActivity(intent)
                 }
             } else {
-                FollowButton(
-                    isFollowed = isUserFollowed,
-                    onFollowClick = {  },
-                    onUnfollowClick = {  } )
+                FollowButton(viewModel)
             }
         }
     }
 }
 
 @Composable
-fun FollowButton(isFollowed: Boolean, onFollowClick:() -> Unit, onUnfollowClick:() -> Unit){
-    Button(
-        onClick = {
-                  if (isFollowed) { onUnfollowClick() }
-                  else { onFollowClick() }
-        },
+fun FollowButton(viewModel: ProfileViewModel){
+    val isUserFollowed = viewModel._isUserFollowed.observeAsState(false)
+    val buttonText = if (isUserFollowed.value) "Unfollow" else "Follow"
+
+    Button(onClick = {
+        if (isUserFollowed.value) {
+            viewModel.unfollow().whenComplete { _, _ ->
+                viewModel._isUserFollowed.value = false
+            }
+        }
+        else {
+            viewModel.follow().whenComplete{_,_ ->
+                viewModel._isUserFollowed.value = true
+            }
+        }
+    },
         modifier = Modifier
             .height(topInterfaceHeight / 4)
             .width((3 * topInterfaceHeight) / 4)
-            .semantics {
-                       testTag = "Follow Button"
-            },
-    )
-    {
+        ,) {
         Text(
-            text = if (isFollowed) "Unfollow" else "Follow",
+            text = buttonText,
             fontSize = smallFontSize)
     }
 }
+
 
 
 @Composable

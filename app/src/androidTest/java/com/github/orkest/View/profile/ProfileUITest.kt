@@ -1,5 +1,6 @@
 package com.github.orkest.View.profile
 
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.test.assertIsDisplayed
 import com.github.orkest.ui.theme.OrkestTheme
 import org.junit.Rule
@@ -9,14 +10,17 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.internal.runner.junit4.statement.UiThreadStatement
 import com.github.orkest.Constants
 import com.github.orkest.Model.Profile
 import com.github.orkest.R
 import com.github.orkest.View.profile.topProfile
 import com.github.orkest.ViewModel.profile.MockProfileViewModel
+import junit.framework.TestCase.assertTrue
 import org.junit.Assert
 import org.junit.runner.RunWith
 import org.junit.Before
+import java.util.concurrent.CompletableFuture
 
 
 @RunWith(AndroidJUnit4::class)
@@ -30,7 +34,7 @@ class ProfileUITest {
 
     @Before
     fun setup() {
-        Constants.currentLoggedUser = "Logan"
+
 
         John = Profile(
             "JohnSmith",
@@ -105,22 +109,29 @@ class ProfileUITest {
     }
 
     @Test
-    fun editButton_click() {
-        var isClicked = false
-
-        // Compose EditButton with onClick that sets isClicked to true
-        composeTestRule.setContent {
-            EditButton { isClicked = true }
-        }
-
-        // Find EditButton by text and perform click
-        val editButton = composeTestRule.onNodeWithText("Edit Profile")
-        editButton.performClick()
-
-        // Verify that onClick sets isClicked to true
-        //assertThat(isClicked).isTrue()
+    fun editButton_isDisplayed_when_Current_Profile_Displayed(){
+        Constants.currentLoggedUser = "JohnSmith"
+        composeTestRule.onNodeWithText("Edit Profile").assertIsDisplayed()
     }
 
+    @Test
+    fun followButton_click_updates_to_unfollow() {
+        Constants.currentLoggedUser = "New User"
+        val button = composeTestRule.onNodeWithText("Follow")
+
+        button.performClick()
+        composeTestRule.onNodeWithText("Unfollow").assertIsDisplayed()
+    }
+
+    @Test
+    fun unfollowButton_click_updates_to_follow() {
+        Constants.currentLoggedUser = "New User"
+        UiThreadStatement.runOnUiThread {viewModel._isUserFollowed.value = true}
+        val button = composeTestRule.onNodeWithText("Unfollow")
+
+        button.performClick()
+        composeTestRule.onNodeWithText("Follow").assertIsDisplayed()
+    }
 
 
 }

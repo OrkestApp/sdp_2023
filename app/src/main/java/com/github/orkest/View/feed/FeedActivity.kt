@@ -31,8 +31,11 @@ import com.github.orkest.Model.User
 import com.github.orkest.R
 import com.github.orkest.View.search.SearchUserView
 
-//TODO: Make the code maintainable
 
+/**
+ * Composable function for the feed screen
+ * Represents the view of the MVVM pattern
+ */
 @Composable
 fun FeedActivity(){
     //Add a list of posts
@@ -52,6 +55,10 @@ fun FeedActivity(){
     }
 }
 
+/**
+ * Composable function to display a post, can be reused for the profile page
+ * @param post the post to display
+ */
 @Composable
 fun Post(post: Post){
 
@@ -91,7 +98,7 @@ private fun UserUsername(username: String){
 }
 
 @Composable
-fun UserProfilePic(profilePicId : Int){
+private fun UserProfilePic(profilePicId : Int){
         //Add the user's profile pic
         Image(
             painter = painterResource(id = profilePicId),
@@ -106,7 +113,7 @@ fun UserProfilePic(profilePicId : Int){
 }
 
 @Composable
-fun PostDescription(postDescription: String){
+private fun PostDescription(postDescription: String){
         //Add the post's content
         Text(text = postDescription,
             fontSize = 15.sp,
@@ -117,6 +124,8 @@ fun PostDescription(postDescription: String){
 
 /**
  * Composable function that displays the song's info and a play button
+ * Can be reused for the sharedWithMe page and profile page
+ * @param song the song to display
  */
 @Composable
 fun SongCard(song: Song){
@@ -182,45 +191,28 @@ private fun PlayButton(){
 private fun Reaction(){
     Column(modifier = Modifier.padding(20.dp)) {
         // Create the like button
-        Icon(painter = painterResource(id = R.drawable.black_like_icon),
-            contentDescription = "Like button",
-            tint = Color.White,
-            modifier = Modifier
-                .testTag("like_button")
-                .height(20.dp)
-                .width(20.dp)
-                .clickable { })
-       //Text(text = "20", color = Color.White, fontSize = 9.sp)
-
+        reactionIcon(R.drawable.black_like_icon,"Like button", "like_button" )
         Spacer(modifier = Modifier.height(10.dp))
 
         //Create the comment button
-        Icon(painter = painterResource(id = R.drawable.comment_icon),
-            contentDescription = "Comment button",
-            tint = Color.White,
-            modifier = Modifier
-                .testTag("comment_button")
-                .height(20.dp)
-                .width(20.dp)
-                .clickable { })
-//       Text(text = "10", color = Color.White, fontSize = 9.sp,
-//       textAlign = TextAlign.Center)
-
+        reactionIcon(R.drawable.comment_icon,"Comment button", "comment_button" )
         Spacer(modifier = Modifier.height(10.dp))
 
         //Create the share button
-        Icon(painter = painterResource(id = R.drawable.share_icon),
-            contentDescription = "Share button",
-            tint = Color.White,
-            modifier = Modifier
-                .testTag("share_button")
-                .height(20.dp)
-                .width(20.dp)
-                .clickable { })
-       // Text(text = "5", color = Color.White, fontSize = 9.sp)
-
+        reactionIcon(R.drawable.share_icon,"Share button", "share_button" )
     }
+}
 
+@Composable
+private fun reactionIcon(iconId: Int,contentDescription:String, testTag: String) {
+    Icon(painter = painterResource(id = iconId),
+        contentDescription = "Share button",
+        tint = Color.White,
+        modifier = Modifier
+            .testTag(testTag)
+            .height(20.dp)
+            .width(20.dp)
+            .clickable { })
 }
 
 

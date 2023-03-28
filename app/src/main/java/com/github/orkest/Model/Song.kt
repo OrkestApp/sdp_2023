@@ -7,4 +7,4 @@ data class Song (var name: String,
                  var author: String,
                  var album: String,
                  var link: String,
-                 var pictureId: String)
+                 var pictureId: Int)

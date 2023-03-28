@@ -4,11 +4,13 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,58 +24,66 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.github.orkest.Model.Post
+import com.github.orkest.Model.Profile
+import com.github.orkest.Model.Song
+import com.github.orkest.Model.User
 import com.github.orkest.R
+import com.github.orkest.View.search.SearchUserView
 
+//TODO: Make the code maintainable
 
 @Composable
 fun FeedActivity(){
-    //Add the post
-    Post()
+    //Add a list of posts
+    val user = User("Username", profile = Profile(username = "Username",
+                                            profilePictureId = R.drawable.profile_picture))
+    val rudeBoySong = Song("Rude Boy", "Rihanna", "Rated R",
+                "link", R.drawable.album_cover)
+    val post = Post(user,"Post Description", rudeBoySong, 0, ArrayList())
 
+    var listPosts by remember { mutableStateOf(mutableListOf(post,post,post,post)) }
+    LazyColumn(modifier = Modifier
+        .fillMaxSize()
+        .background(Color.LightGray)) {
+        items(listPosts) { post ->
+            Post(post = post)
+        }
+    }
 }
 
 @Composable
-fun Post(){
+fun Post(post: Post){
 
     Row(modifier = Modifier
-        .padding(20.dp)
+        .padding(start = 25.dp, top = 20.dp)
         .clip(shape = RoundedCornerShape(20.dp))
-        //.background(Color.hsl(60f, 0.16f, 0.92f))
-        //.background(Color.hsl(180f, 0.11f, 0.98f))
         .background(Color.DarkGray)){
 
-
         Column {
-
             // Display the user profile pic
-            UserProfilePic()
-
-
+            UserProfilePic(post.user.profile.profilePictureId)
             //Display the reaction buttons
             Reaction()
         }
 
-
-
         Column(modifier = Modifier.padding(10.dp, top = 10.dp, end = 10.dp)) {
             //Add the user's username
-            UserUsername()
-
+            UserUsername(post.user.username)
             // Display the post's content
-            PostDescription()
+            PostDescription(post.postDescription)
             Spacer(modifier = Modifier.height(10.dp))
-
             // Display the post's song
-            SongCard()
+            SongCard(post.song)
             Spacer(modifier = Modifier.height(10.dp))
         }
     }
 }
 
 @Composable
-fun UserUsername(){
+private fun UserUsername(username: String){
     //Add the user's username
-    Text(text = "Username", fontSize = 14.sp, fontWeight = FontWeight.Bold,
+    Text(text = username, fontSize = 14.sp, fontWeight = FontWeight.Bold,
         color = Color.White,
         modifier = Modifier
           //  .padding(start = 10.dp)
@@ -81,10 +91,10 @@ fun UserUsername(){
 }
 
 @Composable
-fun UserProfilePic(){
+fun UserProfilePic(profilePicId : Int){
         //Add the user's profile pic
         Image(
-            painter = painterResource(id = R.drawable.profile_picture),
+            painter = painterResource(id = profilePicId),
             contentDescription = "Profile Picture of the user",
             modifier = Modifier
                 .padding(start = 10.dp, top = 10.dp)
@@ -96,16 +106,20 @@ fun UserProfilePic(){
 }
 
 @Composable
-fun PostDescription(){
+fun PostDescription(postDescription: String){
         //Add the post's content
-        Text(text = "Post Content",
+        Text(text = postDescription,
             fontSize = 15.sp,
             color = Color.White,
             maxLines = 2)
 }
 
+
+/**
+ * Composable function that displays the song's info and a play button
+ */
 @Composable
-fun SongCard(){
+fun SongCard(song: Song){
 
     //Row containing the song's album pic, info and play button
         Row(horizontalArrangement = Arrangement.SpaceBetween,
@@ -117,7 +131,7 @@ fun SongCard(){
                 .padding(end = 10.dp)){
 
             //Add the song's info at the left of the card
-            SongInfo()
+            SongInfo(song)
 
             Spacer(modifier = Modifier.width(5.dp))
 
@@ -127,12 +141,12 @@ fun SongCard(){
 }
 
 @Composable
-fun SongInfo(){
+private fun SongInfo(song: Song){
 
     Row(Modifier.padding(10.dp)) {
         //Add the song's picture at the left of the card
         Image(
-            painter = painterResource(id = R.drawable.album_cover),
+            painter = painterResource(id = song.pictureId),
             contentDescription = "Cover of the album of the song Rude Boy by Rihanna",
             modifier = Modifier
                 .height(80.dp)
@@ -143,18 +157,18 @@ fun SongInfo(){
 
         Column(verticalArrangement = Arrangement.SpaceEvenly) {
 
-            //Add the song's title at the right of the card
-            Text(text = "Rude Boy", fontSize = 25.sp)
-            //Add the song's artist at the right of the card
-            Text(text = "Rihanna", color = Color.Gray, fontSize = 18.sp)
-            //Add the song's album at the right of the card
-            Text(text = "Rated R", color = Color.Gray, fontSize = 14.sp)
+            //Add the song's title at the right of the album
+            Text(text = song.name, fontSize = 25.sp)
+            //Add the song's artist at the right of the album
+            Text(text = song.author, color = Color.Gray, fontSize = 18.sp)
+            //Add the song's album at the right of the album
+            Text(text = song.album, color = Color.Gray, fontSize = 14.sp)
         }
     }
 }
 
 @Composable
-fun PlayButton(){
+private fun PlayButton(){
     Icon(painter = painterResource(id = R.drawable.play_button),
         contentDescription = "Play button",
         modifier = Modifier
@@ -165,7 +179,7 @@ fun PlayButton(){
 }
 
 @Composable
-fun Reaction(){
+private fun Reaction(){
     Column(modifier = Modifier.padding(20.dp)) {
         // Create the like button
         Icon(painter = painterResource(id = R.drawable.black_like_icon),
@@ -213,6 +227,5 @@ fun Reaction(){
 @Preview
 @Composable
 fun PreviewSongCard(){
-Post()
-
+FeedActivity()
 }

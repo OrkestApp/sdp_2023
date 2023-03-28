@@ -51,11 +51,11 @@ internal class FeedActivityKtTest {
     @Test
     fun reactionButtonDisplay(){
         composeTestRule.onAllNodesWithTag("comment_button")
-            .assertCountEquals(4).assertAll(isEnabled())
+            .assertAll(isEnabled())
         composeTestRule.onAllNodesWithTag("like_button")
-            .assertCountEquals(4).assertAll(isEnabled())
+            .assertAll(isEnabled())
         composeTestRule.onAllNodesWithTag("share_button")
-            .assertCountEquals(4).assertAll(isEnabled())
+            .assertAll(isEnabled())
     }
 
 

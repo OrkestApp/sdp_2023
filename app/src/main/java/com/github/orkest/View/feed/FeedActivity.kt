@@ -14,22 +14,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.orkest.Model.Post
-import com.github.orkest.Model.Profile
 import com.github.orkest.Model.Song
-import com.github.orkest.Model.User
 import com.github.orkest.R
-import com.github.orkest.View.search.SearchUserView
 
 
 /**
@@ -39,11 +33,10 @@ import com.github.orkest.View.search.SearchUserView
 @Composable
 fun FeedActivity(){
     //Add a list of posts
-    val user = User("Username", profile = Profile(username = "Username",
-                                            profilePictureId = R.drawable.profile_picture))
+    // Once the backend will be implemented, this list will be filled with the posts from the database
     val rudeBoySong = Song("Rude Boy", "Rihanna", "Rated R",
                 "link", R.drawable.album_cover)
-    val post = Post(user,"Post Description", rudeBoySong, 0, ArrayList())
+    val post = Post("Username", R.drawable.profile_picture, "Post Description", rudeBoySong, 0, ArrayList())
 
     var listPosts by remember { mutableStateOf(mutableListOf(post,post,post,post)) }
     LazyColumn(modifier = Modifier
@@ -69,14 +62,14 @@ fun Post(post: Post){
 
         Column {
             // Display the user profile pic
-            UserProfilePic(post.user.profile.profilePictureId)
+            ProfilePic(post.profilePicId)
             //Display the reaction buttons
             Reaction()
         }
 
         Column(modifier = Modifier.padding(10.dp, top = 10.dp, end = 10.dp)) {
             //Add the user's username
-            UserUsername(post.user.username)
+            Username(post.username)
             // Display the post's content
             PostDescription(post.postDescription)
             Spacer(modifier = Modifier.height(10.dp))
@@ -88,17 +81,16 @@ fun Post(post: Post){
 }
 
 @Composable
-private fun UserUsername(username: String){
+private fun Username(username: String){
     //Add the user's username
     Text(text = username, fontSize = 14.sp, fontWeight = FontWeight.Bold,
         color = Color.White,
         modifier = Modifier
-          //  .padding(start = 10.dp)
             .clickable {  })
 }
 
 @Composable
-private fun UserProfilePic(profilePicId : Int){
+private fun ProfilePic(profilePicId : Int){
         //Add the user's profile pic
         Image(
             painter = painterResource(id = profilePicId),
@@ -191,22 +183,22 @@ private fun PlayButton(){
 private fun Reaction(){
     Column(modifier = Modifier.padding(20.dp)) {
         // Create the like button
-        reactionIcon(R.drawable.black_like_icon,"Like button", "like_button" )
+        ReactionIcon(R.drawable.black_like_icon,"Like button", "like_button" )
         Spacer(modifier = Modifier.height(10.dp))
 
         //Create the comment button
-        reactionIcon(R.drawable.comment_icon,"Comment button", "comment_button" )
+        ReactionIcon(R.drawable.comment_icon,"Comment button", "comment_button" )
         Spacer(modifier = Modifier.height(10.dp))
 
         //Create the share button
-        reactionIcon(R.drawable.share_icon,"Share button", "share_button" )
+        ReactionIcon(R.drawable.share_icon,"Share button", "share_button" )
     }
 }
 
 @Composable
-private fun reactionIcon(iconId: Int,contentDescription:String, testTag: String) {
+private fun ReactionIcon(iconId: Int, contentDescription:String, testTag: String) {
     Icon(painter = painterResource(id = iconId),
-        contentDescription = "Share button",
+        contentDescription = contentDescription,
         tint = Color.White,
         modifier = Modifier
             .testTag(testTag)
@@ -219,5 +211,5 @@ private fun reactionIcon(iconId: Int,contentDescription:String, testTag: String)
 @Preview
 @Composable
 fun PreviewSongCard(){
-FeedActivity()
+    FeedActivity()
 }

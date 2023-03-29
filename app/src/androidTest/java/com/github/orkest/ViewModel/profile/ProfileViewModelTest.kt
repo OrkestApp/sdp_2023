@@ -208,4 +208,25 @@ class ProfileViewModelTest {
             assertEquals(0, user.profile.nbFollowings)
         }
     }
+
+    @Test
+    fun isUserUpdatedThrowsExceptionWhenCalledInCurrentProfile(){
+        try { viewModel.isUserFollowed() } catch(e: java.lang.IllegalArgumentException){
+            assertEquals("Cannot call this function when visiting the current logged-in user's profile", e.message)
+        }
+    }
+
+    @Test
+    fun followThrowsExceptionWhenCalledInCurrentProfile(){
+        try { viewModel.follow() } catch(e: java.lang.IllegalArgumentException){
+            assertEquals("Cannot call this function when visiting the current logged-in user's profile", e.message)
+        }
+    }
+
+    @Test
+    fun unfollowThrowsExceptionWhenCalledInCurrentProfile(){
+        try { viewModel.unfollow() } catch(e: java.lang.IllegalArgumentException){
+            assertEquals("Cannot call this function when visiting the current logged-in user's profile", e.message)
+        }
+    }
 }

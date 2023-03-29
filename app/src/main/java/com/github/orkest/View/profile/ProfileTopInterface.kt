@@ -1,18 +1,20 @@
 package com.github.orkest.View.profile
 
 import android.content.Intent
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
-//import androidx.compose.material3.Button
-//import androidx.compose.material3.Text
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
@@ -29,7 +31,8 @@ import com.github.orkest.ViewModel.profile.ProfileViewModel
 private val topInterfaceHeight = 150.dp
 private val separator = 10.dp
 private val fontSize = 16.sp
-private val smallFontSize = 12.sp
+private val smallFontSize = 13.sp
+private val paddingValue = 10.dp
 
 /**
  * The top interface of the user's profile displaying the user's information
@@ -41,7 +44,9 @@ fun ProfileTopInterface(viewModel: ProfileViewModel) {
     val context = LocalContext.current
     viewModel.setupListener()
 
-    Column{
+
+    Column(Modifier
+        .padding(paddingValue)){
         Row(Modifier.height(IntrinsicSize.Min)){//allows to make fillMaxHeight relatively
             Column(
                 verticalArrangement = Arrangement.Center,
@@ -70,43 +75,57 @@ fun ProfileTopInterface(viewModel: ProfileViewModel) {
         Spacer(modifier = Modifier.height(separator))
 
 
-        Row {
+        Row{
             if(viewModel.username.value == Constants.currentLoggedUser) {
                 EditButton {
                     val intent = Intent(context, EditProfileActivity::class.java)
                     context.startActivity(intent)
                 }
             } else {
-                FollowButton(viewModel)
+                FollowButton(viewModel, viewModel.isUserFollowed.observeAsState().value)
             }
         }
     }
 }
 
 @Composable
-fun FollowButton(viewModel: ProfileViewModel){
-    val isUserFollowed = viewModel.isUserFollowed.observeAsState(false)
-    val buttonText = if (isUserFollowed.value) "Unfollow" else "Follow"
+fun FollowButton(viewModel: ProfileViewModel, isUserFollowed: Boolean?){
+    //Empty body, here waiting for the future that fetch isUserFollowed to complete
+    if(isUserFollowed == null){
+        Text(text="")
+    }
+    else {
+        val buttonText = if (isUserFollowed) "Unfollow" else "Follow"
 
-    Button(onClick = {
-        if (isUserFollowed.value) {
-            viewModel.unfollow().whenComplete { _, _ ->
-                viewModel.isUserFollowed.value = false
-            }
+        val color = Color(0xFFFEE600) // bright yellow
+        Button(
+            onClick = {
+                if (isUserFollowed) {
+                    viewModel.unfollow().whenComplete { _, _ ->
+                        viewModel.isUserFollowed.value = false
+                    }
+                } else {
+                    viewModel.follow().whenComplete { _, _ ->
+                        viewModel.isUserFollowed.value = true
+                    }
+                }
+            },
+
+            shape = RoundedCornerShape(20.dp),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = if (isUserFollowed) Color.White else color,
+                contentColor = if (isUserFollowed) color else Color.White
+            ),
+            border = BorderStroke(2.dp, color),
+            modifier = Modifier
+                .height(topInterfaceHeight / 4)
+                .width((3 * topInterfaceHeight) / 4)
+        ) {
+            Text(
+                text = buttonText,
+                fontSize = smallFontSize
+            )
         }
-        else {
-            viewModel.follow().whenComplete{_,_ ->
-                viewModel.isUserFollowed.value = true
-            }
-        }
-    },
-        modifier = Modifier
-            .height(topInterfaceHeight / 4)
-            .width((3 * topInterfaceHeight) / 4)
-        ,) {
-        Text(
-            text = buttonText,
-            fontSize = smallFontSize)
     }
 }
 
@@ -115,7 +134,7 @@ fun FollowButton(viewModel: ProfileViewModel){
 @Composable
 fun UserName(username: String?){
     Text(
-        text = username ?: "",
+        text = username ?: "Username",
         fontWeight = FontWeight.Bold,
         fontSize = fontSize
     )
@@ -158,8 +177,9 @@ fun EditButton(onClick:() -> Unit){
         onClick = onClick,
         modifier = Modifier
             .height(topInterfaceHeight / 4)
-            .width((3 * topInterfaceHeight) / 4)
-
+            .width((3 * topInterfaceHeight) / 4),
+        shape = RoundedCornerShape(10.dp),
+        colors = ButtonDefaults.buttonColors(backgroundColor = Color.Gray, contentColor = Color.White)
     ){
         Text(
             text ="Edit Profile",

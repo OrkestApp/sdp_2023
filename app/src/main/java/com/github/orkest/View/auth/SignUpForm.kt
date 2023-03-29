@@ -135,10 +135,9 @@ fun SignUpForm(navController: NavController, viewModel: AuthViewModel) {
                         onClick = { viewModel.createUser()
                             .whenComplete { result, _ ->
                                 if(result) {
+                                    Constants.currentLoggedUser = viewModel.getUsername().text
                                     //Launches intent to the main Activity
                                     val intent = Intent(context, MainActivity::class.java)
-                                    Constants.currentLoggedUser = viewModel.getUsername().text
-                                    intent.putExtra("username",viewModel.getUsername().text)
                                     context.startActivity(intent)
                                 } else {
                                     //Displays error

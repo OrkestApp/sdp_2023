@@ -23,11 +23,9 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
     open var nbFollowers = MutableLiveData<Int>()
     open var nbFollowings = MutableLiveData<Int>()
     open var profilePictureId = MutableLiveData<Int>()
+    open val isUserFollowed = MutableLiveData<Boolean>()
 
     lateinit var future : CompletableFuture<Profile>
-
-    //sets initial value to false while waiting for the future to complete
-    open val isUserFollowed = MutableLiveData(false)
 
     init{ setupListener() }
 
@@ -104,6 +102,9 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
      * Checks whether the current logged in user follows this account
      */
     open fun isUserFollowed(): CompletableFuture<Boolean>{
+        if(user == Constants.currentLoggedUser){
+            Log.e(TAG, "Cannot call this function when visiting the current logged-in user's profile", IllegalArgumentException())
+        }
         val future = CompletableFuture<Boolean>()
         userDocument(user).get()
             .addOnSuccessListener { document ->
@@ -122,40 +123,9 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
 
     open fun follow(): CompletableFuture<Boolean>{
         val futureFollow =CompletableFuture<Boolean>()
-        var userUpdated = false
-        var currentUserUpdated = false
 
-        //Updates the data of the user whose profile is displayed
-        userDocument(user).get()
-            .addOnSuccessListener { document ->
-                if (document != null && document.exists()) {
-                    val user = document.toObject(User::class.java)
-                    if (user != null) {
-                        user.profile.nbFollowers += 1
-                        user.followers.add(Constants.currentLoggedUser)
-                        userUpdated = true
-                    }
-                }
-            }
-            .addOnFailureListener { e ->
-                Log.w(TAG, "Error getting user data", e)
-            }
-
-        //updates the data of the current logged-in user
-        userDocument(Constants.currentLoggedUser).get()
-            .addOnSuccessListener { document ->
-                if (document != null && document.exists()) {
-                    val user = document.toObject(User::class.java)
-                    if (user != null) {
-                        user.profile.nbFollowings += 1
-                        user.followings.add(username.toString())
-                        currentUserUpdated = true
-                    }
-                }
-            }
-            .addOnFailureListener { e ->
-                Log.w(TAG, "Error getting current user data", e)
-            }
+        val userUpdated = updateUser(toFollow = true)
+        val currentUserUpdated = updateCurrentUser(toFollow = true)
 
         //Both updates must be successful
         futureFollow.complete(userUpdated && currentUserUpdated)
@@ -163,45 +133,78 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
     }
 
     open fun unfollow(): CompletableFuture<Boolean>{
-        val futureFollow =CompletableFuture<Boolean>()
-        var userUpdated = false
-        var currentUserUpdated = false
+        val futureFollow = CompletableFuture<Boolean>()
 
-        //updates the data of the user whose profile is displayed
+        val userUpdated = updateUser(toFollow = false)
+        val currentUserUpdated = updateCurrentUser(toFollow = false)
+
+        //Both updates must be successful
+        futureFollow.complete(userUpdated && currentUserUpdated)
+        return futureFollow
+    }
+
+    /**
+     * Updates the user's followers' list
+     * toFollow: Boolean = represents whether or not the current logged in user wants to follow this account
+     */
+    private fun updateUser(toFollow: Boolean): Boolean{
+        if(user == Constants.currentLoggedUser){
+            Log.e(TAG, "Cannot call this function when visiting the current logged-in user's profile", IllegalArgumentException())
+        }
+        var userUpdated = false
         userDocument(user).get()
             .addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
                     val user = document.toObject(User::class.java)
                     if (user != null) {
-                        if (user.profile.nbFollowers > 0) user.profile.nbFollowers -= 1
-                        user.followers.remove(Constants.currentLoggedUser)
-                        userUpdated = true
+                        if(toFollow){
+                            user.profile.nbFollowers += 1
+                            user.followers.add(Constants.currentLoggedUser)
+                            userUpdated = true
+                        } else {
+                            if (user.profile.nbFollowers > 0) user.profile.nbFollowers -= 1
+                            user.followers.remove(Constants.currentLoggedUser)
+                            userUpdated = true
+                        }
                     }
                 }
             }
             .addOnFailureListener { e ->
                 Log.w(TAG, "Error getting user data", e)
             }
+        return userUpdated
+    }
 
-        //updates the data of the current logged in user
+    /**
+     * Updates the current logged-in user's followings' list
+     * toFollow: Boolean = represents whether or not the current logged in user wants to follow this account
+     */
+    private fun updateCurrentUser(toFollow: Boolean): Boolean{
+        if(user == Constants.currentLoggedUser){
+            Log.e(TAG, "Cannot call this function when visiting the current logged-in user's profile", IllegalArgumentException())
+        }
+        var currentUserUpdated = false
         userDocument(Constants.currentLoggedUser).get()
             .addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
                     val user = document.toObject(User::class.java)
                     if (user != null) {
-                        if (user.profile.nbFollowings > 0 ) user.profile.nbFollowings -= 1
-                        user.followings.remove(username.toString())
-                        currentUserUpdated = true
+                        if(toFollow){
+                            user.profile.nbFollowings += 1
+                            user.followings.add(username.toString())
+                            currentUserUpdated = true
+                        } else {
+                            if (user.profile.nbFollowings > 0) user.profile.nbFollowings -= 1
+                            user.followings.remove(username.toString())
+                            currentUserUpdated = true
+                        }
                     }
                 }
             }
             .addOnFailureListener { e ->
                 Log.w(TAG, "Error getting current user data", e)
             }
-
-        //Both updates must be successful
-        futureFollow.complete(userUpdated && currentUserUpdated)
-        return futureFollow
+        return currentUserUpdated
     }
 
 }

@@ -10,17 +10,12 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.internal.runner.junit4.statement.UiThreadStatement
 import com.github.orkest.Constants
 import com.github.orkest.Model.Profile
 import com.github.orkest.R
-import com.github.orkest.View.profile.topProfile
 import com.github.orkest.ViewModel.profile.MockProfileViewModel
-import junit.framework.TestCase.assertTrue
-import org.junit.Assert
 import org.junit.runner.RunWith
 import org.junit.Before
-import java.util.concurrent.CompletableFuture
 
 
 @RunWith(AndroidJUnit4::class)
@@ -111,6 +106,7 @@ class ProfileUITest {
     @Test
     fun followButton_click_updates_to_unfollow() {
         composeTestRule.setContent { OrkestTheme { topProfile(viewModel = newViewModel) } }
+        newViewModel.setIsUserFollowed(false)
         val button = composeTestRule.onNodeWithText("Follow")
 
         button.performClick()

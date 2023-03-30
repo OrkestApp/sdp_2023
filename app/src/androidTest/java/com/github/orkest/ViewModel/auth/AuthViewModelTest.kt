@@ -2,10 +2,8 @@ package com.github.orkest.ViewModel.auth
 
 import androidx.compose.ui.text.input.TextFieldValue
 import com.github.orkest.Model.Providers
-import com.google.firebase.firestore.ktx.firestoreSettings
 import org.junit.Before
 
-import org.junit.BeforeClass
 
 import org.junit.Test
 

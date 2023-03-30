@@ -16,7 +16,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat.startActivity
 import com.github.orkest.R
 import com.github.orkest.View.profile.ProfileActivity
 import com.github.orkest.ViewModel.search.SearchViewModel
@@ -43,9 +42,9 @@ class SearchUserView {
             var list by remember { mutableStateOf(mutableListOf("")) }
 
             //Each time the text is updated, this is called
-            // Need to use future to wait for the asynchronous fetch on the database
+            // Need to use future to wait for the asynchronous fetch on the datxabase
             viewModel.searchUserInDatabase(text).thenAccept {
-                list = it
+                list = it.map{x -> x.profile.username} as MutableList<String>
             }
 
             Column(modifier = Modifier.fillMaxSize())

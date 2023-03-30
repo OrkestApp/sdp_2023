@@ -2,6 +2,9 @@ package com.github.orkest
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
+import com.github.orkest.Model.FireStoreDatabaseAPI
+import com.github.orkest.Model.Profile
+import com.github.orkest.Model.User
 import com.github.orkest.View.search.SearchUserView
 import com.github.orkest.ViewModel.auth.AuthViewModelTest
 import com.github.orkest.ViewModel.search.SearchViewModel
@@ -13,6 +16,9 @@ import org.junit.*
 import java.util.concurrent.CompletableFuture
 
 class SearchViewModelTest {
+    val user1 = User(username = "Alico", profile = Profile("Alico"))
+    val user2= User(username = "Arthur", profile = Profile("Arthur"))
+    val user3= User(username = "bobby", profile = Profile("bobby"))
 
     @get:Rule
     var composeTestRule =  createComposeRule()
@@ -35,27 +41,17 @@ class SearchViewModelTest {
             "username" to "bobby"
         )
         viewModel = SearchViewModel()
-        try {
-            viewModel.db.useEmulator("10.0.2.2", 8080)
-            viewModel.db.firestoreSettings = firestoreSettings {
-                isPersistenceEnabled = false
-            }
-        }
-        catch (_: java.lang.IllegalStateException){
-
-        }
 
 
-        val future1 = CompletableFuture<Any>()
-        val future2 = CompletableFuture<Any>()
-        val future3 = CompletableFuture<Any>()
-        viewModel.db.collection("user/user-A/users").document("Alico").set(woman1).addOnSuccessListener { future1.complete(1) }
-        viewModel.db.collection("user/user-A/users").document("Arthur").set(man1).addOnSuccessListener { future2.complete(2) }
-        viewModel.db.collection("user/user-B/users").document("bobby").set(man2).addOnSuccessListener { future3.complete(3) }
 
-        future1.get()
-        future2.get()
-        future3.get()
+        val dbAPI = FireStoreDatabaseAPI()
+        val user1 = User(username = "Alico", profile = Profile("Alico"))
+        val user2= User(username = "Arthur", profile = Profile("Arthur"))
+        val user3= User(username = "bobby", profile = Profile("bobby"))
+        dbAPI.addUserInDatabase(user1).get()
+        dbAPI.addUserInDatabase(user2).get()
+        dbAPI.addUserInDatabase(user3).get()
+
 
 
     }}
@@ -130,7 +126,7 @@ class SearchViewModelTest {
 
 
             val it  = viewModel.searchUserInDatabase("A").get()
-            MatcherAssert.assertThat(mutableListOf("Alico","Arthur"), `is`(it))
+            MatcherAssert.assertThat(mutableListOf(user1,user2), `is`(it))
 
             val it2 = viewModel.searchUserInDatabase("Z").get()
             MatcherAssert.assertThat(mutableListOf(),`is` (it2))

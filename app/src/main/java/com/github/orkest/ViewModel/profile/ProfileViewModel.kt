@@ -102,9 +102,7 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
      * Checks whether the current logged in user follows this account
      */
     open fun isUserFollowed(): CompletableFuture<Boolean>{
-        if(user == Constants.currentLoggedUser){
-            Log.e(TAG, "Cannot call this function when visiting the current logged-in user's profile", IllegalArgumentException())
-        }
+        if(user == Constants.currentLoggedUser){ Log.e(TAG, "Cannot call this function when visiting the current logged-in user's profile", IllegalArgumentException()) }
         val future = CompletableFuture<Boolean>()
         userDocument(user).get()
             .addOnSuccessListener { document ->
@@ -148,12 +146,9 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
      * toFollow: Boolean = represents whether or not the current logged in user wants to follow this account
      */
     private fun updateUser(toFollow: Boolean): Boolean{
-        if(user == Constants.currentLoggedUser){
-            Log.e(TAG, "Cannot call this function when visiting the current logged-in user's profile", IllegalArgumentException())
-        }
+        if(user == Constants.currentLoggedUser){ Log.e(TAG, "Cannot call this function when visiting the current logged-in user's profile", IllegalArgumentException()) }
         var userUpdated = false
-        userDocument(user).get()
-            .addOnSuccessListener { document ->
+        userDocument(user).get().addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
                     val user = document.toObject(User::class.java)
                     if (user != null) {
@@ -169,9 +164,7 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
                     }
                 }
             }
-            .addOnFailureListener { e ->
-                Log.w(TAG, "Error getting user data", e)
-            }
+            .addOnFailureListener { e -> Log.w(TAG, "Error getting user data", e) }
         return userUpdated
     }
 
@@ -180,12 +173,9 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
      * toFollow: Boolean = represents whether or not the current logged in user wants to follow this account
      */
     private fun updateCurrentUser(toFollow: Boolean): Boolean{
-        if(user == Constants.currentLoggedUser){
-            Log.e(TAG, "Cannot call this function when visiting the current logged-in user's profile", IllegalArgumentException())
-        }
+        if(user == Constants.currentLoggedUser){ Log.e(TAG, "Cannot call this function when visiting the current logged-in user's profile", IllegalArgumentException()) }
         var currentUserUpdated = false
-        userDocument(Constants.currentLoggedUser).get()
-            .addOnSuccessListener { document ->
+        userDocument(Constants.currentLoggedUser).get().addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
                     val user = document.toObject(User::class.java)
                     if (user != null) {
@@ -201,9 +191,7 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
                     }
                 }
             }
-            .addOnFailureListener { e ->
-                Log.w(TAG, "Error getting current user data", e)
-            }
+            .addOnFailureListener { e -> Log.w(TAG, "Error getting current user data", e) }
         return currentUserUpdated
     }
 

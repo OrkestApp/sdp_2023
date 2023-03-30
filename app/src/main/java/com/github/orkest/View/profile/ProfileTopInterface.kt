@@ -3,7 +3,6 @@ package com.github.orkest.View.profile
 import android.content.Intent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,6 +32,10 @@ private val separator = 10.dp
 private val fontSize = 16.sp
 private val smallFontSize = 13.sp
 private val paddingValue = 10.dp
+private val buttonSettings = Modifier
+                                .height(topInterfaceHeight / 4)
+                                .width((3 * topInterfaceHeight) / 4)
+private val followColor = Color(0xFFFEE600) // bright yellow
 
 /**
  * The top interface of the user's profile displaying the user's information
@@ -90,39 +93,23 @@ fun ProfileTopInterface(viewModel: ProfileViewModel) {
 
 @Composable
 fun FollowButton(viewModel: ProfileViewModel, isUserFollowed: Boolean?){
-    //Empty body, here waiting for the future that fetch isUserFollowed to complete
-    if(isUserFollowed == null){
-        Text(text="")
-    }
+    if(isUserFollowed == null){ Text(text="") } //Empty body, here waiting for the future that fetch isUserFollowed to complete
     else {
-        val buttonText = if (isUserFollowed) "Unfollow" else "Follow"
-
-        val color = Color(0xFFFEE600) // bright yellow
         Button(
             onClick = {
-                if (isUserFollowed) {
-                    viewModel.unfollow().whenComplete { _, _ ->
-                        viewModel.isUserFollowed.value = false
-                    }
-                } else {
-                    viewModel.follow().whenComplete { _, _ ->
-                        viewModel.isUserFollowed.value = true
-                    }
-                }
+                if (isUserFollowed) { viewModel.unfollow().whenComplete { _, _ -> viewModel.isUserFollowed.value = false } }
+                else { viewModel.follow().whenComplete { _, _ -> viewModel.isUserFollowed.value = true } }
             },
-
             shape = RoundedCornerShape(20.dp),
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = if (isUserFollowed) Color.White else color,
-                contentColor = if (isUserFollowed) color else Color.White
+                backgroundColor = if (isUserFollowed) Color.White else followColor,
+                contentColor = if (isUserFollowed) followColor else Color.White
             ),
-            border = BorderStroke(2.dp, color),
-            modifier = Modifier
-                .height(topInterfaceHeight / 4)
-                .width((3 * topInterfaceHeight) / 4)
+            border = BorderStroke(2.dp, followColor),
+            modifier = buttonSettings
         ) {
             Text(
-                text = buttonText,
+                text = if (isUserFollowed) "Unfollow" else "Follow",
                 fontSize = smallFontSize
             )
         }
@@ -175,9 +162,7 @@ fun NbFollowings(nb: Int){
 fun EditButton(onClick:() -> Unit){
     Button(
         onClick = onClick,
-        modifier = Modifier
-            .height(topInterfaceHeight / 4)
-            .width((3 * topInterfaceHeight) / 4),
+        modifier = buttonSettings,
         shape = RoundedCornerShape(10.dp),
         colors = ButtonDefaults.buttonColors(backgroundColor = Color.Gray, contentColor = Color.White)
     ){

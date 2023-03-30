@@ -1,7 +1,7 @@
 package com.github.orkest.Model
 
-import android.content.ContentValues
 import android.util.Log
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -93,8 +93,33 @@ class FireStoreDatabaseAPI {
             }
 
         return completableFuture
-        }
+    }
 
+    /**
+     * Check if user and mail are already in the database
+     */
+    fun userMailInDatabase(user: User): CompletableFuture<Boolean>{
+
+        val auth = FirebaseAuth.getInstance()
+        val future = CompletableFuture<Boolean>()
+
+        //Checks if the database already contains a user with the same username and email
+        getUserDocumentRef(user.username).get()
+            .addOnSuccessListener {
+                if (it.data != null && it.get("mail").toString() == auth.currentUser?.email.toString()) {
+                    println(it)
+                    future.complete(true)
+                } else {
+                    future.complete(false)
+                }
+            }
+            //Propagates the exception in case of another exception
+            .addOnFailureListener{
+                future.completeExceptionally(it)
+            }
+
+        return future
+    }
 
     /**
      * @param username

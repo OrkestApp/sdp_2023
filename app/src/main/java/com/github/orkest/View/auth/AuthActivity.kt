@@ -53,7 +53,7 @@ fun AuthMain(viewModel: AuthViewModel, navController: NavHostController) {
 
     NavHost(navController = navController, startDestination = "signIn") {
         composable("signup") { SignUpForm(viewModel) }
-        composable("signIn") { SignIn(navController)}
+        composable("signIn") { SignIn(navController,viewModel)}
     }
 }
 

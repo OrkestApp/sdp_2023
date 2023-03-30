@@ -48,6 +48,7 @@ class ProfileUITest {
         composeTestRule.onNodeWithText("${John.nbFollowers}\nfollowers").assertIsDisplayed()
         composeTestRule.onNodeWithText("${John.nbFollowings}\nfollowings").assertIsDisplayed()
         composeTestRule.onNodeWithContentDescription("${R.drawable.profile_picture}").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Sign Out").assertIsDisplayed()
     }
 
     @Test
@@ -68,6 +69,7 @@ class ProfileUITest {
         composeTestRule.onNodeWithText("$newNbFollowers\nfollowers").assertIsDisplayed()
         composeTestRule.onNodeWithText("$newNbFollowings\nfollowings").assertIsDisplayed()
         composeTestRule.onNodeWithContentDescription("$newProfilePictureId").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Sign Out").assertIsDisplayed()
     }
 
     @Test
@@ -124,5 +126,24 @@ class ProfileUITest {
         composeTestRule.onNodeWithText("Follow").assertIsDisplayed()
     }
 
+
+    /**
+     * The sign out button is displayed
+     */
+    @Test
+    fun signOutButton_displayed() {
+        composeTestRule.setContent { OrkestTheme { topProfile(viewModel = viewModel) } }
+        composeTestRule.onNodeWithText("Sign Out").assertIsDisplayed()
+    }
+
+    /**
+     * Clicking on the sign out button redirects to the login screen
+     */
+    @Test
+    fun signOutButton_click() {
+        composeTestRule.setContent { OrkestTheme { topProfile(viewModel = viewModel) } }
+        composeTestRule.onNodeWithText("Sign Out").performClick()
+        composeTestRule.onNodeWithText("Sign in with Google").assertIsDisplayed()
+    }
 
 }

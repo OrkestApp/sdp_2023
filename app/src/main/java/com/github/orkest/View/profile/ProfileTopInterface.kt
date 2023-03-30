@@ -7,7 +7,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -26,6 +29,12 @@ import com.github.orkest.Constants
 import com.github.orkest.R
 import com.github.orkest.View.EditProfileActivity
 import com.github.orkest.ViewModel.profile.ProfileViewModel
+import androidx.compose.ui.graphics.Color
+import com.github.orkest.View.auth.AuthActivity
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.auth.FirebaseAuth
+
 
 private val topInterfaceHeight = 150.dp
 private val separator = 10.dp
@@ -88,6 +97,30 @@ fun ProfileTopInterface(viewModel: ProfileViewModel) {
                 FollowButton(viewModel, viewModel.isUserFollowed.observeAsState().value)
             }
         }
+
+        Row(){
+            SignOutButton {
+                val auth = FirebaseAuth.getInstance()
+                val intent = Intent(context, AuthActivity::class.java)
+                auth.signOut()
+                //uncomment if un-caching is needed
+                GoogleSignIn.getClient(context, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut()
+                context.startActivity(intent)
+            }
+        }
+    }
+}
+
+/**
+ * The button to sign out of the app
+ */
+@Composable
+fun SignOutButton(onClick:() -> Unit) {
+    Button(
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(backgroundColor = Color.Yellow))
+    {
+        Text("Sign Out")
     }
 }
 
@@ -194,5 +227,6 @@ fun ProfilePicture(profilePictureId: Int?){
             .clip(CircleShape)
     )
 }
+
 
 

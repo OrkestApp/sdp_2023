@@ -1,5 +1,6 @@
 package com.github.orkest.ViewModel.auth
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
@@ -7,8 +8,7 @@ import com.github.orkest.Model.FireStoreDatabaseAPI
 import com.github.orkest.Model.Providers
 import com.github.orkest.Model.User
 import com.google.android.gms.tasks.Task
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.auth.FirebaseAuth
 import java.util.concurrent.CompletableFuture
 
 
@@ -93,12 +93,39 @@ open class AuthViewModel: ViewModel() {
      * Updates the user's credentials after validation
      */
     private fun updateUser(){
+        val auth = FirebaseAuth.getInstance()
+
         if (username.value.text.isEmpty()) throw Exception("Username cannot be empty")
         user.username = username.value.text
         user.profile.username = user.username
         user.profile.bio = bio.value.text
         user.serviceProvider = selectedProvider.value.value
+        //updated with the email of the user
+        user.mail = auth.currentUser?.email.toString()
     }
 
+    /**
+     * If the username is empty throws an exception
+     */
+    private fun checkUsername(){
+        if (username.value.text.isEmpty()) throw Exception("Username cannot be empty")
+    }
 
+    /**
+     * In a logic similar to createUser,
+     * this method checks if the user and the corresponding email already exist in the database
+     */
+    open fun signInUser(): CompletableFuture<Boolean> {
+
+        val future = CompletableFuture<Boolean>()
+
+        user.username = username.value.text
+
+        try { checkUsername() } catch (e: Exception) {
+            future.completeExceptionally(e)
+            return future
+        }
+
+        return dbAPI.userMailInDatabase(user)
+    }
 }

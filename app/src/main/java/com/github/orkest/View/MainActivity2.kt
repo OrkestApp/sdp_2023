@@ -1,6 +1,6 @@
 package com.github.orkest.View
 
-
+/*
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -69,4 +69,4 @@ class MainActivity2 : AppCompatActivity() {
         private const val CLIENT_ID = "e7ac920406d54975bc79962dec94f4ab"
         private const val REDIRECT_URI = "https://com.github.orkest/callback/"
     }
-}
+}*/

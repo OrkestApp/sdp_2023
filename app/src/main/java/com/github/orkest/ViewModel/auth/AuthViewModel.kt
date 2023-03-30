@@ -116,54 +116,16 @@ open class AuthViewModel: ViewModel() {
      * this method checks if the user and the corresponding email already exist in the database
      */
     open fun signInUser(): CompletableFuture<Boolean> {
-        val auth = FirebaseAuth.getInstance()
+
         val future = CompletableFuture<Boolean>()
+
+        user.username = username.value.text
 
         try { checkUsername() } catch (e: Exception) {
             future.completeExceptionally(e)
             return future
         }
 
-        // Computes the path to store the user in : user/user-firstLetter/users
-        // user-firstletter is a document containing a subcollection which contains the users's documents
-        val firstLetter = username.value.text[0].uppercase()
-        val path = "user/user-$firstLetter/users"
-
-        //Checks if the database already contains a user with the same username and email
-        
-        dbAPI.getUserDocumentRef(username.value.text).get()
-            .addOnSuccessListener {
-                if (it.data != null && it.get("mail").toString() == auth.currentUser?.email.toString()) {
-                    println(it)
-                    future.complete(true)
-                } else {
-                    future.complete(false)
-                }
-            }
-
-            //Propagates the exception in case of another exception
-            .addOnFailureListener{
-                future.completeExceptionally(it)
-            }
-
-        return future
-
-        /*db.collection(path)
-            .document(username.value.text).get()
-            .addOnSuccessListener {
-                if (it.data != null && it.get("mail").toString() == auth.currentUser?.email.toString()) {
-                    println(it)
-                    future.complete(true)
-                } else {
-                    future.complete(false)
-                }
-            }
-
-            //Propagates the exception in case of another exception
-            .addOnFailureListener{
-                future.completeExceptionally(it)
-            }
-
-        return future*/
+        return dbAPI.userMailInDatabase(user)
     }
 }

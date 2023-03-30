@@ -86,7 +86,7 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
     open fun isUserFollowed(): CompletableFuture<Boolean>{
         if(user == Constants.currentLoggedUser){ Log.e(TAG, "Cannot call this function when visiting the current logged-in user's profile")  }
         val future = CompletableFuture<Boolean>()
-        userDocument(user).get()
+        dbAPI.getUserDocumentRef(user).get()
             .addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
                     val user = document.toObject(User::class.java)
@@ -130,7 +130,7 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
     private fun accessUserData(toFollow: Boolean): Boolean{
         if(user == Constants.currentLoggedUser){ Log.e(TAG, "Cannot call this function when visiting the current logged-in user's profile") }
         var userUpdated = false
-        userDocument(user).get().addOnSuccessListener { document ->
+        dbAPI.getUserDocumentRef(user).get().addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
                     val user = document.toObject(User::class.java)
                     if (user != null) {
@@ -160,7 +160,7 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
     private fun accessCurrentUserData(toFollow: Boolean): Boolean{
         if(user == Constants.currentLoggedUser){ Log.e(TAG, "Cannot call this function when visiting the current logged-in user's profile") }
         var currentUserUpdated = false
-        userDocument(Constants.currentLoggedUser).get().addOnSuccessListener { document ->
+        dbAPI.getUserDocumentRef(Constants.currentLoggedUser).get().addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
                     val user = document.toObject(User::class.java)
                     if (user != null) {

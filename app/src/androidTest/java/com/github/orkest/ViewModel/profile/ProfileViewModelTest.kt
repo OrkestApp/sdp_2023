@@ -47,7 +47,7 @@ class ProfileViewModelTest {
         }
         runBlocking {
             newUser = User(profile = Profile(newUsername, newProfilePicture, newBio, newNbFollowers, newNbFollowings))
-            newViewModel.userDocument(newUsername).set(newUser).await()
+            FireStoreDatabaseAPI().getUserDocumentRef(newUsername).set(newUser).await()
         }
         viewModel.setupListener()
     }
@@ -172,9 +172,9 @@ class ProfileViewModelTest {
     fun isUserFollowedReturnsTrueWhenFollowed(){
         runBlocking {
             user.followings.add(newUsername)
-            viewModel.userDocument(testUserName).set(user).await()
+            FireStoreDatabaseAPI().getUserDocumentRef(testUserName).set(user).await()
             newUser.followers.add(testUserName)
-            newViewModel.userDocument(newUsername).set(newUser).await()
+            FireStoreDatabaseAPI().getUserDocumentRef(newUsername).set(newUser).await()
         }
 
         newViewModel.isUserFollowed().whenComplete{_, _ ->
@@ -213,9 +213,9 @@ class ProfileViewModelTest {
     fun unFollowNeverGoesUnderZero(){
         runBlocking {
             newUser.profile.nbFollowers = 0
-            newViewModel.userDocument(newUsername).set(newUser).await()
+            FireStoreDatabaseAPI().getUserDocumentRef(newUsername).set(newUser).await()
             user.profile.nbFollowings = 0
-            viewModel.userDocument(testUserName).set(user).await()
+            FireStoreDatabaseAPI().getUserDocumentRef(testUserName).set(user).await()
         }
         newViewModel.unfollow().whenComplete{_, _ ->
             assertEquals(0, newUser.profile.nbFollowers)

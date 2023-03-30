@@ -9,9 +9,7 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0419b86c-e714-45b8-ac49-9862c084bbca" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="0419b86c-e714-45b8-ac49-9862c084bbca" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -47,10 +45,10 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.cidr.known.project.marker": "true",
     "cidr.known.project.marker": "true",
-    "last_opened_file_path": "/home/zermelo/Documents/code/sdp_2023"
+    "last_opened_file_path": "/home/zermelo/Documents/code/SDP/sdp_2023"
   }
 }]]></component>
-  <component name="RunManager" selected="Android Instrumented Tests.SignUpFormTest">
+  <component name="RunManager" selected="Android App.Activity">
     <configuration name="Activity" type="AndroidRunConfigurationType" factoryName="Android App">
       <module name="Orkest.app.main" />
       <option name="DEPLOY" value="true" />

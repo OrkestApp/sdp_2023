@@ -95,23 +95,34 @@ fun ProfileTopInterface(viewModel: ProfileViewModel) {
 fun FollowButton(viewModel: ProfileViewModel, isUserFollowed: Boolean?){
     if(isUserFollowed == null){ Text(text="") } //Empty body, here waiting for the future that fetch isUserFollowed to complete
     else {
+        //Adapts the UI to the Follow or Unfollow button
+        val buttonText = if (isUserFollowed) "Unfollow" else "Follow"
+        val backGroundColor = if (isUserFollowed) Color.White else followColor
+        val contentColor = if (isUserFollowed) followColor else Color.White
         Button(
-            onClick = {
-                if (isUserFollowed) { viewModel.unfollow().whenComplete { _, _ -> viewModel.isUserFollowed.value = false } }
-                else { viewModel.follow().whenComplete { _, _ -> viewModel.isUserFollowed.value = true } }
-            },
+            onClick = { followOrUnfollow(viewModel, isUserFollowed) },
             shape = RoundedCornerShape(20.dp),
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = if (isUserFollowed) Color.White else followColor,
-                contentColor = if (isUserFollowed) followColor else Color.White
-            ),
+            colors = ButtonDefaults.buttonColors(backgroundColor = backGroundColor, contentColor = contentColor),
             border = BorderStroke(2.dp, followColor),
             modifier = buttonSettings
         ) {
-            Text(
-                text = if (isUserFollowed) "Unfollow" else "Follow",
-                fontSize = smallFontSize
-            )
+            Text(text = buttonText, fontSize = smallFontSize)
+        }
+    }
+}
+
+private fun followOrUnfollow(viewModel: ProfileViewModel, isUserFollowed: Boolean) {
+    if (isUserFollowed) {
+        //The unfollow button is displayed at this stage, when clicked on,
+        //the current user unfollows the account and isUserFollowed is updated to false
+        viewModel.unfollow().whenComplete { _, _ ->
+            viewModel.isUserFollowed.value = false
+        }
+    } else {
+        //The follow button is displayed at this stage, when clicked on,
+        //the current user follows the account and isUserFollowed is updated to true
+        viewModel.follow().whenComplete { _, _ ->
+            viewModel.isUserFollowed.value = true
         }
     }
 }

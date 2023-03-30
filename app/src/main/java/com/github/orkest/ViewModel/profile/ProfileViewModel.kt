@@ -102,7 +102,7 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
      * Checks whether the current logged in user follows this account
      */
     open fun isUserFollowed(): CompletableFuture<Boolean>{
-        if(user == Constants.currentLoggedUser){ Log.e(TAG, "Cannot call this function when visiting the current logged-in user's profile", IllegalArgumentException()) }
+        if(user == Constants.currentLoggedUser){ Log.e(TAG, "Cannot call this function when visiting the current logged-in user's profile")  }
         val future = CompletableFuture<Boolean>()
         userDocument(user).get()
             .addOnSuccessListener { document ->
@@ -122,8 +122,8 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
     open fun follow(): CompletableFuture<Boolean>{
         val futureFollow =CompletableFuture<Boolean>()
 
-        val userUpdated = updateUser(toFollow = true)
-        val currentUserUpdated = updateCurrentUser(toFollow = true)
+        val userUpdated = accessUserData(toFollow = true)
+        val currentUserUpdated = accessCurrentUserData(toFollow = true)
 
         //Both updates must be successful
         futureFollow.complete(userUpdated && currentUserUpdated)
@@ -133,8 +133,8 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
     open fun unfollow(): CompletableFuture<Boolean>{
         val futureFollow = CompletableFuture<Boolean>()
 
-        val userUpdated = updateUser(toFollow = false)
-        val currentUserUpdated = updateCurrentUser(toFollow = false)
+        val userUpdated = accessUserData(toFollow = false)
+        val currentUserUpdated = accessCurrentUserData(toFollow = false)
 
         //Both updates must be successful
         futureFollow.complete(userUpdated && currentUserUpdated)
@@ -145,22 +145,14 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
      * Updates the user's followers' list
      * toFollow: Boolean = represents whether or not the current logged in user wants to follow this account
      */
-    private fun updateUser(toFollow: Boolean): Boolean{
-        if(user == Constants.currentLoggedUser){ Log.e(TAG, "Cannot call this function when visiting the current logged-in user's profile", IllegalArgumentException()) }
+    private fun accessUserData(toFollow: Boolean): Boolean{
+        if(user == Constants.currentLoggedUser){ Log.e(TAG, "Cannot call this function when visiting the current logged-in user's profile") }
         var userUpdated = false
         userDocument(user).get().addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
                     val user = document.toObject(User::class.java)
                     if (user != null) {
-                        if(toFollow){
-                            user.profile.nbFollowers += 1
-                            user.followers.add(Constants.currentLoggedUser)
-                            userUpdated = true
-                        } else {
-                            if (user.profile.nbFollowers > 0) user.profile.nbFollowers -= 1
-                            user.followers.remove(Constants.currentLoggedUser)
-                            userUpdated = true
-                        }
+                        userUpdated = updateUserFollowers(user, toFollow)
                     }
                 }
             }
@@ -168,26 +160,29 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
         return userUpdated
     }
 
+    private fun updateUserFollowers(user: User, toFollow: Boolean): Boolean {
+        if(toFollow){
+            user.profile.nbFollowers += 1
+            user.followers.add(Constants.currentLoggedUser)
+        } else {
+            if (user.profile.nbFollowers > 0) user.profile.nbFollowers -= 1
+            user.followers.remove(Constants.currentLoggedUser)
+        }
+        return true //means that the values have been updated
+    }
+
     /**
      * Updates the current logged-in user's followings' list
      * toFollow: Boolean = represents whether or not the current logged in user wants to follow this account
      */
-    private fun updateCurrentUser(toFollow: Boolean): Boolean{
-        if(user == Constants.currentLoggedUser){ Log.e(TAG, "Cannot call this function when visiting the current logged-in user's profile", IllegalArgumentException()) }
+    private fun accessCurrentUserData(toFollow: Boolean): Boolean{
+        if(user == Constants.currentLoggedUser){ Log.e(TAG, "Cannot call this function when visiting the current logged-in user's profile") }
         var currentUserUpdated = false
         userDocument(Constants.currentLoggedUser).get().addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
                     val user = document.toObject(User::class.java)
                     if (user != null) {
-                        if(toFollow){
-                            user.profile.nbFollowings += 1
-                            user.followings.add(username.toString())
-                            currentUserUpdated = true
-                        } else {
-                            if (user.profile.nbFollowings > 0) user.profile.nbFollowings -= 1
-                            user.followings.remove(username.toString())
-                            currentUserUpdated = true
-                        }
+                        currentUserUpdated = updateCurrentUserFollowings(user, toFollow)
                     }
                 }
             }
@@ -195,4 +190,14 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
         return currentUserUpdated
     }
 
+    private fun updateCurrentUserFollowings(user: User, toFollow: Boolean): Boolean{
+        if(toFollow){
+            user.profile.nbFollowings += 1
+            user.followings.add(username.toString())
+        } else {
+            if (user.profile.nbFollowings > 0) user.profile.nbFollowings -= 1
+            user.followings.remove(username.toString())
+        }
+        return true //means that the values have been updated
+    }
 }

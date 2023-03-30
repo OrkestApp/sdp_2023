@@ -43,9 +43,9 @@ class SearchUserView {
             var list by remember { mutableStateOf(mutableListOf("")) }
 
             //Each time the text is updated, this is called
-            // Need to use future to wait for the asynchronous fetch on the database
+            // Need to use future to wait for the asynchronous fetch on the datxabase
             viewModel.searchUserInDatabase(text).thenAccept {
-                list = it
+                list = it.map{x -> x.profile.username} as MutableList<String>
             }
 
             Column(modifier = Modifier.fillMaxSize())

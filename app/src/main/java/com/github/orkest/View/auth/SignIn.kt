@@ -131,7 +131,7 @@ fun signIn(activityResultLauncher: ActivityResultLauncher<Intent>,
 private fun updateUI(user: FirebaseUser?, navController: NavController) {
     if (user != null) {
         Log.d(TAG, "User is not null")
-        navController.navigate("signup")
+//        navController.navigate("signup")
     } else {
         Log.d(TAG, "User is null")
     }

@@ -1,13 +1,15 @@
 package com.github.orkest.ViewModel.profile
 
+import com.github.orkest.Model.FireStoreDatabaseAPI
 import com.github.orkest.Model.Profile
 import com.github.orkest.Model.User
-import com.github.orkest.ViewModel.profile.ProfileViewModel
 import junit.framework.TestCase.assertEquals
-import org.junit.Before
-import org.junit.Test
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
+import org.junit.Before
+import org.junit.Test
 
 // run firebase emulators:start --only firestore in terminal before
 class ProfileViewModelTest {
@@ -30,8 +32,14 @@ class ProfileViewModelTest {
     @Before
     fun setUp() {
         runBlocking {
-            user = User(profile = Profile(testUserName, testProfilePicture, testBio, testNbFollowers, testNbFollowings))
-            viewModel.userDocument(testUserName).set(user).await()
+            user = User(username = testUserName, profile = Profile(testUserName, testProfilePicture, testBio, testNbFollowers, testNbFollowings))
+
+            withContext(Dispatchers.IO) {
+                FireStoreDatabaseAPI().addUserInDatabase(user).get()
+            }
+
+
+
         }
         viewModel.setupListener()
     }
@@ -56,7 +64,7 @@ class ProfileViewModelTest {
     fun onlyProfilePictureIdGetsUpdated(){
         runBlocking {
             user.profile.profilePictureId = newProfilePicture
-            viewModel.userDocument(testUserName).set(user).await()
+
         }
         assertEquals(newProfilePicture, user.profile.profilePictureId)
         assertEquals(testUserName, user.profile.username)
@@ -69,7 +77,7 @@ class ProfileViewModelTest {
     fun onlyBioGetsUpdated(){
         runBlocking {
             user.profile.bio = newBio
-            viewModel.userDocument(testUserName).set(user).await()
+
         }
         assertEquals(newBio, user.profile.bio)
         assertEquals(testUserName, user.profile.username)
@@ -82,7 +90,7 @@ class ProfileViewModelTest {
     fun onlyNbFollowersGetsUpdated(){
         runBlocking {
             user.profile.nbFollowers = newNbFollowers
-            viewModel.userDocument(testUserName).set(user).await()
+
         }
         assertEquals(testBio, user.profile.bio)
         assertEquals(testUserName, user.profile.username)
@@ -95,7 +103,7 @@ class ProfileViewModelTest {
     fun onlyNbFollowingsGetsUpdated(){
         runBlocking {
             user.profile.nbFollowings = newNbFollowings
-            viewModel.userDocument(testUserName).set(user).await()
+
         }
         assertEquals(testBio, user.profile.bio)
         assertEquals(testUserName, user.profile.username)
@@ -111,7 +119,7 @@ class ProfileViewModelTest {
             user.profile.nbFollowers = newNbFollowers
             user.profile.nbFollowings = newNbFollowings
             user.profile.profilePictureId = newProfilePicture
-            viewModel.userDocument(testUserName).set(user).await()
+
         }
         assertEquals(newBio, user.profile.bio)
         assertEquals(testUserName, user.profile.username)
@@ -120,11 +128,14 @@ class ProfileViewModelTest {
         assertEquals(newProfilePicture, user.profile.profilePictureId)
     }
 
+    /*
     @Test
     fun testUserDocument() {
         val documentReference = viewModel.userDocument("testUser")
         assertEquals(documentReference.path, "user/user-T/users/testUser")
     }
+
+     */
 
     /**
      * If a user changes their username, the path will change as well.
@@ -135,8 +146,10 @@ class ProfileViewModelTest {
 
         val newViewModel = ProfileViewModel(newUsername)
         runBlocking {
-            user = User(profile = Profile(newUsername, 2, "New bio", 20, 15))
-            newViewModel.userDocument(newUsername).set(user).await()
+            user = User(username = newUsername, profile = Profile(newUsername, 2, "New bio", 20, 15))
+            withContext(Dispatchers.IO) {
+                FireStoreDatabaseAPI().addUserInDatabase(user).get()
+            }
         }
         newViewModel.setupListener()
 

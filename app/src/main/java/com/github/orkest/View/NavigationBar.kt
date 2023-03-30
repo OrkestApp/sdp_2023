@@ -21,6 +21,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.github.orkest.View.feed.FeedActivity
+import com.github.orkest.View.profile.ProfileActivity
+import com.github.orkest.View.profile.ProfileActivityScreen
+import com.github.orkest.View.profile.ProfileActivitySetting
 import com.github.orkest.View.profile.ProfileTopInterface
 import com.github.orkest.View.search.SearchUserView
 import com.github.orkest.ViewModel.profile.ProfileViewModel
@@ -79,7 +82,9 @@ class NavigationBar {
                     composable("HomePage") { FeedActivity() }
                     composable("SearchPage") { SearchUserView.SearchUi(viewModel = viewModel) }
                     composable("PlaylistPage") { Text(text = "Playlist tab") }
-                    composable("ProfilePage") { ProfileTopInterface(viewModel = ProfileViewModel(user = currentUser)) }
+                    composable("ProfilePage") {
+                            ProfileActivityScreen(ProfileActivity(), viewModel = ProfileViewModel("JohnDoe"))
+                    }
                 }
             }
         }

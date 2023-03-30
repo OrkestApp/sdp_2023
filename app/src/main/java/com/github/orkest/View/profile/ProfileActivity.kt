@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.DrawerValue
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.rememberScaffoldState
@@ -34,6 +35,7 @@ import com.github.orkest.R
 import com.github.orkest.View.*
 import com.github.orkest.View.theme.OrkestTheme
 import com.github.orkest.ViewModel.profile.ProfileViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 class ProfileActivity() : ComponentActivity() {
@@ -94,8 +96,7 @@ fun ProfileActivityScreen(activity: ComponentActivity, viewModel: ProfileViewMod
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    topProfile(viewModel = viewModel)
-                    NavDrawerButton(coroutineScope, scaffoldState)
+                    topProfile(viewModel = viewModel, scaffoldState, coroutineScope)
                 }
                 mainBody()
             }
@@ -106,8 +107,8 @@ fun ProfileActivityScreen(activity: ComponentActivity, viewModel: ProfileViewMod
 }
 
 @Composable
-fun topProfile(viewModel: ProfileViewModel) {
-    ProfileTopInterface(viewModel = viewModel)
+fun topProfile(viewModel: ProfileViewModel, scaffoldState: ScaffoldState, coroutineScope: CoroutineScope) {
+    ProfileTopInterface(viewModel = viewModel, scaffoldState, coroutineScope)
 }
 
 @Composable

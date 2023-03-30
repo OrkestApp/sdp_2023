@@ -27,7 +27,9 @@ import com.github.orkest.Model.Profile
 import com.github.orkest.R
 import com.github.orkest.View.EditProfileActivity
 import com.github.orkest.View.MainActivity
+import com.github.orkest.View.NavDrawerButton
 import com.github.orkest.ViewModel.profile.ProfileViewModel
+import kotlinx.coroutines.CoroutineScope
 
 private val topInterfaceHeight = 150.dp
 private val separator = 10.dp
@@ -39,7 +41,7 @@ private val smallFontSize = 12.sp
  * username, bio, number of followers, number of followings, profile picture
  */
 @Composable
-fun ProfileTopInterface(viewModel: ProfileViewModel) {
+fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldState, coroutineScope: CoroutineScope) {
 
     val context = LocalContext.current
     viewModel.setupListener()
@@ -60,14 +62,17 @@ fun ProfileTopInterface(viewModel: ProfileViewModel) {
                 Modifier.fillMaxHeight(),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
-                UserName(viewModel.username.observeAsState().value)
+                Row(modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween) {
+                    UserName(viewModel.username.observeAsState().value)
+                    NavDrawerButton(coroutineScope, scaffoldState)
+                }
                 Row (
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ){
                     //Separate followers/followings in an even way
-                    NbFollowers(number(viewModel.nbFollowers.observeAsState().value))
-                    Spacer(modifier = Modifier.width(10.dp))
-                    NbFollowings(number(viewModel.nbFollowings.observeAsState().value))
+                    Column(modifier = Modifier.weight(1f)) { NbFollowers(number(viewModel.nbFollowers.observeAsState().value)) }
+                    Column(modifier = Modifier.weight(1f)) { NbFollowings(number(viewModel.nbFollowings.observeAsState().value)) }
                 }
                 Description(viewModel.bio.observeAsState().value)
             }
@@ -87,7 +92,7 @@ fun ProfileTopInterface(viewModel: ProfileViewModel) {
 @Composable
 fun UserName(username: String?){
     Text(
-        text = username ?: "",
+        text = username ?: "Username",
         fontWeight = FontWeight.Bold,
         fontSize = fontSize
     )

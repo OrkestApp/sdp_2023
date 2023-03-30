@@ -1,5 +1,6 @@
 package com.github.orkest.ViewModel.auth
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
@@ -138,6 +139,32 @@ open class AuthViewModel: ViewModel() {
     }
 
     open fun signInUser(): CompletableFuture<Boolean> {
+
+        /*val auth = FirebaseAuth.getInstance()
+        val future = CompletableFuture<Boolean>()
+
+        val userRef = db.collection("user")
+
+        //take the user name of the first element of the list
+        userRef.whereArrayContains("mail", auth.currentUser?.email.toString())
+            .get()
+            .addOnSuccessListener { result ->
+                if(result.isEmpty){
+                    Log.d("signInUser()", "result is empty")
+                    future.complete(false)
+                } else {
+                    updateUsername(TextFieldValue(result.documents[0].get("username").toString()))
+                    Log.d("signInUser()", "result wasn't empty")
+                    future.complete(true)
+                }
+            }
+            .addOnFailureListener { exception ->
+                future.completeExceptionally(exception)
+            }
+
+        return future*/
+
+
 
         val auth = FirebaseAuth.getInstance()
 

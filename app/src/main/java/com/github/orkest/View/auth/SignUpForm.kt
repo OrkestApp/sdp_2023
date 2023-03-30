@@ -63,16 +63,12 @@ fun SignUpForm(viewModel: AuthViewModel) {
         Font(R.font.permanentmarker_regular, FontWeight.Normal)
     )
 
-    val userDoesntExist = remember {
-        mutableStateOf(false)
-    }
-
     Scaffold(
         //Creates the top bar
         topBar = {
             TopAppBar(
                 title = { Text(text = "Create Your Profile",
-                                color = Color.White) },
+                    color = Color.White) },
 
                 backgroundColor = Color.Black
             )},
@@ -123,76 +119,10 @@ fun SignUpForm(viewModel: AuthViewModel) {
                 // Box with button to choose the service provider from a dropDownMenu
                 ChooseServiceProvider(viewModel, expanded)
 
+                AddSpace()
+
                 //Button to confirm choices
-                Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
-                    Button(
-                        onClick = { viewModel.createUser()
-                            .whenComplete { result, _ ->
-                                if(result) {
-                                    //Launches intent to the main Activity
-                                    val intent = Intent(context, MainActivity::class.java)
-                                    intent.putExtra("username",viewModel.getUsername().text)
-                                    context.startActivity(intent)
-                                } else {
-                                    //Displays error
-                                    userExists.value = true
-                                }
-                            }
-                        },
-                        shape = RoundedCornerShape(50.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp)
-                    ) {
-                        Text(text = "Create Profile",
-                            style = TextStyle(fontSize = 20.sp)
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(15.dp))
-
-
-                TextField(
-                    label = { Text(text = "Current Username") },
-                    value = viewModel.getCurrentUsername(),
-                    onValueChange = { viewModel.updateCurrentUsername(it) }
-                )
-
-                AnimatedVisibility(visible = userDoesntExist.value){
-                    Text(text = "No permissions for this user!",
-                        color = Color.Red,
-                        modifier = Modifier.width(280.dp))
-                }
-
-                Spacer(modifier = Modifier.height(15.dp))
-
-                //sign in button
-                Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
-                    Button(
-                        onClick = { viewModel.signInUser()
-                                    .whenComplete { result, _ ->
-                                    if(result) {
-                                        //Launches intent to the main Activity
-                                        val intent = Intent(context, MainActivity::class.java)
-                                        intent.putExtra("username",viewModel.getCurrentUsername().text)
-                                        context.startActivity(intent)
-                                    } else {
-                                        //Displays error
-                                        userDoesntExist.value = true
-                                    }
-                                   }
-                        },
-                        shape = RoundedCornerShape(50.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp)
-                    ) {
-                        Text(text = "Sign In",
-                            style = TextStyle(fontSize = 20.sp)
-                        )
-                    }
-                }
+                confirmButton(viewModel, context, userExists)
             }
         })
 }

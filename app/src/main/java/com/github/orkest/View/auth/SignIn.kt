@@ -3,7 +3,6 @@ package com.github.orkest.View.auth
 import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
-import android.content.Intent.getIntent
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.material.Button
@@ -12,11 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.TextField
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,8 +21,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.github.orkest.R
+import com.github.orkest.View.MainActivity
+import com.github.orkest.ViewModel.auth.AuthViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -47,11 +47,12 @@ private const val TAG = "Google_Sign_In_Activity"
  * The function that launches the call to firebase and the google api to sign in
  */
 @Composable
-fun SignIn (navController: NavController) {
+fun SignIn (navController: NavController, viewModel: AuthViewModel) {
 
     val context = LocalContext.current
     val googleSignInClient = remember { getGoogleSignInClient(context) }
     val auth = Firebase.auth
+    var isInDatabase = false
 
     val activityResultLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -64,13 +65,13 @@ fun SignIn (navController: NavController) {
                 auth.signInWithCredential(credential).addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         val user = auth.currentUser
-                        updateUI(user, navController)
+                        updateUI(user, navController, isInDatabase, context, viewModel)
                     } else {
-                        updateUI(null, navController)
+                        updateUI(null, navController, isInDatabase, context, viewModel)
                     }
                 }
             } catch (e: ApiException) {
-                updateUI(null, navController)
+                updateUI(null, navController, isInDatabase, context, viewModel)
             }
         }
     }
@@ -95,7 +96,37 @@ fun SignIn (navController: NavController) {
             modifier = Modifier.fillMaxWidth(0.5f),
             colors = ButtonDefaults.buttonColors(backgroundColor = Color.Yellow)
         ) {
-            Text("Sign in with Google")
+            Text("Sign up with Google")
+        }
+
+        Spacer(modifier = Modifier.height(30.dp))
+
+        TextField(
+            label = { Text(text = "Username") },
+            value = viewModel.getCurrentUsername(),
+            modifier = Modifier.fillMaxWidth(0.5f),
+            onValueChange = { viewModel.updateCurrentUsername(it) }
+        )
+
+        Button(
+            onClick = {
+                if(auth.currentUser != null) {
+                    viewModel.signInUser()
+                        .whenComplete { result, _ ->
+                            if(result) {
+                                updateUI(auth.currentUser, navController, true, context, viewModel)
+                            } else {
+                                //to complete
+                            }
+                        }
+                } else {
+                    isInDatabase = true
+                    signIn(activityResultLauncher, googleSignInClient)
+                }
+            },
+            modifier = Modifier.fillMaxWidth(0.5f)
+        ) {
+            Text(text = "Sign in with Google")
         }
     }
 
@@ -129,12 +160,24 @@ fun signIn(activityResultLauncher: ActivityResultLauncher<Intent>,
 /**
  * Changes the intent depending on the user's credentials
  */
-private fun updateUI(user: FirebaseUser?, navController: NavController) {
+private fun updateUI(user: FirebaseUser?, navController: NavController,
+                     isInDatabase: Boolean, context: Context, viewModel: AuthViewModel) {
 
-    if (user != null) {
-        Log.d(TAG, "User is not null")
+    if (user != null && !isInDatabase) {
+
+        Log.d(TAG, "User is not null and is not in database")
         navController.navigate("signup")
-    } else {
+
+    } else if (user != null && isInDatabase) {
+
+        val intent = Intent(context, MainActivity::class.java)
+        intent.putExtra("username",viewModel.getCurrentUsername().text)
+        context.startActivity(intent)
+        Log.d(TAG, "User is not null and is in database")
+
+    }
+    else {
+
         Log.d(TAG, "User is null")
     }
 

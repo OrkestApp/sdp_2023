@@ -6,6 +6,7 @@ import org.junit.Test
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.orkest.Model.Profile
 import com.github.orkest.R
@@ -56,6 +57,7 @@ class ProfileUITest {
         composeTestRule.onNodeWithText("${John.nbFollowers}\nfollowers").assertIsDisplayed()
         composeTestRule.onNodeWithText("${John.nbFollowings}\nfollowings").assertIsDisplayed()
         composeTestRule.onNodeWithContentDescription("${R.drawable.profile_picture}").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Sign Out").assertIsDisplayed()
     }
 
     @Test
@@ -73,6 +75,7 @@ class ProfileUITest {
         composeTestRule.onNodeWithText("$newNbFollowers\nfollowers").assertIsDisplayed()
         composeTestRule.onNodeWithText("$newNbFollowings\nfollowings").assertIsDisplayed()
         composeTestRule.onNodeWithContentDescription("$newProfilePictureId").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Sign Out").assertIsDisplayed()
     }
 
     @Test
@@ -97,6 +100,23 @@ class ProfileUITest {
     fun loadData_withNullDescription(){
         viewModel.setBio(null)
         composeTestRule.onNodeWithText("Description").assertIsDisplayed()
+    }
+
+    /**
+     * The sign out button is displayed
+     */
+    @Test
+    fun signOutButton_displayed() {
+        composeTestRule.onNodeWithText("Sign Out").assertIsDisplayed()
+    }
+
+    /**
+     * Clicking on the sign out button redirects to the login screen
+     */
+    @Test
+    fun signOutButton_click() {
+        composeTestRule.onNodeWithText("Sign Out").performClick()
+        composeTestRule.onNodeWithText("Sign in with Google").assertIsDisplayed()
     }
 
 }

@@ -9,13 +9,21 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
+<<<<<<< HEAD
+    <list default="true" id="d16d1e89-2366-4212-b38d-c0356d12dbf9" name="Changes" comment="" />
+=======
     <list default="true" id="0419b86c-e714-45b8-ac49-9862c084bbca" name="Changes" comment="" />
+>>>>>>> main
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+<<<<<<< HEAD
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[/Users/evguenirousselot/.android/avd/Pixel_2_API_33.avd]" />
+=======
   <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[/home/zermelo/.android/avd/Pixel_6_Pro_API_33.avd]" />
+>>>>>>> main
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -34,11 +42,34 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
+<<<<<<< HEAD
+  <component name="ProjectId" id="2NT8SPB311KOUMj7bDiVR0CQy8L" />
+=======
   <component name="ProjectId" id="2NXngXDCFD4mZ5WQOxS2nsAca1v" />
+>>>>>>> main
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
+<<<<<<< HEAD
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;android-custom-view/Users/evguenirousselot/Library/Android/sdk/sources/android-33/android/view/ViewGroup.java_SELECTED&quot;: &quot;ViewGroup&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;memory.settings.postsync.last.time.stamp&quot;: &quot;1680104247334&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveKotlinTopLevelDeclarationsDialog.RECENTS_KEY">
+      <recent name="com.github.orkest.View.auth" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Android App.app">
+    <configuration name="app" type="AndroidRunConfigurationType" factoryName="Android App">
+=======
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "RunOnceActivity.OpenProjectViewOnStart": "true",
@@ -50,6 +81,7 @@
 }]]></component>
   <component name="RunManager" selected="Android App.Activity">
     <configuration name="Activity" type="AndroidRunConfigurationType" factoryName="Android App">
+>>>>>>> main
       <module name="Orkest.app.main" />
       <option name="DEPLOY" value="true" />
       <option name="DEPLOY_APK_FROM_BUNDLE" value="false" />
@@ -65,7 +97,11 @@
       <option name="CLEAR_LOGCAT" value="false" />
       <option name="SHOW_LOGCAT_AUTOMATICALLY" value="false" />
       <option name="INSPECTION_WITHOUT_ACTIVITY_RESTART" value="false" />
+<<<<<<< HEAD
+      <option name="TARGET_SELECTION_MODE" value="DEVICE_AND_SNAPSHOT_COMBO_BOX" />
+=======
       <option name="TARGET_SELECTION_MODE" value="SHOW_DIALOG" />
+>>>>>>> main
       <option name="SELECTED_CLOUD_MATRIX_CONFIGURATION_ID" value="-1" />
       <option name="SELECTED_CLOUD_MATRIX_PROJECT_ID" value="" />
       <option name="DEBUGGER_TYPE" value="Auto" />
@@ -111,7 +147,11 @@
       <module name="Orkest.app.androidTest" />
       <option name="TESTING_TYPE" value="2" />
       <option name="METHOD_NAME" value="" />
+<<<<<<< HEAD
+      <option name="CLASS_NAME" value="com.github.orkest.View.auth.SignInTest" />
+=======
       <option name="CLASS_NAME" value="com.github.orkest.SignInTest" />
+>>>>>>> main
       <option name="PACKAGE_NAME" value="" />
       <option name="TEST_NAME_REGEX" value="" />
       <option name="INSTRUMENTATION_RUNNER_CLASS" value="" />
@@ -160,10 +200,17 @@
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
       </method>
     </configuration>
+<<<<<<< HEAD
+    <configuration name="existingUsernameLaunchesMain()" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
+      <module name="Orkest.app.androidTest" />
+      <option name="TESTING_TYPE" value="3" />
+      <option name="METHOD_NAME" value="existingUsernameLaunchesMain" />
+=======
     <configuration name="SignUpFormTest" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
       <module name="Orkest.app.androidTest" />
       <option name="TESTING_TYPE" value="2" />
       <option name="METHOD_NAME" value="" />
+>>>>>>> main
       <option name="CLASS_NAME" value="com.github.orkest.View.auth.SignUpFormTest" />
       <option name="PACKAGE_NAME" value="" />
       <option name="TEST_NAME_REGEX" value="" />
@@ -213,10 +260,17 @@
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
       </method>
     </configuration>
+<<<<<<< HEAD
+    <configuration name="noPermissionDisplaysError()" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
+      <module name="Orkest.app.androidTest" />
+      <option name="TESTING_TYPE" value="3" />
+      <option name="METHOD_NAME" value="noPermissionDisplaysError" />
+=======
     <configuration name="inputFieldsUpdateViewAndViewModelWhenInput()" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
       <module name="Orkest.app.androidTest" />
       <option name="TESTING_TYPE" value="3" />
       <option name="METHOD_NAME" value="inputFieldsUpdateViewAndViewModelWhenInput" />
+>>>>>>> main
       <option name="CLASS_NAME" value="com.github.orkest.View.auth.SignUpFormTest" />
       <option name="PACKAGE_NAME" value="" />
       <option name="TEST_NAME_REGEX" value="" />
@@ -266,11 +320,19 @@
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
       </method>
     </configuration>
+<<<<<<< HEAD
+    <configuration name="signOutButton_click()" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
+      <module name="Orkest.app.androidTest" />
+      <option name="TESTING_TYPE" value="3" />
+      <option name="METHOD_NAME" value="signOutButton_click" />
+      <option name="CLASS_NAME" value="com.github.orkest.View.profile.ProfileUITest" />
+=======
     <configuration name="testSignInButtonCanBeClicked()" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
       <module name="Orkest.app.androidTest" />
       <option name="TESTING_TYPE" value="3" />
       <option name="METHOD_NAME" value="testSignInButtonCanBeClicked" />
       <option name="CLASS_NAME" value="com.github.orkest.SignInTest" />
+>>>>>>> main
       <option name="PACKAGE_NAME" value="" />
       <option name="TEST_NAME_REGEX" value="" />
       <option name="INSTRUMENTATION_RUNNER_CLASS" value="" />
@@ -319,11 +381,19 @@
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
       </method>
     </configuration>
+<<<<<<< HEAD
+    <configuration name="signOutButton_displayed()" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
+      <module name="Orkest.app.androidTest" />
+      <option name="TESTING_TYPE" value="3" />
+      <option name="METHOD_NAME" value="signOutButton_displayed" />
+      <option name="CLASS_NAME" value="com.github.orkest.View.profile.ProfileUITest" />
+=======
     <configuration name="theViewModelFetchOnlyRetrieveUserThatBeginWithTheArgument()" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
       <module name="Orkest.app.androidTest" />
       <option name="TESTING_TYPE" value="3" />
       <option name="METHOD_NAME" value="theViewModelFetchOnlyRetrieveUserThatBeginWithTheArgument" />
       <option name="CLASS_NAME" value="com.github.orkest.SearchViewModelTest" />
+>>>>>>> main
       <option name="PACKAGE_NAME" value="" />
       <option name="TEST_NAME_REGEX" value="" />
       <option name="INSTRUMENTATION_RUNNER_CLASS" value="" />
@@ -374,22 +444,38 @@
     </configuration>
     <recent_temporary>
       <list>
+<<<<<<< HEAD
+        <item itemvalue="Android Instrumented Tests.SignInTest" />
+        <item itemvalue="Android Instrumented Tests.signOutButton_click()" />
+        <item itemvalue="Android Instrumented Tests.signOutButton_displayed()" />
+        <item itemvalue="Android Instrumented Tests.existingUsernameLaunchesMain()" />
+        <item itemvalue="Android Instrumented Tests.noPermissionDisplaysError()" />
+=======
         <item itemvalue="Android Instrumented Tests.SignUpFormTest" />
         <item itemvalue="Android Instrumented Tests.inputFieldsUpdateViewAndViewModelWhenInput()" />
         <item itemvalue="Android Instrumented Tests.SignInTest" />
         <item itemvalue="Android Instrumented Tests.testSignInButtonCanBeClicked()" />
         <item itemvalue="Android Instrumented Tests.theViewModelFetchOnlyRetrieveUserThatBeginWithTheArgument()" />
+>>>>>>> main
       </list>
     </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
+<<<<<<< HEAD
+      <changelist id="d16d1e89-2366-4212-b38d-c0356d12dbf9" name="Changes" comment="" />
+      <created>1679676716200</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1679676716200</updated>
+=======
       <changelist id="0419b86c-e714-45b8-ac49-9862c084bbca" name="Changes" comment="" />
       <created>1679819407996</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1679819407996</updated>
+>>>>>>> main
     </task>
     <servers />
   </component>

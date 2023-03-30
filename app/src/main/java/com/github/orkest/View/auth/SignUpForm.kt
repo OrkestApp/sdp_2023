@@ -18,7 +18,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -27,7 +26,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -68,7 +66,7 @@ fun SignUpForm(viewModel: AuthViewModel) {
         topBar = {
             TopAppBar(
                 title = { Text(text = "Create Your Profile",
-                                color = Color.White) },
+                    color = Color.White) },
 
                 backgroundColor = Color.Black
             )},
@@ -122,7 +120,7 @@ fun SignUpForm(viewModel: AuthViewModel) {
                 AddSpace()
 
                 //Button to confirm choices
-                confirmButton(viewModel, context, userExists)
+                ConfirmButton(viewModel, context, userExists)
             }
         })
 }
@@ -131,7 +129,7 @@ fun SignUpForm(viewModel: AuthViewModel) {
  * Creates the button to confirm and start the creation of the profile
  */
 @Composable
-private fun confirmButton(viewModel: AuthViewModel, context: Context, userExists: MutableState<Boolean>){
+private fun ConfirmButton(viewModel: AuthViewModel, context: Context, userExists: MutableState<Boolean>){
     val error = remember { mutableStateOf(false) }
     val errorMessage = remember { mutableStateOf("") }
 
@@ -228,9 +226,9 @@ private fun ChooseServiceProvider(viewModel: AuthViewModel, expanded: MutableSta
 
     Box() {
         // The button that will be displayed for the choice of the provider
-       providerButtonContent(viewModel = viewModel, expanded = expanded , logos = logos)
+       ProviderButtonContent(viewModel = viewModel, expanded = expanded , logos = logos)
 
-        dropDownMenu(viewModel = viewModel, expanded = expanded, logos = logos)
+        DropDownMenu(viewModel = viewModel, expanded = expanded, logos = logos)
 
 
     }
@@ -241,7 +239,7 @@ private fun ChooseServiceProvider(viewModel: AuthViewModel, expanded: MutableSta
  */
 @Composable
 @OptIn(ExperimentalCoilApi::class)
-private fun providerButtonContent(viewModel: AuthViewModel, expanded: MutableState<Boolean>, logos: Map<Providers, Int>){
+private fun ProviderButtonContent(viewModel: AuthViewModel, expanded: MutableState<Boolean>, logos: Map<Providers, Int>){
 
     Button(
         colors= ButtonDefaults.buttonColors(backgroundColor = Color(217,217,217)),
@@ -295,7 +293,7 @@ private fun providerButtonContent(viewModel: AuthViewModel, expanded: MutableSta
  * Creates the dropDownMenu for the choice of the service provider
  */
 @Composable
-private fun dropDownMenu(viewModel: AuthViewModel, expanded: MutableState<Boolean>, logos: Map<Providers, Int>){
+private fun DropDownMenu(viewModel: AuthViewModel, expanded: MutableState<Boolean>, logos: Map<Providers, Int>){
     DropdownMenu(
         expanded = expanded.value,
         onDismissRequest = { expanded.value = false },

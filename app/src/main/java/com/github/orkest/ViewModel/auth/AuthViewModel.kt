@@ -22,17 +22,12 @@ open class AuthViewModel: ViewModel() {
     private val username = mutableStateOf(TextFieldValue())
     private val bio = mutableStateOf(TextFieldValue())
     private val selectedProvider = mutableStateOf(Providers.SPOTIFY)
-    private val currentUsername = mutableStateOf(TextFieldValue())
 
     /**
      * Returns the current value of the username to be displayed on the view
      */
     fun getUsername(): TextFieldValue{
         return username.value
-    }
-
-    fun getCurrentUsername(): TextFieldValue{
-        return currentUsername.value
     }
 
     /**
@@ -55,10 +50,6 @@ open class AuthViewModel: ViewModel() {
      */
     fun updateUsername(value:TextFieldValue){
         username.value = value
-    }
-
-    fun updateCurrentUsername(value:TextFieldValue){
-        currentUsername.value = value
     }
 
     /**
@@ -139,22 +130,33 @@ open class AuthViewModel: ViewModel() {
     }
 
     /**
+     * If the username is empty throws an exception
+     */
+    private fun checkUsername(){
+        if (username.value.text.isEmpty()) throw Exception("Username cannot be empty")
+    }
+
+    /**
      * In a logic similar to createUser,
      * this method checks if the user and the corresponding email already exist in the database
      */
     open fun signInUser(): CompletableFuture<Boolean> {
         val auth = FirebaseAuth.getInstance()
+        val future = CompletableFuture<Boolean>()
+
+        try { checkUsername() } catch (e: Exception) {
+            future.completeExceptionally(e)
+            return future
+        }
 
         // Computes the path to store the user in : user/user-firstLetter/users
         // user-firstletter is a document containing a subcollection which contains the users's documents
-        val firstLetter = currentUsername.value.text[0].uppercase()
+        val firstLetter = username.value.text[0].uppercase()
         val path = "user/user-$firstLetter/users"
-
-        val future = CompletableFuture<Boolean>()
 
         //Checks if the database already contains a user with the same username and email
         db.collection(path)
-            .document(currentUsername.value.text).get()
+            .document(username.value.text).get()
             .addOnSuccessListener {
                 if (it.data != null && it.get("mail").toString() == auth.currentUser?.email.toString()) {
                     println(it)

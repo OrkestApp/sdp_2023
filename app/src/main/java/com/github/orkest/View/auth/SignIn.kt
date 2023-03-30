@@ -122,14 +122,14 @@ fun SignIn (navController: NavController, viewModel: AuthViewModel) {
 
         TextField(
             label = { Text(text = "Username") },
-            value = viewModel.getCurrentUsername(),
+            value = viewModel.getUsername(),
             modifier = Modifier.fillMaxWidth(0.5f),
-            onValueChange = { viewModel.updateCurrentUsername(it) }
+            onValueChange = { viewModel.updateUsername(it) }
         )
 
         //Displays an error when the username is not in the db
         AnimatedVisibility(visible = userNotInDb.value){
-            Text(text = "This username doesn't exist!",
+            Text(text = "This pair (username,email) doesn't exist!",
                 color = Color.Red,
                 modifier = Modifier.width(280.dp))
         }
@@ -146,7 +146,7 @@ fun SignIn (navController: NavController, viewModel: AuthViewModel) {
             },
             modifier = Modifier.fillMaxWidth(0.5f)
         ) {
-            Text(text = "Sign in with Google")
+            Text(text = if (waiting.value) "Signing in with Google ..." else "Sign in with Google")
         }
 
         // Display of the error
@@ -166,7 +166,9 @@ fun SignIn (navController: NavController, viewModel: AuthViewModel) {
 
 }
 
-
+/**
+ * Listener to catch the exception from the db call
+ */
 private fun onConfirmListener(context: Context, error: MutableState<Boolean>, errorMessage: MutableState<String>,
                               waiting: MutableState<Boolean>, userNotInDb: MutableState<Boolean>,
                               viewModel: AuthViewModel, auth: FirebaseAuth, navController: NavController){
@@ -175,7 +177,6 @@ private fun onConfirmListener(context: Context, error: MutableState<Boolean>, er
     error.value = false
     waiting.value = true
     userNotInDb.value = false
-
 
     viewModel.signInUser()
         .whenComplete { result, e ->
@@ -191,32 +192,7 @@ private fun onConfirmListener(context: Context, error: MutableState<Boolean>, er
                     userNotInDb.value = true
                 }
             }
-
-
-
-
         }
-
-    // Calls the function to create the user
-    /*viewModel.createUser().whenComplete { result, e ->
-        waiting.value = false
-        if (e != null){
-            // Print the Exception Message on the UI
-            error.value = true
-            errorMessage.value = e.message?:""
-
-        }else{
-            if(result) {
-                //Launches intent to the main Activity
-                val intent = Intent(context, MainActivity::class.java)
-                intent.putExtra("username",viewModel.getUsername().text)
-                context.startActivity(intent)
-            } else {
-                //Displays error
-                userExists.value = true
-            }
-        }
-    }*/
 }
 
 /**
@@ -258,7 +234,7 @@ private fun updateUI(user: FirebaseUser?, navController: NavController,
     } else if (user != null && isInDatabase) {
 
         val intent = Intent(context, MainActivity::class.java)
-        intent.putExtra("username",viewModel.getCurrentUsername().text)
+        intent.putExtra("username",viewModel.getUsername().text)
         context.startActivity(intent)
         Log.d(TAG, "User is not null and is in database")
 

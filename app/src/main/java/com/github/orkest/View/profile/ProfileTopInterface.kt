@@ -58,13 +58,15 @@ fun ProfileTopInterface(viewModel: ProfileViewModel) {
 
             Column(
                 Modifier.fillMaxHeight(),
-                verticalArrangement = Arrangement.SpaceEvenly
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
                 UserName(viewModel.username.observeAsState().value)
-                Row (                ){
+                Row (
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ){
                     //Separate followers/followings in an even way
                     NbFollowers(number(viewModel.nbFollowers.observeAsState().value))
-                    Spacer(modifier = Modifier.width(80.dp))
+                    Spacer(modifier = Modifier.width(10.dp))
                     NbFollowings(number(viewModel.nbFollowings.observeAsState().value))
                 }
                 Description(viewModel.bio.observeAsState().value)

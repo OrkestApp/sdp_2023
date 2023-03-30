@@ -157,6 +157,7 @@ class SignUpFormTest {
 
         composeTestRule.onNodeWithText("No permissions for this user!").assertIsDisplayed()
     }
+
     @Test
     fun emptyUsernameDisplaysError(){
         composeTestRule.onNodeWithText("Username")

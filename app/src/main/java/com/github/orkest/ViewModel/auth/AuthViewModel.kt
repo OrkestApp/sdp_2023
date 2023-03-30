@@ -138,37 +138,12 @@ open class AuthViewModel: ViewModel() {
             .set(user)
     }
 
+    /**
+     * In a logic similar to createUser,
+     * this method checks if the user and the corresponding email already exist in the database
+     */
     open fun signInUser(): CompletableFuture<Boolean> {
-
-        /*val auth = FirebaseAuth.getInstance()
-        val future = CompletableFuture<Boolean>()
-
-        val userRef = db.collection("user")
-
-        //take the user name of the first element of the list
-        userRef.whereArrayContains("mail", auth.currentUser?.email.toString())
-            .get()
-            .addOnSuccessListener { result ->
-                if(result.isEmpty){
-                    Log.d("signInUser()", "result is empty")
-                    future.complete(false)
-                } else {
-                    updateUsername(TextFieldValue(result.documents[0].get("username").toString()))
-                    Log.d("signInUser()", "result wasn't empty")
-                    future.complete(true)
-                }
-            }
-            .addOnFailureListener { exception ->
-                future.completeExceptionally(exception)
-            }
-
-        return future*/
-
-
-
         val auth = FirebaseAuth.getInstance()
-
-        //Updates the user's credentials
 
         // Computes the path to store the user in : user/user-firstLetter/users
         // user-firstletter is a document containing a subcollection which contains the users's documents
@@ -177,7 +152,7 @@ open class AuthViewModel: ViewModel() {
 
         val future = CompletableFuture<Boolean>()
 
-        //Checks if the database already contains a user with the same username
+        //Checks if the database already contains a user with the same username and email
         db.collection(path)
             .document(currentUsername.value.text).get()
             .addOnSuccessListener {
@@ -185,7 +160,6 @@ open class AuthViewModel: ViewModel() {
                     println(it)
                     future.complete(true)
                 } else {
-                    //If no user with the same username was found, add the user to the database
                     future.complete(false)
                 }
             }

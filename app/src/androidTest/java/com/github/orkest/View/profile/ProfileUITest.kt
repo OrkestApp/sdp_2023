@@ -103,6 +103,14 @@ class ProfileUITest {
     }
 
     /**
+     * The sign out button is displayed
+     */
+    @Test
+    fun signOutButton_displayed() {
+        composeTestRule.onNodeWithText("Sign Out").assertIsDisplayed()
+    }
+
+    /**
      * Clicking on the sign out button redirects to the login screen
      */
     @Test

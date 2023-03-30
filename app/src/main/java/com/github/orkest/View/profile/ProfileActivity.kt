@@ -32,8 +32,8 @@ import coil.compose.rememberImagePainter
 import com.github.orkest.Model.Song
 import com.github.orkest.R
 import com.github.orkest.View.*
+import com.github.orkest.View.theme.OrkestTheme
 import com.github.orkest.ViewModel.profile.ProfileViewModel
-import com.github.orkest.ui.theme.OrkestTheme
 import kotlinx.coroutines.launch
 
 class ProfileActivity() : ComponentActivity() {

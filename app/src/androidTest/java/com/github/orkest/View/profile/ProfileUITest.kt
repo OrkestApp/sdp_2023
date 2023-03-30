@@ -1,18 +1,16 @@
 package com.github.orkest.View.profile
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.*
-import com.github.orkest.ui.theme.OrkestTheme
 import org.junit.Rule
 import org.junit.Test
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.orkest.Model.Profile
 import com.github.orkest.R
 import com.github.orkest.View.profile.topProfile
+import com.github.orkest.View.theme.OrkestTheme
 import com.github.orkest.ViewModel.profile.MockProfileViewModel
 import org.junit.runner.RunWith
 import org.junit.Before
@@ -127,7 +125,5 @@ class ProfileUITest {
         viewModel.setBio(null)
         composeTestRule.onNodeWithText("Description").assertIsDisplayed()
     }
-
-
 
 }

@@ -4,18 +4,18 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
+import com.github.orkest.Model.FireStoreDatabaseAPI
 import com.github.orkest.Model.Providers
 import com.github.orkest.Model.User
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import java.util.concurrent.CompletableFuture
 
 
 open class AuthViewModel: ViewModel() {
 
-    var db = Firebase.firestore
+
+    private val dbAPI = FireStoreDatabaseAPI()
 
     private var user = User()
 
@@ -85,25 +85,8 @@ open class AuthViewModel: ViewModel() {
 
         // Computes the path to store the user in : user/user-firstLetter/users
         // user-firstletter is a document containing a subcollection which contains the users's documents
-        val firstLetter = username.value.text[0].uppercase()
-        val path = "user/user-$firstLetter/users"
 
-        //Checks if the database already contains a user with the same username
-        db.collection(path)
-            .document(user.username).get().addOnSuccessListener {
-                if (it.data != null) {
-                    println(it)
-                    future.complete(false)
-                } else {
-                    //If no user with the same username was found, add the user to the database
-                    pushUser(path).addOnSuccessListener { future.complete(true) }
-                }
-            } //Propagates the exception in case of another exception
-            .addOnFailureListener{
-                future.completeExceptionally(
-                Exception("Sorry, something went wrong ... Please check your Internet connection"))
-            }
-        return future
+        return dbAPI.addUserInDatabase(user)
     }
 
     /**
@@ -119,14 +102,6 @@ open class AuthViewModel: ViewModel() {
         user.serviceProvider = selectedProvider.value.value
         //updated with the email of the user
         user.mail = auth.currentUser?.email.toString()
-    }
-
-    /**
-     * Adds the newly created user to the database
-     */
-    private fun pushUser(path : String): Task<Void> {
-        return db.collection(path).document(user.username)
-            .set(user)
     }
 
     /**
@@ -155,8 +130,8 @@ open class AuthViewModel: ViewModel() {
         val path = "user/user-$firstLetter/users"
 
         //Checks if the database already contains a user with the same username and email
-        db.collection(path)
-            .document(username.value.text).get()
+        
+        dbAPI.getUserDocumentRef(username.value.text).get()
             .addOnSuccessListener {
                 if (it.data != null && it.get("mail").toString() == auth.currentUser?.email.toString()) {
                     println(it)
@@ -172,5 +147,23 @@ open class AuthViewModel: ViewModel() {
             }
 
         return future
+
+        /*db.collection(path)
+            .document(username.value.text).get()
+            .addOnSuccessListener {
+                if (it.data != null && it.get("mail").toString() == auth.currentUser?.email.toString()) {
+                    println(it)
+                    future.complete(true)
+                } else {
+                    future.complete(false)
+                }
+            }
+
+            //Propagates the exception in case of another exception
+            .addOnFailureListener{
+                future.completeExceptionally(it)
+            }
+
+        return future*/
     }
 }

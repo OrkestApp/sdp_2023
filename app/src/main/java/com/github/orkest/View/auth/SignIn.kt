@@ -240,7 +240,6 @@ private fun updateUI(user: FirebaseUser?, navController: NavController,
 
     }
     else {
-
         Log.d(TAG, "User is null")
     }
 

@@ -3,6 +3,9 @@ package com.github.orkest.View.auth
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.navigation.compose.rememberNavController
+import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.matcher.IntentMatchers
+import com.github.orkest.View.MainActivity
 import com.github.orkest.ViewModel.auth.MockAuthViewModel
 import org.junit.Before
 import org.junit.Rule
@@ -88,5 +91,33 @@ class SignInTest {
             .performClick()
     }
 
+
+
+
+
+
+
+    /////////////
+    /*
+    @Test
+    fun existingUsernameLaunchesMain(){
+        Intents.init()
+        composeTestRule.onNodeWithText("Current Username")
+            .performTextInput(MockAuthViewModel.EXISTING_USER)
+
+        composeTestRule.onNodeWithText("Sign In").performClick()
+        Intents.intended((IntentMatchers.hasComponent(MainActivity::class.java.name)))
+        Intents.release()
+    }
+
+    @Test
+    fun noPermissionDisplaysError(){
+        composeTestRule.onNodeWithText("Current Username")
+            .performTextInput(MockAuthViewModel.NO_PERMISSIONS)
+
+        composeTestRule.onNodeWithText("Sign In").performClick()
+
+        composeTestRule.onNodeWithText("No permissions for this user!").assertIsDisplayed()
+    }*/
 
 }

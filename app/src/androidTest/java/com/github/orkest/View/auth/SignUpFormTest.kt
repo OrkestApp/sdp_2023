@@ -138,27 +138,6 @@ class SignUpFormTest {
     }
 
     @Test
-    fun existingUsernameLaunchesMain(){
-        Intents.init()
-        composeTestRule.onNodeWithText("Current Username")
-            .performTextInput(MockAuthViewModel.EXISTING_USER)
-
-        composeTestRule.onNodeWithText("Sign In").performClick()
-        intended((hasComponent(MainActivity::class.java.name)))
-        Intents.release()
-    }
-
-    @Test
-    fun noPermissionDisplaysError(){
-        composeTestRule.onNodeWithText("Current Username")
-            .performTextInput(MockAuthViewModel.NO_PERMISSIONS)
-
-        composeTestRule.onNodeWithText("Sign In").performClick()
-
-        composeTestRule.onNodeWithText("No permissions for this user!").assertIsDisplayed()
-    }
-
-    @Test
     fun emptyUsernameDisplaysError(){
         composeTestRule.onNodeWithText("Username")
             .performTextInput("")

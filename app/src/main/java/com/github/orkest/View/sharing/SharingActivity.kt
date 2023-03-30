@@ -102,7 +102,7 @@ fun UserSelection(){
     var list by remember { mutableStateOf(mutableListOf("")) }
 
     viewModel.searchUserInDatabase(text).thenAccept {
-        list = it
+        list = it.map { user -> user.username }.toMutableList()
     }
     Column(modifier = Modifier.fillMaxSize())
     {

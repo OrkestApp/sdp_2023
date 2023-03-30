@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,19 +20,18 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.github.orkest.View.feed.FeedActivity
 import com.github.orkest.View.profile.ProfileTopInterface
 import com.github.orkest.View.search.SearchUserView
 import com.github.orkest.ViewModel.profile.ProfileViewModel
 import com.github.orkest.ViewModel.search.SearchViewModel
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
+
 
 class NavigationBar {
 
 
     companion object {
         private val viewModel = SearchViewModel()
-        @OptIn(ExperimentalMaterial3Api::class)
         @Composable
         fun CreateNavigationBar(navController: NavHostController, currentUser: String) {
 
@@ -78,7 +76,7 @@ class NavigationBar {
                     startDestination = "HomePage",
                     Modifier.padding(padding)
                 ) {
-                    composable("HomePage") { Text(text = "Feed tab") } // TODO REPLACE BY THE COMPOSABLE FUNCTION OF WHAT YOU WANT TO SHOW WHEN BUTTON IS PRESSED
+                    composable("HomePage") { FeedActivity() }
                     composable("SearchPage") { SearchUserView.SearchUi(viewModel = viewModel) }
                     composable("PlaylistPage") { Text(text = "Playlist tab") }
                     composable("ProfilePage") { ProfileTopInterface(viewModel = ProfileViewModel(user = currentUser)) }

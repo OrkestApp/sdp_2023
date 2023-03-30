@@ -3,18 +3,13 @@ package com.github.orkest
 import android.app.Activity
 import android.app.Instrumentation
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
-import androidx.test.core.app.ActivityScenario
-import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
 import androidx.test.espresso.intent.rule.IntentsTestRule
 import com.github.orkest.View.sharing.SharingComposeActivity
-import junit.framework.TestCase.assertEquals
-import junit.framework.TestCase.assertNotNull
 import org.junit.Rule
 import org.junit.Test
 

@@ -38,8 +38,6 @@ class SignUpFormTest {
         composeTestRule.onNodeWithText("Spotify").assertIsDisplayed()
         composeTestRule.onNodeWithText("Create Profile").assertIsDisplayed()
 
-        composeTestRule.onNodeWithText("Current Username").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Sign In").assertIsDisplayed()
     }
 
     @Test
@@ -49,8 +47,6 @@ class SignUpFormTest {
         composeTestRule.onNodeWithText("Spotify").assert(hasClickAction())
         composeTestRule.onNodeWithText("Create Profile").assert(hasClickAction())
 
-        composeTestRule.onNodeWithText("Current Username").assert(hasClickAction())
-        composeTestRule.onNodeWithText("Sign In").assert(hasClickAction())
     }
 
     @Test

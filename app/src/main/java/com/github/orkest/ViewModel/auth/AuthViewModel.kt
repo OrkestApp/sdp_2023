@@ -70,14 +70,18 @@ open class AuthViewModel: ViewModel() {
 
     /**
      * Called once the user finished inputting its credentials
-     * Returns a Future that completes with :
-     * True if the user has been successfully added to the database,
-     * False if the username already exists in the database
+     * Returns a Future that completes with True if the user has been successfully added to the database,
+     * False if it already exists, and an exception if an error occurred
      */
     open fun createUser(): CompletableFuture<Boolean> {
 
-        //Updates the user's credentials
-        updateUser()
+        val future = CompletableFuture<Boolean>()
+
+        //Updates the user's credentials and transmits any exception through the future
+        try { updateUser() } catch (e: Exception) {
+             future.completeExceptionally(e)
+             return future
+        }
 
         // Computes the path to store the user in : user/user-firstLetter/users
         // user-firstletter is a document containing a subcollection which contains the users's documents
@@ -89,6 +93,7 @@ open class AuthViewModel: ViewModel() {
      * Updates the user's credentials after validation
      */
     private fun updateUser(){
+        if (username.value.text.isEmpty()) throw Exception("Username cannot be empty")
         user.username = username.value.text
         user.profile.username = user.username
         user.profile.bio = bio.value.text

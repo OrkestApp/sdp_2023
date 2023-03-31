@@ -19,7 +19,7 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
     private val dbAPI = FireStoreDatabaseAPI()
     private var userProfile = User()
 
-    open var username = MutableLiveData<String>()
+    open var username = MutableLiveData(user)
     open var bio = MutableLiveData<String>()
     open var nbFollowers = MutableLiveData<Int>()
     open var nbFollowings = MutableLiveData<Int>()

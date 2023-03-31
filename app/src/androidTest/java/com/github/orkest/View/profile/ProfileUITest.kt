@@ -1,7 +1,8 @@
 package com.github.orkest.View.profile
 
-
-import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.material.rememberScaffoldState
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.test.*
 import org.junit.Rule
 import org.junit.Test
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -42,19 +43,62 @@ class ProfileUITest {
 
     @Test
     fun profileScreen_displaysRightValues() {
-        composeTestRule.setContent { OrkestTheme { topProfile(viewModel = viewModel) } }
+        composeTestRule.setContent {
+            ProfileActivitySetting {
+                ProfileActivityScreen(ProfileActivity(), viewModel = viewModel)
+            }
+        }
         composeTestRule.onNodeWithText(John.username).assertIsDisplayed()
         composeTestRule.onNodeWithText(John.bio).assertIsDisplayed()
         composeTestRule.onNodeWithText("${John.nbFollowers}\nfollowers").assertIsDisplayed()
         composeTestRule.onNodeWithText("${John.nbFollowings}\nfollowings").assertIsDisplayed()
         composeTestRule.onNodeWithContentDescription("${R.drawable.profile_picture}").assertIsDisplayed()
+
+        composeTestRule.onNodeWithText("Favorite Songs").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Favorite Artists").assertIsDisplayed()
+    }
+
+    @Test
+    fun navigationDrawerComponentsDisplayOnScreen() {
+        composeTestRule.setContent {
+            ProfileActivitySetting {
+                ProfileActivityScreen(ProfileActivity(), viewModel = viewModel)
+            }
+        }
+
+        // drawer elements displayed when opening the drawer
+        composeTestRule.onNodeWithContentDescription("Drawer Icon").performClick()
+        composeTestRule.onNodeWithText("Notifications").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Privacy").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Help").assertIsDisplayed()
+
+        // elements not displayed when closing the drawer
+        composeTestRule.onNodeWithContentDescription("Drawer Icon").performClick()
+        composeTestRule.onNodeWithText("Notifications").assertIsNotDisplayed()
+        composeTestRule.onNodeWithText("Privacy").assertIsNotDisplayed()
+        composeTestRule.onNodeWithText("Help").assertIsNotDisplayed()
+    }
+
+    @Test
+    fun addFavoriteSongsAndArtistsButtonsAreDisplayedAndClickable() {
+         composeTestRule.setContent {
+            ProfileActivitySetting {
+                ProfileActivityScreen(ProfileActivity(), viewModel = viewModel)
+            }
+        }
+
+        val numAddButtons = composeTestRule.onAllNodesWithContentDescription("Add Button").fetchSemanticsNodes().size
+        assert(numAddButtons == 2)
+        composeTestRule.onAllNodesWithContentDescription("Add Button").assertAll(hasClickAction())
         composeTestRule.onNodeWithText("Sign Out").assertIsDisplayed()
     }
 
     @Test
     fun profileScreen_updatesWhenValuesChangedInDatabase() {
         composeTestRule.setContent {
-            OrkestTheme { topProfile(viewModel = viewModel) }
+            val scaffoldState = rememberScaffoldState()
+            val coroutineScope = rememberCoroutineScope()
+            OrkestTheme { topProfile(viewModel = viewModel, scaffoldState, coroutineScope) }
         }
         val newUsername = "Mike"
         val newBio = "New Bio"
@@ -69,46 +113,70 @@ class ProfileUITest {
         composeTestRule.onNodeWithText("$newNbFollowers\nfollowers").assertIsDisplayed()
         composeTestRule.onNodeWithText("$newNbFollowings\nfollowings").assertIsDisplayed()
         composeTestRule.onNodeWithContentDescription("$newProfilePictureId").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Sign Out").assertIsDisplayed()
+        //composeTestRule.onNodeWithText("Sign Out").assertIsDisplayed()
     }
 
     @Test
     fun loadData_withNullProfilePictureId() {
-        composeTestRule.setContent { OrkestTheme { topProfile(viewModel = viewModel) } }
+        composeTestRule.setContent {
+            val scaffoldState = rememberScaffoldState()
+            val coroutineScope = rememberCoroutineScope()
+            OrkestTheme { topProfile(viewModel = viewModel, scaffoldState, coroutineScope) }
+        }
         viewModel.setProfilePictureId(null)
         composeTestRule.onNodeWithContentDescription("${R.drawable.profile_picture}").assertIsDisplayed()
     }
 
     @Test
     fun loadData_withNullNbFollowers(){
-        composeTestRule.setContent { OrkestTheme { topProfile(viewModel = viewModel) } }
+        composeTestRule.setContent {
+            val scaffoldState = rememberScaffoldState()
+            val coroutineScope = rememberCoroutineScope()
+            OrkestTheme { topProfile(viewModel = viewModel, scaffoldState, coroutineScope) }
+        }
         viewModel.setNbFollowers(null)
         composeTestRule.onNodeWithText("${0}\nfollower").assertIsDisplayed()
     }
 
     @Test
     fun loadData_withNullNbFollowings(){
-        composeTestRule.setContent { OrkestTheme { topProfile(viewModel = viewModel) } }
+        composeTestRule.setContent {
+            val scaffoldState = rememberScaffoldState()
+            val coroutineScope = rememberCoroutineScope()
+            OrkestTheme { topProfile(viewModel = viewModel, scaffoldState, coroutineScope) }
+        }
         viewModel.setNbFollowings(null)
         composeTestRule.onNodeWithText("${0}\nfollowing").assertIsDisplayed()
     }
 
     @Test
     fun loadData_withNullDescription(){
-        composeTestRule.setContent { OrkestTheme { topProfile(viewModel = viewModel) } }
+        composeTestRule.setContent {
+            val scaffoldState = rememberScaffoldState()
+            val coroutineScope = rememberCoroutineScope()
+            OrkestTheme { topProfile(viewModel = viewModel, scaffoldState, coroutineScope) }
+        }
         viewModel.setBio(null)
         composeTestRule.onNodeWithText("Description").assertIsDisplayed()
     }
 
     @Test
     fun editButton_isDisplayed_when_Current_Profile_Displayed(){
-        composeTestRule.setContent { OrkestTheme { topProfile(viewModel = viewModel) } }
+        composeTestRule.setContent {
+            val scaffoldState = rememberScaffoldState()
+            val coroutineScope = rememberCoroutineScope()
+            OrkestTheme { topProfile(viewModel = viewModel, scaffoldState, coroutineScope) }
+        }
         composeTestRule.onNodeWithText("Edit Profile").assertIsDisplayed()
     }
 
     @Test
     fun followButton_click_updates_to_unfollow() {
-        composeTestRule.setContent { OrkestTheme { topProfile(viewModel = newViewModel) } }
+        composeTestRule.setContent {
+            val scaffoldState = rememberScaffoldState()
+            val coroutineScope = rememberCoroutineScope()
+            OrkestTheme { topProfile(viewModel = newViewModel, scaffoldState, coroutineScope) }
+        }
         newViewModel.setIsUserFollowed(false)
         val button = composeTestRule.onNodeWithText("Follow")
 
@@ -118,7 +186,11 @@ class ProfileUITest {
 
     @Test
     fun unfollowButton_click_updates_to_follow() {
-        composeTestRule.setContent { OrkestTheme { topProfile(viewModel = newViewModel) } }
+        composeTestRule.setContent {
+            val scaffoldState = rememberScaffoldState()
+            val coroutineScope = rememberCoroutineScope()
+            OrkestTheme { topProfile(viewModel = newViewModel, scaffoldState, coroutineScope) }
+        }
         newViewModel.setIsUserFollowed(true)
         val button = composeTestRule.onNodeWithText("Unfollow")
 
@@ -132,7 +204,11 @@ class ProfileUITest {
      */
     @Test
     fun signOutButton_displayed() {
-        composeTestRule.setContent { OrkestTheme { topProfile(viewModel = viewModel) } }
+        composeTestRule.setContent {
+            val scaffoldState = rememberScaffoldState()
+            val coroutineScope = rememberCoroutineScope()
+            OrkestTheme { topProfile(viewModel = viewModel, scaffoldState, coroutineScope) }
+        }
         composeTestRule.onNodeWithText("Sign Out").assertIsDisplayed()
     }
 
@@ -141,7 +217,11 @@ class ProfileUITest {
      */
     @Test
     fun signOutButton_click() {
-        composeTestRule.setContent { OrkestTheme { topProfile(viewModel = viewModel) } }
+        composeTestRule.setContent {
+            val scaffoldState = rememberScaffoldState()
+            val coroutineScope = rememberCoroutineScope()
+            OrkestTheme { topProfile(viewModel = viewModel, scaffoldState, coroutineScope) }
+        }
         composeTestRule.onNodeWithText("Sign Out").performClick()
         composeTestRule.onNodeWithText("Sign in with Google").assertIsDisplayed()
     }

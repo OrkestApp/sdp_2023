@@ -194,9 +194,9 @@ private fun onConfirmListener(context: Context, error: MutableState<Boolean>, er
 
         }else{
             if(result) {
+                Constants.currentLoggedUser = viewModel.getUsername().text
                 //Launches intent to the main Activity
                 val intent = Intent(context, MainActivity::class.java)
-                intent.putExtra("username",viewModel.getUsername().text)
                 context.startActivity(intent)
             } else {
                 //Displays error

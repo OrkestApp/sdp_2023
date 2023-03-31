@@ -27,9 +27,7 @@ import androidx.compose.ui.unit.times
 import com.github.orkest.Constants
 import com.github.orkest.R
 import com.github.orkest.View.EditProfileActivity
-import com.github.orkest.View.MainActivity
 import com.github.orkest.View.NavDrawerButton
-import com.github.orkest.ViewModel.profile.ProfileViewModel
 import kotlinx.coroutines.CoroutineScope
 import com.github.orkest.ViewModel.profile.ProfileViewModel
 import androidx.compose.ui.graphics.Color
@@ -45,8 +43,8 @@ private val fontSize = 16.sp
 private val smallFontSize = 13.sp
 private val paddingValue = 10.dp
 private val buttonSettings = Modifier
-                                .height(topInterfaceHeight / 4)
-                                .width((3 * topInterfaceHeight) / 4)
+    .height(topInterfaceHeight / 4)
+    .width((3 * topInterfaceHeight) / 4)
 private val followColor = Color(0xFFFEE600) // bright yellow
 
 /**
@@ -58,6 +56,10 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
 
     val context = LocalContext.current
     viewModel.setupListener()
+
+    val currentUser = remember {
+        viewModel.username.value
+    }
 
 
     Column(Modifier
@@ -97,26 +99,29 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
 
 
         Row{
+
             if(viewModel.username.value == Constants.currentLoggedUser) {
                 EditButton {
                     val intent = Intent(context, EditProfileActivity::class.java)
                     context.startActivity(intent)
+                }
+                Spacer(modifier = Modifier.width(separator))
+                Row(){
+                    SignOutButton {
+                        val auth = FirebaseAuth.getInstance()
+                        val intent = Intent(context, AuthActivity::class.java)
+                        auth.signOut()
+                        //uncomment if un-caching is needed
+                        GoogleSignIn.getClient(context, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut()
+                        context.startActivity(intent)
+                    }
                 }
             } else {
                 FollowButton(viewModel, viewModel.isUserFollowed.observeAsState().value)
             }
         }
 
-        Row(){
-            SignOutButton {
-                val auth = FirebaseAuth.getInstance()
-                val intent = Intent(context, AuthActivity::class.java)
-                auth.signOut()
-                //uncomment if un-caching is needed
-                GoogleSignIn.getClient(context, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut()
-                context.startActivity(intent)
-            }
-        }
+
     }
 }
 

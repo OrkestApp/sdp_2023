@@ -30,6 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
+import com.github.orkest.Constants
 import com.github.orkest.Model.Song
 import com.github.orkest.R
 import com.github.orkest.View.*
@@ -46,8 +47,8 @@ class ProfileActivity() : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        currentUser = intent.getStringExtra("username").toString()
-        val viewModel = ProfileViewModel(currentUser)
+        //currentUser = intent.getStringExtra("username").toString()
+        val viewModel = ProfileViewModel(Constants.currentLoggedUser)
         setContent {
             ProfileActivitySetting {
                 ProfileActivityScreen(this, viewModel = viewModel)

@@ -1,19 +1,22 @@
 package com.github.orkest.ViewModel.auth
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
+import com.github.orkest.Constants
+import com.github.orkest.Model.FireStoreDatabaseAPI
 import com.github.orkest.Model.Providers
 import com.github.orkest.Model.User
 import com.google.android.gms.tasks.Task
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.auth.FirebaseAuth
 import java.util.concurrent.CompletableFuture
 
 
 open class AuthViewModel: ViewModel() {
 
-    var db = Firebase.firestore
+
+    private val dbAPI = FireStoreDatabaseAPI()
 
     private var user = User()
 
@@ -68,58 +71,63 @@ open class AuthViewModel: ViewModel() {
 
     /**
      * Called once the user finished inputting its credentials
-     * Returns a Future that completes with :
-     * True if the user has been successfully added to the database,
-     * False if the username already exists in the database
+     * Returns a Future that completes with True if the user has been successfully added to the database,
+     * False if it already exists, and an exception if an error occurred
      */
     open fun createUser(): CompletableFuture<Boolean> {
 
-        //Updates the user's credentials
-        updateUser()
+        val future = CompletableFuture<Boolean>()
+
+        //Updates the user's credentials and transmits any exception through the future
+        try { updateUser() } catch (e: Exception) {
+             future.completeExceptionally(e)
+             return future
+        }
 
         // Computes the path to store the user in : user/user-firstLetter/users
         // user-firstletter is a document containing a subcollection which contains the users's documents
-        val firstLetter = username.value.text[0].uppercase()
-        val path = "user/user-$firstLetter/users"
 
-        val future = CompletableFuture<Boolean>()
-
-        //Checks if the database already contains a user with the same username
-        db.collection(path)
-            .document(user.username).get()
-            .addOnSuccessListener {
-                if (it.data != null) {
-                    println(it)
-                    future.complete(false)
-                } else {
-                    //If no user with the same username was found, add the user to the database
-                    pushUser(path)
-                        .addOnSuccessListener { future.complete(true) }
-                }
-            }
-            //Propagates the exception in case of another exception
-            .addOnFailureListener{
-                future.completeExceptionally(it)
-            }
-
-        return future
+        return dbAPI.addUserInDatabase(user)
     }
 
     /**
      * Updates the user's credentials after validation
      */
     private fun updateUser(){
+        val auth = FirebaseAuth.getInstance()
+
+        if (username.value.text.isEmpty()) throw Exception("Username cannot be empty")
         user.username = username.value.text
         user.profile.username = user.username
         user.profile.bio = bio.value.text
         user.serviceProvider = selectedProvider.value.value
+        //updated with the email of the user
+        user.mail = auth.currentUser?.email.toString()
     }
 
     /**
-     * Adds the newly created user to the database
+     * If the username is empty throws an exception
      */
-    private fun pushUser(path : String): Task<Void> {
-        return db.collection(path).document(user.username)
-            .set(user)
+    private fun checkUsername(){
+        if (username.value.text.isEmpty()) throw Exception("Username cannot be empty")
+    }
+
+    /**
+     * In a logic similar to createUser,
+     * this method checks if the user and the corresponding email already exist in the database
+     */
+    open fun signInUser(): CompletableFuture<Boolean> {
+
+        val future = CompletableFuture<Boolean>()
+
+        user.username = username.value.text
+        Constants.currentLoggedUser = username.value.text
+
+        try { checkUsername() } catch (e: Exception) {
+            future.completeExceptionally(e)
+            return future
+        }
+
+        return dbAPI.userMailInDatabase(user)
     }
 }

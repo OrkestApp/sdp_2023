@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.DrawerValue
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.rememberScaffoldState
@@ -23,15 +24,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
+import com.github.orkest.Constants
 import com.github.orkest.Model.Song
 import com.github.orkest.R
 import com.github.orkest.View.*
+import com.github.orkest.View.theme.OrkestTheme
 import com.github.orkest.ViewModel.profile.ProfileViewModel
-import com.github.orkest.ui.theme.OrkestTheme
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 class ProfileActivity() : ComponentActivity() {
@@ -92,8 +97,7 @@ fun ProfileActivityScreen(activity: ComponentActivity, viewModel: ProfileViewMod
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    topProfile(viewModel = viewModel)
-                    NavDrawerButton(coroutineScope, scaffoldState)
+                    topProfile(viewModel = viewModel, scaffoldState, coroutineScope)
                 }
                 mainBody()
             }
@@ -104,8 +108,8 @@ fun ProfileActivityScreen(activity: ComponentActivity, viewModel: ProfileViewMod
 }
 
 @Composable
-fun topProfile(viewModel: ProfileViewModel) {
-    ProfileTopInterface(viewModel = viewModel)
+fun topProfile(viewModel: ProfileViewModel, scaffoldState: ScaffoldState, coroutineScope: CoroutineScope) {
+    ProfileTopInterface(viewModel = viewModel, scaffoldState, coroutineScope)
 }
 
 @Composable
@@ -137,7 +141,8 @@ fun <T> placeholders (title: String, items: List<T>, select: () -> Unit = { } ){
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(title)
-        IconButton(onClick = { /* TODO ADD ABILITY TO ADD SONGS + ARTISTS */ }) {
+        IconButton(
+            onClick = { /* TODO ADD ABILITY TO ADD SONGS + ARTISTS */ }) {
             Icon(imageVector = Icons.Outlined.Add, contentDescription = "Add Button")
         }
     }

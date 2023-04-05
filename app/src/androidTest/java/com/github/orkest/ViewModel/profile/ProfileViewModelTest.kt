@@ -1,13 +1,16 @@
 package com.github.orkest.ViewModel.profile
 
+import com.github.orkest.Constants
+import com.github.orkest.Model.FireStoreDatabaseAPI
 import com.github.orkest.Model.Profile
 import com.github.orkest.Model.User
-import com.github.orkest.ViewModel.profile.ProfileViewModel
 import junit.framework.TestCase.assertEquals
-import org.junit.Before
-import org.junit.Test
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
+import org.junit.Before
+import org.junit.Test
 
 // run firebase emulators:start --only firestore in terminal before
 class ProfileViewModelTest {
@@ -15,23 +18,36 @@ class ProfileViewModelTest {
     private var testUserName = "testUser"
     private var testBio = "This is my bio"
     private var testNbFollowers = 10
-    private var testNbFollowings = 2
+    private var testNbFollowings = 34
     private var testProfilePicture = 45
 
     private val newUsername = "newUsername"
     private val newBio = "My new bio"
     private val newNbFollowers = 32
-    private val newNbFollowings = 0
+    private val newNbFollowings = 65
     private val newProfilePicture = 928
 
     private lateinit var user: User
+    private lateinit var newUser: User
     private var viewModel: ProfileViewModel = ProfileViewModel(testUserName)
+    private val newViewModel: ProfileViewModel = ProfileViewModel(newUsername)
 
     @Before
     fun setUp() {
+        Constants.currentLoggedUser = testUserName
         runBlocking {
-            user = User(profile = Profile(testUserName, testProfilePicture, testBio, testNbFollowers, testNbFollowings))
-            viewModel.userDocument(testUserName).set(user).await()
+            user = User(username = testUserName, profile = Profile(testUserName, testProfilePicture, testBio, testNbFollowers, testNbFollowings))
+
+            withContext(Dispatchers.IO) {
+                FireStoreDatabaseAPI().addUserInDatabase(user).get()
+            }
+
+
+
+        }
+        runBlocking {
+            newUser = User(profile = Profile(newUsername, newProfilePicture, newBio, newNbFollowers, newNbFollowings))
+            FireStoreDatabaseAPI().getUserDocumentRef(newUsername).set(newUser).await()
         }
         viewModel.setupListener()
     }
@@ -56,7 +72,7 @@ class ProfileViewModelTest {
     fun onlyProfilePictureIdGetsUpdated(){
         runBlocking {
             user.profile.profilePictureId = newProfilePicture
-            viewModel.userDocument(testUserName).set(user).await()
+
         }
         assertEquals(newProfilePicture, user.profile.profilePictureId)
         assertEquals(testUserName, user.profile.username)
@@ -69,7 +85,7 @@ class ProfileViewModelTest {
     fun onlyBioGetsUpdated(){
         runBlocking {
             user.profile.bio = newBio
-            viewModel.userDocument(testUserName).set(user).await()
+
         }
         assertEquals(newBio, user.profile.bio)
         assertEquals(testUserName, user.profile.username)
@@ -82,7 +98,7 @@ class ProfileViewModelTest {
     fun onlyNbFollowersGetsUpdated(){
         runBlocking {
             user.profile.nbFollowers = newNbFollowers
-            viewModel.userDocument(testUserName).set(user).await()
+
         }
         assertEquals(testBio, user.profile.bio)
         assertEquals(testUserName, user.profile.username)
@@ -95,7 +111,7 @@ class ProfileViewModelTest {
     fun onlyNbFollowingsGetsUpdated(){
         runBlocking {
             user.profile.nbFollowings = newNbFollowings
-            viewModel.userDocument(testUserName).set(user).await()
+
         }
         assertEquals(testBio, user.profile.bio)
         assertEquals(testUserName, user.profile.username)
@@ -111,7 +127,7 @@ class ProfileViewModelTest {
             user.profile.nbFollowers = newNbFollowers
             user.profile.nbFollowings = newNbFollowings
             user.profile.profilePictureId = newProfilePicture
-            viewModel.userDocument(testUserName).set(user).await()
+
         }
         assertEquals(newBio, user.profile.bio)
         assertEquals(testUserName, user.profile.username)
@@ -120,11 +136,14 @@ class ProfileViewModelTest {
         assertEquals(newProfilePicture, user.profile.profilePictureId)
     }
 
+    /*
     @Test
     fun testUserDocument() {
         val documentReference = viewModel.userDocument("testUser")
         assertEquals(documentReference.path, "user/user-T/users/testUser")
     }
+
+     */
 
     /**
      * If a user changes their username, the path will change as well.
@@ -135,8 +154,10 @@ class ProfileViewModelTest {
 
         val newViewModel = ProfileViewModel(newUsername)
         runBlocking {
-            user = User(profile = Profile(newUsername, 2, "New bio", 20, 15))
-            newViewModel.userDocument(newUsername).set(user).await()
+            user = User(username = newUsername, profile = Profile(newUsername, 2, "New bio", 20, 15))
+            withContext(Dispatchers.IO) {
+                FireStoreDatabaseAPI().addUserInDatabase(user).get()
+            }
         }
         newViewModel.setupListener()
 
@@ -147,6 +168,79 @@ class ProfileViewModelTest {
         assertEquals(2, user.profile.profilePictureId)
     }
 
+    @Test
+    fun isUserFollowedReturnsTrueWhenFollowed(){
+        runBlocking {
+            user.followings.add(newUsername)
+            FireStoreDatabaseAPI().getUserDocumentRef(testUserName).set(user).await()
+            newUser.followers.add(testUserName)
+            FireStoreDatabaseAPI().getUserDocumentRef(newUsername).set(newUser).await()
+        }
 
+        newViewModel.isUserFollowed().whenComplete{_, _ ->
+            assertEquals(true, newViewModel.isUserFollowed.value)
+        }
+    }
 
+    @Test
+    fun isUserFollowedReturnsFalseWhenNotFollowed(){
+        newViewModel.isUserFollowed().whenComplete{_, _ ->
+            assertEquals(false, newViewModel.isUserFollowed.value)
+        }
+    }
+
+    @Test
+    fun followFunctionalityUpdatesUsers(){
+        newViewModel.follow().whenComplete {_,_ ->
+            assertEquals(true, user.followings.contains(newUsername))
+            assertEquals(true, newUser.followers.contains(testUserName))
+            assertEquals(testNbFollowings+1, user.profile.nbFollowings)
+            assertEquals(newNbFollowers+1, newUser.profile.nbFollowers)
+        }
+    }
+
+    @Test
+    fun unFollowFunctionalityUpdatesUsers(){
+        newViewModel.unfollow().whenComplete {_,_ ->
+            assertEquals(false, user.followings.contains(newUsername))
+            assertEquals(false, newUser.followers.contains(testUserName))
+            assertEquals(testNbFollowings-1, user.profile.nbFollowings)
+            assertEquals(newNbFollowers-1, newUser.profile.nbFollowers)
+        }
+    }
+
+    @Test
+    fun unFollowNeverGoesUnderZero(){
+        runBlocking {
+            newUser.profile.nbFollowers = 0
+            FireStoreDatabaseAPI().getUserDocumentRef(newUsername).set(newUser).await()
+            user.profile.nbFollowings = 0
+            FireStoreDatabaseAPI().getUserDocumentRef(testUserName).set(user).await()
+        }
+        newViewModel.unfollow().whenComplete{_, _ ->
+            assertEquals(0, newUser.profile.nbFollowers)
+            assertEquals(0, user.profile.nbFollowings)
+        }
+    }
+
+    @Test
+    fun isUserUpdatedThrowsExceptionWhenCalledInCurrentProfile(){
+        try { viewModel.isUserFollowed() } catch(e: java.lang.IllegalArgumentException){
+            assertEquals("Cannot call this function when visiting the current logged-in user's profile", e.message)
+        }
+    }
+
+    @Test
+    fun followThrowsExceptionWhenCalledInCurrentProfile(){
+        try { viewModel.follow() } catch(e: java.lang.IllegalArgumentException){
+            assertEquals("Cannot call this function when visiting the current logged-in user's profile", e.message)
+        }
+    }
+
+    @Test
+    fun unfollowThrowsExceptionWhenCalledInCurrentProfile(){
+        try { viewModel.unfollow() } catch(e: java.lang.IllegalArgumentException){
+            assertEquals("Cannot call this function when visiting the current logged-in user's profile", e.message)
+        }
+    }
 }

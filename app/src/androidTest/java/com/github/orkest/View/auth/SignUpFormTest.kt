@@ -26,8 +26,9 @@ class SignUpFormTest {
         // Start the app
         viewModel = MockAuthViewModel()
         composeTestRule.setContent {
-            SignUpForm(navController = rememberNavController(), viewModel)
+            SignUpForm( viewModel)
         }
+        composeTestRule.waitForIdle()
     }
 
     @Test
@@ -35,16 +36,18 @@ class SignUpFormTest {
         composeTestRule.onAllNodesWithText("Create Your Profile").assertAll(isEnabled())
         composeTestRule.onNodeWithText("Username").assertIsDisplayed()
         composeTestRule.onNodeWithText("Profile Description").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Service Provider: Spotify").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Spotify").assertIsDisplayed()
         composeTestRule.onNodeWithText("Create Profile").assertIsDisplayed()
+
     }
 
     @Test
     fun buttonsCanBeClicked(){
         composeTestRule.onNodeWithText("Username").assert(hasClickAction())
         composeTestRule.onNodeWithText("Profile Description").assert(hasClickAction())
-        composeTestRule.onNodeWithText("Service Provider: Spotify").assert(hasClickAction())
+        composeTestRule.onNodeWithText("Spotify").assert(hasClickAction())
         composeTestRule.onNodeWithText("Create Profile").assert(hasClickAction())
+
     }
 
     @Test
@@ -54,11 +57,16 @@ class SignUpFormTest {
 
     @Test
     fun inputFieldsUpdateViewAndViewModelWhenInput(){
+        composeTestRule.waitUntil{
+            composeTestRule.onAllNodesWithText("Username").fetchSemanticsNodes().size ==1
+        }
         composeTestRule.onNodeWithText("Username").performTextInput("Steve")
         composeTestRule.onNodeWithText("Steve").assertIsDisplayed()
-        //This has to be put after we check the view to be sure we didn't check this info too soon
+        //his has to be put after we check the view to be sure we didn't check this info too soon
         assert(viewModel.getUsername().text == "Steve")
-
+        composeTestRule.waitUntil{
+            composeTestRule.onAllNodesWithText("Profile Description").fetchSemanticsNodes().size ==1
+        }
         composeTestRule.onNodeWithText("Profile Description").performTextInput("bio")
         composeTestRule.onNodeWithText("bio").assertIsDisplayed()
         assert(viewModel.getBio().text == "bio")
@@ -66,47 +74,47 @@ class SignUpFormTest {
 
     @Test
     fun dropDownMenuDisplaysOnClick(){
-        composeTestRule.onNodeWithText("Service Provider: Spotify").performClick()
+        composeTestRule.onNodeWithTag("providerButton").performClick()
 
-        composeTestRule.onNodeWithText("Spotify").assertExists()
-        composeTestRule.onNodeWithText("Deezer").assertExists()
-        composeTestRule.onNodeWithText("Apple Music").assertExists()
+        composeTestRule.onNodeWithTag("option Spotify").assertExists()
+        composeTestRule.onNodeWithTag("option Deezer").assertExists()
+        composeTestRule.onNodeWithTag("option Apple Music").assertExists()
 
-        composeTestRule.onNodeWithText("Spotify").assert(hasClickAction())
-        composeTestRule.onNodeWithText("Deezer").assert(hasClickAction())
-        composeTestRule.onNodeWithText("Apple Music").assert(hasClickAction())
+        composeTestRule.onNodeWithTag("option Spotify").assert(hasClickAction())
+        composeTestRule.onNodeWithTag("option Deezer").assert(hasClickAction())
+        composeTestRule.onNodeWithTag("option Apple Music").assert(hasClickAction())
     }
 
     @Test
     fun dropDownMenuHidesOnClick(){
-        composeTestRule.onNodeWithText("Service Provider: Spotify").performClick()
-        composeTestRule.onNodeWithText("Deezer").performClick()
+        composeTestRule.onNodeWithTag("providerButton").performClick()
+        composeTestRule.onNodeWithTag("option Deezer").performClick()
 
-        composeTestRule.onNodeWithText("Spotify").assertDoesNotExist()
-        composeTestRule.onNodeWithText("Deezer").assertDoesNotExist()
-        composeTestRule.onNodeWithText("Apple Music").assertDoesNotExist()
+        composeTestRule.onNodeWithTag("option Spotify").assertDoesNotExist()
+        composeTestRule.onNodeWithTag("option Deezer").assertDoesNotExist()
+        composeTestRule.onNodeWithTag("option Apple Music").assertDoesNotExist()
 
     }
 
     @Test
     fun clickOnDropDownUpdatesViewAndViewModel(){
-        composeTestRule.onNodeWithText("Service Provider: Spotify").performClick()
+        composeTestRule.onNodeWithText("Spotify").performClick()
 
         composeTestRule.onNodeWithText("Deezer").performClick()
-        composeTestRule.onNodeWithText("Service Provider: Deezer").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Deezer").assertIsDisplayed()
         assert(viewModel.getProvider() == Providers.DEEZER)
 
-        composeTestRule.onNodeWithText("Service Provider: Deezer").performClick()
+        composeTestRule.onNodeWithText("Deezer").performClick()
 
         composeTestRule.onNodeWithText("Apple Music").performClick()
-        composeTestRule.onNodeWithText("Service Provider: Apple Music").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Apple Music").assertIsDisplayed()
         assert(viewModel.getProvider() == Providers.APPLE_MUSIC)
 
 
-        composeTestRule.onNodeWithText("Service Provider: Apple Music").performClick()
+        composeTestRule.onNodeWithText("Apple Music").performClick()
 
         composeTestRule.onNodeWithText("Spotify").performClick()
-        composeTestRule.onNodeWithText("Service Provider: Spotify").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Spotify").assertIsDisplayed()
         assert(viewModel.getProvider() == Providers.SPOTIFY)
     }
 
@@ -130,4 +138,26 @@ class SignUpFormTest {
         intended((hasComponent(MainActivity::class.java.name)))
         Intents.release()
     }
+
+    @Test
+    fun emptyUsernameDisplaysError(){
+        composeTestRule.onNodeWithText("Username")
+            .performTextInput("")
+
+        composeTestRule.onNodeWithText("Create Profile").performClick()
+
+        composeTestRule.onNodeWithText("Username cannot be empty!").assertIsDisplayed()
+    }
+
+    @Test
+    fun noConnectionDisplaysError(){
+        composeTestRule.onNodeWithText("Username")
+            .performTextInput(MockAuthViewModel.NO_CONNECTION)
+
+        composeTestRule.onNodeWithText("Create Profile").performClick()
+
+        composeTestRule.onNodeWithText("Sorry, something went wrong ... " +
+                "Please check your Internet connection").assertIsDisplayed()
+    }
+
 }

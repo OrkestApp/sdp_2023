@@ -2,10 +2,8 @@ package com.github.orkest.ViewModel.auth
 
 import androidx.compose.ui.text.input.TextFieldValue
 import com.github.orkest.Model.Providers
-import com.google.firebase.firestore.ktx.firestoreSettings
 import org.junit.Before
 
-import org.junit.BeforeClass
 
 import org.junit.Test
 
@@ -56,5 +54,15 @@ class AuthViewModelTest {
         assert(auth.createUser().get() == true)
         //Adding 2 times the same user should return false
         assert(auth.createUser().get() == false)
+    }
+
+    @Test
+    fun createWithEmptyUsernameThrowsException() {
+        auth.updateUsername(TextFieldValue(""))
+        try {
+            auth.createUser().get()
+        } catch (e: Exception) {
+            assert(e.message!!.contains("Username cannot be empty"))
+        }
     }
 }

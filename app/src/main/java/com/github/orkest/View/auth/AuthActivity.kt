@@ -9,6 +9,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.github.orkest.View.theme.OrkestTheme
@@ -36,7 +37,8 @@ class AuthActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    AuthMain(viewModel)
+                    val navController = rememberNavController()
+                    AuthMain(viewModel, navController)
                 }
             }
         }
@@ -47,22 +49,22 @@ class AuthActivity : ComponentActivity() {
  * Launch of the AuthMain composable
  */
 @Composable
-fun AuthMain(viewModel: AuthViewModel) {
-    val navController = rememberNavController()
+fun AuthMain(viewModel: AuthViewModel, navController: NavHostController) {
 
     NavHost(navController = navController, startDestination = "signIn") {
-        composable("signup") { SignUpForm(navController = navController,viewModel) }
-        composable("signIn") { SignIn(navController)}
+        composable("signup") { SignUpForm(viewModel) }
+        composable("signIn") { SignIn(navController,viewModel)}
     }
 }
 
 /**
  * Composable for the default preview of the OrkestTheme
  */
+/**
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
     OrkestTheme {
-        AuthMain(AuthViewModel())
+       // AuthMain(AuthViewModel())
     }
-}
+}**/

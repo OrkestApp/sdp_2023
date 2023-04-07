@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import com.github.orkest.Model.Post
 import com.github.orkest.Model.Song
 import com.github.orkest.R
+import java.time.LocalDateTime
 
 
 /**
@@ -36,14 +37,14 @@ fun FeedActivity(){
     // Once the backend will be implemented, this list will be filled with the posts from the database
     val rudeBoySong = Song("Rude Boy", "Rihanna", "Rated R",
                 "link", R.drawable.album_cover)
-    val post = Post("Username", R.drawable.profile_picture, "Post Description", rudeBoySong, 0, ArrayList())
+    val post = Post("Username",LocalDateTime.now(), R.drawable.profile_picture, "Post Description", rudeBoySong, 0, ArrayList())
 
     var listPosts by remember { mutableStateOf(mutableListOf(post,post,post,post)) }
     LazyColumn(modifier = Modifier
         .fillMaxSize()
         .background(Color.LightGray)) {
         items(listPosts) { post ->
-            Post(post = post)
+            DisplayPost(post = post)
         }
     }
 }
@@ -53,7 +54,7 @@ fun FeedActivity(){
  * @param post the post to display
  */
 @Composable
-fun Post(post: Post){
+fun DisplayPost(post: Post){
 
     Row(modifier = Modifier
         .padding(start = 25.dp, top = 20.dp)

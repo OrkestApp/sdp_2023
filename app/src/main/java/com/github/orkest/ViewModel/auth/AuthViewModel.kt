@@ -86,7 +86,6 @@ open class AuthViewModel: ViewModel() {
 
         // Computes the path to store the user in : user/user-firstLetter/users
         // user-firstletter is a document containing a subcollection which contains the users's documents
-
         return dbAPI.addUserInDatabase(user)
     }
 

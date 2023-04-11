@@ -1,56 +1,95 @@
 package com.github.orkest.Model
 
-import okhttp3.FormBody
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import org.json.JSONObject
-import okhttp3.*
-import java.io.IOException
+import android.app.Activity
+import android.content.Intent
+import android.util.Base64
+import com.spotify.sdk.android.auth.AuthorizationClient
+import com.spotify.sdk.android.auth.AuthorizationRequest
+import com.spotify.sdk.android.auth.AuthorizationResponse
+import java.security.MessageDigest
 
-import java.util.concurrent.CompletableFuture
 
-
+/**
+ * This class is used to get the access token from the Spotify API
+ *
+ * It implements methods for the authorization code flow with PKCE Flow. It
+ * is the recommended authorization flow if you’re implementing authorization
+ * in a mobile app, single page web app, or any other type of application where
+ * the client secret can’t be safely stored
+ */
 class Authorization {
 
     companion object{
 
-        fun getAccessToken(): String? {
-            val client_id = Providers.SPOTIFY.CLIENT_ID // Your client id
-            val client_secret = "1fc2f06625b8415ea071cf3cf46d390b" // Your secret
+        private val CODE_VERIFIER = generateRandomString()
 
-            val client = OkHttpClient()
-            val requestBody = FormBody.Builder()
-                .add("grant_type", "client_credentials")
-                .build()
-            val request = client_id?.let { Credentials.basic(it, client_secret) }?.let {
-                Request.Builder()
-                    .url("https://accounts.spotify.com/api/token")
-                    .addHeader("Authorization", it)
-                    .post(requestBody)
+        /**
+         * Code verifier
+         *
+         * @return a random string with a length between 43 and 128 characters
+         */
+        fun generateRandomString(): String {
+            val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
+            return (1..128)
+                .map { allowedChars.random() }
+                .joinToString("")
+        }
+
+        /**
+         * Generate cryptographic digest of a variable
+         */
+        private fun calculateDigest(data: ByteArray): ByteArray {
+            val digest = MessageDigest.getInstance("SHA-256")
+            return digest.digest(data)
+        }
+
+        /**
+         * Code challenge
+         *
+         * @param codeVerifier the code verifier
+         * @return the code challenge
+         */
+        private fun generateCodeChallenge(codeVerifier: String): String{
+            val codeVerifierBytes = codeVerifier.toByteArray()
+            val codeChallengeBytes = calculateDigest(codeVerifierBytes)
+            return Base64.encodeToString(
+                codeChallengeBytes,
+                Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE
+            )
+        }
+
+        fun requestUserAuthorization(activity: Activity): Intent =
+            AuthorizationClient.createLoginActivityIntent(
+                activity,
+                AuthorizationRequest.Builder(
+                    Providers.SPOTIFY.CLIENT_ID,
+                    AuthorizationResponse.Type.CODE,
+                    Providers.SPOTIFY.REDIRECT_URI
+                )
+                    .setScopes(
+                        arrayOf(
+                            "user-library-read", "user-library-modify",
+                            "app-remote-control", "user-read-currently-playing"
+                        )
+                    )
+                    .setCustomParam("code_challenge_method", "S256")
+                    .setCustomParam("code_challenge", generateCodeChallenge(CODE_VERIFIER))
                     .build()
-            }
+            )
 
-            val tokenFuture = CompletableFuture<String>()
-            if (request != null) {
-                client.newCall(request).enqueue(object : Callback {
-                    override fun onFailure(call: Call, e: IOException) {
-                        tokenFuture.completeExceptionally(e)
-                    }
+        fun getLoginActivityTokenIntent(code: String, activity: Activity): Intent =
+            AuthorizationClient.createLoginActivityIntent(
+                activity,
+                AuthorizationRequest.Builder(
+                    Providers.SPOTIFY.CLIENT_ID,
+                    AuthorizationResponse.Type.TOKEN,
+                    Providers.SPOTIFY.REDIRECT_URI
+                )
+                    .setCustomParam("grant_type", "authorization_code")
+                    .setCustomParam("code", code)
+                    .setCustomParam("code_verifier", CODE_VERIFIER)
+                    .build()
+            )
 
-                    override fun onResponse(call: Call, response: Response) {
-                        if (!response.isSuccessful) {
-                            tokenFuture.completeExceptionally(IOException("Unexpected code $response"))
-                        }
-                        val jsonObject = response.body?.string()?.let { JSONObject(it) }
-                        val token = jsonObject?.getString("access_token")
-                        tokenFuture.complete(token)
-                    }
-                })
-            }
-
-            val token = tokenFuture.get()
-
-            return token
         }
     }
-}

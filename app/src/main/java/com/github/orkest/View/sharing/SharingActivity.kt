@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,10 +19,14 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import com.github.orkest.Model.Authorization.Companion.getLoginActivityTokenIntent
+import com.github.orkest.Model.Authorization.Companion.requestUserAuthorization
 import com.github.orkest.View.profile.ProfileActivity
 import com.github.orkest.View.search.SearchUserView
 import com.github.orkest.View.sharing.ui.theme.OrkestTheme
 import com.github.orkest.ViewModel.search.SearchViewModel
+import com.spotify.sdk.android.auth.AuthorizationClient
+import com.spotify.sdk.android.auth.AuthorizationResponse
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
@@ -29,9 +35,11 @@ import org.json.JSONObject
 class SharingComposeActivity : ComponentActivity() {
 
     private var accessToken : String = ""
+    private var authorizationCode : String = ""
 
     @SuppressLint("MutableCollectionMutableState")
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         when (intent?.action) {
             Intent.ACTION_SEND -> {
@@ -43,10 +51,49 @@ class SharingComposeActivity : ComponentActivity() {
         }
         // ----------------- Spotify API -----------------
 
-        // TODO: get access token from Spotify API
-//        val token = Authorization.getAccessToken()
-//
-//        Log.d("token", token.toString())
+
+        val showLoginActivityCode = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result: ActivityResult ->
+
+            val authorizationResponse = AuthorizationClient.getResponse(result.resultCode, result.data)
+
+            when (authorizationResponse.type) {
+                AuthorizationResponse.Type.CODE ->
+                    // retrieve the authorization code
+//                    this.authorizationCode = authorizationResponse.code
+                    Log.d("SPOTIFY", "Code: ${authorizationResponse.code}")
+                AuthorizationResponse.Type.ERROR ->
+                    // log the error
+                    Log.d("Debug", "Error: ${authorizationResponse.error}")
+                else ->
+                    // interrupt
+                    Log.d("Debug", "Error: Fatal")
+            }
+        }
+//        Log.d("SPOTIFY", "Code: $authorizationCode")
+        showLoginActivityCode.launch(requestUserAuthorization(this))
+
+        val showLoginActivityToken = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result: ActivityResult ->
+
+            val authorizationResponse = AuthorizationClient.getResponse(result.resultCode, result.data)
+
+            when (authorizationResponse.type) {
+                AuthorizationResponse.Type.TOKEN -> {
+                    // Retrieve the access token
+                    this.accessToken = authorizationResponse.accessToken
+                }
+                AuthorizationResponse.Type.ERROR ->
+                // Handle Error
+                    Log.d("Debug", "Error: ${authorizationResponse.error}")
+                else ->
+                    Log.d("Debug", "Error: Fatal")
+            }
+        }
+
+        showLoginActivityToken.launch(getLoginActivityTokenIntent(authorizationCode, this))
 
 
         // ----------------- Compose UI -----------------

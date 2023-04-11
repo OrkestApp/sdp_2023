@@ -6,12 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.github.orkest.Constants
 import com.github.orkest.Model.FireStoreDatabaseAPI
-import com.github.orkest.Model.Profile
 import com.github.orkest.Model.User
-import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import java.util.concurrent.CompletableFuture
 
 open class ProfileViewModel(private val user: String) : ViewModel() {

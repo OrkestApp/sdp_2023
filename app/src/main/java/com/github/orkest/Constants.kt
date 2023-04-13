@@ -7,11 +7,11 @@ import java.time.ZoneId
  */
 class Constants {
     companion object{
-        private var _currentLoggedUser: String = ""
-        var currentLoggedUser: String
-            get() = _currentLoggedUser
-            set(value) { _currentLoggedUser = value }
+        private var currentLoggedUser: String = ""
+        var CURRENT_LOGGED_USER: String
+            get() = currentLoggedUser
+            set(value) { currentLoggedUser = value }
 
-        val DB_ZONE_ID = ZoneId.of("Europe/Paris")
+        val DB_ZONE_ID: ZoneId = ZoneId.of("Europe/Paris")
     }
 }

@@ -30,7 +30,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.github.orkest.Constants
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
@@ -194,7 +193,7 @@ private fun onConfirmListener(context: Context, error: MutableState<Boolean>, er
 
         }else{
             if(result) {
-                Constants.currentLoggedUser = viewModel.getUsername().text
+                Constants.CURRENT_LOGGED_USER = viewModel.getUsername().text
                 //Launches intent to the main Activity
                 val intent = Intent(context, MainActivity::class.java)
                 context.startActivity(intent)

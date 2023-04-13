@@ -1,6 +1,5 @@
 package com.github.orkest.ViewModel.auth
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
@@ -8,7 +7,6 @@ import com.github.orkest.Constants
 import com.github.orkest.Model.FireStoreDatabaseAPI
 import com.github.orkest.Model.Providers
 import com.github.orkest.Model.User
-import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import java.util.concurrent.CompletableFuture
 
@@ -120,7 +118,7 @@ open class AuthViewModel: ViewModel() {
         val future = CompletableFuture<Boolean>()
 
         user.username = username.value.text
-        Constants.currentLoggedUser = username.value.text
+        Constants.CURRENT_LOGGED_USER = username.value.text
 
         try { checkUsername() } catch (e: Exception) {
             future.completeExceptionally(e)

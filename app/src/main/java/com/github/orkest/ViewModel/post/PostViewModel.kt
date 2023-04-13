@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture
 class PostViewModel {
     private val dbAPI = FireStoreDatabaseAPI()
 
-    private val username = Constants.currentLoggedUser
+    private val username = Constants.CURRENT_LOGGED_USER
 
     //======Mutable States=====
     private val postDescription = mutableStateOf("")

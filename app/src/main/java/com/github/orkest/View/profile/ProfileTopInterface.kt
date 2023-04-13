@@ -7,10 +7,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material.*
-import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -100,7 +98,7 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
 
         Row{
 
-            if(viewModel.username.value == Constants.currentLoggedUser) {
+            if(viewModel.username.value == Constants.CURRENT_LOGGED_USER) {
                 EditButton {
                     val intent = Intent(context, EditProfileActivity::class.java)
                     context.startActivity(intent)

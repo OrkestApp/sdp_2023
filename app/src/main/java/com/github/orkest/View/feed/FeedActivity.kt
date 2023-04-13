@@ -37,7 +37,7 @@ fun FeedActivity(){
     // Once the backend will be implemented, this list will be filled with the posts from the database
     val rudeBoySong = Song("Rude Boy", "Rihanna", "Rated R",
                 "link", R.drawable.album_cover)
-    val post = Post("Username",LocalDateTime.now(), R.drawable.profile_picture, "Post Description", rudeBoySong, 0, ArrayList())
+    val post = Post(username = "Username", profilePicId = R.drawable.profile_picture, song= rudeBoySong)
 
     var listPosts by remember { mutableStateOf(mutableListOf(post,post,post,post)) }
     LazyColumn(modifier = Modifier

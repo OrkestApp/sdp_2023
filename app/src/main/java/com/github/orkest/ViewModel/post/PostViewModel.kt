@@ -12,7 +12,6 @@ class PostViewModel {
     private val dbAPI = FireStoreDatabaseAPI()
 
     private val username = Constants.currentLoggedUser
-    private var post = Post(username = username)
 
     //======Mutable States=====
     private val postDescription = mutableStateOf("")
@@ -38,8 +37,7 @@ class PostViewModel {
      * Adds a post to the database
      */
     fun addPost(): CompletableFuture<Boolean>{
-        createPost()
-        return dbAPI.addPostInDataBase(post)
+        return dbAPI.addPostInDataBase(createPost())
     }
 
     /**
@@ -59,10 +57,13 @@ class PostViewModel {
     /**
      * Updates and creates the post object to be added to the database
      */
-    private fun createPost() {
+    private fun createPost(): Post {
+        val post = Post()
+        post.username = username
         post.postDescription = postDescription.value
-        post.date = LocalDateTime.now()
         post.song = song.value
+
+        return post
     }
 
 

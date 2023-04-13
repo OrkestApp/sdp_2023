@@ -1,6 +1,7 @@
 package com.github.orkest.ViewModel.post
 
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.text.input.TextFieldValue
 import com.github.orkest.Constants
 import com.github.orkest.Model.FireStoreDatabaseAPI
 import com.github.orkest.Model.Post
@@ -14,15 +15,30 @@ class PostViewModel {
     private val username = Constants.CURRENT_LOGGED_USER
 
     //======Mutable States=====
-    private val postDescription = mutableStateOf("")
+    private val postDescription = mutableStateOf(TextFieldValue())
     private val song = mutableStateOf(Song())
 
     //TODO: Add a function to get the current user's profile picture when available
 
     /**
+     * Returns the value of the post description
+     */
+    fun getPostDescription(): TextFieldValue {
+        return postDescription.value
+    }
+
+    /**
+     * Returns the value of the song
+     */
+    fun getSong(): Song {
+        return song.value
+    }
+
+
+    /**
      * Updates the value of the post description after the user set it on the view
      */
-    fun updatePostDescription(description: String) {
+    fun updatePostDescription(description: TextFieldValue) {
         postDescription.value = description
     }
 
@@ -43,7 +59,7 @@ class PostViewModel {
     /**
      * Returns a list of posts of the user @param username from the database
      */
-    fun getUserPosts(): CompletableFuture<List<Post>>{
+    fun getUserPosts(username: String = Constants.CURRENT_LOGGED_USER): CompletableFuture<List<Post>>{
         return dbAPI.getUserPostsFromDataBase(username)
     }
 
@@ -60,7 +76,7 @@ class PostViewModel {
     private fun createPost(): Post {
         val post = Post()
         post.username = username
-        post.postDescription = postDescription.value
+        post.postDescription = postDescription.value.text
         post.song = song.value
 
         return post

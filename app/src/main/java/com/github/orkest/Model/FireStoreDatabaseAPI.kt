@@ -214,30 +214,4 @@ class FireStoreDatabaseAPI {
 
         return future
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    }
+}

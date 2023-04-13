@@ -25,6 +25,7 @@ import com.github.orkest.View.feed.FeedActivity
 import com.github.orkest.View.profile.ProfileActivity
 import com.github.orkest.View.profile.ProfileActivityScreen
 import com.github.orkest.View.search.SearchUserView
+import com.github.orkest.ViewModel.post.PostViewModel
 import com.github.orkest.ViewModel.profile.ProfileViewModel
 import com.github.orkest.ViewModel.search.SearchViewModel
 
@@ -78,7 +79,7 @@ class NavigationBar {
                     startDestination = "HomePage",
                     Modifier.padding(padding)
                 ) {
-                    composable("HomePage") { FeedActivity() }
+                    composable("HomePage") { FeedActivity(PostViewModel()) }
                     composable("SearchPage") { SearchUserView.SearchUi(viewModel = viewModel) }
                     composable("PlaylistPage") { Text(text = "Playlist tab") }
                     composable("ProfilePage") {

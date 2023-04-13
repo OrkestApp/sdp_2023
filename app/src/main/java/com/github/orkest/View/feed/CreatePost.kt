@@ -98,10 +98,10 @@ fun EditPostScreen(viewModel: PostViewModel, activity: ComponentActivity) {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun EditPost() {
-    OrkestTheme {
-        EditPostScreen(PostViewModel(), CreatePost())
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun EditPost() {
+//    OrkestTheme {
+//        EditPostScreen(PostViewModel(), CreatePost())
+//    }
+//}

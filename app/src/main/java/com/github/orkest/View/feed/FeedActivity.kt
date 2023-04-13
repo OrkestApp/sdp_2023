@@ -46,7 +46,8 @@ fun FeedActivity(viewModel: PostViewModel) {
     } //Add the .toList() to always store an immutable collection to avoid unpredictable behavior
 
     //Fetch posts from database
-    viewModel.getUserPosts("Yas")
+    //viewModel.getUserPosts("Yas")
+    viewModel.getRecentPosts(Constants.DUMMY_LAST_CONNECTED_TIME)
         .whenComplete { t, u ->
             if (t != null) {
                 listPosts = t
@@ -178,7 +179,7 @@ private fun SongInfo(song: Song){
     Row(Modifier.padding(10.dp)) {
         //Add the song's picture at the left of the card
         Image(
-            painter = painterResource(id = song.pictureId),
+            painter = painterResource(id = if(song.pictureId == -1) R.drawable.album_cover else song.pictureId ),
             contentDescription = "Cover of the album of the song Rude Boy by Rihanna",
             modifier = Modifier
                 .height(80.dp)

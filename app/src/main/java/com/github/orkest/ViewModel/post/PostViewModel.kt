@@ -9,10 +9,11 @@ import com.github.orkest.Model.Song
 import java.time.LocalDateTime
 import java.util.concurrent.CompletableFuture
 
-class PostViewModel {
+open class PostViewModel {
     private val dbAPI = FireStoreDatabaseAPI()
 
     private val username = Constants.CURRENT_LOGGED_USER
+    private var post: Post = Post()
 
     //======Mutable States=====
     private val postDescription = mutableStateOf(TextFieldValue())
@@ -23,14 +24,14 @@ class PostViewModel {
     /**
      * Returns the value of the post description
      */
-    fun getPostDescription(): TextFieldValue {
+    open fun getPostDescription(): TextFieldValue {
         return postDescription.value
     }
 
     /**
      * Returns the value of the song
      */
-    fun getSong(): Song {
+    open fun getSong(): Song {
         return song.value
     }
 
@@ -38,7 +39,7 @@ class PostViewModel {
     /**
      * Updates the value of the post description after the user set it on the view
      */
-    fun updatePostDescription(description: TextFieldValue) {
+    open fun updatePostDescription(description: TextFieldValue) {
         postDescription.value = description
     }
 
@@ -52,29 +53,43 @@ class PostViewModel {
     /**
      * Adds a post to the database
      */
-    fun addPost(): CompletableFuture<Boolean>{
+    open fun addPost(): CompletableFuture<Boolean>{
         return dbAPI.addPostInDataBase(createPost())
     }
 
     /**
      * Returns a list of posts of the user @param username from the database
      */
-    fun getUserPosts(username: String = Constants.CURRENT_LOGGED_USER): CompletableFuture<List<Post>>{
+    open fun getUserPosts(username: String = Constants.CURRENT_LOGGED_USER): CompletableFuture<List<Post>>{
         return dbAPI.getUserPostsFromDataBase(username)
     }
 
     /**
      * Returns a list of the most recent posts since the last connection of the user from the database
      */
-    fun getRecentPosts(lastConnected: LocalDateTime): CompletableFuture<List<Post>>{
+    open fun getRecentPosts(lastConnected: LocalDateTime): CompletableFuture<List<Post>>{
         return dbAPI.getRecentPostsFromDataBase(lastConnected)
     }
 
     /**
-     * Updates and creates the post object to be added to the database
+     * Deletes a @param post from the database
+     * Returns a future that completes to true if the post was deleted successfully
+     */
+    open fun deletePost(post: Post): CompletableFuture<Boolean>{
+        return dbAPI.deletePostInDataBase(post)
+    }
+
+    /**
+     * Returns the post object
+     */
+    fun getPost(): Post {
+        return post
+    }
+
+    /**
+     * Updates the post object to be added to the database
      */
     private fun createPost(): Post {
-        val post = Post()
         post.username = username
         post.postDescription = postDescription.value.text
         post.song = song.value

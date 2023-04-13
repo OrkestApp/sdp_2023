@@ -4,14 +4,20 @@ import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import java.sql.Connection
+import com.google.gson.GsonBuilder
+import com.google.gson.reflect.TypeToken
 import java.time.LocalDateTime
 import java.util.concurrent.CompletableFuture
 
 class FireStoreDatabaseAPI {
-    private val db = Firebase.firestore
+
+    companion object{
+        val db = Firebase.firestore
+    }
+
 
     //============================USER OPERATIONS==========================================
 
@@ -147,6 +153,7 @@ class FireStoreDatabaseAPI {
         return db.collection(path)
     }
 
+
     /**
      * @param post the post we want to add in the database
      * @return a completable future that completes to true only if post is correctly added
@@ -155,20 +162,22 @@ class FireStoreDatabaseAPI {
         val future = CompletableFuture<Boolean>()
         val postDocument = getPostCollectionRef(post.username).document(post.date.toString())
 
-        postDocument.get().addOnSuccessListener {
-            if (it.data != null) {
-                println(it)
-                //TODO: Delay the date of the post by minutes and then store in database
-                future.complete(false)
-            } else {
-                //If no post with the same date and username was found, add the post to the database
-                postDocument.set(post).addOnSuccessListener { future.complete(true) }
-            }
-        }
-            //Propagates the exception in case of another exception
-            .addOnFailureListener{
-                future.completeExceptionally(it)
-            }
+        postDocument.set(post).addOnSuccessListener { future.complete(true) }
+            .addOnFailureListener { future.completeExceptionally(it) }
+
+        return future
+    }
+
+    /**
+     * @param post the post we want to delete in the database
+     * @return a completable future that completes to true only if post is correctly deleted
+     */
+    fun deletePostInDataBase(post: Post): CompletableFuture<Boolean> {
+        val future = CompletableFuture<Boolean>()
+        val postDocument = getPostCollectionRef(post.username).document(post.date.toString())
+
+        postDocument.delete().addOnSuccessListener { future.complete(true) }
+            .addOnFailureListener { future.completeExceptionally(it) }
 
         return future
     }
@@ -183,7 +192,8 @@ class FireStoreDatabaseAPI {
 
         usersPosts.get().addOnSuccessListener{
             // Get all posts documents as a list of posts objects
-            val list: MutableList<Post> = it.toObjects(Post::class.java)
+            val list: MutableList<Post> =  it.toObjects(Post::class.java)
+
             future.complete(list)
         } //Propagates the exception in case of exception
         .addOnFailureListener{
@@ -195,14 +205,25 @@ class FireStoreDatabaseAPI {
 
     /**
      * @param lastConnection the last time the user was connected
-     * @return a completable future of a list of post that match the username
+     * @return a completable future of a list of post that were recently published
      */
     fun getRecentPostsFromDataBase(lastConnection: LocalDateTime): CompletableFuture<List<Post>> {
         //TODO: Add the condition on posts belonging to the user's friends
         val future = CompletableFuture<List<Post>>()
         val posts = db.collectionGroup("posts")
 
-        posts.whereGreaterThan("date", lastConnection).get()
+        val currentTime = LocalDateTime.now()
+
+        //TODO: Make this logic better and refactor it + discuss it with team (corner cases like end of month/end of year not covered)
+        //TODO: See if there is a workaround the interdiction to combine plage queries on different fields
+
+        //Get all posts that were published after the last connection of the user, and that are from the current month
+        posts.whereEqualTo(FieldPath.of("date","year"), currentTime.year)
+            .whereEqualTo(FieldPath.of("date","month"), currentTime.monthValue)
+            .whereGreaterThan(FieldPath.of("date","dayOfMonth"),
+                if (currentTime.year > lastConnection.year &&
+                    currentTime.monthValue > lastConnection.monthValue) 1 else
+                        lastConnection.dayOfMonth).get()
             .addOnSuccessListener {
                 // Get all posts documents as a list of posts objects
                 val list: MutableList<Post> = it.toObjects(Post::class.java)

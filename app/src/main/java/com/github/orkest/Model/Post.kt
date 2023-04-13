@@ -1,13 +1,12 @@
 package com.github.orkest.Model
 
 import com.github.orkest.Constants
-import java.time.Clock
+import com.github.orkest.R
 import java.time.LocalDateTime
-import java.time.ZoneId
 
 data class Post(var username: String = "",
-                var date: LocalDateTime = LocalDateTime.now(Constants.DB_ZONE_ID),
-                var profilePicId: Int = -1,
+                var date: OrkestDate = OrkestDate(LocalDateTime.now(Constants.DB_ZONE_ID)),
+                var profilePicId: Int = R.drawable.blank_profile_pic,
                 var postDescription: String = "Post Description",
                 var song: Song = Song(),
                 var likes: Int = 0,

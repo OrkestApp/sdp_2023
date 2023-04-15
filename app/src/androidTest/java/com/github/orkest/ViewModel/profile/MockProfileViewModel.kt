@@ -54,15 +54,18 @@ class MockProfileViewModel(user: String) : ProfileViewModel(user) {
         return CompletableFuture.completedFuture(isUserFollowed.value)
     }
 
-    override fun follow(): CompletableFuture<Boolean> {
-        isUserFollowed.value = true
-        return CompletableFuture.completedFuture(true)
+
+    override fun updateCurrentUserFollowings(toFollow: Boolean): CompletableFuture<Boolean> {
+        isUserFollowed.value = toFollow
+        return super.updateCurrentUserFollowings(toFollow)
     }
 
-    override fun unfollow(): CompletableFuture<Boolean> {
-        isUserFollowed.value = false
-        return CompletableFuture.completedFuture(true)
+    override fun updateUserFollowers(toFollow: Boolean): CompletableFuture<Boolean> {
+        isUserFollowed.value = toFollow
+        return super.updateCurrentUserFollowings(toFollow)
     }
+
+
 
 
 }

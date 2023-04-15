@@ -1,4 +1,4 @@
-package com.github.orkest.View
+package com.github.orkest.View.feed
 
 
 import android.os.Bundle
@@ -67,6 +67,8 @@ fun CommentScreen(post: ComponentActivity) { // TODO must become FeedActivity to
             Comments(comments)
         }
         Divider()
+
+        /* text field where the user can type their comment */
         var modifyName by rememberSaveable { mutableStateOf("") }
         TextField(
             modifier = Modifier.fillMaxWidth(),
@@ -146,7 +148,21 @@ fun displayProfilePic(/* TODO */) {
 @Composable
 fun PublishButton() {
     IconButton(
-        onClick = { /* TODO */ }
+        /* TODO
+        Must create a new Comment() object and save it inside the database.
+        This should be done through the PostViewModel()
+
+        passer le viewmodel en paramètre ?
+        Ou bien mettre toutes les fonctions dans la classe et faire du viewmodel un attribut ?
+
+        val comment = this.getText du textfield
+        viewmodel.createComment(text = comment)
+
+        createComment(text: String) {
+
+        }
+         */
+        onClick = { /* TODO */ } //
     ) {
         Icon(
             Icons.Default.Send,

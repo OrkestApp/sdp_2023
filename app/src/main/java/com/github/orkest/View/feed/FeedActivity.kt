@@ -1,5 +1,6 @@
 package com.github.orkest.View.feed
 
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -10,11 +11,16 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Comment
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -181,14 +187,20 @@ private fun PlayButton(){
 
 @Composable
 private fun Reaction(){
+    val context = LocalContext.current
     Column(modifier = Modifier.padding(20.dp)) {
         // Create the like button
         ReactionIcon(R.drawable.black_like_icon,"Like button", "like_button" )
         Spacer(modifier = Modifier.height(10.dp))
 
         //Create the comment button
-        ReactionIcon(R.drawable.comment_icon,"Comment button", "comment_button" )
-        Spacer(modifier = Modifier.height(10.dp))
+        IconButton(
+            onClick = { context.startActivity(Intent(context, CommentActivity::class.java)) }
+        ) {
+            androidx.compose.material3.Icon(imageVector = Icons.Outlined.Comment, contentDescription = "Comment button")
+        }
+        //ReactionIcon(R.drawable.comment_icon,"Comment button", "comment_button" )
+        //Spacer(modifier = Modifier.height(10.dp))
 
         //Create the share button
         ReactionIcon(R.drawable.share_icon,"Share button", "share_button" )

@@ -7,7 +7,8 @@ package com.github.orkest.Model
  * @param postId: id of the post under which the comment is published
  */
 data class Comment(
+    val postId: Int,
+    //val commentId: Int,
     val username: String,
-    val text: String,
-    val postId: Int
+    val text: String
     )

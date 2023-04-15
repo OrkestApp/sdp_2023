@@ -34,7 +34,7 @@ class ProfileViewModelTest {
 
     @Before
     fun setUp() {
-        Constants.currentLoggedUser = testUserName
+        Constants.CURRENT_LOGGED_USER = testUserName
         runBlocking {
             user = User(username = testUserName, profile = Profile(testUserName, testProfilePicture, testBio, testNbFollowers, testNbFollowings))
 

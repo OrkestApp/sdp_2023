@@ -1,22 +1,14 @@
 package com.github.orkest.Model
 
-data class Post(var username: String,
-                var profilePicId: Int,
-                var postDescription: String,
-                var song: Song,
-                var likes: Int,
-                var comments: List<String>)
+import com.github.orkest.Constants
+import com.github.orkest.R
+import java.time.LocalDateTime
 
-/* alternative:
-
-data class Post(var username: String,
-                var postId: Int,      // thanks to this we can search for comments in database
-                var profilePicId: Int,
-                var postDescription: String,
-                var song: Song,
-                var likes: Int,
-                var numComments: Int,
-                var comments: LazyList<String> // if possible
-                )
-
- */
+data class Post(var username: String = "",
+                var date: OrkestDate = OrkestDate(LocalDateTime.now(Constants.DB_ZONE_ID)),
+                var profilePicId: Int = R.drawable.blank_profile_pic,
+                var postDescription: String = "Post Description",
+                var song: Song = Song(),
+                var likes: Int = 0,
+                var comments: List<String> = ArrayList(),
+                var nbComments : Int = 0)

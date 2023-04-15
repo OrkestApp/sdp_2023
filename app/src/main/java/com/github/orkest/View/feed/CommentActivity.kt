@@ -27,6 +27,7 @@ import androidx.compose.ui.modifier.modifierLocalOf
 import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
@@ -74,9 +75,8 @@ fun CommentSetting(content: @Composable () -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommentScreen(activity: ComponentActivity, viewModel: PostViewModel) {
-    //val comments = (1..15).map { Comment(username = "roman n° ${it}", text = "oh nah")}
     Column() {
-        // Button to return to feed
+        /* The given button allows the user to return to feed */
         IconButton(
             onClick = {activity.finish()}
         ) {
@@ -86,26 +86,37 @@ fun CommentScreen(activity: ComponentActivity, viewModel: PostViewModel) {
             )
         }
 
-        // The Modifier.weight(1f, false) is to have a sticky footer (which is the TextField)
-        Surface(modifier = Modifier.weight(1f, false)) {
-            Comments(viewModel)
-        }
-        Divider()
+        Column(modifier = Modifier.fillMaxSize()) {
+            // The Modifier.weight(1f, false) is to have a sticky footer (which is the TextField)
+            Surface(modifier = Modifier.fillMaxWidth().weight(1f)) {
+                Comments(viewModel)
+            }
+            Divider()
 
-        /* text field where the user can type their comment */
-        var comment by rememberSaveable { mutableStateOf("") }
-        TextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = comment,
-            onValueChange = { comment = it },
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = Color.Transparent,
-            ),
-            leadingIcon = { displayProfilePic() },//Icon(imageVector = Icons.Default.Android, contentDescription = "User Profile Pic") },
-            trailingIcon = { PublishButton(viewModel, comment) },
-            //label = { Text(text = "Username") },
-            placeholder = { Text(text = "Write your thoughts...") }
-        )
+            /* text field where the user can type their comment */
+            var comment by rememberSaveable { mutableStateOf("") }
+            TextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = comment,
+                onValueChange = { comment = it },
+                colors = TextFieldDefaults.textFieldColors(
+                    containerColor = Color.Transparent,
+                ),
+                leadingIcon = { displayProfilePic() },
+                /* publish button */
+                trailingIcon = {
+                    Icon(Icons.Default.Send,
+                        contentDescription = "Send Button",
+                        modifier = Modifier.clickable {
+                            // adds the written text in the database
+                            viewModel.updateComments(Comment(text = comment))
+                            comment = ""
+                        })
+                },
+                //label = { Text(text = "Username") },
+                placeholder = { Text(text = "Write your thoughts...") }
+            )
+        }
     }
 
 }
@@ -117,6 +128,7 @@ fun CommentScreen(activity: ComponentActivity, viewModel: PostViewModel) {
 @Composable
 fun Comments(viewModel: PostViewModel) {
 
+    /* fetch comments of the given post from database */
     var listComments by remember {
         mutableStateOf( ArrayList<Comment>().toList())
     }
@@ -127,8 +139,8 @@ fun Comments(viewModel: PostViewModel) {
             }
         }
 
+    /* Display the comments in a LazyColumn */
     LazyColumn {
-        //val list = (1..15).map {Comment(username = "$it")}
         itemsIndexed(listComments) { _, comment ->
             Divider()
             CommentBox(comment = comment)
@@ -179,25 +191,6 @@ fun displayProfilePic(/* TODO */) {
     }
 }
 
-
-/**
- * "Send" button that when pressed will publish the typed comment
- * TODO: add the onClick functionality
- */
-@Composable
-fun PublishButton(viewModel: PostViewModel, text: String) {
-    IconButton(
-        onClick = {
-            val comment = Comment(text = text)
-            viewModel.updateComments(comment)
-        }
-    ) {
-        Icon(
-            Icons.Default.Send,
-            contentDescription = "Send Button"
-        )
-    }
-}
 
 @Preview(showBackground = true)
 @Composable

@@ -30,6 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.orkest.Constants
+import com.github.orkest.Model.OrkestDate
 import com.github.orkest.Model.Post
 import com.github.orkest.Model.Song
 import com.github.orkest.R
@@ -100,7 +101,7 @@ fun DisplayPost(post: Post){
             // Display the user profile pic
             ProfilePic(post.profilePicId)
             //Display the reaction buttons
-            Reaction()
+            Reaction(post)
         }
 
         Column(modifier = Modifier.padding(10.dp, top = 10.dp, end = 10.dp)) {
@@ -216,7 +217,7 @@ private fun PlayButton(){
 }
 
 @Composable
-private fun Reaction(){
+private fun Reaction(post: Post){
     val context = LocalContext.current
     Column(modifier = Modifier.padding(20.dp)) {
         // Create the like button
@@ -225,7 +226,10 @@ private fun Reaction(){
 
         //Create the comment button
         IconButton(
-            onClick = { context.startActivity(Intent(context, CommentActivity::class.java)) }
+            onClick = { context.startActivity(Intent(context, CommentActivity::class.java)
+                                .putExtra("post_date", post.date.toString())
+                                .putExtra("post_username", post.username))
+            }
         ) {
             androidx.compose.material3.Icon(imageVector = Icons.Outlined.Comment, contentDescription = "Comment button")
         }

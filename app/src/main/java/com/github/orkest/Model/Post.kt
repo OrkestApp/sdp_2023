@@ -10,5 +10,5 @@ data class Post(var username: String = "",
                 var postDescription: String = "Post Description",
                 var song: Song = Song(),
                 var likes: Int = 0,
-                var comments: List<String> = ArrayList(),
+                var comments: MutableList<Comment> = ArrayList(),
                 var nbComments : Int = 0)

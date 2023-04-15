@@ -7,43 +7,17 @@ import com.github.orkest.Model.*
 import java.time.LocalDateTime
 import java.util.concurrent.CompletableFuture
 
-open class PostViewModel {
+open class CommentViewModel(postId: OrkestDate) {
     private val dbAPI = FireStoreDatabaseAPI()
 
-    private val current_username = Constants.CURRENT_LOGGED_USER
-    private var post: Post = Post()
+    private val username = Constants.CURRENT_LOGGED_USER
 
     //======Mutable States=====
-    private val postDescription = mutableStateOf(TextFieldValue())
-    private val song = mutableStateOf(Song())
-    //private val comments = mutableStateOf()
-
-    private var post_username = ""
-    private var post_date = ""
-
-    open fun setPostUsername(usr: String) {
-        post_username = usr
-    }
-
-    open fun setPostDate(date: String) {
-        post_date = date
-    }
+    private val comment = mutableStateOf(String())
 
 
-    //TODO: Add a function to get the current user's profile picture when available
-
-    /**
-     * Returns the value of the post description
-     */
-    open fun getPostDescription(): TextFieldValue {
-        return postDescription.value
-    }
-
-    /**
-     * Returns the value of the song
-     */
-    open fun getSong(): Song {
-        return song.value
+    /*open fun getComments(): List<Comment> {
+        return post.comments
     }
 
 
@@ -54,24 +28,20 @@ open class PostViewModel {
         postDescription.value = description
     }
 
-   /**
+    /**
      * Updates the value of the song after the user set it on the view
      */
     fun updateSong(song: Song) {
         this.song.value = song
     }
 
-    open fun getComments(): List<Comment> {
-        return dbAPI.getPostCommentsFromDataBase(post_username, post_date).get()
-    }
-
     fun updateComments(comment: Comment) {
-        dbAPI.addCommentInDataBase(post_username, post_date, comment)
+        post.comments.add(comment)
     }
 
-    /*fun removeComment(comm: String): Boolean {
+    fun removeComment(id: OrkestDate): Boolean {
         return post.comments.removeIf { x: Comment -> x.date == id }
-    }*/
+    }
 
     /**
      * Adds a post to the database
@@ -113,9 +83,8 @@ open class PostViewModel {
      * Updates the post object to be added to the database
      */
     private fun createPost(): Post {
-        post.username = current_username
+        post.username = username
         post.postDescription = postDescription.value.text
-        post.date = OrkestDate(LocalDateTime.now())
         post.song = song.value
 
         return post
@@ -127,7 +96,7 @@ open class PostViewModel {
     public fun createComment(): Comment {
         return Comment(text="a")
     }*/
-
+*/
 
 
 

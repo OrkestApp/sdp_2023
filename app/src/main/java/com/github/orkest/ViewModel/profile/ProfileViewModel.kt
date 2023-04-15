@@ -79,13 +79,13 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
      * Checks whether the current logged in user follows this account
      */
     open fun isUserFollowed(): CompletableFuture<Boolean>{
-        if(user == Constants.currentLoggedUser){ Log.e(TAG, "Cannot call this function when visiting the current logged-in user's profile")  }
+        if(user == Constants.CURRENT_LOGGED_USER){ Log.e(TAG, "Cannot call this function when visiting the current logged-in user's profile")  }
         val future = CompletableFuture<Boolean>()
         dbAPI.getUserDocumentRef(user).get()
             .addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
                     val user = document.toObject(User::class.java)
-                    if (user != null && user.followers.contains(Constants.currentLoggedUser)) {
+                    if (user != null && user.followers.contains(Constants.CURRENT_LOGGED_USER)) {
                         future.complete(true)
                     } else{
                         future.complete(false)
@@ -123,7 +123,7 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
      * toFollow: Boolean = represents whether or not the current logged in user wants to follow this account
      */
     private fun accessUserData(toFollow: Boolean): Boolean{
-        if(user == Constants.currentLoggedUser){ Log.e(TAG, "Cannot call this function when visiting the current logged-in user's profile") }
+        if(user == Constants.CURRENT_LOGGED_USER){ Log.e(TAG, "Cannot call this function when visiting the current logged-in user's profile") }
         var userUpdated = false
         dbAPI.getUserDocumentRef(user).get().addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
@@ -140,10 +140,10 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
     private fun updateUserFollowers(user: User, toFollow: Boolean): Boolean {
         if(toFollow){
             user.profile.nbFollowers += 1
-            user.followers.add(Constants.currentLoggedUser)
+            user.followers.add(Constants.CURRENT_LOGGED_USER)
         } else {
             if (user.profile.nbFollowers > 0) user.profile.nbFollowers -= 1
-            user.followers.remove(Constants.currentLoggedUser)
+            user.followers.remove(Constants.CURRENT_LOGGED_USER)
         }
         return true //means that the values have been updated
     }
@@ -153,9 +153,9 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
      * toFollow: Boolean = represents whether or not the current logged in user wants to follow this account
      */
     private fun accessCurrentUserData(toFollow: Boolean): Boolean{
-        if(user == Constants.currentLoggedUser){ Log.e(TAG, "Cannot call this function when visiting the current logged-in user's profile") }
+        if(user == Constants.CURRENT_LOGGED_USER){ Log.e(TAG, "Cannot call this function when visiting the current logged-in user's profile") }
         var currentUserUpdated = false
-        dbAPI.getUserDocumentRef(Constants.currentLoggedUser).get().addOnSuccessListener { document ->
+        dbAPI.getUserDocumentRef(Constants.CURRENT_LOGGED_USER).get().addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
                     val user = document.toObject(User::class.java)
                     if (user != null) {

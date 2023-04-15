@@ -31,7 +31,7 @@ class ProfileUITest {
 
     @Before
     fun setup() {
-        Constants.currentLoggedUser = "JohnSmith"
+        Constants.CURRENT_LOGGED_USER = "JohnSmith"
 
         John = Profile("JohnSmith", R.drawable.profile_picture, "I like everything", 10, 2)
         viewModel.loadData(John.username, John.bio, John.nbFollowers, John.nbFollowings, John.profilePictureId)

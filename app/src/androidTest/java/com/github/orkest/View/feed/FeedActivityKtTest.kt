@@ -5,6 +5,8 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.navigation.compose.rememberNavController
 import com.github.orkest.View.auth.SignUpForm
 import com.github.orkest.ViewModel.auth.MockAuthViewModel
+import com.github.orkest.ViewModel.feed.MockPostViewModel
+import com.github.orkest.ViewModel.post.PostViewModel
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -17,8 +19,9 @@ internal class FeedActivityKtTest {
     @Before
     fun setup(){
         // Start the app
+        val viewModel = MockPostViewModel()
         composeTestRule.setContent {
-            FeedActivity()
+            FeedActivity(viewModel = viewModel)
         }
     }
 

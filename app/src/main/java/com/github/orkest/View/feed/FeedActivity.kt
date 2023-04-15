@@ -1,5 +1,7 @@
 package com.github.orkest.View.feed
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -8,6 +10,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -15,15 +18,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.github.orkest.Constants
 import com.github.orkest.Model.Post
 import com.github.orkest.Model.Song
 import com.github.orkest.R
+import com.github.orkest.ViewModel.post.PostViewModel
+import java.time.LocalDateTime
 
 
 /**
@@ -31,29 +38,54 @@ import com.github.orkest.R
  * Represents the view of the MVVM pattern
  */
 @Composable
-fun FeedActivity(){
-    //Add a list of posts
-    // Once the backend will be implemented, this list will be filled with the posts from the database
-    val rudeBoySong = Song("Rude Boy", "Rihanna", "Rated R",
-                "link", R.drawable.album_cover)
-    val post = Post("Username", R.drawable.profile_picture, "Post Description", rudeBoySong, 0, ArrayList())
+fun FeedActivity(viewModel: PostViewModel) {
 
-    var listPosts by remember { mutableStateOf(mutableListOf(post,post,post,post)) }
-    LazyColumn(modifier = Modifier
-        .fillMaxSize()
-        .background(Color.LightGray)) {
+    //Add a list of posts
+    var listPosts by remember {
+        mutableStateOf( ArrayList<Post>().toList())
+    } //Add the .toList() to always store an immutable collection to avoid unpredictable behavior
+
+    //Fetch posts from database
+    //viewModel.getUserPosts("Yas")
+    viewModel.getRecentPosts(Constants.DUMMY_LAST_CONNECTED_TIME)
+        .whenComplete { t, u ->
+            if (t != null) {
+                listPosts = t
+            }
+        }
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.LightGray)
+    ) {
         items(listPosts) { post ->
-            Post(post = post)
+            DisplayPost(post = post)
         }
     }
+
+    val context = LocalContext.current
+
+    //Add a button to create a new post
+    FloatingActionButton(
+        modifier = Modifier
+            .padding(10.dp),
+        onClick = { launchCreatePostActivity(context) }) {
+        Icon(painter = painterResource(id = R.drawable.add_button), contentDescription = "Add post")
+    }
 }
+
+fun launchCreatePostActivity(context: Context){
+    val intent = Intent(context, CreatePost::class.java)
+    context.startActivity(intent)
+}
+
 
 /**
  * Composable function to display a post, can be reused for the profile page
  * @param post the post to display
  */
 @Composable
-fun Post(post: Post){
+fun DisplayPost(post: Post){
 
     Row(modifier = Modifier
         .padding(start = 25.dp, top = 20.dp)
@@ -147,7 +179,7 @@ private fun SongInfo(song: Song){
     Row(Modifier.padding(10.dp)) {
         //Add the song's picture at the left of the card
         Image(
-            painter = painterResource(id = song.pictureId),
+            painter = painterResource(id = if(song.pictureId == -1) R.drawable.album_cover else song.pictureId ),
             contentDescription = "Cover of the album of the song Rude Boy by Rihanna",
             modifier = Modifier
                 .height(80.dp)
@@ -211,5 +243,5 @@ private fun ReactionIcon(iconId: Int, contentDescription:String, testTag: String
 @Preview
 @Composable
 fun PreviewSongCard(){
-    FeedActivity()
+    FeedActivity(PostViewModel())
 }

@@ -61,8 +61,8 @@ open class PostViewModel {
         this.song.value = song
     }
 
-    open fun getComments(): List<Comment> {
-        return dbAPI.getPostCommentsFromDataBase(post_username, post_date).get()
+    open fun getComments(): CompletableFuture<List<Comment>> {
+        return dbAPI.getPostCommentsFromDataBase(post_username, post_date)
     }
 
     fun updateComments(comment: Comment) {

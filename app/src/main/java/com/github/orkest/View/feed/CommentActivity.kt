@@ -30,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
+import com.github.orkest.Constants
 import com.github.orkest.Model.Comment
 import com.github.orkest.Model.Post
 import com.github.orkest.R
@@ -115,8 +116,20 @@ fun CommentScreen(activity: ComponentActivity, viewModel: PostViewModel) {
  */
 @Composable
 fun Comments(viewModel: PostViewModel) {
+
+    var listComments by remember {
+        mutableStateOf( ArrayList<Comment>().toList())
+    }
+    viewModel.getComments()
+        .whenComplete { t, _ ->
+            if (t != null) {
+                listComments = t
+            }
+        }
+
     LazyColumn {
-        itemsIndexed(viewModel.getComments()) { _, comment ->
+        //val list = (1..15).map {Comment(username = "$it")}
+        itemsIndexed(listComments) { _, comment ->
             Divider()
             CommentBox(comment = comment)
         }

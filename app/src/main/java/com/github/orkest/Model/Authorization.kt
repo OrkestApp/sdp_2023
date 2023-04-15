@@ -58,6 +58,12 @@ class Authorization {
             )
         }
 
+        /**
+         * This method is used to get the authorization code from the Spotify API
+         *
+         * @param activity the activity
+         * @return the intent
+         */
         fun requestUserAuthorization(activity: Activity): Intent =
             AuthorizationClient.createLoginActivityIntent(
                 activity,
@@ -77,6 +83,13 @@ class Authorization {
                     .build()
             )
 
+        /*
+            * This method is used to get the access token from the Spotify API
+            * @param code the authorization code
+            * @param activity the activity
+            * @return Login intent for the Spotify API
+            *
+         */
         fun getLoginActivityTokenIntent(code: String, activity: Activity): Intent =
             AuthorizationClient.createLoginActivityIntent(
                 activity,

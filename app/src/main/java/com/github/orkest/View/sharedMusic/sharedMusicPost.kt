@@ -15,23 +15,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.orkest.Constants
 import com.github.orkest.Model.Song
+import com.github.orkest.Model.User
 import com.github.orkest.R
 import com.github.orkest.View.feed.*
 
 
 private val separator = 10.dp
+private val fontSize = 14.sp
+private val smallFontSize = 12.dp
 
 @Preview
 @Composable
 fun sharedMusicPost() {
-    val song = Song("Shape of you", "Ed Sheeran", "Love yourself")
+    val song = Song("Bad boy", "Rihanna", "Rated R")
+    val message = "Check this out bro. It's amazing. It reminds me of summer 2012."
     Row(modifier = Modifier
         .fillMaxWidth()
         ) {
@@ -39,31 +43,63 @@ fun sharedMusicPost() {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(10.dp)
-                //.padding(start = 25.dp, top = 20.dp)
-                //.clip(shape = RoundedCornerShape(20.dp))
+                .clip(shape = RoundedCornerShape(20.dp))
                 .background(Color.DarkGray)
         ) {
-            Row(modifier = Modifier.padding(start = 15.dp, top = 10.dp)) {
+            Row(modifier = Modifier.padding(start = 10.dp, top = 10.dp, end = 10.dp)) {
                 Column(Modifier.weight(1f)) {
-                    UserInfo(username = "JohnDoe", userPicture = -1)
+                    UserInfo(username = "John", userPicture = -1)
                     Spacer(modifier = Modifier.height(separator))
-                    SongInfo(author = song.name, album = song.album)
+                    Message(message = message)
                 }
                 Spacer(modifier = Modifier.width(separator))
-                Column() {
-                    AlbumCover(pictureId = -1)
-                }
+                AlbumCover(pictureId = -1)
             }
-            Row(modifier = Modifier.padding(start = 15.dp, bottom = 10.dp)) {
-                PlayButton()
-                Spacer(modifier = Modifier.width(separator))
-                Text(song.name)
+            Spacer(modifier = Modifier.height(separator))
+            Row(modifier = Modifier
+                .padding(10.dp)
+                .fillMaxWidth()
+                .clip(shape = RoundedCornerShape(10.dp))
+                .background(Color.Yellow)
+                ) {
+                    Column(Modifier.weight(1f)){ playMusic(song)}
+                    AddToPlaylistButton()
             }
         }
     }
 }
 
+@Composable
+fun playMusic(song: Song) {
+    Row(modifier = Modifier
+        .padding(5.dp)
+        .clip(shape = RoundedCornerShape(10.dp))) {
+            PlayButton()
+            Spacer(modifier = Modifier.width(separator))
+            Text(text = song.name, fontWeight = FontWeight.Bold, fontSize = fontSize)
+            Text(" - ", fontSize = fontSize)
+            SongInfo(author = song.author, album = song.album)
+    }
+}
 
+@Composable
+fun Message(message: String){
+    Text(
+        text = message,
+        fontWeight = FontWeight.Normal
+    )
+}
+@Composable
+fun AddToPlaylistButton(){
+    Image(painter = painterResource(id = R.drawable.add_to_playlist),
+        contentDescription = "Add to playlist",
+        modifier = Modifier
+            .padding(5.dp)
+            .height(20.dp)
+            .width(20.dp)
+            .clip(shape = RoundedCornerShape(10.dp))
+            .clickable { })
+}
 
 @Composable
 fun AlbumCover(pictureId: Int){
@@ -92,16 +128,27 @@ fun UserInfo(username: String, userPicture: Int){
         )
         Spacer(modifier = Modifier.width(separator))
         //Display the informative text
-        Text(text = "$username ", fontWeight = FontWeight.Bold)
-        Text(text = "has shared this music with you")
+        //Text(text = "$username ", fontWeight = FontWeight.Bold)
+        val boldStyle = SpanStyle(fontWeight = FontWeight.Bold)
+        val lightStyle = SpanStyle(fontWeight = FontWeight.Light)
+
+        val text = buildAnnotatedString {
+            val username = "JohnDoe"
+            withStyle(boldStyle) { append(username) }
+            withStyle(lightStyle) { append(" shared this music with you") }
+        }
+
+        Text(text = text)
+
     }
 }
 
 @Composable
 fun SongInfo(author: String, album: String){
     Row {
-        Text(text ="$author, $album",
-        fontWeight = FontWeight.Thin
+        Text(text ="$author ($album)",
+            fontWeight = FontWeight.Thin,
+            fontSize = fontSize
         )
     }
 }

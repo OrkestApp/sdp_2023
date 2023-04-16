@@ -41,7 +41,7 @@ class SharingComposeActivity : ComponentActivity() {
 
     // spotify song name
     companion object {
-        private var spotifySongName : String = String()
+        var spotifySongName : String = String()
     }
 
 
@@ -73,7 +73,26 @@ class SharingComposeActivity : ComponentActivity() {
             }
         }
         // ----------------- Spotify API -----------------
+        spotifyAuthorization()
+        // ----------------- Compose UI -----------------
+        setContent {
+            OrkestTheme {
+                // A surface container using the 'background' color from the theme
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colors.background
+                ) {
+                    UserSelection()
+                }
+            }
+        }
+    }
 
+    /**
+     * This function is used to connect to the Spotify API and get the song name
+     *
+     */
+    private fun spotifyAuthorization(){
         // This is a callback for the authorization function that requests the access token
         val showLoginActivityToken = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
@@ -126,21 +145,10 @@ class SharingComposeActivity : ComponentActivity() {
             showLoginActivityCode.launch(requestUserAuthorization(this))
         }
 
-        // wait for the song name to be retrieved after the completion of Authorization callbacks
+        // retrieve the song name from the future
         completableFutureSong.get()
 
-        // ----------------- Compose UI -----------------
-        setContent {
-            OrkestTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
-                    UserSelection()
-                }
-            }
-        }
+
     }
 
     /**

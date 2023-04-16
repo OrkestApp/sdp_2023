@@ -226,12 +226,16 @@ private fun Reaction(post: Post){
 
         //Create the comment button
         IconButton(
+            modifier = Modifier.testTag("comment_button"),
             onClick = { context.startActivity(Intent(context, CommentActivity::class.java)
                                 .putExtra("post_date", post.date.toString())
                                 .putExtra("post_username", post.username))
             }
         ) {
-            androidx.compose.material3.Icon(imageVector = Icons.Outlined.Comment, contentDescription = "Comment button")
+            androidx.compose.material3.Icon(
+                imageVector = Icons.Outlined.Comment,
+                contentDescription = "comment_button"
+            )
         }
         //ReactionIcon(R.drawable.comment_icon,"Comment button", "comment_button" )
         //Spacer(modifier = Modifier.height(10.dp))

@@ -2,7 +2,9 @@ package com.github.orkest.ViewModel.feed
 
 import androidx.compose.ui.text.input.TextFieldValue
 import com.github.orkest.Constants
+import com.github.orkest.Model.Comment
 import com.github.orkest.Model.FireStoreDatabaseAPI
+import com.github.orkest.Model.OrkestDate
 import com.github.orkest.ViewModel.post.PostViewModel
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.firestoreSettings
@@ -18,17 +20,17 @@ class PostViewModelTest {
     companion object {
 
         private lateinit var postViewModel : PostViewModel
-//        @BeforeClass
-//        @JvmStatic
-//        fun setupEmulator() {
-//
-//            val db = FireStoreDatabaseAPI.db
-//            db.useEmulator("10.0.2.2", 8080)
-//            db.firestoreSettings = firestoreSettings {
-//                isPersistenceEnabled = false
-//            }
-//
-//        }
+        /*@BeforeClass
+        @JvmStatic
+        fun setupEmulator() {
+
+            val db = FireStoreDatabaseAPI.db
+            db.useEmulator("10.0.2.2", 8181) //8080
+            db.firestoreSettings = firestoreSettings {
+                isPersistenceEnabled = false
+            }
+
+        }*/
 
         @BeforeClass
         @JvmStatic
@@ -37,8 +39,6 @@ class PostViewModelTest {
             postViewModel = PostViewModel()
         }
     }
-
-
 
 
     @Test
@@ -99,5 +99,30 @@ class PostViewModelTest {
         postViewModel.deletePost(postViewModel.getPost()).get()
     }
 
+
+    @Test
+    fun updateCommentAddsCommentInDatabase() {
+        // create post and get
+        postViewModel.updateSong(Constants.DUMMY_RUDE_BOY_SONG)
+        postViewModel.updatePostDescription(TextFieldValue("Description"))
+        postViewModel.addPost().get()
+        val post = postViewModel.getPost()
+
+
+        postViewModel.setPostDate(post.date.toString())
+        postViewModel.setPostUsername("DummyUser")
+        postViewModel.updateComments(Comment(text="test")).get()
+
+        val list = postViewModel.getComments().get()
+        assert(list.size == 1)
+        assert(list[0].text == "test")
+
+        // remove newly added post
+        postViewModel.deletePost(post).get()
+
+    }
+
+    private var testComments = mutableListOf(Comment(text="test"))
+    private val newComments = mutableListOf(Comment(text="test"), Comment(text="new"))
 
 }

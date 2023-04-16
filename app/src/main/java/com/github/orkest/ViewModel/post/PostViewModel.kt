@@ -65,8 +65,8 @@ open class PostViewModel {
         return dbAPI.getPostCommentsFromDataBase(post_username, post_date)
     }
 
-    fun updateComments(comment: Comment) {
-        dbAPI.addCommentInDataBase(post_username, post_date, comment)
+    open fun updateComments(comment: Comment): CompletableFuture<Boolean> {
+        return dbAPI.addCommentInDataBase(post_username, post_date, comment)
     }
 
     /*fun removeComment(comm: String): Boolean {

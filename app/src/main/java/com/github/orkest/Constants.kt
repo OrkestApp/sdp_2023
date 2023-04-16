@@ -12,7 +12,7 @@ import java.time.ZoneId
  */
 class Constants {
     companion object{
-        private var currentLoggedUser: String = "Yas"
+        private var currentLoggedUser: String = ""
         var CURRENT_LOGGED_USER: String
             get() = currentLoggedUser
             set(value) { currentLoggedUser = value }

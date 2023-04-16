@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.modifier.modifierLocalOf
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -78,6 +79,7 @@ fun CommentScreen(activity: ComponentActivity, viewModel: PostViewModel) {
     Column() {
         /* The given button allows the user to return to feed */
         IconButton(
+            modifier = Modifier.testTag("return_button"),
             onClick = {activity.finish()}
         ) {
             Icon(
@@ -96,7 +98,7 @@ fun CommentScreen(activity: ComponentActivity, viewModel: PostViewModel) {
             /* text field where the user can type their comment */
             var comment by rememberSaveable { mutableStateOf("") }
             TextField(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().testTag("comment_field"),
                 value = comment,
                 onValueChange = { comment = it },
                 colors = TextFieldDefaults.textFieldColors(
@@ -107,7 +109,7 @@ fun CommentScreen(activity: ComponentActivity, viewModel: PostViewModel) {
                 trailingIcon = {
                     Icon(Icons.Default.Send,
                         contentDescription = "Send Button",
-                        modifier = Modifier.clickable {
+                        modifier = Modifier.testTag("publish_comment_button").clickable {
                             // adds the written text in the database
                             viewModel.updateComments(Comment(text = comment))
                             comment = ""
@@ -162,10 +164,10 @@ fun CommentBox(comment: Comment) {
             displayProfilePic()
             Column {
                 Row(horizontalArrangement = Arrangement.SpaceEvenly){
-                    Text(text = comment.username, fontWeight = FontWeight.Bold)
-                    Text(modifier = Modifier.padding(horizontal = 8.dp), fontSize = 10.sp, text = comment.date.toString())
+                    Text(text = comment.username, fontWeight = FontWeight.Bold, modifier = Modifier.testTag("comment_username"))
+                    Text(modifier = Modifier.padding(horizontal = 8.dp).testTag("comment_date"), fontSize = 10.sp, text = comment.date.toString())
                 }
-                Text(text = comment.text)
+                Text(text = comment.text, modifier = Modifier.testTag("comment_text"))
             }
         }
     }
@@ -182,20 +184,21 @@ fun displayProfilePic(/* TODO */) {
         modifier = Modifier
             .padding(8.dp)
             .size(40.dp)
+            .testTag("display_pic")
     ) {
         val imageUri = rememberSaveable { mutableStateOf("") }
         val painter = rememberImagePainter(
             imageUri.value.ifEmpty { R.drawable.blank_profile_pic }
         )
-        Image(painter = painter, contentDescription = "Profile Picture")
+        Image(painter = painter, contentDescription = "Profile Picture", modifier = Modifier.testTag("display_pic"))
     }
 }
 
 
-@Preview(showBackground = true)
+/*@Preview(showBackground = true)
 @Composable
 fun DefaultCommentPreview() {
     CommentSetting {
         CommentScreen(CommentActivity(), PostViewModel())
     }
-}
+}*/

@@ -225,7 +225,20 @@ private fun Reaction(post: Post){
         Spacer(modifier = Modifier.height(10.dp))
 
         //Create the comment button
-        CommentButton(post = post)
+        val context = LocalContext.current
+        IconButton(
+            modifier = Modifier.testTag("comment_button").height(20.dp).width(20.dp),
+            onClick = { context.startActivity(Intent(context, CommentActivity::class.java)
+                .putExtra("post_date", post.date.toString())
+                .putExtra("post_username", post.username))
+            }
+        ) {
+            androidx.compose.material3.Icon(
+                painter = painterResource(id = R.drawable.comment_icon),
+                contentDescription = "comment_button",
+                tint = Color.White
+            )
+        }
 
         Spacer(modifier = Modifier.height(10.dp))
 
@@ -234,23 +247,14 @@ private fun Reaction(post: Post){
     }
 }
 
+/* TODO modularize in next sprint */
+
+/*
 @Composable
 private fun CommentButton(post: Post) {
-    val context = LocalContext.current
-    IconButton(
-        modifier = Modifier.testTag("comment_button").height(20.dp).width(20.dp),
-        onClick = { context.startActivity(Intent(context, CommentActivity::class.java)
-            .putExtra("post_date", post.date.toString())
-            .putExtra("post_username", post.username))
-        }
-    ) {
-        androidx.compose.material3.Icon(
-            painter = painterResource(id = R.drawable.comment_icon),
-            contentDescription = "comment_button",
-            tint = Color.White
-        )
-    }
+
 }
+*/
 
 @Composable
 private fun ReactionIcon(iconId: Int, contentDescription:String, testTag: String) {

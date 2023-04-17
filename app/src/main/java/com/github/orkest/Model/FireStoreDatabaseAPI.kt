@@ -169,6 +169,22 @@ class FireStoreDatabaseAPI {
     }
 
     /**
+     * @param post the post we want to add in the database
+     * @param
+     * @return a completable future that completes to true only if post is correctly added
+     */
+    fun addCommentInDataBase(username: String, post_date: String, comment: Comment): CompletableFuture<Boolean> {
+        val future = CompletableFuture<Boolean>()
+        val postDocument = getPostCollectionRef(username).document("${post_date}/comments/${comment.date}")
+
+        postDocument.set(comment).addOnSuccessListener { future.complete(true) }
+            .addOnFailureListener { future.completeExceptionally(it) }
+
+        return future
+    }
+
+
+    /**
      * @param post the post we want to delete in the database
      * @return a completable future that completes to true only if post is correctly deleted
      */
@@ -202,6 +218,28 @@ class FireStoreDatabaseAPI {
 
         return future
     }
+
+
+    /**
+     * @param us
+     */
+    fun getPostCommentsFromDataBase(post_username: String, post_date: String): CompletableFuture<List<Comment>>{
+        val future = CompletableFuture<List<Comment>>()
+        val usersPosts = getPostCollectionRef(post_username).document(post_date).collection("comments")
+
+        usersPosts.get().addOnSuccessListener{
+            // Get all posts documents as a list of posts objects
+            val list: MutableList<Comment> =  it.toObjects(Comment::class.java)
+
+            future.complete(list)
+        } //Propagates the exception in case of exception
+            .addOnFailureListener{
+                future.completeExceptionally(it)
+            }
+
+        return future
+    }
+
 
     /**
      * @param lastConnection the last time the user was connected

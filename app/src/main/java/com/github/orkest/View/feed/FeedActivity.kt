@@ -13,6 +13,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Comment
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,6 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.orkest.Constants
+import com.github.orkest.Model.OrkestDate
 import com.github.orkest.Model.Post
 import com.github.orkest.Model.Song
 import com.github.orkest.R
@@ -96,7 +101,7 @@ fun DisplayPost(post: Post){
             // Display the user profile pic
             ProfilePic(post.profilePicId)
             //Display the reaction buttons
-            Reaction()
+            Reaction(post)
         }
 
         Column(modifier = Modifier.padding(10.dp, top = 10.dp, end = 10.dp)) {
@@ -212,20 +217,44 @@ private fun PlayButton(){
 }
 
 @Composable
-private fun Reaction(){
+private fun Reaction(post: Post){
+    //val context = LocalContext.current
     Column(modifier = Modifier.padding(20.dp)) {
         // Create the like button
         ReactionIcon(R.drawable.black_like_icon,"Like button", "like_button" )
         Spacer(modifier = Modifier.height(10.dp))
 
         //Create the comment button
-        ReactionIcon(R.drawable.comment_icon,"Comment button", "comment_button" )
+        val context = LocalContext.current
+        IconButton(
+            modifier = Modifier.testTag("comment_button").height(20.dp).width(20.dp),
+            onClick = { context.startActivity(Intent(context, CommentActivity::class.java)
+                .putExtra("post_date", post.date.toString())
+                .putExtra("post_username", post.username))
+            }
+        ) {
+            androidx.compose.material3.Icon(
+                painter = painterResource(id = R.drawable.comment_icon),
+                contentDescription = "comment_button",
+                tint = Color.White
+            )
+        }
+
         Spacer(modifier = Modifier.height(10.dp))
 
         //Create the share button
         ReactionIcon(R.drawable.share_icon,"Share button", "share_button" )
     }
 }
+
+/* TODO modularize in next sprint */
+
+/*
+@Composable
+private fun CommentButton(post: Post) {
+
+}
+*/
 
 @Composable
 private fun ReactionIcon(iconId: Int, contentDescription:String, testTag: String) {

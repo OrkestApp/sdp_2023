@@ -17,7 +17,7 @@ class MockPostViewModel : PostViewModel() {
 
     private val post = Post(username = user, date= OrkestDate(date), song= song, postDescription = description.text)
     private val comment = Comment(text="testing")
-    val postComm = Post(username = user, date= OrkestDate(date), song= song, postDescription = description.text, comments = mutableListOf(comment))
+    val postComm = Post(username = user, date= OrkestDate(date), song= song, postDescription = description.text)
 
     override fun getSong() = song
 

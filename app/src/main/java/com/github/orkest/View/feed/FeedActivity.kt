@@ -218,30 +218,37 @@ private fun PlayButton(){
 
 @Composable
 private fun Reaction(post: Post){
-    val context = LocalContext.current
+    //val context = LocalContext.current
     Column(modifier = Modifier.padding(20.dp)) {
         // Create the like button
         ReactionIcon(R.drawable.black_like_icon,"Like button", "like_button" )
         Spacer(modifier = Modifier.height(10.dp))
 
         //Create the comment button
-        IconButton(
-            modifier = Modifier.testTag("comment_button"),
-            onClick = { context.startActivity(Intent(context, CommentActivity::class.java)
-                                .putExtra("post_date", post.date.toString())
-                                .putExtra("post_username", post.username))
-            }
-        ) {
-            androidx.compose.material3.Icon(
-                imageVector = Icons.Outlined.Comment,
-                contentDescription = "comment_button"
-            )
-        }
-        //ReactionIcon(R.drawable.comment_icon,"Comment button", "comment_button" )
-        //Spacer(modifier = Modifier.height(10.dp))
+        CommentButton(post = post)
+
+        Spacer(modifier = Modifier.height(10.dp))
 
         //Create the share button
         ReactionIcon(R.drawable.share_icon,"Share button", "share_button" )
+    }
+}
+
+@Composable
+private fun CommentButton(post: Post) {
+    val context = LocalContext.current
+    IconButton(
+        modifier = Modifier.testTag("comment_button").height(20.dp).width(20.dp),
+        onClick = { context.startActivity(Intent(context, CommentActivity::class.java)
+            .putExtra("post_date", post.date.toString())
+            .putExtra("post_username", post.username))
+        }
+    ) {
+        androidx.compose.material3.Icon(
+            painter = painterResource(id = R.drawable.comment_icon),
+            contentDescription = "comment_button",
+            tint = Color.White
+        )
     }
 }
 

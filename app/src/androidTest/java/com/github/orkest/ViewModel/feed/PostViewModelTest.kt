@@ -25,7 +25,7 @@ class PostViewModelTest {
         fun setupEmulator() {
 
             val db = FireStoreDatabaseAPI.db
-            db.useEmulator("10.0.2.2", 8181) //8080
+            db.useEmulator("10.0.2.2", 8080)
             db.firestoreSettings = firestoreSettings {
                 isPersistenceEnabled = false
             }

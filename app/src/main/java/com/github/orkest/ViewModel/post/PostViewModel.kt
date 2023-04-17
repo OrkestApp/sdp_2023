@@ -121,17 +121,4 @@ open class PostViewModel {
         return post
     }
 
-    /*open fun addComment(): CompletableFuture<Comment> {
-        return dbAPI.addPostInDataBase(createComment())
-    }
-    public fun createComment(): Comment {
-        return Comment(text="a")
-    }*/
-
-
-
-
-
-
-
 }

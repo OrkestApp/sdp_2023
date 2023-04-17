@@ -76,29 +76,23 @@ fun CommentSetting(content: @Composable () -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommentScreen(activity: ComponentActivity, viewModel: PostViewModel) {
-    Column() {
+    Column {
         /* The given button allows the user to return to feed */
-        IconButton(
-            modifier = Modifier.testTag("return_button"),
-            onClick = {activity.finish()}
-        ) {
-            Icon(
-                Icons.Default.ArrowBack,
-                contentDescription = "Return Button"
-            )
-        }
+        ReturnButton(activity = activity)
 
         Column(modifier = Modifier.fillMaxSize()) {
             // The Modifier.weight(1f, false) is to have a sticky footer (which is the TextField)
             Surface(modifier = Modifier.fillMaxWidth().weight(1f)) {
+                // display the post's comments
                 Comments(viewModel)
             }
             Divider()
 
-            /* text field where the user can type their comment */
             var comment by rememberSaveable { mutableStateOf("") }
             TextField(
-                modifier = Modifier.fillMaxWidth().testTag("comment_field"),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("comment_field"),
                 value = comment,
                 onValueChange = { comment = it },
                 colors = TextFieldDefaults.textFieldColors(
@@ -109,19 +103,39 @@ fun CommentScreen(activity: ComponentActivity, viewModel: PostViewModel) {
                 trailingIcon = {
                     Icon(Icons.Default.Send,
                         contentDescription = "Send Button",
-                        modifier = Modifier.testTag("publish_comment_button").clickable {
-                            // adds the written text in the database
-                            viewModel.updateComments(Comment(text = comment))
-                            comment = ""
-                        })
+                        modifier = Modifier
+                            .testTag("publish_comment_button")
+                            .clickable {
+                                // adds the written text in the database
+                                viewModel.updateComments(Comment(text = comment))
+                                comment = ""
+                            })
                 },
-                //label = { Text(text = "Username") },
                 placeholder = { Text(text = "Write your thoughts...") }
             )
         }
     }
 
 }
+
+
+/**
+ * Button allowing user to return to feed
+ */
+@Composable
+fun ReturnButton(activity: ComponentActivity) {
+    IconButton(
+        modifier = Modifier.testTag("return_button"),
+        onClick = {activity.finish()}
+    ) {
+        Icon(
+            Icons.Default.ArrowBack,
+            contentDescription = "Return Button"
+        )
+    }
+}
+
+
 
 /**
  * Displays the comments under a post
@@ -165,7 +179,9 @@ fun CommentBox(comment: Comment) {
             Column {
                 Row(horizontalArrangement = Arrangement.SpaceEvenly){
                     Text(text = comment.username, fontWeight = FontWeight.Bold, modifier = Modifier.testTag("comment_username"))
-                    Text(modifier = Modifier.padding(horizontal = 8.dp).testTag("comment_date"), fontSize = 10.sp, text = comment.date.toString())
+                    Text(modifier = Modifier
+                        .padding(horizontal = 8.dp)
+                        .testTag("comment_date"), fontSize = 10.sp, text = comment.date.toString())
                 }
                 Text(text = comment.text, modifier = Modifier.testTag("comment_text"))
             }

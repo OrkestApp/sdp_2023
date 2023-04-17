@@ -28,5 +28,6 @@ class Constants {
 
         val DUMMY_LAST_CONNECTED_TIME: LocalDateTime =
             LocalDateTime.of(2021, 5, 1, 12, 0)
+
     }
 }

@@ -3,6 +3,10 @@ package com.github.orkest.View.feed
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.navigation.compose.rememberNavController
+import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.matcher.IntentMatchers
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import com.github.orkest.View.MainActivity
 import com.github.orkest.View.auth.SignUpForm
 import com.github.orkest.ViewModel.auth.MockAuthViewModel
 import com.github.orkest.ViewModel.feed.MockPostViewModel
@@ -67,7 +71,17 @@ internal class FeedActivityKtTest {
         composeTestRule.onAllNodesWithTag("comment_button").assertAll(hasClickAction())
         composeTestRule.onAllNodesWithTag("like_button").assertAll(hasClickAction())
         composeTestRule.onAllNodesWithTag("share_button").assertAll(hasClickAction())
-
     }
+
+    /*@Test
+    fun openedCommentActivityWhenClickOnCommentButton() {
+        Intents.init()
+
+        val button = composeTestRule.onNodeWithTag("comment_button")
+        button.performClick()
+        Intents.intended((IntentMatchers.hasComponent(CommentActivity::class.java.name)))
+
+        Intents.release()
+    }*/
 
 }

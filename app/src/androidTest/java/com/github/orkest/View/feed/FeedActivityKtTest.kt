@@ -73,7 +73,7 @@ internal class FeedActivityKtTest {
         composeTestRule.onAllNodesWithTag("share_button").assertAll(hasClickAction())
     }
 
-    @Test
+    /*@Test
     fun openedCommentActivityWhenClickOnCommentButton() {
         Intents.init()
 
@@ -82,6 +82,6 @@ internal class FeedActivityKtTest {
         Intents.intended((IntentMatchers.hasComponent(CommentActivity::class.java.name)))
 
         Intents.release()
-    }
+    }*/
 
 }

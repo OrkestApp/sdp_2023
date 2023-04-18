@@ -15,9 +15,20 @@
         <activity
             android:name=".View.DeezerWelcomeActivity"
             android:exported="true"
-            android:theme="@style/Theme.Orkest" >
+            android:label="Deezer"
+            android:theme="@style/Theme.Orkest">
+
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="https" android:host="orkest" android:pathPrefix="/deezer/oauth" />
+            </intent-filter>
 
         </activity>
+
+
         <activity
             android:name=".View.sharing.SharingComposeActivity"
             android:exported="true"
@@ -34,6 +45,8 @@
         <activity
             android:name=".View.MainActivity"
             android:exported="true" />
+
+
         <activity android:name=".View.profile.ProfileActivity" /> <!-- "adjustResize": to be able to scroll on the screen -->
         <activity
             android:name=".View.EditProfileActivity"

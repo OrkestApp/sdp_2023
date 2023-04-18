@@ -30,9 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.orkest.Constants
-import com.github.orkest.Model.OrkestDate
-import com.github.orkest.Model.Post
-import com.github.orkest.Model.Song
+import com.github.orkest.Model.*
 import com.github.orkest.R
 import com.github.orkest.ViewModel.post.PostViewModel
 import java.time.LocalDateTime
@@ -174,7 +172,7 @@ fun SongCard(song: Song){
             Spacer(modifier = Modifier.width(5.dp))
 
             //Add a play button at the right of the card
-            PlayButton()
+            PlayButton(song)
         }
 }
 
@@ -206,14 +204,18 @@ private fun SongInfo(song: Song){
 }
 
 @Composable
-private fun PlayButton(){
+private fun PlayButton(song: Song){
+    val context = LocalContext.current
     Icon(painter = painterResource(id = R.drawable.play_button),
         contentDescription = "Play button",
         modifier = Modifier
             .height(50.dp)
             .width(50.dp)
             .clip(shape = RoundedCornerShape(10.dp))
-            .clickable { })
+            .clickable {
+                if (Constants.CURRENT_USER_PROVIDER == Providers.SPOTIFY)
+                    PlaySpotify.play(context, PlaySpotify.songToUri(song))
+            })
 }
 
 @Composable

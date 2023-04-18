@@ -3,6 +3,7 @@ package com.github.orkest
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import com.github.orkest.Model.Providers
 import com.github.orkest.Model.Song
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -12,6 +13,8 @@ import java.time.ZoneId
  */
 class Constants {
     companion object{
+        //TODO: Need to set this value on sign in
+        var CURRENT_USER_PROVIDER: Providers = Providers.SPOTIFY
         private var currentLoggedUser: String = ""
         var CURRENT_LOGGED_USER: String
             get() = currentLoggedUser

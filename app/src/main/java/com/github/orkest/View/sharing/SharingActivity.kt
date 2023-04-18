@@ -86,8 +86,8 @@ class SharingComposeActivity : ComponentActivity() {
             if (!response.isSuccessful) throw Exception("Unexpected code $response")
 
             val responseData = response.body?.string()
-            val jsonObject = JSONObject(responseData)
-            val trackName = jsonObject.getString("name")
+            val jsonObject = responseData?.let { JSONObject(it) }
+            val trackName = jsonObject?.getString("name")
 
             Log.d("MainActivity", "Track name: $trackName")
         }

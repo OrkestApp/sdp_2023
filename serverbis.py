@@ -7,7 +7,7 @@ def custom_url():
     arg = request.args.get('code')
     # Generate the custom URL based on the argument
     #custom_url = "https://orkest.page.link/deezer/{}".format(arg)
-    custom_url = "https://orkest.page.link/?link=https://orkest/deezer/oauth?param1=Jordan&param2=Alico&apn=com.github.orkest&afl=https://orkest/deezer/oauth?param1=value1&param2=value2"
+    custom_url = "https://orkest.page.link/?link=https://orkest/deezer/oauth?code={}&&apn=com.github.orkest&afl=https://orkest/deezer/oauth?param1=value1&param2=value2".format(arg)
 
 
     # Render the HTML template with the custom URL

@@ -1,10 +1,14 @@
 package com.github.orkest.View
 
+import android.content.ContentValues.TAG
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.compose.rememberNavController
+import com.github.orkest.Constants
+
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -20,12 +24,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val extras = intent.extras
-            var user = ""
-            if (extras != null){
-                user = extras.getString("username").toString()
+            if(Constants.CURRENT_LOGGED_USER == ""){
+                Log.e(TAG, "currentLoggedUser is empty", IllegalArgumentException())
             }
-            NavigationBar.CreateNavigationBar(navController = rememberNavController(), user)
+            NavigationBar.CreateNavigationBar(navController = rememberNavController(), Constants.CURRENT_LOGGED_USER)
         }
 
         createNotificationChannel(this)

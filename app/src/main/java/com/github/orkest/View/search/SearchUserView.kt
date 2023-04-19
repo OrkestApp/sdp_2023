@@ -60,7 +60,10 @@ class SearchUserView {
                 // This draw the found users each time the list is updated
                 LazyColumn {
                     items(list) { userName ->
-                        createUser(name = userName)
+                        val context = LocalContext.current
+                        val intent = Intent(context,ProfileActivity::class.java)
+                        intent.putExtra("username",userName)
+                        CreateUser(name = userName, intent = intent)
                     }
                 }
             }
@@ -70,12 +73,11 @@ class SearchUserView {
          * This encapsulate the drawing of a single user with name @param user
          */
         @Composable
-        private fun createUser(name: String) {
+        fun CreateUser(name: String, intent: Intent) {
             val context = LocalContext.current
             Row(modifier = Modifier
                 .padding(all = 8.dp)
-                .clickable { val intent = Intent(context,ProfileActivity::class.java)
-                    intent.putExtra("username",name)
+                .clickable {
                     context.startActivity(intent)
                 } //TODO the empty brackets need to be replaced by the composable function or fires an intent to the desired profiles
                 .fillMaxSize()) {

@@ -23,13 +23,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.github.orkest.Constants
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import com.github.orkest.Model.Providers
@@ -57,9 +55,6 @@ fun SignUpForm(viewModel: AuthViewModel) {
     val userExists = remember { mutableStateOf(false) }
 
     // Font used for the title
-    val marker = FontFamily(
-        Font(R.font.permanentmarker_regular, FontWeight.Normal)
-    )
 
     Scaffold(
         //Creates the top bar
@@ -81,7 +76,7 @@ fun SignUpForm(viewModel: AuthViewModel) {
                 //Title of the page
                 Text(
                     text = "Create Your Profile",
-                    style = TextStyle(fontSize = 35.sp, fontFamily = marker),
+                    style = TextStyle(fontSize = 35.sp, fontFamily = Constants.FONT_MARKER),
                     color = Color.Black
                 )
 
@@ -192,9 +187,9 @@ private fun onConfirmListener(context: Context, error: MutableState<Boolean>, er
 
         }else{
             if(result) {
+                Constants.CURRENT_LOGGED_USER = viewModel.getUsername().text
                 //Launches intent to the main Activity
                 val intent = Intent(context, MainActivity::class.java)
-                intent.putExtra("username",viewModel.getUsername().text)
                 context.startActivity(intent)
             } else {
                 //Displays error
@@ -226,7 +221,7 @@ private fun ChooseServiceProvider(viewModel: AuthViewModel, expanded: MutableSta
 
     Box() {
         // The button that will be displayed for the choice of the provider
-       ProviderButtonContent(viewModel = viewModel, expanded = expanded , logos = logos)
+        ProviderButtonContent(viewModel = viewModel, expanded = expanded , logos = logos)
 
         DropDownMenu(viewModel = viewModel, expanded = expanded, logos = logos)
 

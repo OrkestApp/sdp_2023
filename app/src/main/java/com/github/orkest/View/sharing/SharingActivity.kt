@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,21 +19,50 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import com.github.orkest.Model.Authorization.Companion.getLoginActivityTokenIntent
+import com.github.orkest.Model.Authorization.Companion.requestUserAuthorization
 import com.github.orkest.View.profile.ProfileActivity
 import com.github.orkest.View.search.SearchUserView
 import com.github.orkest.View.sharing.ui.theme.OrkestTheme
 import com.github.orkest.ViewModel.search.SearchViewModel
-import okhttp3.OkHttpClient
-import okhttp3.Request
+import com.spotify.sdk.android.auth.AuthorizationClient
+import com.spotify.sdk.android.auth.AuthorizationResponse
+import okhttp3.*
 import org.json.JSONObject
+import java.io.IOException
+import java.util.concurrent.CompletableFuture
 
 
 class SharingComposeActivity : ComponentActivity() {
 
-    private var accessToken : String = ""
+    private var accessToken : String = String()        // access token for Spotify API
+    private var authorizationCode : String = String()  // authorization code for token request
+    private var spotifySongID : String = String()      // spotify song ID
 
+    // spotify song name
+    companion object {
+        var spotifySongName : String = String()
+    }
+
+
+
+    /**
+     * This override of the onCreate method is used to get the text from the intent
+     * The text corresponds to a spotify song URL that is used to get the song ID and
+     * song name.
+     *
+     * It consists of 3 parts:
+     * 1. Intent handling
+     * 2. Spotify API: It performs the PKCE Authorization Code Flow to get the access token
+     * 3. Compose UI
+     *
+     * @param savedInstanceState the saved instance state
+     * @see <a href="https://developer.android.com/guide/components/activities/intents-filters"></a>
+     *
+     */
     @SuppressLint("MutableCollectionMutableState")
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         when (intent?.action) {
             Intent.ACTION_SEND -> {
@@ -42,13 +73,7 @@ class SharingComposeActivity : ComponentActivity() {
             }
         }
         // ----------------- Spotify API -----------------
-
-        // TODO: get access token from Spotify API
-//        val token = Authorization.getAccessToken()
-//
-//        Log.d("token", token.toString())
-
-
+        spotifyAuthorization()
         // ----------------- Compose UI -----------------
         setContent {
             OrkestTheme {
@@ -63,35 +88,124 @@ class SharingComposeActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * This function is used to connect to the Spotify API and get the song name
+     *
+     */
+    private fun spotifyAuthorization(){
+        // This is a callback for the authorization function that requests the access token
+        val showLoginActivityToken = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result: ActivityResult ->
+
+            val authorizationResponse = AuthorizationClient.getResponse(result.resultCode, result.data)
+
+            // Check the response type
+            when (authorizationResponse.type) {
+                AuthorizationResponse.Type.TOKEN -> {
+                    // Retrieve the access token
+                    this.accessToken = authorizationResponse.accessToken
+                    Log.d("SPOTIFY TOKEN", this.accessToken)
+                    CompletableFuture.runAsync {
+                        getTrackName(this.spotifySongID)
+                    }
+                }
+                AuthorizationResponse.Type.ERROR ->
+                    Log.d("SPOTIFY ERROR", authorizationResponse.error)
+                else ->
+                    Log.d("SPOTIFY FATAL ERROR", "Abort")
+            }
+        }
+
+        // This is a callback for the authorization function that requests the authorization code
+        val showLoginActivityCode = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result: ActivityResult ->
+
+            val authorizationResponse = AuthorizationClient.getResponse(result.resultCode, result.data)
+            when (authorizationResponse.type) {
+                AuthorizationResponse.Type.CODE -> {
+                    // retrieve the authorization code
+                    this.authorizationCode = authorizationResponse.code
+                    Log.d("SPOTIFY", "Code: ${this.authorizationCode}")
+                    CompletableFuture.runAsync {
+                        showLoginActivityToken.launch(getLoginActivityTokenIntent(authorizationCode, this))
+                    }
+                }
+                AuthorizationResponse.Type.ERROR ->
+                    // log the error
+                    Log.d("Debug", "Error: ${authorizationResponse.error}")
+                else ->
+                    // interrupt
+                    Log.d("Debug", "Error: Fatal")
+            }
+        }
+
+        val completableFutureSong = CompletableFuture.supplyAsync {
+            showLoginActivityCode.launch(requestUserAuthorization(this))
+        }
+
+        // retrieve the song name from the future
+        completableFutureSong.get()
+
+
+    }
+
+    /**
+     * This function extracts the spotify song ID shared
+     * from Spotify.
+     *
+     * @param intent The intent that is sent to the app
+     * @see <a href="https://developer.android.com/guide/components/activities/intents-filters"></a>
+     */
     private fun handleSendText(intent: Intent) {
         intent.getStringExtra(Intent.EXTRA_TEXT)?.let {
-            // use spotify API to get the name of the song from the link
-
             // extract Spotify ID from the link
-            val spotifyID = it.substringAfterLast("/").substringBefore("?")
-            //TODO: debug
-            //getTrackName(spotifyID)
-
+            this.spotifySongID = it.substringAfterLast("/").substringBefore("?")
         }
     }
 
-    fun getTrackName(spotifyUri: String) {
+    /**
+     * This function is used to get the track name from the Spotify API
+     *
+     * @param spotifyUri The Spotify song ID
+     * @return A CompletableFuture that contains the track name
+     * @see <a href="https://developer.android.com/reference/java/util/concurrent/CompletableFuture"></a>
+     */
+    private fun getTrackName(spotifyUri: String) : CompletableFuture<String>{
+        val future = CompletableFuture<String>()
         val client = OkHttpClient()
+
+        // construct a request containing the URI and the access token
         val request = Request.Builder()
             .url("https://api.spotify.com/v1/tracks/$spotifyUri")
             .addHeader("Authorization", "Bearer $accessToken")
             .build()
 
-        client.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) throw Exception("Unexpected code $response")
+        // send the request to the Spotify API
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                future.completeExceptionally(e)
+            }
 
-            val responseData = response.body?.string()
-            val jsonObject = responseData?.let { JSONObject(it) }
-            val trackName = jsonObject?.getString("name")
+            override fun onResponse(call: Call, response: Response) {
+                if (!response.isSuccessful) {
+                    future.completeExceptionally(Exception("Unexpected code ${response.code}"))
+                    return
+                }
 
-            Log.d("MainActivity", "Track name: $trackName")
-        }
-    }
+                val responseData = response.body?.string()
+                val jsonObject = responseData?.let { JSONObject(it) }
+                val trackName = jsonObject?.getString("name")
+
+                Log.d("ShareActivity", "Track name: $trackName")
+                spotifySongName = trackName.toString()
+                future.complete(trackName)
+
+            }
+        })
+
+        return future
 }
 
 
@@ -118,11 +232,12 @@ fun UserSelection(){
             items(list){ username ->
                 // create an intent
                 val context = LocalContext.current
-//               // Temporary solution-to be replaced by an intent to launch the chat with the user
+                // Temporary solution-to be replaced by an intent to launch the chat with the user
                 val intent : Intent = Intent(context, ProfileActivity::class.java)
 
                 SearchUserView.CreateUser(name = username, intent)
 
+                }
             }
         }
     }

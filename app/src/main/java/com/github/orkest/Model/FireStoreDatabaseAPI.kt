@@ -1,14 +1,25 @@
 package com.github.orkest.Model
 
-import android.content.ContentValues
 import android.util.Log
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.gson.GsonBuilder
+import com.google.gson.reflect.TypeToken
+import java.time.LocalDateTime
 import java.util.concurrent.CompletableFuture
 
 class FireStoreDatabaseAPI {
-    private val db = Firebase.firestore
+
+    companion object{
+        val db = Firebase.firestore
+    }
+
+
+    //============================USER OPERATIONS==========================================
 
     /**
      * @param prefix the prefix of the username we want to search in the database
@@ -93,8 +104,33 @@ class FireStoreDatabaseAPI {
             }
 
         return completableFuture
-        }
+    }
 
+    /**
+     * Check if user and mail are already in the database
+     */
+    fun userMailInDatabase(user: User): CompletableFuture<Boolean>{
+
+        val auth = FirebaseAuth.getInstance()
+        val future = CompletableFuture<Boolean>()
+
+        //Checks if the database already contains a user with the same username and email
+        getUserDocumentRef(user.username).get()
+            .addOnSuccessListener {
+                if (it.data != null && it.get("mail").toString() == auth.currentUser?.email.toString()) {
+                    println(it)
+                    future.complete(true)
+                } else {
+                    future.complete(false)
+                }
+            }
+            //Propagates the exception in case of another exception
+            .addOnFailureListener{
+                future.completeExceptionally(it)
+            }
+
+        return future
+    }
 
     /**
      * @param username
@@ -106,29 +142,135 @@ class FireStoreDatabaseAPI {
         return db.collection(path).document(username)
     }
 
+    //===========================SONG POST OPERATIONS======================
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    private fun getPostCollectionRef(username: String): CollectionReference{
+        val firstLetter = username[0].uppercase()
+        //TODO: Discuss other option: "posts/user-$firstLetter/$username"
+        //Chose this for now because easier for group queries
+        // But question: what happens when we get the docRef of one user
+        val path = "user/user-$firstLetter/users/$username/posts"
+        return db.collection(path)
     }
+
+
+    /**
+     * @param post the post we want to add in the database
+     * @return a completable future that completes to true only if post is correctly added
+     */
+    fun addPostInDataBase(post: Post): CompletableFuture<Boolean> {
+        val future = CompletableFuture<Boolean>()
+        val postDocument = getPostCollectionRef(post.username).document(post.date.toString())
+
+        postDocument.set(post).addOnSuccessListener { future.complete(true) }
+            .addOnFailureListener { future.completeExceptionally(it) }
+
+        return future
+    }
+
+    /**
+     * @param post the post we want to add in the database
+     * @param
+     * @return a completable future that completes to true only if post is correctly added
+     */
+    fun addCommentInDataBase(username: String, post_date: String, comment: Comment): CompletableFuture<Boolean> {
+        val future = CompletableFuture<Boolean>()
+        val postDocument = getPostCollectionRef(username).document("${post_date}/comments/${comment.date}")
+
+        postDocument.set(comment).addOnSuccessListener { future.complete(true) }
+            .addOnFailureListener { future.completeExceptionally(it) }
+
+        return future
+    }
+
+
+    /**
+     * @param post the post we want to delete in the database
+     * @return a completable future that completes to true only if post is correctly deleted
+     */
+    fun deletePostInDataBase(post: Post): CompletableFuture<Boolean> {
+        val future = CompletableFuture<Boolean>()
+        val postDocument = getPostCollectionRef(post.username).document(post.date.toString())
+
+        postDocument.delete().addOnSuccessListener { future.complete(true) }
+            .addOnFailureListener { future.completeExceptionally(it) }
+
+        return future
+    }
+
+    /**
+     * @param username the username of the user we want to get the posts from
+     * @return a completable future of a list of post that match the username
+     */
+    fun getUserPostsFromDataBase(username: String): CompletableFuture<List<Post>>{
+        val future = CompletableFuture<List<Post>>()
+        val usersPosts = getPostCollectionRef(username)
+
+        usersPosts.get().addOnSuccessListener{
+            // Get all posts documents as a list of posts objects
+            val list: MutableList<Post> =  it.toObjects(Post::class.java)
+
+            future.complete(list)
+        } //Propagates the exception in case of exception
+        .addOnFailureListener{
+            future.completeExceptionally(it)
+        }
+
+        return future
+    }
+
+
+    /**
+     * @param us
+     */
+    fun getPostCommentsFromDataBase(post_username: String, post_date: String): CompletableFuture<List<Comment>>{
+        val future = CompletableFuture<List<Comment>>()
+        val usersPosts = getPostCollectionRef(post_username).document(post_date).collection("comments")
+
+        usersPosts.get().addOnSuccessListener{
+            // Get all posts documents as a list of posts objects
+            val list: MutableList<Comment> =  it.toObjects(Comment::class.java)
+
+            future.complete(list)
+        } //Propagates the exception in case of exception
+            .addOnFailureListener{
+                future.completeExceptionally(it)
+            }
+
+        return future
+    }
+
+
+    /**
+     * @param lastConnection the last time the user was connected
+     * @return a completable future of a list of post that were recently published
+     */
+    fun getRecentPostsFromDataBase(lastConnection: LocalDateTime): CompletableFuture<List<Post>> {
+        //TODO: Add the condition on posts belonging to the user's friends
+        val future = CompletableFuture<List<Post>>()
+        val posts = db.collectionGroup("posts")
+
+        val currentTime = LocalDateTime.now()
+
+        //TODO: Make this logic better and refactor it + discuss it with team (corner cases like end of month/end of year not covered)
+        //TODO: See if there is a workaround the interdiction to combine plage queries on different fields
+
+        //Get all posts that were published after the last connection of the user, and that are from the current month
+        posts.whereEqualTo(FieldPath.of("date","year"), currentTime.year)
+            .whereEqualTo(FieldPath.of("date","month"), currentTime.monthValue)
+            .whereGreaterThan(FieldPath.of("date","dayOfMonth"),
+                if (currentTime.year > lastConnection.year &&
+                    currentTime.monthValue > lastConnection.monthValue) 1 else
+                        lastConnection.dayOfMonth).get()
+            .addOnSuccessListener {
+                // Get all posts documents as a list of posts objects
+                val list: MutableList<Post> = it.toObjects(Post::class.java)
+                future.complete(list)
+            } //Propagates the exception in case of exception
+            .addOnFailureListener {
+                future.completeExceptionally(it)
+            }
+
+        return future
+    }
+}

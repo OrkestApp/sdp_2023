@@ -1,16 +1,12 @@
 package com.github.orkest.View
 
+import android.content.ContentValues.TAG
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.setContent
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
-import com.github.orkest.R
-import com.github.orkest.databinding.ActivityMainBinding
+import com.github.orkest.Constants
 
 
 class MainActivity : AppCompatActivity() {
@@ -18,12 +14,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val extras = intent.extras
-            var user = ""
-            if (extras != null){
-                user = extras.getString("username").toString()
+            if(Constants.CURRENT_LOGGED_USER == ""){
+                Log.e(TAG, "currentLoggedUser is empty", IllegalArgumentException())
             }
-            NavigationBar.CreateNavigationBar(navController = rememberNavController(), user)
+            NavigationBar.CreateNavigationBar(navController = rememberNavController(), Constants.CURRENT_LOGGED_USER)
         }
     }
 }

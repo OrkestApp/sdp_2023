@@ -2,14 +2,11 @@ package com.github.orkest.View.auth
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.navigation.compose.rememberNavController
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
 import com.github.orkest.Model.Providers
 import com.github.orkest.View.MainActivity
-import com.github.orkest.View.auth.SignUpForm
-import com.github.orkest.ViewModel.auth.AuthViewModel
 import com.github.orkest.ViewModel.auth.MockAuthViewModel
 import org.junit.Before
 import org.junit.Rule
@@ -38,6 +35,7 @@ class SignUpFormTest {
         composeTestRule.onNodeWithText("Profile Description").assertIsDisplayed()
         composeTestRule.onNodeWithText("Spotify").assertIsDisplayed()
         composeTestRule.onNodeWithText("Create Profile").assertIsDisplayed()
+
     }
 
     @Test
@@ -46,6 +44,7 @@ class SignUpFormTest {
         composeTestRule.onNodeWithText("Profile Description").assert(hasClickAction())
         composeTestRule.onNodeWithText("Spotify").assert(hasClickAction())
         composeTestRule.onNodeWithText("Create Profile").assert(hasClickAction())
+
     }
 
     @Test

@@ -63,7 +63,7 @@ fun sharedMusicPost(profile: Profile, song: Song, message: String) {
                 .padding(paddingValue)
                 .fillMaxWidth()
                 .clip(shape = RoundedCornerShape(roundedCornerValue))
-                .background(Color.Yellow)
+                .background(Color.hsl(54f, 1f, 0.5f))
                 ) {
                     Column(Modifier.weight(1f)){ playMusic(song)}
                     AddToPlaylistButton()

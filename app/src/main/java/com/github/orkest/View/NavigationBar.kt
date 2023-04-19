@@ -85,14 +85,7 @@ class NavigationBar {
                     composable("HomePage") { FeedActivity(PostViewModel()) }
                     composable("SearchPage") { SearchUserView.SearchUi(viewModel = viewModel) }
                     composable("PlaylistPage") {
-                        Column {
-                            repeat(3) {// WILL BE DELETED. Only here for preview purposes for the sprint review.
-                                sharedMusicPost(
-                                    profile = Constants.MOCK_USER.profile,
-                                    song = Constants.DUMMY_RUDE_BOY_SONG,
-                                    message = "Amazing music! Check it out.")
-                            }
-                        }
+                        Text("Playlist Page")
                     }
                     composable("ProfilePage") {
                             ProfileActivityScreen(ProfileActivity(), viewModel = ProfileViewModel(Constants.CURRENT_LOGGED_USER))

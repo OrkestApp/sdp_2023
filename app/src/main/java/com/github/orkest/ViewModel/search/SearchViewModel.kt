@@ -1,12 +1,9 @@
 package com.github.orkest.ViewModel.search
 
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.github.orkest.Model.FireStoreDatabaseAPI
 import com.github.orkest.Model.User
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import java.util.concurrent.CompletableFuture
 
 /**

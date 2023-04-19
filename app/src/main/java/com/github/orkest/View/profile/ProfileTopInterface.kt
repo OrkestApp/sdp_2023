@@ -1,16 +1,12 @@
 package com.github.orkest.View.profile
 
-import android.content.Context
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.Intent
-import android.os.Build
-import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -26,11 +22,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
+import com.github.orkest.Constants
 import com.github.orkest.R
 import com.github.orkest.View.EditProfileActivity
+import com.github.orkest.View.NavDrawerButton
+import kotlinx.coroutines.CoroutineScope
 import com.github.orkest.ViewModel.profile.ProfileViewModel
 import androidx.compose.ui.graphics.Color
-import androidx.core.app.NotificationCompat
 import com.github.orkest.View.auth.AuthActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -40,19 +38,30 @@ import com.google.firebase.auth.FirebaseAuth
 private val topInterfaceHeight = 150.dp
 private val separator = 10.dp
 private val fontSize = 16.sp
-private val smallFontSize = 12.sp
+private val smallFontSize = 13.sp
+private val paddingValue = 10.dp
+private val buttonSettings = Modifier
+    .height(topInterfaceHeight / 4)
+    .width((3 * topInterfaceHeight) / 4)
+private val followColor = Color(0xFFFEE600) // bright yellow
 
 /**
  * The top interface of the user's profile displaying the user's information
  * username, bio, number of followers, number of followings, profile picture
  */
 @Composable
-fun ProfileTopInterface(viewModel: ProfileViewModel) {
+fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldState, coroutineScope: CoroutineScope) {
 
     val context = LocalContext.current
     viewModel.setupListener()
 
-    Column{
+    val currentUser = remember {
+        viewModel.username.value
+    }
+
+
+    Column(Modifier
+        .padding(paddingValue)){
         Row(Modifier.height(IntrinsicSize.Min)){//allows to make fillMaxHeight relatively
             Column(
                 verticalArrangement = Arrangement.Center,
@@ -66,64 +75,53 @@ fun ProfileTopInterface(viewModel: ProfileViewModel) {
 
             Column(
                 Modifier.fillMaxHeight(),
-                verticalArrangement = Arrangement.SpaceEvenly
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
-                Row{ UserName(viewModel.username.observeAsState().value) }
-                Row{
+                Row(modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween) {
+                    UserName(viewModel.username.observeAsState().value)
+                    NavDrawerButton(coroutineScope, scaffoldState)
+                }
+                Row (
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ){
                     //Separate followers/followings in an even way
                     Column(modifier = Modifier.weight(1f)) { NbFollowers(number(viewModel.nbFollowers.observeAsState().value)) }
                     Column(modifier = Modifier.weight(1f)) { NbFollowings(number(viewModel.nbFollowings.observeAsState().value)) }
                 }
-                Row{ Description(viewModel.bio.observeAsState().value) }
+                Description(viewModel.bio.observeAsState().value)
             }
         }
 
         Spacer(modifier = Modifier.height(separator))
 
-        Row(){
-            EditButton {
-                val intent = Intent(context, EditProfileActivity::class.java)
-                context.startActivity(intent)
+
+        Row{
+
+            if(viewModel.username.value == Constants.CURRENT_LOGGED_USER) {
+                EditButton {
+                    val intent = Intent(context, EditProfileActivity::class.java)
+                    context.startActivity(intent)
+                }
+                Spacer(modifier = Modifier.width(separator))
+                Row(){
+                    SignOutButton {
+                        val auth = FirebaseAuth.getInstance()
+                        val intent = Intent(context, AuthActivity::class.java)
+                        auth.signOut()
+                        //uncomment if un-caching is needed
+                        GoogleSignIn.getClient(context, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut()
+                        context.startActivity(intent)
+                    }
+                }
+            } else {
+                FollowButton(viewModel, viewModel.isUserFollowed.observeAsState().value)
             }
         }
 
-        Row(){
-            SignOutButton {
-                val auth = FirebaseAuth.getInstance()
-                val intent = Intent(context, AuthActivity::class.java)
-                auth.signOut()
 
-                //notification
-                sendNotification(context, "Orkest", "You've signed out ;)", "channel_id_signout")
-
-                //uncomment if un-caching is needed
-                GoogleSignIn.getClient(context, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut()
-                context.startActivity(intent)
-            }
-        }
     }
 }
-
-/**
- * Send a Notification for the user when signing out
- * This is an example to later finish developing the notifications
- */
-fun sendNotification(context: Context, title: String, message: String, channelId: String) {
-    val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-    val channel = NotificationChannel(channelId, "Sign Out Channel", NotificationManager.IMPORTANCE_DEFAULT)
-    notificationManager.createNotificationChannel(channel)
-
-    val notificationBuilder = NotificationCompat.Builder(context, channelId)
-        .setContentTitle(title)
-        .setContentText(message)
-        .setSmallIcon(android.R.drawable.ic_dialog_info)
-
-    notificationManager.notify(0, notificationBuilder.build())
-
-    Log.d("Notification",title)
-}
-
 
 /**
  * The button to sign out of the app
@@ -139,9 +137,47 @@ fun SignOutButton(onClick:() -> Unit) {
 }
 
 @Composable
+fun FollowButton(viewModel: ProfileViewModel, isUserFollowed: Boolean?){
+    if(isUserFollowed == null){ Text(text="") } //Empty body, here waiting for the future that fetch isUserFollowed to complete
+    else {
+        //Adapts the UI to the Follow or Unfollow button
+        val buttonText = if (isUserFollowed) "Unfollow" else "Follow"
+        val backGroundColor = if (isUserFollowed) Color.White else followColor
+        val contentColor = if (isUserFollowed) followColor else Color.White
+        Button(
+            onClick = { followOrUnfollow(viewModel, isUserFollowed) },
+            shape = RoundedCornerShape(20.dp),
+            colors = ButtonDefaults.buttonColors(backgroundColor = backGroundColor, contentColor = contentColor),
+            border = BorderStroke(2.dp, followColor),
+            modifier = buttonSettings
+        ) {
+            Text(text = buttonText, fontSize = smallFontSize)
+        }
+    }
+}
+
+private fun followOrUnfollow(viewModel: ProfileViewModel, isUserFollowed: Boolean) {
+    if (isUserFollowed) {
+        //The unfollow button is displayed at this stage, when clicked on,
+        //the current user unfollows the account and isUserFollowed is updated to false
+        viewModel.unfollow().whenComplete { _, _ ->
+            viewModel.isUserFollowed.value = false
+        }
+    } else {
+        //The follow button is displayed at this stage, when clicked on,
+        //the current user follows the account and isUserFollowed is updated to true
+        viewModel.follow().whenComplete { _, _ ->
+            viewModel.isUserFollowed.value = true
+        }
+    }
+}
+
+
+
+@Composable
 fun UserName(username: String?){
     Text(
-        text = username ?: "",
+        text = username ?: "Username",
         fontWeight = FontWeight.Bold,
         fontSize = fontSize
     )
@@ -182,10 +218,9 @@ fun NbFollowings(nb: Int){
 fun EditButton(onClick:() -> Unit){
     Button(
         onClick = onClick,
-        modifier = Modifier
-            .height(topInterfaceHeight / 4)
-            .width((3 * topInterfaceHeight) / 4)
-
+        modifier = buttonSettings,
+        shape = RoundedCornerShape(10.dp),
+        colors = ButtonDefaults.buttonColors(backgroundColor = Color.Gray, contentColor = Color.White)
     ){
         Text(
             text ="Edit Profile",

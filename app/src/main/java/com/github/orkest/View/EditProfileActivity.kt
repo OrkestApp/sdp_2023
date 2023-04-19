@@ -29,6 +29,7 @@ import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material.DrawerValue
 import androidx.compose.runtime.*
+import androidx.compose.ui.tooling.preview.Preview
 import com.github.orkest.View.theme.OrkestTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -324,10 +325,10 @@ fun MenuDrawer(
 }
 
 
-//@Preview(showBackground = true)
-//@Composable
-//fun DefaultPreview() {
-//    EditProfileSetting {
-//        EditProfileScreen()
-//    }
-//}
+@Preview(showBackground = true)
+@Composable
+fun DefaultPreview() {
+    EditProfileSetting {
+        EditProfileScreen(EditProfileActivity())
+    }
+}

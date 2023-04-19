@@ -1,12 +1,8 @@
 package com.github.orkest.ViewModel.profile
 
-import android.content.ContentValues
-import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement
-import com.github.orkest.R
-import com.github.orkest.ViewModel.profile.ProfileViewModel
+import java.util.concurrent.CompletableFuture
 
 class MockProfileViewModel(user: String) : ProfileViewModel(user) {
 
@@ -15,6 +11,7 @@ class MockProfileViewModel(user: String) : ProfileViewModel(user) {
     override var nbFollowers = MutableLiveData<Int>()
     override var nbFollowings = MutableLiveData<Int>()
     override var profilePictureId = MutableLiveData<Int>()
+
 
     // Using runOnUiThread for the mock to set values bc it is not permitted on background threads
     fun setUsername(value: String?){
@@ -44,6 +41,27 @@ class MockProfileViewModel(user: String) : ProfileViewModel(user) {
             setNbFollowers(nbFollowers)
             setNbFollowings(nbFollowings)
         }
+    }
+
+
+
+
+    fun setIsUserFollowed(value: Boolean){
+        UiThreadStatement.runOnUiThread { isUserFollowed.value = value }
+    }
+
+     override fun isUserFollowed(): CompletableFuture<Boolean> {
+        return CompletableFuture.completedFuture(isUserFollowed.value)
+    }
+
+    override fun follow(): CompletableFuture<Boolean> {
+        isUserFollowed.value = true
+        return CompletableFuture.completedFuture(true)
+    }
+
+    override fun unfollow(): CompletableFuture<Boolean> {
+        isUserFollowed.value = false
+        return CompletableFuture.completedFuture(true)
     }
 
 

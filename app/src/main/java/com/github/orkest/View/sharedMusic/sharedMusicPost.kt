@@ -16,8 +16,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.github.orkest.Constants
 import com.github.orkest.Model.Profile
 import com.github.orkest.Model.Song
 import com.github.orkest.R
@@ -36,13 +38,14 @@ private val roundedCornerValue = 10.dp
  *
  * This only represents the UI and the parameters can be adapted to what will be implemented in the backend
  */
+
 @Composable
 fun sharedMusicPost(profile: Profile, song: Song, message: String) {
     Row(modifier = Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(paddingValue)
+                .padding(start = paddingValue, top = paddingValue, end = paddingValue)
                 .clip(shape = RoundedCornerShape(20.dp))
                 .background(Color.DarkGray)
         ) {

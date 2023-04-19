@@ -3,6 +3,7 @@ package com.github.orkest.View.sharedMusic
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.orkest.Constants
 import com.github.orkest.Model.Profile
 import com.github.orkest.Model.Song
 import com.github.orkest.View.sharing.ui.theme.OrkestTheme
@@ -19,7 +20,7 @@ class SharedMusicPostUITest {
 
     @Before
     fun setUp(){
-        val song = Song("Bad boy", "Rihanna", "Rated R")
+        val song = Constants.DUMMY_RUDE_BOY_SONG
         val message = "It's amazing."
         val profile = Profile(username = "JohnDoe")
 
@@ -41,7 +42,7 @@ class SharedMusicPostUITest {
     // Test if the song name, author, and album are displayed correctly
     @Test
     fun songInfoAreDisplayed(){
-        composeTestRule.onNodeWithText("Bad boy")
+        composeTestRule.onNodeWithText("Rude Boy")
             .assertIsDisplayed()
         composeTestRule.onNodeWithText("Rihanna (Rated R)")
             .assertIsDisplayed()

@@ -1,5 +1,6 @@
 package com.github.orkest.View.profile
 
+import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -29,6 +30,7 @@ import com.github.orkest.View.NavDrawerButton
 import kotlinx.coroutines.CoroutineScope
 import com.github.orkest.ViewModel.profile.ProfileViewModel
 import androidx.compose.ui.graphics.Color
+import com.github.orkest.View.FollowListActivity
 import com.github.orkest.View.auth.AuthActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -86,8 +88,8 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
                     horizontalArrangement = Arrangement.SpaceBetween
                 ){
                     //Separate followers/followings in an even way
-                    Column(modifier = Modifier.weight(1f)) { NbFollowers(number(viewModel.nbFollowers.observeAsState().value)) }
-                    Column(modifier = Modifier.weight(1f)) { NbFollowings(number(viewModel.nbFollowings.observeAsState().value)) }
+                    Column(modifier = Modifier.weight(1f)) { NbFollowers(number(viewModel.nbFollowers.observeAsState().value), viewModel.user) }
+                    Column(modifier = Modifier.weight(1f)) { NbFollowings(number(viewModel.nbFollowings.observeAsState().value), viewModel.user) }
                 }
                 Description(viewModel.bio.observeAsState().value)
             }
@@ -197,21 +199,42 @@ fun number(nb: Int?): Int{
 }
 
 @Composable
-fun NbFollowers(nb: Int){
+fun NbFollowers(nb: Int, username: String){
+    val context = LocalContext.current
     ClickableText(
         text = AnnotatedString(if (nb > 1) "$nb\nfollowers" else "$nb\nfollower"),
-        onClick = {},
+        onClick = {
+            val intent = Intent(context, FollowListActivity::class.java)
+            intent.putExtra("username", username)
+            intent.putExtra("isFollowers", true)
+            context.startActivity(intent)
+        },
         style = TextStyle( fontSize = fontSize )
     )
 }
 
 @Composable
-fun NbFollowings(nb: Int){
+fun NbFollowings(nb: Int, username: String){
+    val context = LocalContext.current
     ClickableText(
         text = AnnotatedString(if (nb > 1) "$nb\nfollowings" else "$nb\nfollowing"),
-        onClick = {},
+        onClick = {
+            val intent = Intent(context, FollowListActivity::class.java)
+            intent.putExtra("username", username)
+            intent.putExtra("isFollowers", false)
+            context.startActivity(intent)
+        },
         style = TextStyle( fontSize = fontSize )
     )
+}
+
+fun launchFollowListActivity(context: Context, isFollowers: Boolean){
+
+    val intent = Intent(context, FollowListActivity::class.java)
+    //intent.putExtra("username", username)
+    intent.putExtra("isFollowers", false)
+    context.startActivity(intent)
+
 }
 
 @Composable

@@ -23,9 +23,7 @@
             android:theme="@style/Theme.Orkest">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <data android:mimeType="text/plain" />
                 <data android:mimeType="image/*" />
             </intent-filter>
@@ -37,6 +35,9 @@
             android:name=".View.feed.CommentActivity"
             android:exported="true" />
         <activity android:name=".View.profile.ProfileActivity" /> <!-- "adjustResize": to be able to scroll on the screen -->
+        <activity
+            android:name=".View.FollowListActivity"
+            android:exported="true" />
         <activity
             android:name=".View.EditProfileActivity"
             android:exported="false"

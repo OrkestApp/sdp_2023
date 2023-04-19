@@ -2,6 +2,7 @@ package com.github.orkest.View
 
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -30,11 +31,16 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material.DrawerValue
 import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.Preview
+import com.github.orkest.Constants
+import com.github.orkest.Model.FireStoreDatabaseAPI
 import com.github.orkest.View.theme.OrkestTheme
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 const val PADDING_FROM_SCREEN_BORDER = 10
+
+private val updatedData = mutableMapOf<String, Any>()
 
 class EditProfileActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,13 +72,11 @@ fun EditProfileSetting(content: @Composable () -> Unit) {
 /**
  * Principal function in which we build the general structure of the activity
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileScreen(activity: ComponentActivity) {
 
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
-
 
     Scaffold(
         // keep track of the state of the scaffold (whether it is opened or closed)
@@ -163,7 +167,11 @@ fun TopBar(activity: ComponentActivity, coroutineScope: CoroutineScope, scaffold
                 // "save" clickable text (button)
                 Text(
                     text = "Save",
-                    modifier = Modifier.clickable { /* TODO */ },
+                    modifier = Modifier.clickable {
+
+                        val username = Constants.CURRENT_LOGGED_USER
+                        FireStoreDatabaseAPI().updateUserProfile(username, updatedData)
+                    },
                     fontSize = 20.sp
                 )
             }
@@ -173,8 +181,6 @@ fun TopBar(activity: ComponentActivity, coroutineScope: CoroutineScope, scaffold
         }
     )
 }
-
-
 
 /**
  * The larger part of the screen containing the fields to modify textual information
@@ -288,6 +294,8 @@ fun EditBio() {
             modifier = Modifier.height(150.dp)
         )
     }
+
+    updatedData.put("profile.bio", bio)
 }
 
 // TODO: transform this into a class since it is something that could be reusable?

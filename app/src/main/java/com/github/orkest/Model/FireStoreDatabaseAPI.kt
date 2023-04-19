@@ -1,5 +1,6 @@
 package com.github.orkest.Model
 
+import android.annotation.SuppressLint
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
@@ -7,14 +8,13 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.google.gson.GsonBuilder
-import com.google.gson.reflect.TypeToken
 import java.time.LocalDateTime
 import java.util.concurrent.CompletableFuture
 
 class FireStoreDatabaseAPI {
 
     companion object{
+        @SuppressLint("StaticFieldLeak")
         val db = Firebase.firestore
     }
 
@@ -71,11 +71,19 @@ class FireStoreDatabaseAPI {
             else {
                 future.completeExceptionally(java.lang.IllegalStateException("2 user with the same name in the database"))
             }
-
             future
         }
+    }
 
-
+    fun updateUserProfile(username : String, updatedData: Map<String, Any>){
+        val document = getUserDocumentRef(username)
+        document.update(updatedData)
+            .addOnSuccessListener {
+                Log.d("ProfileUpdate", "User profile updated successfully.")
+            }
+            .addOnFailureListener { e ->
+                Log.w("ProfileUpdate", "Error updating user profile.", e)
+            }
     }
 
     /**

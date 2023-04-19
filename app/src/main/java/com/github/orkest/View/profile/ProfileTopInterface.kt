@@ -1,6 +1,9 @@
 package com.github.orkest.View.profile
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Intent
+import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -30,6 +33,9 @@ import com.github.orkest.View.EditProfileActivity
 import com.github.orkest.View.MainActivity
 import com.github.orkest.ViewModel.profile.ProfileViewModel
 import androidx.compose.ui.graphics.Color
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat.getSystemService
 import com.github.orkest.View.auth.AuthActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -91,6 +97,34 @@ fun ProfileTopInterface(viewModel: ProfileViewModel) {
                 val auth = FirebaseAuth.getInstance()
                 val intent = Intent(context, AuthActivity::class.java)
                 auth.signOut()
+
+                //notification
+
+                // Create an explicit intent for an Activity in your app
+                val intent = Intent(this, AlertDetails::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                }
+                val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+
+                val builder = NotificationCompat.Builder(this, CHANNEL_ID)
+                    .setSmallIcon(R.drawable.notification_icon)
+                    .setContentTitle("My notification")
+                    .setContentText("Hello World!")
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    // Set the intent that will fire when the user taps the notification
+                    .setContentIntent(pendingIntent)
+                    .setAutoCancel(true)
+
+                with(NotificationManagerCompat.from(this)) {
+                    // notificationId is a unique int for each notification that you must define
+                    notify(notificationId, builder.build())
+                }
+
+
+
+                //
+
+
                 //uncomment if un-caching is needed
                 GoogleSignIn.getClient(context, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut()
                 context.startActivity(intent)
@@ -98,6 +132,24 @@ fun ProfileTopInterface(viewModel: ProfileViewModel) {
         }
     }
 }
+
+private fun createNotificationChannel() {
+    // Create the NotificationChannel, but only on API 26+ because
+    // the NotificationChannel class is new and not in the support library
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val name = getString(R.string.channel_name)
+        val descriptionText = getString(R.string.channel_description)
+        val importance = NotificationManager.IMPORTANCE_DEFAULT
+        val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
+            description = descriptionText
+        }
+        // Register the channel with the system
+        val notificationManager: NotificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
+    }
+}
+
 
 /**
  * The button to sign out of the app

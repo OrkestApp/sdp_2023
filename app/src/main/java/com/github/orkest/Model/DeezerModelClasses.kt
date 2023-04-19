@@ -14,4 +14,9 @@ class DeezerModelClasses {
     data class Album(val id: String , val title:String, val cover :String, val cover_small:String,
                      val cover_medium:String, val cover_big:String, val cover_xl:String, val md5_image:String,
                      val tracklist:String, val type:String)
+
+
+
 }
+
+data class ListTrack(val data: List<DeezerModelClasses.Track>, val total : Int, val next:String)

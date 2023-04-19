@@ -8,8 +8,10 @@ class DeezerApiIntegrationTest {
 
     @Test
     fun JSONresponseIsParsedCorrectly(){
-        val value = DeezerApiIntegration().searchSongInDeezerDatabse("pettite fille").get()
+        val value = DeezerApiIntegration().searchSongInDeezerDatabse("petite fille").get()
+        print(value.data[0])
 
-        Assert.assertEquals("hello",value.toString())
+        Assert.assertEquals("Petite fille",value.data[0].title)
+        Assert.assertEquals("Booba",value.data[0].artist.name)
     }
 }

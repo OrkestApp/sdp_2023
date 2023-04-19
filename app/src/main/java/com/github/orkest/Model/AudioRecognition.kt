@@ -157,11 +157,9 @@ class AudioRecognition {
 
             other as AudioChunk
 
-            if (!buffer.contentEquals(other.buffer)) return false
-            if (meaningfulLengthInBytes != other.meaningfulLengthInBytes) return false
-            if (timestamp != other.timestamp) return false
-
-            return true
+            return buffer.contentEquals(other.buffer) &&
+                    meaningfulLengthInBytes == other.meaningfulLengthInBytes &&
+                    timestamp == other.timestamp
         }
 
         override fun hashCode(): Int {

@@ -1,60 +1,83 @@
 package com.github.orkest.View
 
+import android.content.Intent
+import androidx.compose.ui.test.*
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithContentDescription
-import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.core.app.launchActivity
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.Intents.intended
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
+import androidx.test.espresso.matcher.ViewMatchers.assertThat
+import androidx.test.espresso.matcher.ViewMatchers.withContentDescription
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.orkest.Model.FireStoreDatabaseAPI
 import com.github.orkest.Model.Profile
 import com.github.orkest.Model.User
 import com.github.orkest.R
+import com.github.orkest.View.profile.ProfileActivity
+import com.github.orkest.View.theme.OrkestTheme
 import com.github.orkest.ViewModel.FollowListViewModel
+import junit.framework.TestCase.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 
-class FollowListUITest {
+@RunWith(AndroidJUnit4::class)
+class FollowListActivityTest {
 
-    private lateinit var viewModel: FollowListViewModel
-
-    private val user1 = User(
-        username = "user1",
-        profile = Profile(username = "user1", profilePictureId = R.drawable.profile_picture, nbFollowers = 2, nbFollowings = 1 ),
-        followers = mutableListOf("user2", "user3"),
-        followings = mutableListOf("user3")
-    )
-    private val user2 = User(
-        username = "user2",
-        profile = Profile(username = "user2", profilePictureId = R.drawable.powerrangerblue, nbFollowers = 1, nbFollowings = 0 ),
-        followers = mutableListOf("user1"),
-        followings = mutableListOf()
-    )
-    private val user3 = User(
-        username = "user3",
-        profile = Profile(username = "user3", profilePictureId = R.drawable.blank_profile_pic, nbFollowers = 1, nbFollowings = 1 ),
-        followers = mutableListOf("user1"),
-        followings = mutableListOf("user1")
-    )
+    private lateinit var intent: Intent
 
     @get:Rule
-    var composeTestRule =  createComposeRule()
+    val composeTestRule = createAndroidComposeRule<FollowListActivity>()
 
     @Before
     fun setUp(){
-        val dbAPI = FireStoreDatabaseAPI()
-        dbAPI.addUserInDatabase(user1).get()
-        dbAPI.addUserInDatabase(user2).get()
-        dbAPI.addUserInDatabase(user3).get()
+        intent = Intent(ApplicationProvider.getApplicationContext(), FollowListActivity::class.java)
+        intent.putExtra("username", "Philippe")
+    }
+
+    @Test
+    fun backButton_navigatesBack() {
+        Intents.init()
+        // Click the back button
+        composeTestRule.onNodeWithContentDescription("Back button").performClick()
+        // Check if the Profile Activity has been launched
+        intended(hasComponent(ProfileActivity::class.java.name))
+        Intents.release()
+    }
+
+    @Test
+    fun displayFollowersList() {
+        // Launch the activity with the followers parameter
+        intent.putExtra("isFollowers", true)
+        val scenario = launchActivity<FollowListActivity>(intent)
+
+        // Check that the "Followers" text is displayed
+        composeTestRule.onNodeWithText("Followers").assertExists()
+        scenario.close()
+    }
+
+    @Test
+    fun displayFollowingsList() {
+        // Launch the activity with the followings parameter
+        intent.putExtra("isFollowers", false)
+        val scenario = launchActivity<FollowListActivity>(intent)
+
+        // Check that the "Followings" text is displayed
+        composeTestRule.onNodeWithText("Followings").assertExists()
+        scenario.close()
     }
 
 
     @Test
-    fun back_button_navigates_to_profile_activity() {
-        composeTestRule.setContent { FollowListActivity() }
-        // Click on the back button
-        composeTestRule.onNodeWithContentDescription("Back button").performClick()
-        // Check that the ProfileActivity is launched
-        composeTestRule.onNodeWithText("ProfileActivity").assertExists()
+    fun displayPreviewProfiles() {
+        // Check that there are 3 profile previews displayed
+        composeTestRule.onAllNodesWithContentDescription("Contact profile picture").assertCountEquals(3)
+        composeTestRule.onAllNodesWithText("Philippe").assertCountEquals(3)
     }
-
 }

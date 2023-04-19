@@ -35,7 +35,15 @@ import com.github.orkest.View.sharing.ui.theme.OrkestTheme
 import com.github.orkest.ViewModel.FollowListViewModel
 import com.github.orkest.R
 
+//Here for preview purposes. Will be deleted.
 val user = User(username = "Philippe", profile = Profile(profilePictureId = R.drawable.blank_profile_pic))
+
+/**
+ * This activity is launched when a user wants to display the list of followers or followings of another user (or himself)
+ * Two extras are sent with the intent to launch the activity
+ * username : String = The username of the user to which we want to access the follow lists
+ * isFollowers : Boolean = Whether it is the followers list we want to display or the followings list
+ */
 class FollowListActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +52,6 @@ class FollowListActivity: ComponentActivity() {
             val isFollowers = intent.getBooleanExtra("isFollowers", false)
             OrkestTheme {
                 FollowList(viewModel = FollowListViewModel(username, isFollowers))
-                //FollowListScreen(FollowListViewModel(username, isFollowers))
             }
         }
     }
@@ -60,6 +67,7 @@ fun FollowList(viewModel: FollowListViewModel){
         ) {
             val context = LocalContext.current
             IconButton(onClick = {
+                // Gets back to the profile page of the user
                 val intent = Intent(context, ProfileActivity::class.java)
                 intent.putExtra("username", viewModel.username)
                 context.startActivity(intent)})
@@ -88,9 +96,10 @@ fun FollowList(viewModel: FollowListViewModel){
         Spacer(modifier = Modifier.height(10.dp))
 
         //Here only to show the feature. Will be deleted.
-        CreateProfilePreview(user = user)
-        CreateProfilePreview(user = user)
-        CreateProfilePreview(user = user)
+        repeat(3){
+            CreateProfilePreview(user = user)
+        }
+
     }
 }
 
@@ -187,7 +196,7 @@ fun UserListItem(user: User, intent: Intent){
         .fillMaxSize()){
 
         Image(
-            painter = painterResource(R.drawable.blank_profile_pic), // TODO A CHANGER
+            painter = painterResource(user.profile.profilePictureId),
             contentDescription = "Profile picture",
             modifier = Modifier
                 .size(40.dp)

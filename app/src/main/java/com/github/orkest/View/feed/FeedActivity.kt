@@ -13,9 +13,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.Comment
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -33,7 +30,6 @@ import com.github.orkest.Constants
 import com.github.orkest.Model.*
 import com.github.orkest.R
 import com.github.orkest.ViewModel.post.PostViewModel
-import java.time.LocalDateTime
 
 
 /**
@@ -205,16 +201,17 @@ private fun SongInfo(song: Song){
 
 @Composable
 private fun PlayButton(song: Song){
+    val isPlayed = remember { mutableStateOf(false) }
     val context = LocalContext.current
-    Icon(painter = painterResource(id = R.drawable.play_button),
-        contentDescription = "Play button",
+    Icon(painter = if (!isPlayed.value) painterResource(id = R.drawable.play_button)
+                    else painterResource(id = R.drawable.pause_button),
+        contentDescription = if (!isPlayed.value) "Play button" else "Pause button",
         modifier = Modifier
             .height(50.dp)
             .width(50.dp)
             .clip(shape = RoundedCornerShape(10.dp))
             .clickable {
-                if (Constants.CURRENT_USER_PROVIDER == Providers.SPOTIFY)
-                    PlaySpotify.play(context, PlaySpotify.songToUri(song))
+                Constants.playMusicButtonClicked(song, isPlayed)
             })
 }
 
@@ -250,13 +247,6 @@ private fun Reaction(post: Post){
 }
 
 /* TODO modularize in next sprint */
-
-/*
-@Composable
-private fun CommentButton(post: Post) {
-
-}
-*/
 
 @Composable
 private fun ReactionIcon(iconId: Int, contentDescription:String, testTag: String) {

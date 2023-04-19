@@ -6,28 +6,36 @@ import com.spotify.android.appremote.api.ConnectionParams
 import com.spotify.android.appremote.api.Connector
 import com.spotify.android.appremote.api.SpotifyAppRemote
 import com.spotify.protocol.types.PlayerState
-import com.spotify.protocol.types.Uri
 
-class PlaySpotify {
-
-
-
+open class PlaySpotify {
 
     companion object {
         private const val CLIENT_ID = "e7ac920406d54975bc79962dec94f4ab"
         private const val REDIRECT_URI = "https://com.github.orkest/callback/"
         private var mSpotifyAppRemote: SpotifyAppRemote? = null
 
-        fun songToUri(song: Song): String {
+        /**
+         * This method is used to convert a song to a Spotify uri
+         * @param song the song to convert
+         */
+        private fun songToUri(song: Song): String {
+            //TODO: Once the export is complete, should get the song's uri from the database
             return "spotify:track:6rqhFgbbKwnb9MLmUQDhG6"
         }
 
-        fun playlistToUri(playlist: List<Song>): List<String> {
+        /**
+         * This method is used to convert a playlist to a list of Spotify uris
+         * @param playlist the playlist to convert
+         */
+        private fun playlistToUri(playlist: List<Song>): List<String> {
             return playlist.map { songToUri(it) }
         }
 
-
-        fun play(context: Context, songUri: String) {
+        /**
+         * This method is used to connect to the Spotify API App Remote
+         * @param context the context of the activity
+         */
+        fun setupSpotifyAppRemote(context: Context) {
             val connectionParams = ConnectionParams.Builder(CLIENT_ID)
                 .setRedirectUri(REDIRECT_URI)
                 .showAuthView(true)
@@ -38,34 +46,22 @@ class PlaySpotify {
                     override fun onConnected(spotifyAppRemote: SpotifyAppRemote) {
                         mSpotifyAppRemote = spotifyAppRemote
                         Log.d("PlaySpotify", "Connected! Yay!")
-
-                        // Now you can start interacting with App Remote
-                        connected(songUri)
                     }
 
                     override fun onFailure(throwable: Throwable) {
                         Log.e("MyActivity", throwable.message, throwable)
-
                         // Something went wrong when attempting to connect! Handle errors here
                     }
                 })
         }
 
-        private fun connected(uri: String) {
+        /**
+         * This method is used to play a song
+         */
+        fun play(song: Song) {
             // Play a playlist
-           // mSpotifyAppRemote!!.playerApi.play(uri)//"spotify:playlist:37i9dQZF1DX2sUQwD7tbmL")
-
-            mSpotifyAppRemote!!.playerApi.play("spotify:playlist:37i9dQZF1DX2sUQwD7tbmL")
-
-            // Subscribe to PlayerState
-            mSpotifyAppRemote!!.playerApi
-                .subscribeToPlayerState()
-                .setEventCallback { playerState: PlayerState ->
-                    val track = playerState.track
-                    if (track != null) {
-                        Log.d("MainActivity", track.name + " by " + track.artist.name)
-                    }
-                }
+            val uri = songToUri(song)
+            mSpotifyAppRemote?.playerApi?.play(uri)
         }
     }
 }

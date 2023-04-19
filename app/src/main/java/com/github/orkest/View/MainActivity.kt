@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.compose.rememberNavController
 import com.github.orkest.Constants
+import com.github.orkest.Model.PlaySpotify
 
 
 class MainActivity : AppCompatActivity() {
@@ -19,5 +20,10 @@ class MainActivity : AppCompatActivity() {
             }
             NavigationBar.CreateNavigationBar(navController = rememberNavController(), Constants.CURRENT_LOGGED_USER)
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        PlaySpotify.setupSpotifyAppRemote(this)
     }
 }

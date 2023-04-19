@@ -1,8 +1,10 @@
 package com.github.orkest
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import com.github.orkest.Model.PlaySpotify
 import com.github.orkest.Model.Providers
 import com.github.orkest.Model.Song
 import java.time.LocalDateTime
@@ -13,6 +15,8 @@ import java.time.ZoneId
  */
 class Constants {
     companion object{
+        var TESTING = false
+
         //TODO: Need to set this value on sign in
         var CURRENT_USER_PROVIDER: Providers = Providers.SPOTIFY
         private var currentLoggedUser: String = ""
@@ -31,6 +35,18 @@ class Constants {
 
         val DUMMY_LAST_CONNECTED_TIME: LocalDateTime =
             LocalDateTime.of(2021, 5, 1, 12, 0)
+
+        /**
+         * Function to play a song on the user's provider app
+         */
+        fun playMusicButtonClicked(song: Song, isPlayed: MutableState<Boolean>) {
+            if (Constants.CURRENT_USER_PROVIDER == Providers.SPOTIFY)
+                PlaySpotify.play(song)
+
+            isPlayed.value = !isPlayed.value
+
+            //TODO: Add the functionality for other providers
+        }
 
     }
 }

@@ -51,7 +51,7 @@ internal class FeedActivityKtTest {
 
     @Test
     fun playButtonDisplaysAndClick(){
-        composeTestRule.onAllNodesWithContentDescription("Play Button")
+        composeTestRule.onAllNodesWithContentDescription("Play button").assertCountEquals(1)
             .assertAll(isEnabled()).assertAll(hasClickAction())
     }
 
@@ -71,6 +71,20 @@ internal class FeedActivityKtTest {
         composeTestRule.onAllNodesWithTag("comment_button").assertAll(hasClickAction())
         composeTestRule.onAllNodesWithTag("like_button").assertAll(hasClickAction())
         composeTestRule.onAllNodesWithTag("share_button").assertAll(hasClickAction())
+    }
+
+    @Test
+    fun pauseButtonChangesToPlayButton(){
+        composeTestRule.onNodeWithContentDescription("Play button").performClick()
+        composeTestRule.onNodeWithContentDescription("Pause button").assertIsDisplayed().performClick()
+        composeTestRule.onNodeWithContentDescription("Play button").assertIsDisplayed()
+
+    }
+
+    @Test
+    fun playButtonChangesToPauseButton(){
+        composeTestRule.onNodeWithContentDescription("Play button").performClick()
+        composeTestRule.onNodeWithContentDescription("Pause button").assertIsDisplayed()
     }
 
     /*@Test

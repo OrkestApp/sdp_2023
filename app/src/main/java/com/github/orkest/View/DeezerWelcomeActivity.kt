@@ -11,23 +11,28 @@ import androidx.compose.material.TextField
 import androidx.compose.material3.Button
 import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.Preview
+import com.github.orkest.Constants
+import com.github.orkest.Model.FireStoreDatabaseAPI
 
 class DeezerWelcomeActivity : AppCompatActivity(){
+
+    private var code =""
+    private var username = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val intent: Intent = intent
-        val deepLink: String = intent.getData().toString()
+        val deepLink: String = intent.data.toString()
 
-// Parse the deep link into a Uri object
 
-// Parse the deep link into a Uri object
         val uri: Uri = Uri.parse(deepLink)
 
-// Get the value of a query parameter
 
-// Get the value of a query parameter
-        val param1Value: String? = uri.getQueryParameter("param1")
+        val codeValue: String? = uri.getQueryParameter("code")
+        val future = FireStoreDatabaseAPI().storeTokenInDatabase(Constants.currentLoggedUser,codeValue)
+        if (codeValue != null) {
+            code = codeValue
+        }
 
         setContent {
             createViewForDeezer()
@@ -39,7 +44,7 @@ class DeezerWelcomeActivity : AppCompatActivity(){
     fun createViewForDeezer(){
         var text by remember { mutableStateOf("Enter userName ") }
         Column() {
-            TextField(value = text, onValueChange = { text = it})
+            TextField(value = text, onValueChange = { text = it; username=it})
             Button(onClick = { saveTokenInDatabase(); launchMainActivity()}, content = { Text("Start to use Deezer")})
 
         }

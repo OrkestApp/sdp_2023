@@ -31,6 +31,9 @@ import com.github.orkest.View.NavDrawerButton
 import kotlinx.coroutines.CoroutineScope
 import com.github.orkest.ViewModel.profile.ProfileViewModel
 import androidx.compose.ui.graphics.Color
+import androidx.core.content.ContextCompat.startActivity
+import com.github.orkest.Model.DeezerApiIntegration
+import com.github.orkest.Model.FireStoreDatabaseAPI
 import com.github.orkest.View.auth.AuthActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -115,6 +118,19 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
                         GoogleSignIn.getClient(context, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut()
                         context.startActivity(intent)
                     }
+                    //
+                    Button(
+                        onClick = {
+
+                            val intent = Intent(Intent.ACTION_VIEW,DeezerApiIntegration.url)
+                            context.startActivity(intent)
+
+
+                        },
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color.Yellow))
+                    {
+                        Text("Link Deezer Account")
+                    }
                 }
             } else {
                 FollowButton(viewModel, viewModel.isUserFollowed.observeAsState().value)
@@ -123,6 +139,11 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
 
 
     }
+}
+
+
+private fun launchDeezerAuth(){
+
 }
 
 /**

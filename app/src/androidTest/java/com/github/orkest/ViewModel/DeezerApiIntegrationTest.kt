@@ -1,5 +1,6 @@
 package com.github.orkest.ViewModel
 
+import android.util.Log
 import com.github.orkest.Model.DeezerApiIntegration
 import com.github.orkest.Model.DeezerModelClasses
 import com.github.orkest.Model.FireStoreDatabaseAPI
@@ -25,6 +26,24 @@ class DeezerApiIntegrationTest {
 
         Assert.assertEquals("Petite fille",value.data[0].title)
         Assert.assertEquals("Booba",value.data[0].artist.name)
+    }
+
+    /**
+     * tested
+     */
+    fun JsonResponseforUSerId(){
+        val value = DeezerApiIntegration().addANewSongToOrkestPlayList("frsizHK2HlrzljGuf9s09gV0sF1Wbf7fWCnQe4w1wFbDI0zCkqV","11300267884","1999525067").get()
+        Log.d("HELLO", value.toString())
+
+    }
+
+    /**
+     * tested
+     */
+    fun createPlaylist(){
+        val value = DeezerApiIntegration().createANewPlaylistOnTheUserProfile("2297625024","frsizHK2HlrzljGuf9s09gV0sF1Wbf7fWCnQe4w1wFbDI0zCkqV").get()
+        Log.d("HELLO", value.toString())
+
     }
 
     /**

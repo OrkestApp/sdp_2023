@@ -46,7 +46,7 @@ internal class FeedActivityKtTest {
 
     @Test
     fun playButtonDisplaysAndClick(){
-        composeTestRule.onAllNodesWithContentDescription("Play button").assertCountEquals(1)
+        composeTestRule.onAllNodesWithContentDescription("Play button").assertCountEquals(2)
             .assertAll(isEnabled()).assertAll(hasClickAction())
     }
 

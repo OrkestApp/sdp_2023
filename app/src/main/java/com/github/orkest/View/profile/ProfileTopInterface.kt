@@ -118,7 +118,8 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
                         auth.signOut()
 
                         //notification
-                        Notification().sendNotificationSignOut(context, "Orkest", "You've signed out ;)", "channel_id_signout")
+                        Notification().sendNotification(context, "Orkest", "You've signed out ;)",
+                            "channel_id_signout", "channel_name_signout", 0)
 
                         //uncomment if un-caching is needed
                         GoogleSignIn.getClient(context, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut()

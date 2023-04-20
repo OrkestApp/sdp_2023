@@ -68,13 +68,15 @@ class Notification {
     }
 
     /**
-     * Send a Notification for the user when signing out
-     * This is an example to later finish developing the notifications
+     * Send a Notification to the user
+     * This is the method to send notifications
+     * channelName and notificationId should be unique for each notification usage
      */
-    fun sendNotificationSignOut(context: Context, title: String, message: String, channelId: String) {
+    fun sendNotification(context: Context, title: String, message: String,
+                                channelId: String, channelName: String, notificationId: Int) {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        val channel = NotificationChannel(channelId, "Sign Out Channel", NotificationManager.IMPORTANCE_DEFAULT)
+        val channel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_DEFAULT)
         notificationManager.createNotificationChannel(channel)
 
         val notificationBuilder = NotificationCompat.Builder(context, channelId)
@@ -82,8 +84,9 @@ class Notification {
             .setContentText(message)
             .setSmallIcon(android.R.drawable.ic_dialog_info)
 
-        notificationManager.notify(Random.nextInt(1000000), notificationBuilder.build())
+        notificationManager.notify(notificationId, notificationBuilder.build())
 
         Log.d("Notification",title)
     }
 }
+

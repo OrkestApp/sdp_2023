@@ -1,12 +1,11 @@
 package com.github.orkest.Model
 
+import android.content.Intent
 import android.net.Uri
-import android.util.Log
+import com.google.gson.Gson
 import java.net.HttpURLConnection
 import java.net.URL
-import org.json.JSONArray
 import java.util.concurrent.CompletableFuture
-import com.google.gson.Gson
 
 class DeezerApiIntegration {
     companion object {
@@ -25,10 +24,12 @@ class DeezerApiIntegration {
     }
 
     /**
-     * Fetch in the deezer
+     * Fetch in the deezer API all the songs that matches the title we gave
      */
     fun searchSongInDeezerDatabse(songName: String? , artistName:String = ""): CompletableFuture<ListTrack>{
         val completableFuture = CompletableFuture<ListTrack>()
+
+        //Need to be on an other Thread because if on the main Thread would block the UI
         Thread{
             val connection = URL("https://api.deezer.com/search/track?q=$songName $artistName").openConnection() as HttpURLConnection
             connection.requestMethod = "GET"
@@ -41,7 +42,7 @@ class DeezerApiIntegration {
                 val trackList = json.fromJson(response,ListTrack::class.java)
                 completableFuture.complete(trackList)
             } else {
-                // Handle the error case here...
+                // TODO  Handle the error case here...
             }
         }.start()
 
@@ -49,7 +50,53 @@ class DeezerApiIntegration {
 
     }
 
-    fun launchDeezerToPlaySong(id:String){
+    fun searchPlaylistInDatabase(playlistName:String):{
+        Thread{
+            val connection = URL("https://api.deezer.com/search/track?q=$playlistName").openConnection() as HttpURLConnection
+            connection.requestMethod = "GET"
+
+            val responseCode = connection.responseCode
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                val inputStream = connection.inputStream
+                val response = inputStream.bufferedReader().use { it.readText() }
+                val json = Gson()
+                val trackList = json.fromJson(response,ListTrack::class.java)
+                completableFuture.complete(trackList)
+            } else {
+                // TODO  Handle the error case here...
+            }
+        }.start()
+
+        return completableFuture
+    }
+
+    fun launchDeezerToPlayAPlaylist(playlistId : String) : Intent{
+        val intent = CompletableFuture<Intent>()
+        val uri = Uri.parse("http://www.deezer.com/track/$playlistId")
+        return Intent(Intent.ACTION_VIEW, uri)
+
+
+
 
     }
+
+
+
+
+
+    fun launchDeezerToPlaySong(songName: String?, artistName: String): CompletableFuture<Intent> {
+
+        val intent = CompletableFuture<Intent>()
+        searchSongInDeezerDatabse(songName,artistName).thenAccept {
+            val trackId = it.data[0].id
+            val uri = Uri.parse("http://www.deezer.com/track/$trackId")
+            intent.complete(Intent(Intent.ACTION_VIEW, uri))
+
+        }
+        return intent
+
+
+        }
+
+
 }

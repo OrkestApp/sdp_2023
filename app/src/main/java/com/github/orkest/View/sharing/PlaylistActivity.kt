@@ -23,12 +23,12 @@ import com.spotify.android.appremote.api.ConnectionParams
 import com.spotify.android.appremote.api.Connector
 import com.spotify.android.appremote.api.SpotifyAppRemote
 
+/*
+    * This class is used to display the list of songs that the user share with other users.
+ */
 class PlaylistActivity() : ComponentActivity() {
 
-    companion object {
-        private const val CLIENT_ID = "e7ac920406d54975bc79962dec94f4ab"
-        private const val REDIRECT_URI = "https://com.github.orkest/callback/"
-    }
+//
 
     private val playlistViewModel = PlaylistViewModel()
     private var spotifySongId = ""
@@ -37,27 +37,7 @@ class PlaylistActivity() : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // -------Connect to Spotify AppRemote-------
-//        this.spotifySongId = intent.getStringExtra("songId") ?: "songId"
-//
-//        val connectionParams = ConnectionParams.Builder(CLIENT_ID)
-//            .setRedirectUri(REDIRECT_URI)
-//            .showAuthView(true)
-//            .build()
-//
-//        SpotifyAppRemote.connect(this, connectionParams,
-//            object : Connector.ConnectionListener {
-//                override fun onConnected(spotifyAppRemote: SpotifyAppRemote) {
-//                    mSpotifyAppRemote = spotifyAppRemote
-//                    Log.d("MainActivity", "Connected! Yay!")
-//                }
-//
-//                override fun onFailure(throwable: Throwable) {
-//                    Log.e("MyActivity", throwable.message, throwable)
-//
-//                    // Something went wrong when attempting to connect! Handle errors here
-//                }
-//            })
-
+        // TODO include spotify in addition to Deezer
 
         //--------Update Database---------
 
@@ -71,6 +51,7 @@ class PlaylistActivity() : ComponentActivity() {
                 Album = "Unknown Album",
                 URL = "Unknown ID")
 
+            // store song in a way that both users can see them in their pages
             playlistViewModel.storeSong(
                 song,
                 intent.getStringExtra("senderUsername") ?: "sender1",
@@ -83,7 +64,6 @@ class PlaylistActivity() : ComponentActivity() {
             )
 
         }
-
         //--------------UI----------------
         setContent {
             OrkestTheme {
@@ -100,7 +80,7 @@ class PlaylistActivity() : ComponentActivity() {
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colors.background
         ) {
-            
+
             Playlist(
                 this.playlistViewModel,
                 intent
@@ -114,7 +94,9 @@ class PlaylistActivity() : ComponentActivity() {
     }
 }
 
-
+/*
+    * This is a Composable that fetches the songs from the database and displays them.
+ */
 @Composable
 fun Playlist(playlistViewModel: PlaylistViewModel,
              senderUsername: String,
@@ -124,7 +106,6 @@ fun Playlist(playlistViewModel: PlaylistViewModel,
     val context = LocalContext.current
 
     var songList by remember { mutableStateOf(listOf<Song>()) }
-    Log.d("DEBUG PLAYLIST", "AAAAAAA")
     playlistViewModel.fetchSongs(senderUsername, receiverUsername)
         .whenComplete { songs, _ ->
             songs?.let {
@@ -138,10 +119,11 @@ fun Playlist(playlistViewModel: PlaylistViewModel,
             Row(modifier =
             Modifier.clickable {
                 // play song
-//                appRemote.playerApi.play("spotify:playlist:$spotifySongId")
-                val player = DeezerApiIntegration()
 
-                startActivity(context, player.launchDeezerToPlaySong(song.Title, song.Artist).get(), null)
+                // This will be adapted to check what is the music provider of the user
+                // play song on Deezer
+                val player = DeezerApiIntegration()
+                startActivity(context, player.launchDeezerToPlaySong(song.Title, song.Artist ?: "default").get(), null)
 
             }.fillMaxSize())
             {
@@ -150,7 +132,5 @@ fun Playlist(playlistViewModel: PlaylistViewModel,
             }
         }
     }
-
-
 }
 

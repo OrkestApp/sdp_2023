@@ -13,7 +13,7 @@ class DeezerApiIntegration {
         private  val DEEZER_TOKEN_URL = "https://connect.deezer.com/oauth/access_token.php"
         private  val CLIENT_ID = "592224"
         private  val CLIENT_SECRET = "7951a1e4171f70af65cae5c55fdd0e51"
-        private  val REDIRECT_URI = "http://10.0.17.226:5000/deezer"
+        private  val REDIRECT_URI = "http://172.20.10.3:5000/deezer"
 
         val url = Uri.parse(
             DEEZER_AUTH_URL +
@@ -87,7 +87,7 @@ class DeezerApiIntegration {
 
 
 
-    fun launchDeezerToPlaySong(songName: String?, artistName: String): CompletableFuture<Intent> {
+    fun launchDeezerToPlaySong(songName: String?, artistName: String=""): CompletableFuture<Intent> {
 
         val intent = CompletableFuture<Intent>()
         searchSongInDeezerDatabse(songName,artistName).thenAccept {

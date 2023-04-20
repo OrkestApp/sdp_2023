@@ -12,9 +12,14 @@ import androidx.compose.material3.Button
 import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.Preview
 import com.github.orkest.Constants
+import com.github.orkest.Model.DeezerApiIntegration
 import com.github.orkest.Model.FireStoreDatabaseAPI
 
 class DeezerWelcomeActivity : AppCompatActivity(){
+
+    /**
+     * This will be used later in the code
+     */
 
     private var code =""
     private var username = ""
@@ -46,7 +51,7 @@ class DeezerWelcomeActivity : AppCompatActivity(){
         var text by remember { mutableStateOf("Enter userName ") }
         Column() {
             TextField(value = text, onValueChange = { text = it; username=it})
-            Button(onClick = { saveTokenInDatabase(); launchMainActivity()}, content = { Text("Start to use Deezer")})
+            Button(onClick = { }, content = { Text("Start to use Deezer")})
 
         }
 

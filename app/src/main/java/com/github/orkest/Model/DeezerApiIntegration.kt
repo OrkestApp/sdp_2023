@@ -50,9 +50,10 @@ class DeezerApiIntegration {
 
     }
 
-    fun searchPlaylistInDatabase(playlistName:String):{
+    fun searchPlaylistInDatabase(playlistName:String):CompletableFuture<ListPlaylist>{
+        val playlistFuture = CompletableFuture<ListPlaylist>()
         Thread{
-            val connection = URL("https://api.deezer.com/search/track?q=$playlistName").openConnection() as HttpURLConnection
+            val connection = URL("https://api.deezer.com/search/playlist?q=$playlistName").openConnection() as HttpURLConnection
             connection.requestMethod = "GET"
 
             val responseCode = connection.responseCode
@@ -60,15 +61,17 @@ class DeezerApiIntegration {
                 val inputStream = connection.inputStream
                 val response = inputStream.bufferedReader().use { it.readText() }
                 val json = Gson()
-                val trackList = json.fromJson(response,ListTrack::class.java)
-                completableFuture.complete(trackList)
+                val playlist = json.fromJson(response,ListPlaylist::class.java)
+                playlistFuture.complete(playlist)
             } else {
                 // TODO  Handle the error case here...
             }
         }.start()
 
-        return completableFuture
+        return playlistFuture
     }
+
+
 
     fun launchDeezerToPlayAPlaylist(playlistId : String) : Intent{
         val intent = CompletableFuture<Intent>()

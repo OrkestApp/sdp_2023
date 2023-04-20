@@ -39,6 +39,7 @@ class DeezerWelcomeActivity : AppCompatActivity(){
         }
     }
 
+    //TODO compare typed username with Actual username
 
     @Composable
     fun createViewForDeezer(){

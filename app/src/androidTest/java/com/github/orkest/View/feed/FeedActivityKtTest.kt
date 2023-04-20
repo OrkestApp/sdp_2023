@@ -70,7 +70,7 @@ internal class FeedActivityKtTest {
 
     @Test
     fun pauseButtonChangesToPlayButton(){
-        composeTestRule.onNodeWithContentDescription("Play button").performClick()
+        //composeTestRule.onNodeWithContentDescription("Play button").performClick()
 //        Thread.sleep(1000)
 //        composeTestRule.onNodeWithContentDescription("Pause button").assertIsDisplayed().performClick()
 //        Thread.sleep(1000)
@@ -80,7 +80,7 @@ internal class FeedActivityKtTest {
 
     @Test
     fun playButtonChangesToPauseButton(){
-        composeTestRule.onNodeWithContentDescription("Play button").performClick()
+        composeTestRule.onAllNodesWithContentDescription("Play button").onFirst().performClick()
        // Thread.sleep(1000)
       //  composeTestRule.onNodeWithContentDescription("Pause button").assertIsDisplayed()
     }

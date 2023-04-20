@@ -75,12 +75,7 @@ class SearchViewModelTest {
         composeTestRule.onNodeWithContentDescription("Contact profile picture").assertIsDisplayed()
 
     }
-    @Test
-    fun DeezerTokenCorrectlyAddTokenInDb(){
-        val future =FireStoreDatabaseAPI().storeTokenInDatabase("hello","26")
 
-        future.thenAccept { Assert.assertEquals(true, it) }
-    }
 
     @Test
     fun whenFirstLettersOfUsernamesIsTypedDisplayCorrectUsers(){

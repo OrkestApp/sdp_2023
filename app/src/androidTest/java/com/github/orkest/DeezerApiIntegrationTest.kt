@@ -1,7 +1,12 @@
-package com.github.orkest.ViewModel
+package com.github.orkest
 
 import com.github.orkest.Model.DeezerApiIntegration
 import com.github.orkest.Model.DeezerModelClasses
+import com.github.orkest.Model.FireStoreDatabaseAPI
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.firestoreSettings
+import com.google.firebase.ktx.Firebase
 import org.junit.Assert
 import org.junit.Test
 
@@ -18,6 +23,35 @@ class DeezerApiIntegrationTest {
 
         Assert.assertEquals("Petite fille",value.data[0].title)
         Assert.assertEquals("Booba",value.data[0].artist.name)
+    }
+
+    /**
+     * need to be run with emulator
+     */
+    @Test
+    fun DeezerTokenCorrectlyAddTokenInDb(){
+        val dbase = FireStoreDatabaseAPI()
+        val db = FireStoreDatabaseAPI.db
+
+
+        try{
+
+            db.useEmulator("10.0.2.2", 8080)
+            db.firestoreSettings = firestoreSettings {
+                isPersistenceEnabled = false
+            }
+
+        }catch(e :java.lang.IllegalStateException) {
+
+        }
+        val mockUsername = "hello"
+        val future = dbase.storeTokenInDatabase(mockUsername,"26")
+
+        future.thenAccept {
+        Assert.assertEquals(db.collection("deezerToken").document(mockUsername).get(),
+            mapOf("token" to "26")
+        )
+            }
     }
 
     /**

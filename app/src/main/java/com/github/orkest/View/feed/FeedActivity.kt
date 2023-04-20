@@ -27,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.orkest.Constants
+import com.github.orkest.Model.*
 import com.github.orkest.Model.Post
 import com.github.orkest.Model.Song
 import com.github.orkest.R
@@ -179,7 +180,7 @@ fun SongCard(song: Song){
             Spacer(modifier = Modifier.width(5.dp))
 
             //Add a play button at the right of the card
-            PlayButton()
+            PlayButton(song)
         }
 }
 
@@ -211,14 +212,19 @@ private fun SongInfo(song: Song){
 }
 
 @Composable
-private fun PlayButton(){
-    Icon(painter = painterResource(id = R.drawable.play_button),
-        contentDescription = "Play button",
+private fun PlayButton(song: Song){
+    val isPlayed = remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    Icon(painter = if (!isPlayed.value) painterResource(id = R.drawable.play_button)
+                    else painterResource(id = R.drawable.pause_button),
+        contentDescription = if (!isPlayed.value) "Play button" else "Pause button",
         modifier = Modifier
             .height(50.dp)
             .width(50.dp)
             .clip(shape = RoundedCornerShape(10.dp))
-            .clickable { })
+            .clickable {
+                Constants.playMusicButtonClicked(song, isPlayed, context)
+            })
 }
 
 @Composable
@@ -253,13 +259,6 @@ private fun Reaction(post: Post){
 }
 
 /* TODO modularize in next sprint */
-
-/*
-@Composable
-private fun CommentButton(post: Post) {
-
-}
-*/
 
 @Composable
 private fun ReactionIcon(iconId: Int, contentDescription:String, testTag: String) {

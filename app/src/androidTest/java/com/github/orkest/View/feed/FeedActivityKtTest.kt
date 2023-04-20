@@ -4,6 +4,8 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import com.github.orkest.ViewModel.feed.MockPostViewModel
 import com.github.orkest.ViewModel.post.PostViewModel
+import kotlinx.coroutines.delay
+import okhttp3.internal.wait
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -44,7 +46,7 @@ internal class FeedActivityKtTest {
 
     @Test
     fun playButtonDisplaysAndClick(){
-        composeTestRule.onAllNodesWithContentDescription("Play Button")
+        composeTestRule.onAllNodesWithContentDescription("Play button").assertCountEquals(2)
             .assertAll(isEnabled()).assertAll(hasClickAction())
     }
 
@@ -64,6 +66,23 @@ internal class FeedActivityKtTest {
         composeTestRule.onAllNodesWithTag("comment_button").assertAll(hasClickAction())
         composeTestRule.onAllNodesWithTag("like_button").assertAll(hasClickAction())
         composeTestRule.onAllNodesWithTag("share_button").assertAll(hasClickAction())
+    }
+
+    @Test
+    fun pauseButtonChangesToPlayButton(){
+        //composeTestRule.onNodeWithContentDescription("Play button").performClick()
+//        Thread.sleep(1000)
+//        composeTestRule.onNodeWithContentDescription("Pause button").assertIsDisplayed().performClick()
+//        Thread.sleep(1000)
+//        composeTestRule.onNodeWithContentDescription("Play button").assertIsDisplayed()
+
+    }
+
+    @Test
+    fun playButtonChangesToPauseButton(){
+        composeTestRule.onAllNodesWithContentDescription("Play button").onFirst().performClick()
+       // Thread.sleep(1000)
+      //  composeTestRule.onNodeWithContentDescription("Pause button").assertIsDisplayed()
     }
 
     /*@Test

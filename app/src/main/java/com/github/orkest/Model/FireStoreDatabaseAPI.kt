@@ -2,14 +2,18 @@ package com.github.orkest.Model
 
 import android.annotation.SuppressLint
 import android.util.Log
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import io.reactivex.annotations.NonNull
 import java.time.LocalDateTime
 import java.util.concurrent.CompletableFuture
+
 
 class FireStoreDatabaseAPI {
 
@@ -75,6 +79,11 @@ class FireStoreDatabaseAPI {
         }
     }
 
+    /**
+     * @param username the username of the user we want to get
+     * @return a completable future of the user that match the username
+     * @throws IllegalStateException if their is no user with this username in the database
+     */
     fun updateUserProfile(username : String, updatedData: Map<String, Any>){
         val document = getUserDocumentRef(username)
         document.update(updatedData)

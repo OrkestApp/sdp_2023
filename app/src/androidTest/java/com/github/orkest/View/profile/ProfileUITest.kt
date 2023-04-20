@@ -13,7 +13,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.orkest.Constants
 import com.github.orkest.Model.Profile
 import com.github.orkest.R
-import com.github.orkest.View.profile.topProfile
 import com.github.orkest.View.theme.OrkestTheme
 import com.github.orkest.ViewModel.profile.MockProfileViewModel
 import org.junit.runner.RunWith
@@ -32,7 +31,7 @@ class ProfileUITest {
 
     @Before
     fun setup() {
-        Constants.currentLoggedUser = "JohnSmith"
+        Constants.CURRENT_LOGGED_USER = "JohnSmith"
 
         John = Profile("JohnSmith", R.drawable.profile_picture, "I like everything", 10, 2)
         viewModel.loadData(John.username, John.bio, John.nbFollowers, John.nbFollowings, John.profilePictureId)

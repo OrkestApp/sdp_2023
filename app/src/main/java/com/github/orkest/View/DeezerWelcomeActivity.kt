@@ -34,7 +34,7 @@ class DeezerWelcomeActivity : AppCompatActivity(){
 
 
         val codeValue: String? = uri.getQueryParameter("code")
-        val future = FireStoreDatabaseAPI().storeTokenInDatabase(Constants.currentLoggedUser,codeValue)
+        val future = FireStoreDatabaseAPI().storeTokenInDatabase(Constants.CURRENT_LOGGED_USER,codeValue)
         if (codeValue != null) {
             code = codeValue
         }

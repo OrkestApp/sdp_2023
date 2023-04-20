@@ -1,5 +1,6 @@
 package com.github.orkest.View
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.BottomNavigation
@@ -21,12 +22,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.github.orkest.Constants
+import com.github.orkest.Model.Profile
 import com.github.orkest.View.feed.FeedActivity
 import com.github.orkest.View.profile.ProfileActivity
 import com.github.orkest.View.profile.ProfileActivityScreen
-import com.github.orkest.View.profile.ProfileActivitySetting
-import com.github.orkest.View.profile.ProfileTopInterface
 import com.github.orkest.View.search.SearchUserView
+import com.github.orkest.View.sharedMusic.sharedMusicPost
+import com.github.orkest.ViewModel.post.PostViewModel
 import com.github.orkest.ViewModel.profile.ProfileViewModel
 import com.github.orkest.ViewModel.search.SearchViewModel
 
@@ -80,11 +82,13 @@ class NavigationBar {
                     startDestination = "HomePage",
                     Modifier.padding(padding)
                 ) {
-                    composable("HomePage") { FeedActivity() }
+                    composable("HomePage") { FeedActivity(PostViewModel()) }
                     composable("SearchPage") { SearchUserView.SearchUi(viewModel = viewModel) }
-                    composable("PlaylistPage") { Text(text = "Playlist tab") }
+                    composable("PlaylistPage") {
+                        Text("Playlist Page")
+                    }
                     composable("ProfilePage") {
-                            ProfileActivityScreen(ProfileActivity(), viewModel = ProfileViewModel(Constants.currentLoggedUser))
+                            ProfileActivityScreen(ProfileActivity(), viewModel = ProfileViewModel(Constants.CURRENT_LOGGED_USER))
                     }
                 }
             }

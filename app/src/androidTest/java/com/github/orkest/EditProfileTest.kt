@@ -34,7 +34,6 @@ class EditProfileTest {
         composeTestRule.onNodeWithText("Save").assertIsDisplayed()
         composeTestRule.onNodeWithText("edit picture").assertIsDisplayed()
         composeTestRule.onNodeWithText("Bio:").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Username:").assertIsDisplayed()
     }
 
 

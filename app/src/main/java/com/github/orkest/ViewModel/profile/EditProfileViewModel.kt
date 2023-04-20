@@ -24,11 +24,17 @@ class EditProfileViewModel : ViewModel() {
 
     val updatedData = mutableMapOf<String, Any>()
 
+    /**
+     * Updates the imageUri with the uri of the image picked by the user
+     */
     fun onImagePicked(uri: Uri) {
         imageUri = uri.toString()
         uploadImage(uri)
     }
 
+    /**
+     * Uploads the image to the Firebase Storage
+     */
     private fun uploadImage(uri: Uri) {
         viewModelScope.launch {
             _isUploading = true
@@ -44,6 +50,9 @@ class EditProfileViewModel : ViewModel() {
         }
     }
 
+    /**
+     * Updates the user profile with the new data
+     */
     fun updateUserProfile(username: String) {
         fireStoreDatabaseAPI.updateUserProfile(username, updatedData)
     }

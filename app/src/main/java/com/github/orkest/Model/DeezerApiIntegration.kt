@@ -20,7 +20,7 @@ class DeezerApiIntegration {
             DEEZER_AUTH_URL +
                     "?app_id=$CLIENT_ID" +
                     "&redirect_uri=$REDIRECT_URI" +
-                    "&perms=basic_access,email,manage_library"+"&response_type=token"
+                    "&perms=basic_access,email,manage_library,offline_access"
         )
     }
 

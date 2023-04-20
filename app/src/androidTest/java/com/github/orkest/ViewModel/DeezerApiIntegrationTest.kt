@@ -31,8 +31,9 @@ class DeezerApiIntegrationTest {
     /**
      * tested
      */
+
     fun JsonResponseforUSerId(){
-        val value = DeezerApiIntegration().addANewSongToOrkestPlayList("frsizHK2HlrzljGuf9s09gV0sF1Wbf7fWCnQe4w1wFbDI0zCkqV","11300267884","1999525067").get()
+        val value = DeezerApiIntegration().addANewSongToOrkestPlayList("fre2MZQMJbgEjomDl7WusDOj3p0RIo3g0dhW4G1kVMG5Oa9CGV","11300267884","533497102").get()
         Log.d("HELLO", value.toString())
 
     }

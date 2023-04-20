@@ -30,11 +30,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.orkest.Constants
-<<<<<<< HEAD
-import com.github.orkest.Model.*
-=======
-import com.github.orkest.Model.OrkestDate
->>>>>>> parent of a816c1a (Merge branch 'main' into FollowListActivity)
 import com.github.orkest.Model.Post
 import com.github.orkest.Model.Song
 import com.github.orkest.R

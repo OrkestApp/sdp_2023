@@ -34,7 +34,6 @@ import com.github.orkest.View.FollowListActivity
 import androidx.core.content.ContextCompat.startActivity
 import com.github.orkest.Model.DeezerApiIntegration
 import com.github.orkest.Model.FireStoreDatabaseAPI
-import com.github.orkest.Constants
 import com.github.orkest.View.NavDrawerButton
 import com.github.orkest.View.auth.AuthActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn

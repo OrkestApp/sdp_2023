@@ -12,7 +12,7 @@ android {
     defaultConfig {
         manifestPlaceholders = [redirectSchemeName: "spotify-sdk", redirectHostName: "auth"]
         applicationId "com.github.orkest"
-        minSdk 28
+        minSdk 27
         targetSdk 33
         versionCode 1
         versionName "1.0"

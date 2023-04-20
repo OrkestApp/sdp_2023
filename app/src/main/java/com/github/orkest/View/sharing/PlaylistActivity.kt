@@ -120,10 +120,8 @@ fun Playlist(playlistViewModel: PlaylistViewModel,
             Modifier.clickable {
                 // play song
 
-                // This will be adapted to check what is the music provider of the user
-                // play song on Deezer
                 val player = DeezerApiIntegration()
-                startActivity(context, player.launchDeezerToPlaySong(song.Title, song.Artist ?: "default").get(), null)
+                startActivity(context, player.launchDeezerToPlaySong(song.Title).get(), null)
 
             }.fillMaxSize())
             {

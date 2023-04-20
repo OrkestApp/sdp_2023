@@ -11,7 +11,6 @@ import com.github.orkest.Model.FireStoreDatabaseAPI
 import com.github.orkest.Model.PlaySpotify
 import com.github.orkest.Model.Providers
 
-import com.github.orkest.View.notification.Notification
 
 class MainActivity : AppCompatActivity() {
 
@@ -23,11 +22,7 @@ class MainActivity : AppCompatActivity() {
             }
             NavigationBar.CreateNavigationBar(navController = rememberNavController(), Constants.CURRENT_LOGGED_USER)
         }
-
-        Notification(this, null).createNotificationChannel()
-        Notification(this, null).promptUserToEnableNotifications()
     }
-
     override fun onStart() {
         super.onStart()
         FireStoreDatabaseAPI().searchUserInDatabase(Constants.CURRENT_LOGGED_USER).whenComplete() { user, _ ->
@@ -40,7 +35,4 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-
 }
-
-

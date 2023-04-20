@@ -2,6 +2,13 @@ package com.github.orkest.View.feed
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.navigation.compose.rememberNavController
+import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.matcher.IntentMatchers
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import com.github.orkest.View.MainActivity
+import com.github.orkest.View.auth.SignUpForm
+import com.github.orkest.ViewModel.auth.MockAuthViewModel
 import com.github.orkest.ViewModel.feed.MockPostViewModel
 import com.github.orkest.ViewModel.post.PostViewModel
 import kotlinx.coroutines.delay

@@ -1,5 +1,7 @@
 package com.github.orkest.View
 
+
+import androidx.compose.foundation.layout.Column
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -23,11 +25,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.github.orkest.Constants
+
+import com.github.orkest.Model.Profile
 import com.github.orkest.Model.User
 import com.github.orkest.View.feed.FeedActivity
 import com.github.orkest.View.profile.ProfileActivity
 import com.github.orkest.View.profile.ProfileActivityScreen
 import com.github.orkest.View.search.SearchUserView
+import com.github.orkest.View.sharedMusic.sharedMusicPost
 import com.github.orkest.View.sharing.UsersList
 import com.github.orkest.ViewModel.playlist.PlaylistViewModel
 import com.github.orkest.ViewModel.post.PostViewModel

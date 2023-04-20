@@ -9,7 +9,7 @@ import com.github.orkest.Model.FireStoreDatabaseAPI
 import com.github.orkest.Model.User
 import java.util.concurrent.CompletableFuture
 
-open class ProfileViewModel(private val user: String) : ViewModel() {
+open class ProfileViewModel(val user: String) : ViewModel() {
 
     private val dbAPI = FireStoreDatabaseAPI()
     private var userProfile = User()

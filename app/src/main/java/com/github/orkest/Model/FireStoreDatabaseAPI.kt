@@ -1,5 +1,7 @@
 package com.github.orkest.Model
 
+import android.content.ContentValues
+import android.content.ContentValues.TAG
 import android.util.Log
 import com.github.orkest.Constants
 import com.google.firebase.auth.FirebaseAuth
@@ -55,6 +57,25 @@ class FireStoreDatabaseAPI {
             return future
 
         }
+
+    /**
+     * @param username of the user's follow lists to display
+     * @param isFollowersList is a boolean to indicate whether we want to fetch the followers list if true or the followings list if false
+     *
+     * @return the follow list indicated by the boolean isFollowersList of the user.
+     */
+    fun fetchFollowList(username: String, isFollowersList: Boolean): CompletableFuture<MutableList<String>>{
+        val future = CompletableFuture<MutableList<String>>()
+
+        getUserDocumentRef(username).get().addOnSuccessListener { document ->
+            if(document != null && document.exists()){
+                val user = document.toObject(User::class.java)
+                if (user != null) { if (isFollowersList) future.complete(user.followers) else future.complete(user.followings) }
+            }
+
+        }.addOnFailureListener { e -> Log.d(TAG, "Error fetching follow lists", e) }
+        return future
+    }
 
     /**
      * @param username search a user with username

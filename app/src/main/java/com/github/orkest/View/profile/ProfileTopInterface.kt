@@ -44,6 +44,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
+import kotlin.random.Random
 
 
 private val topInterfaceHeight = 150.dp
@@ -153,7 +154,7 @@ fun sendNotification(context: Context, title: String, message: String, channelId
         .setContentText(message)
         .setSmallIcon(android.R.drawable.ic_dialog_info)
 
-    notificationManager.notify(0, notificationBuilder.build())
+    notificationManager.notify(Random.nextInt(1000000), notificationBuilder.build())
 
     Log.d("Notification",title)
 }

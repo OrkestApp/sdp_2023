@@ -211,7 +211,7 @@ private fun PlayButton(song: Song){
             .width(50.dp)
             .clip(shape = RoundedCornerShape(10.dp))
             .clickable {
-                Constants.playMusicButtonClicked(song, isPlayed)
+                Constants.playMusicButtonClicked(song, isPlayed, context)
             })
 }
 

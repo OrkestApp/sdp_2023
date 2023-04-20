@@ -1,5 +1,6 @@
 package com.github.orkest
 
+import android.content.Context
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -15,9 +16,7 @@ import java.time.ZoneId
  */
 class Constants {
     companion object{
-        var TESTING = false
 
-        //TODO: Need to set this value on sign in
         var CURRENT_USER_PROVIDER: Providers = Providers.SPOTIFY
         private var currentLoggedUser: String = ""
         var CURRENT_LOGGED_USER: String
@@ -39,13 +38,20 @@ class Constants {
         /**
          * Function to play a song on the user's provider app
          */
-        fun playMusicButtonClicked(song: Song, isPlayed: MutableState<Boolean>) {
-            if (Constants.CURRENT_USER_PROVIDER == Providers.SPOTIFY)
+        fun playMusicButtonClicked(song: Song, isPlayed: MutableState<Boolean>, context: Context) {
+            if (Constants.CURRENT_USER_PROVIDER == Providers.SPOTIFY) {
                 PlaySpotify.play(song)
+                isPlayed.value = !isPlayed.value
+            }
 
-            isPlayed.value = !isPlayed.value
+            //TODO: Uncomment this when the deezer integration is merged
 
-            //TODO: Add the functionality for other providers
+//            if (Constants.CURRENT_USER_PROVIDER == Providers.DEEZER) {
+//                DeezerApiIntegration.launchDeezerToPlaySong(song.name, song.artist).whenComplete { intent, _ ->
+//                    context.startActivity(intent)
+//                    isPlayed.value = !isPlayed.value
+//                }
+//            }
         }
 
     }

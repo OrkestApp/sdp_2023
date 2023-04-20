@@ -58,6 +58,10 @@ class DeezerApiIntegration {
         return jsonParser.fromJson(string, T::class.java)
     }
 
+    /**
+     * We will need this method later when Orkest will add a playlist to the User profile
+     */
+
     fun searchPlaylistInDatabase(playlistName:String):CompletableFuture<ListPlaylist>{
         val playlistFuture = CompletableFuture<ListPlaylist>()
         Thread{
@@ -80,10 +84,13 @@ class DeezerApiIntegration {
     }
 
 
+    /**
+     * We will need this method when we will want to play the entire playlist of shared songs
+     */
 
     fun launchDeezerToPlayAPlaylist(playlistId : String) : Intent{
         val intent = CompletableFuture<Intent>()
-        val uri = Uri.parse("http://www.deezer.com/track/$playlistId")
+        val uri = Uri.parse("http://www.deezer.com/playlist/$playlistId")
         return Intent(Intent.ACTION_VIEW, uri)
 
 

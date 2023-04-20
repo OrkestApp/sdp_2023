@@ -2,7 +2,10 @@ package com.github.orkest.Model
 
 import android.content.Intent
 import android.net.Uri
+<<<<<<< HEAD
 import android.util.Log
+=======
+>>>>>>> main
 import com.google.gson.Gson
 import java.net.HttpURLConnection
 import java.net.URL
@@ -14,7 +17,11 @@ class DeezerApiIntegration {
         private  val DEEZER_TOKEN_URL = "https://connect.deezer.com/oauth/access_token.php"
         private  val CLIENT_ID = "592224"
         private  val CLIENT_SECRET = "7951a1e4171f70af65cae5c55fdd0e51"
+<<<<<<< HEAD
         private  val REDIRECT_URI = "http://10.0.17.226:5000/deezer"
+=======
+        private  val REDIRECT_URI = "http://172.20.10.3:5000/deezer"
+>>>>>>> main
 
         val url = Uri.parse(
             DEEZER_AUTH_URL +
@@ -51,6 +58,21 @@ class DeezerApiIntegration {
 
     }
 
+<<<<<<< HEAD
+=======
+    /**
+     * Generic Function to deserialize JSON
+     */
+    inline fun <reified T> deserialise(string: String): T {
+        val jsonParser = Gson()
+        return jsonParser.fromJson(string, T::class.java)
+    }
+
+    /**
+     * We will need this method later when Orkest will add a playlist to the User profile
+     */
+
+>>>>>>> main
     fun searchPlaylistInDatabase(playlistName:String):CompletableFuture<ListPlaylist>{
         val playlistFuture = CompletableFuture<ListPlaylist>()
         Thread{
@@ -73,10 +95,20 @@ class DeezerApiIntegration {
     }
 
 
+<<<<<<< HEAD
 
     fun launchDeezerToPlayAPlaylist(playlistId : String) : Intent{
         val intent = CompletableFuture<Intent>()
         val uri = Uri.parse("http://www.deezer.com/track/$playlistId")
+=======
+    /**
+     * We will need this method when we will want to play the entire playlist of shared songs
+     */
+
+    fun launchDeezerToPlayAPlaylist(playlistId : String) : Intent{
+        val intent = CompletableFuture<Intent>()
+        val uri = Uri.parse("http://www.deezer.com/playlist/$playlistId")
+>>>>>>> main
         return Intent(Intent.ACTION_VIEW, uri)
 
 
@@ -88,10 +120,17 @@ class DeezerApiIntegration {
 
 
 
+<<<<<<< HEAD
     fun launchDeezerToPlaySong(songName: String?, artistName : String = ""): CompletableFuture<Intent> {
         Log.d("DEBUG FETCH API",songName + artistName)
         val intent = CompletableFuture<Intent>()
         searchSongInDeezerDatabse(songName,artistName).thenAccept {//TODO FIX ARTIST NAME
+=======
+    fun launchDeezerToPlaySong(songName: String?, artistName: String=""): CompletableFuture<Intent> {
+
+        val intent = CompletableFuture<Intent>()
+        searchSongInDeezerDatabse(songName,artistName).thenAccept {
+>>>>>>> main
             val trackId = it.data[0].id
             val uri = Uri.parse("http://www.deezer.com/track/$trackId")
             intent.complete(Intent(Intent.ACTION_VIEW, uri))
@@ -100,7 +139,11 @@ class DeezerApiIntegration {
         return intent
 
 
+<<<<<<< HEAD
     }
+=======
+        }
+>>>>>>> main
 
 
 }

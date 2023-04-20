@@ -41,7 +41,5 @@ class navigationTabTest {
         playlistTab.performClick()
 
 
-
-
     }
 }

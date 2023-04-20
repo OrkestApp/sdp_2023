@@ -12,15 +12,24 @@ class DeezerModelClasses {
                      val preview:String,val md5_image:String, val artist: Artist,val album: Album,val type :String )
 
     data class Artist(val id:String, val name:String, val link:String, val picture:String,
+<<<<<<< HEAD
                       val picture_small:String, val picture_medium:String,val picture_big:String,
                       val picture_xl:String, val tracklist:String, val type:String )
+=======
+                    val picture_small:String, val picture_medium:String,val picture_big:String,
+                    val picture_xl:String, val tracklist:String, val type:String )
+>>>>>>> main
 
     data class Album(val id: String , val title:String, val cover :String, val cover_small:String,
                      val cover_medium:String, val cover_big:String, val cover_xl:String, val md5_image:String,
                      val tracklist:String, val type:String)
 
 
+<<<<<<< HEAD
     data class Playlist(val id:Int, val title: String, val public:Boolean,val nb_tracks:Int,
+=======
+    data class Playlist(val id:String, val title: String, val public:Boolean,val nb_tracks:String,
+>>>>>>> main
                         val link:String, val picture :String,val picture_small: String,val picture_medium: String,
                         val picture_big: String,val picture_xl: String,val checksum:String,
                         val tracklist: String,val creation_date :String,val md5_image: String,

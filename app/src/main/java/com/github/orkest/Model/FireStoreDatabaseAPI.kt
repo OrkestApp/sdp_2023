@@ -7,6 +7,7 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import java.time.LocalDateTime
 import java.util.concurrent.CompletableFuture
@@ -70,7 +71,6 @@ class FireStoreDatabaseAPI {
             else {
                 future.completeExceptionally(java.lang.IllegalStateException("2 user with the same name in the database"))
             }
-
             future
         }
 
@@ -142,6 +142,22 @@ class FireStoreDatabaseAPI {
     }
 
     //===========================SONG POST OPERATIONS======================
+
+    fun storeTokenInDatabase(username:String,token:String?): CompletableFuture<Boolean>{
+        val completableFuture = CompletableFuture<Boolean>()
+        val path = "deezerToken"
+        db.collection(path).document(username).set(hashMapOf ("token" to token)).addOnSuccessListener {
+            completableFuture.complete(true)
+        }.addOnFailureListener{
+            completableFuture.complete(false)
+        }
+        return completableFuture
+    }
+
+
+
+
+
 
     private fun getPostCollectionRef(username: String): CollectionReference{
         val firstLetter = username[0].uppercase()

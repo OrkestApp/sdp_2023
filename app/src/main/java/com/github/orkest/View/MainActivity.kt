@@ -7,7 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.compose.rememberNavController
 import com.github.orkest.Constants
-
+import com.github.orkest.View.notification.Notification
 
 class MainActivity : AppCompatActivity() {
 
@@ -19,5 +19,13 @@ class MainActivity : AppCompatActivity() {
             }
             NavigationBar.CreateNavigationBar(navController = rememberNavController(), Constants.CURRENT_LOGGED_USER)
         }
+
+        Notification(this, null).createNotificationChannel()
+        Notification(this, null).promptUserToEnableNotifications()
     }
+
+
+
 }
+
+

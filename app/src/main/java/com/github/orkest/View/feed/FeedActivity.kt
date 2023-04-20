@@ -34,6 +34,7 @@ import com.github.orkest.Model.OrkestDate
 import com.github.orkest.Model.Post
 import com.github.orkest.Model.Song
 import com.github.orkest.R
+import com.github.orkest.View.sharedMusic.sharedMusicPost
 import com.github.orkest.ViewModel.post.PostViewModel
 import java.time.LocalDateTime
 
@@ -64,9 +65,16 @@ fun FeedActivity(viewModel: PostViewModel) {
             .background(Color.LightGray)
     ) {
         items(listPosts) { post ->
-            DisplayPost(post = post)
+            Column {//TODO SUPPRESS, only here for preview purposes
+                DisplayPost(post = post)
+                sharedMusicPost(
+                    profile = Constants.MOCK_USER.profile,
+                    song = Constants.DUMMY_RUDE_BOY_SONG,
+                    message = "Amazing music! Check it out.")
+            }
         }
     }
+
 
     val context = LocalContext.current
 
@@ -93,9 +101,10 @@ fun launchCreatePostActivity(context: Context){
 fun DisplayPost(post: Post){
 
     Row(modifier = Modifier
-        .padding(start = 25.dp, top = 20.dp)
+        .padding(start = 10.dp, top = 10.dp, end = 10.dp)
         .clip(shape = RoundedCornerShape(20.dp))
-        .background(Color.DarkGray)){
+        .background(Color.DarkGray)
+        .fillMaxWidth()){
 
         Column {
             // Display the user profile pic
@@ -163,7 +172,8 @@ fun SongCard(song: Song){
         Row(horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .wrapContentSize()
+                .fillMaxWidth()
+                //.wrapContentSize()
                 .clip(shape = RoundedCornerShape(20.dp))
                 .background(Color.hsl(54f, 1f, 0.5f))
                 .padding(end = 10.dp)){

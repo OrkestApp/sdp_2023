@@ -50,6 +50,14 @@ class DeezerApiIntegration {
 
     }
 
+    /**
+     * Generic Function to deserialize JSON
+     */
+    inline fun <reified T> deserialise(string: String): T {
+        val jsonParser = Gson()
+        return jsonParser.fromJson(string, T::class.java)
+    }
+
     fun searchPlaylistInDatabase(playlistName:String):CompletableFuture<ListPlaylist>{
         val playlistFuture = CompletableFuture<ListPlaylist>()
         Thread{

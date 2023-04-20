@@ -20,7 +20,7 @@ class DeezerModelClasses {
                      val tracklist:String, val type:String)
 
 
-    data class Playlist(val id:Int, val title: String, val public:Boolean,val nb_tracks:Int,
+    data class Playlist(val id:String, val title: String, val public:Boolean,val nb_tracks:String,
                         val link:String, val picture :String,val picture_small: String,val picture_medium: String,
                         val picture_big: String,val picture_xl: String,val checksum:String,
                         val tracklist: String,val creation_date :String,val md5_image: String,

@@ -9,6 +9,14 @@ android {
     namespace 'com.github.orkest'
     compileSdk 33
 
+    sourceSets {
+        test {
+            resources.srcDirs += 'src/test/resources'
+            java.srcDirs += 'src/test/java'
+            manifest.srcFile 'src/test/AndroidManifest.xml'
+        }
+    }
+
     defaultConfig {
         manifestPlaceholders = [redirectSchemeName: "spotify-sdk", redirectHostName: "auth"]
         applicationId "com.github.orkest"
@@ -58,7 +66,7 @@ android {
 
 dependencies {
 
-    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'androidx.core:core-ktx:1.9.0' //notification dependency
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.8.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
@@ -247,6 +255,7 @@ dependencies {
 
     androidTestImplementation('androidx.test.espresso:espresso-intents:3.4.0')
 
+    testImplementation 'org.robolectric:robolectric:4.6.1'
 
 }
 

@@ -13,9 +13,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.Comment
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -30,13 +27,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.orkest.Constants
-import com.github.orkest.Model.OrkestDate
 import com.github.orkest.Model.Post
 import com.github.orkest.Model.Song
 import com.github.orkest.R
 import com.github.orkest.View.sharedMusic.sharedMusicPost
 import com.github.orkest.ViewModel.post.PostViewModel
-import java.time.LocalDateTime
 
 
 /**

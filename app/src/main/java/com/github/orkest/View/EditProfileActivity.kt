@@ -1,5 +1,6 @@
 package com.github.orkest.View
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -30,10 +31,14 @@ import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material.DrawerValue
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import com.github.orkest.Constants
 import com.github.orkest.Model.FireStoreDatabaseAPI
+import com.github.orkest.View.profile.ProfileActivity
+import com.github.orkest.View.profile.ProfileActivityScreen
 import com.github.orkest.View.theme.OrkestTheme
+import com.github.orkest.ViewModel.profile.ProfileViewModel
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -43,6 +48,7 @@ const val PADDING_FROM_SCREEN_BORDER = 10
 private val updatedData = mutableMapOf<String, Any>()
 
 class EditProfileActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -148,6 +154,8 @@ fun CreateMenuDrawer() {
 @Composable
 fun TopBar(activity: ComponentActivity, coroutineScope: CoroutineScope, scaffoldState: ScaffoldState) {
 
+    val context = LocalContext.current
+
     TopAppBar(
         title = {
             Row(
@@ -171,6 +179,9 @@ fun TopBar(activity: ComponentActivity, coroutineScope: CoroutineScope, scaffold
 
                         val username = Constants.CURRENT_LOGGED_USER
                         FireStoreDatabaseAPI().updateUserProfile(username, updatedData)
+
+                        val intent = Intent(context, ProfileActivityScreen(ProfileActivity(), viewModel = ProfileViewModel(Constants.CURRENT_LOGGED_USER)))
+                        context.startActivity(intent)
                     },
                     fontSize = 20.sp
                 )
@@ -188,7 +199,7 @@ fun TopBar(activity: ComponentActivity, coroutineScope: CoroutineScope, scaffold
 @Composable
 fun MainBody() {
     Column() {
-        EditNameSection(name = "Username", default = "default username")
+        //EditNameSection(name = "Username", default = "default username")
         EditBio()
     }
 }
@@ -244,6 +255,7 @@ fun EditProfileImage() {
 /**
  * fields to modify small text data such as name and username
  */
+/*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditNameSection(name: String, default: String) {
@@ -264,7 +276,7 @@ fun EditNameSection(name: String, default: String) {
             )
         )
     }
-}
+}*/
 
 
 /**

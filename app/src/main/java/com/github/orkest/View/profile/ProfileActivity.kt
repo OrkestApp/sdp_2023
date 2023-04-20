@@ -64,7 +64,6 @@ fun ProfileActivitySetting(content: @Composable () -> Unit) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileActivityScreen(activity: ComponentActivity, viewModel: ProfileViewModel) {
     val scaffoldState = rememberScaffoldState()

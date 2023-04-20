@@ -30,25 +30,12 @@ class DeezerApiIntegrationTest {
      */
     @Test
     fun DeezerTokenCorrectlyAddTokenInDb(){
-        val dbase = FireStoreDatabaseAPI()
-        val db = FireStoreDatabaseAPI.db
 
-
-        try{
-
-            db.useEmulator("10.0.2.2", 8080)
-            db.firestoreSettings = firestoreSettings {
-                isPersistenceEnabled = false
-            }
-
-        }catch(e :java.lang.IllegalStateException) {
-
-        }
         val mockUsername = "hello"
-        val future = dbase.storeTokenInDatabase(mockUsername,"26")
+        val future = FireStoreDatabaseAPI().storeTokenInDatabase(mockUsername,"26")
 
         future.thenAccept {
-        Assert.assertEquals(db.collection("deezerToken").document(mockUsername).get(),
+        Assert.assertEquals(Firebase.firestore.collection("deezerToken").document(mockUsername).get(),
             mapOf("token" to "26")
         )
             }

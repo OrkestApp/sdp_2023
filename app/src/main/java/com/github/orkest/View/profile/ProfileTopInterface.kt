@@ -1,10 +1,6 @@
 package com.github.orkest.View.profile
 
-import android.content.Context
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.Intent
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -30,7 +26,6 @@ import com.github.orkest.R
 import com.github.orkest.View.EditProfileActivity
 import com.github.orkest.ViewModel.profile.ProfileViewModel
 import androidx.compose.ui.graphics.Color
-import androidx.core.app.NotificationCompat
 import com.github.orkest.Constants
 import com.github.orkest.View.NavDrawerButton
 import com.github.orkest.View.auth.AuthActivity
@@ -39,7 +34,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
-import kotlin.random.Random
 
 
 private val topInterfaceHeight = 150.dp
@@ -118,7 +112,7 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
                         auth.signOut()
 
                         //notification
-                        Notification().sendNotification(context, "Orkest", "You've signed out ;)",
+                        Notification(context,null).sendNotification( "Orkest", "You've signed out ;)",
                             "channel_id_signout", "channel_name_signout", 0)
 
                         //uncomment if un-caching is needed

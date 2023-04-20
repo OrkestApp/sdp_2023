@@ -11,15 +11,15 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.github.orkest.Constants.Companion.NOTIFICATION_CHANNEL_ID
-import kotlin.random.Random
+import org.junit.runner.manipulation.Ordering
 
-class Notification {
+class Notification(private val context: Context, private val alertDialogListener: AlertDialogListener?) {
 
     /**
      * The notification channel is required for Android 8.0 and above
      * To inform the user to enable the notifications for this app
      */
-    fun createNotificationChannel(context: Context) {
+    fun createNotificationChannel() {
         val name = "Notification Channel"
         val descriptionText = "To receive cool notifications ;)"
         val importance = NotificationManager.IMPORTANCE_DEFAULT
@@ -34,9 +34,8 @@ class Notification {
      * Build the notification manager to enable notifications
      * The choice will be saved in the phone's parameters
      */
-    fun promptUserToEnableNotifications(activity: Context) {
-        val notificationManager = NotificationManagerCompat.from(activity)
-        if (!notificationManager.areNotificationsEnabled()) {
+    fun promptUserToEnableNotifications() {
+        fun promptUserToEnableNotifications(activity: Context) {
             val alertDialog = AlertDialog.Builder(activity)
                 .setTitle("Enable Notifications")
                 .setMessage("To receive important updates, please enable notifications for this app.")
@@ -44,26 +43,27 @@ class Notification {
                 .setNegativeButton("Cancel", null)
                 .create()
 
-            //display of the alert dialog
-            alertDialog.setOnShowListener {
-                alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).apply {
-                    setTextColor(Color.BLUE) // set the blue color for the enable button
-                    setOnClickListener {
-                        val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
-                            putExtra(Settings.EXTRA_APP_PACKAGE, activity.packageName)
+            val notificationManager = NotificationManagerCompat.from(activity)
+            if (!notificationManager.areNotificationsEnabled()) {
+                alertDialog.setOnShowListener {
+                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).apply {
+                        setTextColor(Color.BLUE)
+                        setOnClickListener {
+                            val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                                putExtra(Settings.EXTRA_APP_PACKAGE, activity.packageName)
+                            }
+                            activity.startActivity(intent)
+                            alertDialog.dismiss()
                         }
-                        activity.startActivity(intent)
-                        alertDialog.dismiss()
                     }
-                }
-                alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).apply {
-                    setTextColor(Color.RED) // set the red color for the cancel button
-                }
-            }
+                    alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).apply {
+                        setTextColor(Color.RED)
+                    }
 
-            alertDialog.show()
-        } else {
-            // Notifications are already enabled
+                    alertDialogListener?.onAlertDialogShown(alertDialog)
+                }
+                alertDialog.show()
+            }
         }
     }
 
@@ -72,7 +72,7 @@ class Notification {
      * This is the method to send notifications
      * channelName and notificationId should be unique for each notification usage
      */
-    fun sendNotification(context: Context, title: String, message: String,
+    fun sendNotification(title: String, message: String,
                                 channelId: String, channelName: String, notificationId: Int) {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 

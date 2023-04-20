@@ -20,8 +20,8 @@ class MainActivity : AppCompatActivity() {
             NavigationBar.CreateNavigationBar(navController = rememberNavController(), Constants.CURRENT_LOGGED_USER)
         }
 
-        Notification().createNotificationChannel(this)
-        Notification().promptUserToEnableNotifications(this)
+        Notification(this, null).createNotificationChannel()
+        Notification(this, null).promptUserToEnableNotifications()
     }
 
 

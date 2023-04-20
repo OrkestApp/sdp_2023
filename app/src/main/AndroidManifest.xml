@@ -12,6 +12,11 @@
         android:theme="@style/Theme.Orkest"
         tools:targetApi="31">
         <activity
+            android:name=".View.sharing.PlaylistActivity"
+            android:exported="false"
+            android:label="@string/title_activity_playlist"
+            android:theme="@style/Theme.Orkest" />
+        <activity
             android:name=".View.feed.CreatePost"
             android:exported="false"
             android:label="@string/title_activity_create_post"

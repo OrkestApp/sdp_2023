@@ -24,7 +24,7 @@ class Constants {
         )
 
         val DUMMY_RUDE_BOY_SONG = Song("Rude Boy", "Rihanna", "Rated R",
-            "link", R.drawable.album_cover)
+            "link")
 
         val DUMMY_LAST_CONNECTED_TIME: LocalDateTime =
             LocalDateTime.of(2021, 5, 1, 12, 0)

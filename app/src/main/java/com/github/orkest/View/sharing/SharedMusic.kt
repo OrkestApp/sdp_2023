@@ -18,7 +18,7 @@ fun UsersList(viewModel: PlaylistViewModel) {
         // create a dummy User
         10
     ) {
-        User("ehreich2", "", "", Profile("ehreich2", 1))
+        User("emile", "", "", Profile("emile", 1))
     }
     LazyColumn {
         items(messages) { user ->

@@ -2,6 +2,7 @@ package com.github.orkest.Model
 
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import com.google.gson.Gson
 import java.net.HttpURLConnection
 import java.net.URL
@@ -87,10 +88,10 @@ class DeezerApiIntegration {
 
 
 
-    fun launchDeezerToPlaySong(songName: String?, artistName: String): CompletableFuture<Intent> {
-
+    fun launchDeezerToPlaySong(songName: String?, artistName : String = ""): CompletableFuture<Intent> {
+        Log.d("DEBUG FETCH API",songName + artistName)
         val intent = CompletableFuture<Intent>()
-        searchSongInDeezerDatabse(songName,artistName).thenAccept {
+        searchSongInDeezerDatabse(songName,artistName).thenAccept {//TODO FIX ARTIST NAME
             val trackId = it.data[0].id
             val uri = Uri.parse("http://www.deezer.com/track/$trackId")
             intent.complete(Intent(Intent.ACTION_VIEW, uri))

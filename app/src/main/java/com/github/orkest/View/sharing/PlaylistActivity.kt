@@ -141,7 +141,7 @@ fun Playlist(playlistViewModel: PlaylistViewModel,
 //                appRemote.playerApi.play("spotify:playlist:$spotifySongId")
                 val player = DeezerApiIntegration()
 
-                startActivity(context, player.launchDeezerToPlaySong(song.Title, song.Artist).get(), null)
+                startActivity(context, player.launchDeezerToPlaySong(song.Title).get(), null)
 
             }.fillMaxSize())
             {

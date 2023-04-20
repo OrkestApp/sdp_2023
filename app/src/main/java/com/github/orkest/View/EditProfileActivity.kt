@@ -180,7 +180,7 @@ fun TopBar(activity: ComponentActivity, coroutineScope: CoroutineScope, scaffold
                         val username = Constants.CURRENT_LOGGED_USER
                         FireStoreDatabaseAPI().updateUserProfile(username, updatedData)
 
-                        val intent = Intent(context, ProfileActivityScreen(ProfileActivity(), viewModel = ProfileViewModel(Constants.CURRENT_LOGGED_USER)))
+                        val intent = Intent(context, MainActivity::class.java)
                         context.startActivity(intent)
                     },
                     fontSize = 20.sp

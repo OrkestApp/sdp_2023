@@ -7,7 +7,11 @@ import org.junit.Test
 
 class DeezerApiIntegrationTest {
 
-    @Test
+
+    //@Test Uncomment test online.
+    /**
+     * This test need to be performed online
+     */
     fun JSONresponseIsParsedCorrectly(){
         val value = DeezerApiIntegration().searchSongInDeezerDatabse("petite fille").get()
         print(value.data[0])

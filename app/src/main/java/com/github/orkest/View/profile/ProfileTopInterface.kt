@@ -41,7 +41,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 
 import java.util.concurrent.CompletableFuture
-import kotlinx.coroutines.CoroutineScope
 
 
 

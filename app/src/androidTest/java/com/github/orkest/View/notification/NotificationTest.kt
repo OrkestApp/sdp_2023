@@ -1,12 +1,9 @@
-package com.github.orkest.View.Notification
+package com.github.orkest.View.notification
 
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.ui.test.junit4.createComposeRule
-import com.github.orkest.View.notification.AlertDialogListener
-import com.github.orkest.View.notification.Notification
 import org.junit.Assert.assertTrue
 import org.junit.Rule
-import org.junit.Test
 
 class NotificationTest {
 

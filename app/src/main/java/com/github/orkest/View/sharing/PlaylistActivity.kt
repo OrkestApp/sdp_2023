@@ -37,26 +37,26 @@ class PlaylistActivity() : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // -------Connect to Spotify AppRemote-------
-        this.spotifySongId = intent.getStringExtra("songId") ?: "songId"
-
-        val connectionParams = ConnectionParams.Builder(CLIENT_ID)
-            .setRedirectUri(REDIRECT_URI)
-            .showAuthView(true)
-            .build()
-
-        SpotifyAppRemote.connect(this, connectionParams,
-            object : Connector.ConnectionListener {
-                override fun onConnected(spotifyAppRemote: SpotifyAppRemote) {
-                    mSpotifyAppRemote = spotifyAppRemote
-                    Log.d("MainActivity", "Connected! Yay!")
-                }
-
-                override fun onFailure(throwable: Throwable) {
-                    Log.e("MyActivity", throwable.message, throwable)
-
-                    // Something went wrong when attempting to connect! Handle errors here
-                }
-            })
+//        this.spotifySongId = intent.getStringExtra("songId") ?: "songId"
+//
+//        val connectionParams = ConnectionParams.Builder(CLIENT_ID)
+//            .setRedirectUri(REDIRECT_URI)
+//            .showAuthView(true)
+//            .build()
+//
+//        SpotifyAppRemote.connect(this, connectionParams,
+//            object : Connector.ConnectionListener {
+//                override fun onConnected(spotifyAppRemote: SpotifyAppRemote) {
+//                    mSpotifyAppRemote = spotifyAppRemote
+//                    Log.d("MainActivity", "Connected! Yay!")
+//                }
+//
+//                override fun onFailure(throwable: Throwable) {
+//                    Log.e("MyActivity", throwable.message, throwable)
+//
+//                    // Something went wrong when attempting to connect! Handle errors here
+//                }
+//            })
 
 
         //--------Update Database---------
@@ -100,17 +100,16 @@ class PlaylistActivity() : ComponentActivity() {
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colors.background
         ) {
-            mSpotifyAppRemote?.let {
-                Playlist(
-                    this.playlistViewModel,
-                    intent
-                        .getStringExtra("senderUsername") ?: "sender1",
-                    intent
-                        .getStringExtra("receiverUsername") ?: "receiver1",
-                    it,
-                    spotifySongId
-                )
-            }
+            
+            Playlist(
+                this.playlistViewModel,
+                intent
+                    .getStringExtra("senderUsername") ?: "sender1",
+                intent
+                    .getStringExtra("receiverUsername") ?: "receiver1",
+                spotifySongId
+            )
+
         }
     }
 }
@@ -120,12 +119,12 @@ class PlaylistActivity() : ComponentActivity() {
 fun Playlist(playlistViewModel: PlaylistViewModel,
              senderUsername: String,
              receiverUsername: String,
-             appRemote: SpotifyAppRemote,
              spotifySongId: String
 ){
     val context = LocalContext.current
 
     var songList by remember { mutableStateOf(listOf<Song>()) }
+    Log.d("DEBUG PLAYLIST", "AAAAAAA")
     playlistViewModel.fetchSongs(senderUsername, receiverUsername)
         .whenComplete { songs, _ ->
             songs?.let {

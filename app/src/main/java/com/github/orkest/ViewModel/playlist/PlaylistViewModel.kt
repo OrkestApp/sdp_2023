@@ -1,5 +1,6 @@
 package com.github.orkest.ViewModel.playlist
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.github.orkest.Model.FireStoreDatabaseAPI
 import com.github.orkest.Model.Song
@@ -14,7 +15,8 @@ class PlaylistViewModel : ViewModel() {
 
     // method to fetch songs from database
     fun fetchSongs(sender: String, receiver: String) : CompletableFuture<List<Song>>  {
-        return dbAPI.fetchSharedSongsFromDataBase(sender, receiver)
+        Log.d("DEBUG FETCH", "FETCHING2")
+        return dbAPI.fetchSharedSongsFromDataBase(receiver, sender)
     }
 
     fun storeSong(song: Song, sender: String, receiver: String) {

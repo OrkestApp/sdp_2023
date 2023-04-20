@@ -281,7 +281,7 @@ class FireStoreDatabaseAPI {
      *
      * @return a completable future that indicates that the song was correctly added
      */
-    fun storeSharedSongToDataBase(song: Song, sender: String, receiver: String): CompletableFuture<Boolean> {
+    fun storeSharedSongToDataBase(song: Song,sender: String, receiver: String): CompletableFuture<Boolean> {
         val future = CompletableFuture<Boolean>()
         val sharedSongDocument1 =
             db.collection("shared songs")
@@ -307,7 +307,7 @@ class FireStoreDatabaseAPI {
         val future = CompletableFuture<List<Song>>()
 
         val sharedSongs = db.collection("shared songs").document(receiverUsername).collection(senderUsername)
-
+        Log.d("DEBUG FETCH", "FETCHING")
         sharedSongs.get().addOnSuccessListener {
 
             // Get all posts documents as a list of posts objects

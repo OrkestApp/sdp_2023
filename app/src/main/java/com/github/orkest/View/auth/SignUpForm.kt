@@ -120,10 +120,6 @@ fun SignUpForm(viewModel: AuthViewModel) {
         })
 }
 
-//function to get the context
-@Composable
-fun Context() = LocalContext.current
-
 /**
  * Creates the button to confirm and start the creation of the profile
  */

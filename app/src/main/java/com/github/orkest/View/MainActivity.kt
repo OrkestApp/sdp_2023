@@ -7,11 +7,15 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.compose.rememberNavController
 import com.github.orkest.Constants
+<<<<<<< HEAD
 import com.github.orkest.Model.FireStoreDatabaseAPI
 import com.github.orkest.Model.PlaySpotify
 import com.github.orkest.Model.Providers
 
 import com.github.orkest.View.notification.Notification
+=======
+
+>>>>>>> parent of a816c1a (Merge branch 'main' into FollowListActivity)
 
 class MainActivity : AppCompatActivity() {
 
@@ -23,10 +27,8 @@ class MainActivity : AppCompatActivity() {
             }
             NavigationBar.CreateNavigationBar(navController = rememberNavController(), Constants.CURRENT_LOGGED_USER)
         }
-
-        Notification(this, null).createNotificationChannel()
-        Notification(this, null).promptUserToEnableNotifications()
     }
+<<<<<<< HEAD
 
     override fun onStart() {
         super.onStart()
@@ -41,6 +43,6 @@ class MainActivity : AppCompatActivity() {
 
 
 
+=======
+>>>>>>> parent of a816c1a (Merge branch 'main' into FollowListActivity)
 }
-
-

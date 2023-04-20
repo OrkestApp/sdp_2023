@@ -23,19 +23,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
+import com.github.orkest.Constants
 import com.github.orkest.R
 import com.github.orkest.View.EditProfileActivity
+import com.github.orkest.View.NavDrawerButton
+import kotlinx.coroutines.CoroutineScope
 import com.github.orkest.ViewModel.profile.ProfileViewModel
 import androidx.compose.ui.graphics.Color
 import com.github.orkest.View.FollowListActivity
-import com.github.orkest.Constants
-import com.github.orkest.View.NavDrawerButton
 import com.github.orkest.View.auth.AuthActivity
-import com.github.orkest.View.notification.Notification
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.CoroutineScope
 
 
 private val topInterfaceHeight = 150.dp
@@ -112,11 +111,6 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
                         val auth = FirebaseAuth.getInstance()
                         val intent = Intent(context, AuthActivity::class.java)
                         auth.signOut()
-
-                        //notification
-                        Notification(context,null).sendNotification( "Orkest", "You've signed out ;)",
-                            "channel_id_signout", "channel_name_signout", 0)
-
                         //uncomment if un-caching is needed
                         GoogleSignIn.getClient(context, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut()
                         context.startActivity(intent)
@@ -130,7 +124,6 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
 
     }
 }
-
 
 /**
  * The button to sign out of the app

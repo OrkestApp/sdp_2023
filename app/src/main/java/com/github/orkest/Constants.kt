@@ -37,6 +37,7 @@ class Constants {
         val DUMMY_LAST_CONNECTED_TIME: LocalDateTime =
             LocalDateTime.of(2021, 5, 1, 12, 0)
 
+<<<<<<< HEAD
 
         /**
          * Function to play a song on the user's provider app
@@ -59,6 +60,8 @@ class Constants {
 
 
         val NOTIFICATION_CHANNEL_ID = "your_channel_id"
+=======
+>>>>>>> parent of a816c1a (Merge branch 'main' into FollowListActivity)
         val MOCK_USER = User("Jacob", profile = Profile(username = "Jacob", profilePictureId = R.drawable.powerrangerblue))
 
     }

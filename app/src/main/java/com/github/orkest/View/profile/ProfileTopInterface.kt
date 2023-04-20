@@ -11,12 +11,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material.*
-import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.runtime.*
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,17 +26,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
-import androidx.navigation.NavController
-import com.github.orkest.Model.Profile
 import com.github.orkest.R
 import com.github.orkest.View.EditProfileActivity
-import com.github.orkest.View.MainActivity
 import com.github.orkest.ViewModel.profile.ProfileViewModel
 import androidx.compose.ui.graphics.Color
 import androidx.core.app.NotificationCompat
 import com.github.orkest.Constants
 import com.github.orkest.View.NavDrawerButton
 import com.github.orkest.View.auth.AuthActivity
+import com.github.orkest.View.notification.Notification
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
@@ -123,7 +118,7 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
                         auth.signOut()
 
                         //notification
-                        sendNotification(context, "Orkest", "You've signed out ;)", "channel_id_signout")
+                        Notification().sendNotificationSignOut(context, "Orkest", "You've signed out ;)", "channel_id_signout")
 
                         //uncomment if un-caching is needed
                         GoogleSignIn.getClient(context, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut()
@@ -137,26 +132,6 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
 
 
     }
-}
-
-/**
- * Send a Notification for the user when signing out
- * This is an example to later finish developing the notifications
- */
-fun sendNotification(context: Context, title: String, message: String, channelId: String) {
-    val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-    val channel = NotificationChannel(channelId, "Sign Out Channel", NotificationManager.IMPORTANCE_DEFAULT)
-    notificationManager.createNotificationChannel(channel)
-
-    val notificationBuilder = NotificationCompat.Builder(context, channelId)
-        .setContentTitle(title)
-        .setContentText(message)
-        .setSmallIcon(android.R.drawable.ic_dialog_info)
-
-    notificationManager.notify(Random.nextInt(1000000), notificationBuilder.build())
-
-    Log.d("Notification",title)
 }
 
 

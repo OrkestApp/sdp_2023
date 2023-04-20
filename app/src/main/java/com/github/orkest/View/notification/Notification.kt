@@ -6,9 +6,12 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.provider.Settings
+import android.util.Log
 import androidx.appcompat.app.AlertDialog
+import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.github.orkest.Constants.Companion.NOTIFICATION_CHANNEL_ID
+import kotlin.random.Random
 
 class Notification {
 
@@ -17,8 +20,8 @@ class Notification {
      * To inform the user to enable the notifications for this app
      */
     fun createNotificationChannel(context: Context) {
-        val name = "Your Channel Name"
-        val descriptionText = "Your Channel Description"
+        val name = "Notification Channel"
+        val descriptionText = "To receive cool notifications ;)"
         val importance = NotificationManager.IMPORTANCE_DEFAULT
         val channel = NotificationChannel(NOTIFICATION_CHANNEL_ID, name, importance).apply {
             description = descriptionText
@@ -62,5 +65,25 @@ class Notification {
         } else {
             // Notifications are already enabled
         }
+    }
+
+    /**
+     * Send a Notification for the user when signing out
+     * This is an example to later finish developing the notifications
+     */
+    fun sendNotificationSignOut(context: Context, title: String, message: String, channelId: String) {
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        val channel = NotificationChannel(channelId, "Sign Out Channel", NotificationManager.IMPORTANCE_DEFAULT)
+        notificationManager.createNotificationChannel(channel)
+
+        val notificationBuilder = NotificationCompat.Builder(context, channelId)
+            .setContentTitle(title)
+            .setContentText(message)
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+
+        notificationManager.notify(Random.nextInt(1000000), notificationBuilder.build())
+
+        Log.d("Notification",title)
     }
 }

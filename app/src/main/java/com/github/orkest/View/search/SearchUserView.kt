@@ -27,15 +27,14 @@ class SearchUserView {
         @OptIn(ExperimentalMaterial3Api::class)
         @Composable
 
-
-                /**
-                 * @param viewModel use to communicate with the Backend
-                 *
-                 *This method display the search bar, and support the drawing of the future users that will
-                 * be find in the database
-                 *
-                 * the viewmodel communicate back to the searchUi view using futures
-                 */
+        /**
+         * @param viewModel use to communicate with the Backend
+         *
+         *This method display the search bar, and support the drawing of the future users that will
+         * be find in the database
+         *
+         * the viewmodel communicate back to the searchUi view using futures
+         */
         fun SearchUi(viewModel: SearchViewModel) {
             //need to use remember because it triggers an action each time
             var text by remember { mutableStateOf("") }

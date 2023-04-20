@@ -56,7 +56,7 @@ fun sharedMusicPost(profile: Profile, song: Song, message: String) {
                     Message(message = message)
                 }
                 Spacer(modifier = Modifier.width(separator))
-                SongCover(pictureId = song.pictureId)
+                //SongCover(pictureId = song.pictureId)
             }
             Spacer(modifier = Modifier.height(separator))
             Row(modifier = Modifier
@@ -79,9 +79,9 @@ fun playMusic(song: Song) {
         .clip(shape = RoundedCornerShape(roundedCornerValue))) {
             PlayButton()
             Spacer(modifier = Modifier.width(separator))
-            Text(text = song.name, fontWeight = FontWeight.Bold, fontSize = fontSize)
+            Text(text = song.Title, fontWeight = FontWeight.Bold, fontSize = fontSize)
             Text(" - ", fontSize = fontSize)
-            SongInfo(author = song.author, album = song.album)
+            SongInfo(author = song.Artist, album = song.Album)
     }
 }
 

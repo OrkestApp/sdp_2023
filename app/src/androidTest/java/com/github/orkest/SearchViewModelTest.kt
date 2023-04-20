@@ -6,14 +6,11 @@ import com.github.orkest.Model.FireStoreDatabaseAPI
 import com.github.orkest.Model.Profile
 import com.github.orkest.Model.User
 import com.github.orkest.View.search.SearchUserView
-import com.github.orkest.ViewModel.auth.AuthViewModelTest
 import com.github.orkest.ViewModel.search.SearchViewModel
-import com.google.firebase.firestore.ktx.firestoreSettings
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert
 import org.junit.*
-import java.util.concurrent.CompletableFuture
 
 class SearchViewModelTest {
     val user1 = User(username = "Alico", profile = Profile("Alico"))
@@ -78,6 +75,7 @@ class SearchViewModelTest {
         composeTestRule.onNodeWithContentDescription("Contact profile picture").assertIsDisplayed()
 
     }
+
 
     @Test
     fun whenFirstLettersOfUsernamesIsTypedDisplayCorrectUsers(){

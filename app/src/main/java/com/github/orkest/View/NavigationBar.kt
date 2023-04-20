@@ -81,7 +81,9 @@ class NavigationBar {
                 ) {
                     composable("HomePage") { FeedActivity(PostViewModel()) }
                     composable("SearchPage") { SearchUserView.SearchUi(viewModel = viewModel) }
-                    composable("PlaylistPage") { Text(text = "Playlist tab") }
+                    composable("PlaylistPage") {
+                        Text("Playlist Page")
+                    }
                     composable("ProfilePage") {
                             ProfileActivityScreen(ProfileActivity(), viewModel = ProfileViewModel(Constants.CURRENT_LOGGED_USER))
                     }

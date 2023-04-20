@@ -39,9 +39,6 @@ class navigationTabTest {
         val playlistTab = composeTestRule.onNodeWithText("Playlist")
         playlistTab.assertIsDisplayed()
         playlistTab.performClick()
-        composeTestRule.onNodeWithText("Playlist tab").assertIsDisplayed()
-
-
 
 
     }

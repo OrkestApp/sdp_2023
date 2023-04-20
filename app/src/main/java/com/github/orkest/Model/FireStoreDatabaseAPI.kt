@@ -6,6 +6,7 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
@@ -71,7 +72,6 @@ class FireStoreDatabaseAPI {
             else {
                 future.completeExceptionally(java.lang.IllegalStateException("2 user with the same name in the database"))
             }
-
             future
         }
 
@@ -144,6 +144,22 @@ class FireStoreDatabaseAPI {
 
     //===========================SONG POST OPERATIONS======================
 
+    fun storeTokenInDatabase(username:String,token:String?): CompletableFuture<Boolean>{
+        val completableFuture = CompletableFuture<Boolean>()
+        val path = "deezerToken"
+        db.collection(path).document(username).set(hashMapOf ("token" to token)).addOnSuccessListener {
+            completableFuture.complete(true)
+        }.addOnFailureListener{
+            completableFuture.complete(false)
+        }
+        return completableFuture
+    }
+
+
+
+
+
+
     private fun getPostCollectionRef(username: String): CollectionReference{
         val firstLetter = username[0].uppercase()
         //TODO: Discuss other option: "posts/user-$firstLetter/$username"
@@ -167,6 +183,22 @@ class FireStoreDatabaseAPI {
 
         return future
     }
+
+    /**
+     * @param post the post we want to add in the database
+     * @param
+     * @return a completable future that completes to true only if post is correctly added
+     */
+    fun addCommentInDataBase(username: String, post_date: String, comment: Comment): CompletableFuture<Boolean> {
+        val future = CompletableFuture<Boolean>()
+        val postDocument = getPostCollectionRef(username).document("${post_date}/comments/${comment.date}")
+
+        postDocument.set(comment).addOnSuccessListener { future.complete(true) }
+            .addOnFailureListener { future.completeExceptionally(it) }
+
+        return future
+    }
+
 
     /**
      * @param post the post we want to delete in the database
@@ -202,6 +234,28 @@ class FireStoreDatabaseAPI {
 
         return future
     }
+
+
+    /**
+     * @param us
+     */
+    fun getPostCommentsFromDataBase(post_username: String, post_date: String): CompletableFuture<List<Comment>>{
+        val future = CompletableFuture<List<Comment>>()
+        val usersPosts = getPostCollectionRef(post_username).document(post_date).collection("comments")
+
+        usersPosts.get().addOnSuccessListener{
+            // Get all posts documents as a list of posts objects
+            val list: MutableList<Comment> =  it.toObjects(Comment::class.java)
+
+            future.complete(list)
+        } //Propagates the exception in case of exception
+            .addOnFailureListener{
+                future.completeExceptionally(it)
+            }
+
+        return future
+    }
+
 
     /**
      * @param lastConnection the last time the user was connected

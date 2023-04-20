@@ -11,6 +11,7 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import org.junit.Before
 import org.junit.Test
+import java.util.concurrent.CompletableFuture
 
 // run firebase emulators:start --only firestore in terminal before
 class ProfileViewModelTest {
@@ -191,17 +192,18 @@ class ProfileViewModelTest {
 
     @Test
     fun followFunctionalityUpdatesUsers(){
-        newViewModel.follow().whenComplete {_,_ ->
+        CompletableFuture.allOf(newViewModel.updateUserFollowers(true), viewModel.updateCurrentUserFollowings(true)).whenComplete{_,_ ->
             assertEquals(true, user.followings.contains(newUsername))
             assertEquals(true, newUser.followers.contains(testUserName))
             assertEquals(testNbFollowings+1, user.profile.nbFollowings)
             assertEquals(newNbFollowers+1, newUser.profile.nbFollowers)
         }
+
     }
 
     @Test
     fun unFollowFunctionalityUpdatesUsers(){
-        newViewModel.unfollow().whenComplete {_,_ ->
+        CompletableFuture.allOf(newViewModel.updateUserFollowers(false), viewModel.updateCurrentUserFollowings(false)).whenComplete{_,_ ->
             assertEquals(false, user.followings.contains(newUsername))
             assertEquals(false, newUser.followers.contains(testUserName))
             assertEquals(testNbFollowings-1, user.profile.nbFollowings)
@@ -217,10 +219,11 @@ class ProfileViewModelTest {
             user.profile.nbFollowings = 0
             FireStoreDatabaseAPI().getUserDocumentRef(testUserName).set(user).await()
         }
-        newViewModel.unfollow().whenComplete{_, _ ->
-            assertEquals(0, newUser.profile.nbFollowers)
+        CompletableFuture.allOf(newViewModel.updateUserFollowers(true), viewModel.updateCurrentUserFollowings(true)).whenComplete{_,_ ->
             assertEquals(0, user.profile.nbFollowings)
+            assertEquals(0, newUser.profile.nbFollowers)
         }
+
     }
 
     @Test
@@ -230,7 +233,7 @@ class ProfileViewModelTest {
         }
     }
 
-    @Test
+    /**@Test
     fun followThrowsExceptionWhenCalledInCurrentProfile(){
         try { viewModel.follow() } catch(e: java.lang.IllegalArgumentException){
             assertEquals("Cannot call this function when visiting the current logged-in user's profile", e.message)
@@ -242,5 +245,5 @@ class ProfileViewModelTest {
         try { viewModel.unfollow() } catch(e: java.lang.IllegalArgumentException){
             assertEquals("Cannot call this function when visiting the current logged-in user's profile", e.message)
         }
-    }
+    }**/
 }

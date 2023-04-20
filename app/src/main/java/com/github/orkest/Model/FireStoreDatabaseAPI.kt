@@ -144,6 +144,22 @@ class FireStoreDatabaseAPI {
 
     //===========================SONG POST OPERATIONS======================
 
+    fun storeTokenInDatabase(username:String,token:String?): CompletableFuture<Boolean>{
+        val completableFuture = CompletableFuture<Boolean>()
+        val path = "deezerToken"
+        db.collection(path).document(username).set(hashMapOf ("token" to token)).addOnSuccessListener {
+            completableFuture.complete(true)
+        }.addOnFailureListener{
+            completableFuture.complete(false)
+        }
+        return completableFuture
+    }
+
+
+
+
+
+
     private fun getPostCollectionRef(username: String): CollectionReference{
         val firstLetter = username[0].uppercase()
         //TODO: Discuss other option: "posts/user-$firstLetter/$username"

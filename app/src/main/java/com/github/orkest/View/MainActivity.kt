@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         Notification(this, null).createNotificationChannel()
-        Notification(this, null).promptUserToEnableNotifications()
+        Notification(this, null).promptUserToEnableNotifications(this)
     }
 
     override fun onStart() {

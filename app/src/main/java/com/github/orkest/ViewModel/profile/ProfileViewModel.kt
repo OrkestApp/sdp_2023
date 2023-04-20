@@ -177,4 +177,5 @@ open class ProfileViewModel(private val user: String) : ViewModel() {
         }
         return true //means that the values have been updated
     }
+
 }

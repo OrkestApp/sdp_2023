@@ -100,6 +100,7 @@ open class AuthViewModel: ViewModel() {
         user.serviceProvider = selectedProvider.value.value
         //updated with the email of the user
         user.mail = auth.currentUser?.email.toString()
+
     }
 
     /**

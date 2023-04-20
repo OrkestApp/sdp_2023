@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -34,17 +35,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import com.github.orkest.Constants
 import com.github.orkest.Model.FireStoreDatabaseAPI
-import com.github.orkest.View.profile.ProfileActivity
-import com.github.orkest.View.profile.ProfileActivityScreen
 import com.github.orkest.View.theme.OrkestTheme
-import com.github.orkest.ViewModel.profile.ProfileViewModel
-import com.google.firebase.auth.FirebaseAuth
+import com.github.orkest.ViewModel.profile.EditProfileViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 const val PADDING_FROM_SCREEN_BORDER = 10
 
-private val updatedData = mutableMapOf<String, Any>()
+//private val updatedData = mutableMapOf<String, Any>()
 
 class EditProfileActivity : ComponentActivity() {
 
@@ -83,10 +81,18 @@ fun EditProfileScreen(activity: ComponentActivity) {
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
 
+    val viewModel = EditProfileViewModel()
+
+    val pickImageLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let { viewModel.onImagePicked(it) }
+    }
+
     Scaffold(
         // keep track of the state of the scaffold (whether it is opened or closed)
         scaffoldState = scaffoldState,
-        topBar = { TopBar(activity, coroutineScope = coroutineScope, scaffoldState = scaffoldState) },
+        topBar = { TopBar(activity, coroutineScope = coroutineScope, scaffoldState = scaffoldState, viewModel = viewModel) },
         // The content displayed inside the drawer when you click on the hamburger menu button
         drawerContent = { CreateMenuDrawer() },
 
@@ -96,15 +102,13 @@ fun EditProfileScreen(activity: ComponentActivity) {
                 .padding(padding)
             Column() {
                 // profile pic and edit button
-                EditProfileImage()
+                EditProfileImage(viewModel, pickImageLauncher)
                 Divider()
-                MainBody()
+                MainBody(viewModel)
             }
         },
         drawerGesturesEnabled = true
     )
-
-
 }
 
 @Composable
@@ -115,7 +119,7 @@ fun NavDrawerButton(coroutineScope: CoroutineScope, scaffoldState: ScaffoldState
                 scaffoldState.drawerState.open()
             else
                 scaffoldState.drawerState.close()
-        }
+            }
         }
     ) {
         Icon(imageVector = Icons.Rounded.Menu, contentDescription = "Drawer Icon")
@@ -151,7 +155,8 @@ fun CreateMenuDrawer() {
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(activity: ComponentActivity, coroutineScope: CoroutineScope, scaffoldState: ScaffoldState) {
+fun TopBar(activity: ComponentActivity, coroutineScope: CoroutineScope,
+           scaffoldState: ScaffoldState, viewModel: EditProfileViewModel) {
 
     val context = LocalContext.current
 
@@ -175,9 +180,8 @@ fun TopBar(activity: ComponentActivity, coroutineScope: CoroutineScope, scaffold
                 Text(
                     text = "Save",
                     modifier = Modifier.clickable {
-
                         val username = Constants.CURRENT_LOGGED_USER
-                        FireStoreDatabaseAPI().updateUserProfile(username, updatedData)
+                        viewModel.updateUserProfile(username)
 
                         val intent = Intent(context, MainActivity::class.java)
                         context.startActivity(intent)
@@ -196,10 +200,10 @@ fun TopBar(activity: ComponentActivity, coroutineScope: CoroutineScope, scaffold
  * The larger part of the screen containing the fields to modify textual information
  */
 @Composable
-fun MainBody() {
+fun MainBody(viewModel: EditProfileViewModel) {
     Column() {
         //EditNameSection(name = "Username", default = "default username")
-        EditBio()
+        EditBio(viewModel)
     }
 }
 
@@ -208,7 +212,7 @@ fun MainBody() {
  */
 @Composable
 @OptIn(coil.annotation.ExperimentalCoilApi::class)
-fun EditProfileImage() {
+fun EditProfileImage(viewModel: EditProfileViewModel, pickImageLauncher: ActivityResultLauncher<String>) {
     val imageUri = rememberSaveable { mutableStateOf("") }
     val painter = rememberImagePainter(
         imageUri.value.ifEmpty { R.drawable.blank_profile_pic }
@@ -243,7 +247,9 @@ fun EditProfileImage() {
         // clickable Text offering the possibility to change profile pic
         Text(
             text = "edit picture",
-            modifier = Modifier.clickable { launcher.launch("image/*") }
+            modifier = Modifier.clickable {
+                pickImageLauncher.launch("image/*")
+            }
         )
     }
 }
@@ -283,7 +289,7 @@ fun EditNameSection(name: String, default: String) {
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditBio() {
+fun EditBio(viewModel: EditProfileViewModel) {
     var bio by rememberSaveable { mutableStateOf("Description") }
     Row(
         modifier = Modifier
@@ -306,7 +312,7 @@ fun EditBio() {
         )
     }
 
-    updatedData.put("profile.bio", bio)
+    viewModel.updatedData["profile.bio"] = bio
 }
 
 // TODO: transform this into a class since it is something that could be reusable?

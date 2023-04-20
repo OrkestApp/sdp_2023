@@ -7,7 +7,9 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import com.github.orkest.Model.PlaySpotify
 import com.github.orkest.Model.Providers
+import com.github.orkest.Model.Profile
 import com.github.orkest.Model.Song
+import com.github.orkest.Model.User
 import java.time.LocalDateTime
 import java.time.ZoneId
 
@@ -35,6 +37,7 @@ class Constants {
         val DUMMY_LAST_CONNECTED_TIME: LocalDateTime =
             LocalDateTime.of(2021, 5, 1, 12, 0)
 
+
         /**
          * Function to play a song on the user's provider app
          */
@@ -53,6 +56,10 @@ class Constants {
 //                }
 //            }
         }
+
+
+        val NOTIFICATION_CHANNEL_ID = "your_channel_id"
+        val MOCK_USER = User("Jacob", profile = Profile(username = "Jacob", profilePictureId = R.drawable.powerrangerblue))
 
     }
 }

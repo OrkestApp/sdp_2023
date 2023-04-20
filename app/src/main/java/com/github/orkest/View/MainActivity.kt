@@ -11,6 +11,7 @@ import com.github.orkest.Model.FireStoreDatabaseAPI
 import com.github.orkest.Model.PlaySpotify
 import com.github.orkest.Model.Providers
 
+import com.github.orkest.View.notification.Notification
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,6 +23,9 @@ class MainActivity : AppCompatActivity() {
             }
             NavigationBar.CreateNavigationBar(navController = rememberNavController(), Constants.CURRENT_LOGGED_USER)
         }
+
+        Notification(this, null).createNotificationChannel()
+        Notification(this, null).promptUserToEnableNotifications()
     }
 
     override fun onStart() {
@@ -34,4 +38,9 @@ class MainActivity : AppCompatActivity() {
         if (Constants.CURRENT_USER_PROVIDER == Providers.SPOTIFY)
              PlaySpotify.setupSpotifyAppRemote(this)
     }
+
+
+
 }
+
+

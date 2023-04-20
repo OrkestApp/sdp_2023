@@ -36,7 +36,9 @@ import com.github.orkest.View.notification.Notification
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
+import java.util.concurrent.CompletableFuture
 import kotlinx.coroutines.CoroutineScope
+
 
 
 private val topInterfaceHeight = 150.dp
@@ -184,22 +186,10 @@ fun FollowButton(viewModel: ProfileViewModel, isUserFollowed: Boolean?){
 }
 
 private fun followOrUnfollow(viewModel: ProfileViewModel, isUserFollowed: Boolean) {
-    if (isUserFollowed) {
-        //The unfollow button is displayed at this stage, when clicked on,
-        //the current user unfollows the account and isUserFollowed is updated to false
-        viewModel.unfollow().whenComplete { _, _ ->
-            viewModel.isUserFollowed.value = false
-        }
-    } else {
-        //The follow button is displayed at this stage, when clicked on,
-        //the current user follows the account and isUserFollowed is updated to true
-        viewModel.follow().whenComplete { _, _ ->
-            viewModel.isUserFollowed.value = true
-        }
+    CompletableFuture.allOf(viewModel.updateUserFollowers(!isUserFollowed), viewModel.updateCurrentUserFollowings(!isUserFollowed)).thenApply{
+        viewModel.isUserFollowed.value = !isUserFollowed
     }
 }
-
-
 
 @Composable
 fun UserName(username: String?){

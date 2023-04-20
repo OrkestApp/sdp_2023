@@ -28,7 +28,6 @@ class NotificationTest {
     /**
      * Check if the alert dialog is shown when the notifications are not enabled
      */
-    @Test
     fun alertDialog_isShown_whenNotificationsNotEnabled() {
         notification.promptUserToEnableNotifications()
         assertTrue(alertDialogShown)

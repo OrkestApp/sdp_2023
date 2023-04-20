@@ -3,9 +3,7 @@ package com.github.orkest
 import com.github.orkest.Model.DeezerApiIntegration
 import com.github.orkest.Model.DeezerModelClasses
 import com.github.orkest.Model.FireStoreDatabaseAPI
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.ktx.firestoreSettings
 import com.google.firebase.ktx.Firebase
 import org.junit.Assert
 import org.junit.Test
@@ -13,6 +11,10 @@ import org.junit.Test
 class DeezerApiIntegrationTest {
 
 
+
+    /**
+     *
+     */
     //@Test Uncomment test online.
     /**
      * This test need to be performed online
@@ -155,4 +157,6 @@ class DeezerApiIntegrationTest {
         Assert.assertEquals(track.id,"434591652")
         Assert.assertEquals(track.album.title,"Trône")
       }
+
+
 }

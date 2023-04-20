@@ -193,7 +193,7 @@ private fun SongInfo(song: Song){
     Row(Modifier.padding(10.dp)) {
         //Add the song's picture at the left of the card
         Image(
-            painter = painterResource(id = if(song.pictureId == -1) R.drawable.album_cover else song.pictureId ),
+            painter = painterResource(id = R.drawable.album_cover),
             contentDescription = "Cover of the album of the song Rude Boy by Rihanna",
             modifier = Modifier
                 .height(80.dp)
@@ -205,11 +205,11 @@ private fun SongInfo(song: Song){
         Column(verticalArrangement = Arrangement.SpaceEvenly) {
 
             //Add the song's title at the right of the album
-            Text(text = song.name, fontSize = 25.sp)
+            Text(text = song.Title, fontSize = 25.sp)
             //Add the song's artist at the right of the album
-            Text(text = song.author, color = Color.Gray, fontSize = 18.sp)
+            Text(text = song.Artist, color = Color.Gray, fontSize = 18.sp)
             //Add the song's album at the right of the album
-            Text(text = song.album, color = Color.Gray, fontSize = 14.sp)
+            Text(text = song.Album, color = Color.Gray, fontSize = 14.sp)
         }
     }
 }

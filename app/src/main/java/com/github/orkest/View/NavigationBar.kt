@@ -1,6 +1,8 @@
 package com.github.orkest.View
 
+
 import androidx.compose.foundation.layout.Column
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.BottomNavigation
@@ -10,6 +12,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -22,12 +25,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.github.orkest.Constants
+
 import com.github.orkest.Model.Profile
+import com.github.orkest.Model.User
 import com.github.orkest.View.feed.FeedActivity
 import com.github.orkest.View.profile.ProfileActivity
 import com.github.orkest.View.profile.ProfileActivityScreen
 import com.github.orkest.View.search.SearchUserView
 import com.github.orkest.View.sharedMusic.sharedMusicPost
+import com.github.orkest.View.sharing.UsersList
+import com.github.orkest.ViewModel.playlist.PlaylistViewModel
 import com.github.orkest.ViewModel.post.PostViewModel
 import com.github.orkest.ViewModel.profile.ProfileViewModel
 import com.github.orkest.ViewModel.search.SearchViewModel
@@ -38,6 +45,7 @@ class NavigationBar {
 
     companion object {
         private val viewModel = SearchViewModel()
+        @SuppressLint("UnrememberedMutableState")
         @Composable
         fun CreateNavigationBar(navController: NavHostController, currentUser: String) {
 
@@ -84,8 +92,10 @@ class NavigationBar {
                 ) {
                     composable("HomePage") { FeedActivity(PostViewModel()) }
                     composable("SearchPage") { SearchUserView.SearchUi(viewModel = viewModel) }
+
                     composable("PlaylistPage") {
-                        Text("Playlist Page")
+
+                        UsersList(PlaylistViewModel())
                     }
                     composable("ProfilePage") {
                             ProfileActivityScreen(ProfileActivity(), viewModel = ProfileViewModel(Constants.CURRENT_LOGGED_USER))

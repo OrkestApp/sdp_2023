@@ -1,4 +1,4 @@
-package com.github.orkest
+package com.github.orkest.ViewModel
 
 import com.github.orkest.Model.DeezerApiIntegration
 import com.github.orkest.Model.DeezerModelClasses

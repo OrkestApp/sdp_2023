@@ -3,7 +3,9 @@ package com.github.orkest
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import com.github.orkest.Model.Profile
 import com.github.orkest.Model.Song
+import com.github.orkest.Model.User
 import java.time.LocalDateTime
 import java.time.ZoneId
 
@@ -30,7 +32,6 @@ class Constants {
             LocalDateTime.of(2021, 5, 1, 12, 0)
 
         val NOTIFICATION_CHANNEL_ID = "your_channel_id"
-
-
+        val MOCK_USER = User("Jacob", profile = Profile(username = "Jacob", profilePictureId = R.drawable.powerrangerblue))
     }
 }

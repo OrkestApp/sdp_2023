@@ -110,7 +110,7 @@ class DeezerApiIntegration {
     }
 
     /**
-     * add a
+     * add a song the Orkest playlist of the User
      */
     fun addANewSongToOrkestPlayList(access_token: String,playlistId: String="Orkest",trackId:String):CompletableFuture<Boolean>{
         val completableFuture = CompletableFuture<Boolean>()

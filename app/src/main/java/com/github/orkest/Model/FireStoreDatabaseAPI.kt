@@ -8,6 +8,7 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
@@ -92,7 +93,6 @@ class FireStoreDatabaseAPI {
             else {
                 future.completeExceptionally(java.lang.IllegalStateException("2 user with the same name in the database"))
             }
-
             future
         }
 

@@ -192,6 +192,7 @@ private fun onConfirmListener(context: Context, error: MutableState<Boolean>, er
         }else{
             if(result) {
                 Constants.CURRENT_LOGGED_USER = viewModel.getUsername().text
+                Constants.CURRENT_USER_PROVIDER = viewModel.getProvider()
                 //Launches intent to the main Activity
                 val intent = Intent(context, MainActivity::class.java)
                 context.startActivity(intent)

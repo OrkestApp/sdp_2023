@@ -120,10 +120,6 @@ fun SignUpForm(viewModel: AuthViewModel) {
         })
 }
 
-//function to get the context
-@Composable
-fun Context() = LocalContext.current
-
 /**
  * Creates the button to confirm and start the creation of the profile
  */
@@ -192,6 +188,7 @@ private fun onConfirmListener(context: Context, error: MutableState<Boolean>, er
         }else{
             if(result) {
                 Constants.CURRENT_LOGGED_USER = viewModel.getUsername().text
+                Constants.CURRENT_USER_PROVIDER = viewModel.getProvider()
                 //Launches intent to the main Activity
                 val intent = Intent(context, MainActivity::class.java)
                 context.startActivity(intent)

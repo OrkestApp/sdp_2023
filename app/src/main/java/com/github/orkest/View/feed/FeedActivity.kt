@@ -13,6 +13,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Comment
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -32,6 +35,7 @@ import com.github.orkest.Model.Song
 import com.github.orkest.R
 import com.github.orkest.View.sharedMusic.sharedMusicPost
 import com.github.orkest.ViewModel.post.PostViewModel
+import java.time.LocalDateTime
 
 
 /**
@@ -179,7 +183,7 @@ fun SongCard(song: Song){
             Spacer(modifier = Modifier.width(5.dp))
 
             //Add a play button at the right of the card
-            PlayButton()
+            PlayButton(song)
         }
 }
 
@@ -189,7 +193,7 @@ private fun SongInfo(song: Song){
     Row(Modifier.padding(10.dp)) {
         //Add the song's picture at the left of the card
         Image(
-            painter = painterResource(id = if(song.pictureId == -1) R.drawable.album_cover else song.pictureId ),
+            painter = painterResource(id = R.drawable.album_cover),
             contentDescription = "Cover of the album of the song Rude Boy by Rihanna",
             modifier = Modifier
                 .height(80.dp)
@@ -201,24 +205,29 @@ private fun SongInfo(song: Song){
         Column(verticalArrangement = Arrangement.SpaceEvenly) {
 
             //Add the song's title at the right of the album
-            Text(text = song.name, fontSize = 25.sp)
+            Text(text = song.Title, fontSize = 25.sp)
             //Add the song's artist at the right of the album
-            Text(text = song.author, color = Color.Gray, fontSize = 18.sp)
+            Text(text = song.Artist, color = Color.Gray, fontSize = 18.sp)
             //Add the song's album at the right of the album
-            Text(text = song.album, color = Color.Gray, fontSize = 14.sp)
+            Text(text = song.Album, color = Color.Gray, fontSize = 14.sp)
         }
     }
 }
 
 @Composable
-private fun PlayButton(){
-    Icon(painter = painterResource(id = R.drawable.play_button),
-        contentDescription = "Play button",
+private fun PlayButton(song: Song){
+    val isPlayed = remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    Icon(painter = if (!isPlayed.value) painterResource(id = R.drawable.play_button)
+                    else painterResource(id = R.drawable.pause_button),
+        contentDescription = if (!isPlayed.value) "Play button" else "Pause button",
         modifier = Modifier
             .height(50.dp)
             .width(50.dp)
             .clip(shape = RoundedCornerShape(10.dp))
-            .clickable { })
+            .clickable {
+                Constants.playMusicButtonClicked(song, isPlayed, context)
+            })
 }
 
 @Composable
@@ -253,13 +262,6 @@ private fun Reaction(post: Post){
 }
 
 /* TODO modularize in next sprint */
-
-/*
-@Composable
-private fun CommentButton(post: Post) {
-
-}
-*/
 
 @Composable
 private fun ReactionIcon(iconId: Int, contentDescription:String, testTag: String) {

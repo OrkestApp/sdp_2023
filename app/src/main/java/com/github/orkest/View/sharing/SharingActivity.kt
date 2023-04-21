@@ -19,9 +19,10 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.os.bundleOf
+import com.github.orkest.Constants
 import com.github.orkest.Model.Authorization.Companion.getLoginActivityTokenIntent
 import com.github.orkest.Model.Authorization.Companion.requestUserAuthorization
-import com.github.orkest.View.profile.ProfileActivity
 import com.github.orkest.View.search.SearchUserView
 import com.github.orkest.View.sharing.ui.theme.OrkestTheme
 import com.github.orkest.ViewModel.search.SearchViewModel
@@ -232,8 +233,18 @@ fun UserSelection(){
             items(list){ username ->
                 // create an intent
                 val context = LocalContext.current
-                // Temporary solution-to be replaced by an intent to launch the chat with the user
-                val intent : Intent = Intent(context, ProfileActivity::class.java)
+
+                // send username and name of the song
+                Log.d("STORING", "Song name: $spotifySongName")
+                val intent = Intent(context, PlaylistActivity::class.java)
+                intent.putExtras(
+                    bundleOf(
+                        "songName" to spotifySongName,
+                        "songID" to spotifySongID,
+                        "senderUsername" to Constants.CURRENT_LOGGED_USER,
+                        "receiverUsername" to username
+                    )
+                )
 
                 SearchUserView.CreateUser(name = username, intent)
 

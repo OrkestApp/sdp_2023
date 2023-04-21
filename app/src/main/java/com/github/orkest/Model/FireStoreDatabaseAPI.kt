@@ -1,14 +1,16 @@
 package com.github.orkest.Model
 
+import android.content.ContentValues
+import android.content.ContentValues.TAG
 import android.util.Log
+import com.github.orkest.Constants
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
-import com.google.gson.GsonBuilder
-import com.google.gson.reflect.TypeToken
 import java.time.LocalDateTime
 import java.util.concurrent.CompletableFuture
 
@@ -57,6 +59,25 @@ class FireStoreDatabaseAPI {
         }
 
     /**
+     * @param username of the user's follow lists to display
+     * @param isFollowersList is a boolean to indicate whether we want to fetch the followers list if true or the followings list if false
+     *
+     * @return the follow list indicated by the boolean isFollowersList of the user.
+     */
+    fun fetchFollowList(username: String, isFollowersList: Boolean): CompletableFuture<MutableList<String>>{
+        val future = CompletableFuture<MutableList<String>>()
+
+        getUserDocumentRef(username).get().addOnSuccessListener { document ->
+            if(document != null && document.exists()){
+                val user = document.toObject(User::class.java)
+                if (user != null) { if (isFollowersList) future.complete(user.followers) else future.complete(user.followings) }
+            }
+
+        }.addOnFailureListener { e -> Log.d(TAG, "Error fetching follow lists", e) }
+        return future
+    }
+
+    /**
      * @param username search a user with username
      * @return CompletableFuture of user, the User that match the username
      *
@@ -71,7 +92,6 @@ class FireStoreDatabaseAPI {
             else {
                 future.completeExceptionally(java.lang.IllegalStateException("2 user with the same name in the database"))
             }
-
             future
         }
 
@@ -143,6 +163,22 @@ class FireStoreDatabaseAPI {
     }
 
     //===========================SONG POST OPERATIONS======================
+
+    fun storeTokenInDatabase(username:String,token:String?): CompletableFuture<Boolean>{
+        val completableFuture = CompletableFuture<Boolean>()
+        val path = "deezerToken"
+        db.collection(path).document(username).set(hashMapOf ("token" to token)).addOnSuccessListener {
+            completableFuture.complete(true)
+        }.addOnFailureListener{
+            completableFuture.complete(false)
+        }
+        return completableFuture
+    }
+
+
+
+
+
 
     private fun getPostCollectionRef(username: String): CollectionReference{
         val firstLetter = username[0].uppercase()
@@ -267,6 +303,55 @@ class FireStoreDatabaseAPI {
                 val list: MutableList<Post> = it.toObjects(Post::class.java)
                 future.complete(list)
             } //Propagates the exception in case of exception
+            .addOnFailureListener {
+                future.completeExceptionally(it)
+            }
+
+        return future
+    }
+
+    /**
+     * This method stores a shared song to the database of the receiver
+     *
+     * @param song the song we want to add in the database
+     * @param receiver the receiver of the shared song
+     *
+     * @return a completable future that indicates that the song was correctly added
+     */
+    fun storeSharedSongToDataBase(song: Song,sender: String, receiver: String): CompletableFuture<Boolean> {
+        val future = CompletableFuture<Boolean>()
+        val sharedSongDocument1 =
+            db.collection("shared songs")
+                .document(receiver)
+                .collection(sender)
+                .document()
+
+        sharedSongDocument1.set(song).addOnSuccessListener {
+            future.complete(true)
+        }.addOnFailureListener {
+                future.completeExceptionally(it)
+            }
+        return future
+    }
+
+    /**
+     * Fetch songs shared with current user from a sender
+     * @param senderUsername the sender of the shared song
+     *
+     * @return a completable future of a list of post that were recently published
+     */
+    fun fetchSharedSongsFromDataBase(senderUsername: String, receiverUsername: String): CompletableFuture<List<Song>> {
+        val future = CompletableFuture<List<Song>>()
+
+        val sharedSongs = db.collection("shared songs").document(receiverUsername).collection(senderUsername)
+        Log.d("DEBUG FETCH", "FETCHING")
+        sharedSongs.get().addOnSuccessListener {
+
+            // Get all posts documents as a list of posts objects
+            val list: MutableList<Song> = it.toObjects(Song::class.java)
+            Log.d("fetchSharedSongs", "list: $list")
+            future.complete(list)
+        } //Propagates the exception in case of exception
             .addOnFailureListener {
                 future.completeExceptionally(it)
             }

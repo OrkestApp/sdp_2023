@@ -76,6 +76,7 @@ class SearchViewModelTest {
 
     }
 
+
     @Test
     fun whenFirstLettersOfUsernamesIsTypedDisplayCorrectUsers(){
 

@@ -1,5 +1,6 @@
 package com.github.orkest.View.profile
 
+import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -22,18 +23,25 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
+import com.github.orkest.Constants
 import com.github.orkest.R
 import com.github.orkest.View.EditProfileActivity
+import com.github.orkest.View.NavDrawerButton
+import kotlinx.coroutines.CoroutineScope
 import com.github.orkest.ViewModel.profile.ProfileViewModel
 import androidx.compose.ui.graphics.Color
-import com.github.orkest.Constants
+import com.github.orkest.View.FollowListActivity
+import androidx.core.content.ContextCompat.startActivity
+import com.github.orkest.Model.DeezerApiIntegration
+import com.github.orkest.Model.FireStoreDatabaseAPI
 import com.github.orkest.View.NavDrawerButton
 import com.github.orkest.View.auth.AuthActivity
-import com.github.orkest.View.notification.Notification
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.CoroutineScope
+
+import java.util.concurrent.CompletableFuture
+
 
 
 private val topInterfaceHeight = 150.dp
@@ -87,8 +95,8 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
                     horizontalArrangement = Arrangement.SpaceBetween
                 ){
                     //Separate followers/followings in an even way
-                    Column(modifier = Modifier.weight(1f)) { NbFollowers(number(viewModel.nbFollowers.observeAsState().value)) }
-                    Column(modifier = Modifier.weight(1f)) { NbFollowings(number(viewModel.nbFollowings.observeAsState().value)) }
+                    Column(modifier = Modifier.weight(1f)) { NbFollowers(number(viewModel.nbFollowers.observeAsState().value), viewModel.user) }
+                    Column(modifier = Modifier.weight(1f)) { NbFollowings(number(viewModel.nbFollowings.observeAsState().value), viewModel.user) }
                 }
                 Description(viewModel.bio.observeAsState().value)
             }
@@ -110,14 +118,22 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
                         val auth = FirebaseAuth.getInstance()
                         val intent = Intent(context, AuthActivity::class.java)
                         auth.signOut()
-
-                        //notification
-                        Notification(context,null).sendNotification( "Orkest", "You've signed out ;)",
-                            "channel_id_signout", "channel_name_signout", 0)
-
                         //uncomment if un-caching is needed
                         GoogleSignIn.getClient(context, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut()
                         context.startActivity(intent)
+                    }
+                    //
+                    Button(
+                        onClick = {
+
+                            val intent = Intent(Intent.ACTION_VIEW,DeezerApiIntegration.url)
+                            context.startActivity(intent)
+
+
+                        },
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color.Yellow))
+                    {
+                        Text("Link Deezer Account")
                     }
                 }
             } else {
@@ -129,6 +145,10 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
     }
 }
 
+
+private fun launchDeezerAuth(){
+
+}
 
 /**
  * The button to sign out of the app
@@ -164,22 +184,10 @@ fun FollowButton(viewModel: ProfileViewModel, isUserFollowed: Boolean?){
 }
 
 private fun followOrUnfollow(viewModel: ProfileViewModel, isUserFollowed: Boolean) {
-    if (isUserFollowed) {
-        //The unfollow button is displayed at this stage, when clicked on,
-        //the current user unfollows the account and isUserFollowed is updated to false
-        viewModel.unfollow().whenComplete { _, _ ->
-            viewModel.isUserFollowed.value = false
-        }
-    } else {
-        //The follow button is displayed at this stage, when clicked on,
-        //the current user follows the account and isUserFollowed is updated to true
-        viewModel.follow().whenComplete { _, _ ->
-            viewModel.isUserFollowed.value = true
-        }
+    CompletableFuture.allOf(viewModel.updateUserFollowers(!isUserFollowed), viewModel.updateCurrentUserFollowings(!isUserFollowed)).thenApply{
+        viewModel.isUserFollowed.value = !isUserFollowed
     }
 }
-
-
 
 @Composable
 fun UserName(username: String?){
@@ -204,21 +212,42 @@ fun number(nb: Int?): Int{
 }
 
 @Composable
-fun NbFollowers(nb: Int){
+fun NbFollowers(nb: Int, username: String){
+    val context = LocalContext.current
     ClickableText(
         text = AnnotatedString(if (nb > 1) "$nb\nfollowers" else "$nb\nfollower"),
-        onClick = {},
+        onClick = {
+            val intent = Intent(context, FollowListActivity::class.java)
+            intent.putExtra("username", username)
+            intent.putExtra("isFollowers", true)
+            context.startActivity(intent)
+        },
         style = TextStyle( fontSize = fontSize )
     )
 }
 
 @Composable
-fun NbFollowings(nb: Int){
+fun NbFollowings(nb: Int, username: String){
+    val context = LocalContext.current
     ClickableText(
         text = AnnotatedString(if (nb > 1) "$nb\nfollowings" else "$nb\nfollowing"),
-        onClick = {},
+        onClick = {
+            val intent = Intent(context, FollowListActivity::class.java)
+            intent.putExtra("username", username)
+            intent.putExtra("isFollowers", false)
+            context.startActivity(intent)
+        },
         style = TextStyle( fontSize = fontSize )
     )
+}
+
+fun launchFollowListActivity(context: Context, isFollowers: Boolean){
+
+    val intent = Intent(context, FollowListActivity::class.java)
+    //intent.putExtra("username", username)
+    intent.putExtra("isFollowers", false)
+    context.startActivity(intent)
+
 }
 
 @Composable

@@ -10,6 +10,7 @@ import com.github.orkest.Constants
 import com.github.orkest.Model.FireStoreDatabaseAPI
 import com.github.orkest.Model.PlaySpotify
 import com.github.orkest.Model.Providers
+import com.github.orkest.View.notification.Notification
 
 
 class MainActivity : AppCompatActivity() {

@@ -24,7 +24,7 @@ fun UsersList(viewModel: PlaylistViewModel) {
         10
     ) {
         // Temporary static list of users for demo, will be replaced by a list of users from cache and Database
-        User("ehreich2", "", "", Profile("ehreich2", 1))
+        User("emile", "", "", Profile("emile", 1))
     }
     LazyColumn {
         items(messages) { user ->

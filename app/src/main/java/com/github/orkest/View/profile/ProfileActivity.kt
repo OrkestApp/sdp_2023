@@ -25,6 +25,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
+import com.github.orkest.Constants
 import com.github.orkest.Model.Song
 import com.github.orkest.R
 import com.github.orkest.View.*
@@ -92,7 +93,7 @@ fun ProfileActivityScreen(activity: ComponentActivity, viewModel: ProfileViewMod
                 ) {
                     topProfile(viewModel = viewModel, scaffoldState, coroutineScope)
                 }
-                mainBody()
+                mainBody(viewModel)
             }
         },
         drawerGesturesEnabled = true
@@ -106,27 +107,27 @@ fun topProfile(viewModel: ProfileViewModel, scaffoldState: ScaffoldState, corout
 }
 
 @Composable
-fun mainBody() {
+fun mainBody(viewModel: ProfileViewModel) {
     Divider(modifier = Modifier.padding(vertical = 10.dp))
-    favoriteSongs()
+    favoriteSongs(viewModel)
     Divider(modifier = Modifier.padding(vertical = 10.dp))
-    favoriteArtists()
+    favoriteArtists(viewModel)
 }
 
 // creates the row displaying the user's favorite songs
 @Composable
-fun favoriteSongs() {
-    placeholders("Favorite Songs", items = ArrayList<Song>())
+fun favoriteSongs(viewModel: ProfileViewModel) {
+    placeholders("Favorite Songs", items = ArrayList<Song>(), viewModel = viewModel)
 }
 
 // creates the row displaying the user's favorite artists
 @Composable
-fun favoriteArtists() {
-    placeholders(title = "Favorite Artists", items = ArrayList<String>())
+fun favoriteArtists(viewModel: ProfileViewModel) {
+    placeholders(title = "Favorite Artists", items = ArrayList<String>(), viewModel = viewModel)
 }
 
 @Composable
-fun <T> placeholders (title: String, items: List<T>, select: () -> Unit = { } ){
+fun <T> placeholders (title: String, items: List<T>, select: () -> Unit = { }, viewModel: ProfileViewModel){
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -134,9 +135,11 @@ fun <T> placeholders (title: String, items: List<T>, select: () -> Unit = { } ){
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(title)
-        IconButton(
-            onClick = { /* TODO ADD ABILITY TO ADD SONGS + ARTISTS */ }) {
-            Icon(imageVector = Icons.Outlined.Add, contentDescription = "Add Button")
+        if(viewModel.user == Constants.CURRENT_LOGGED_USER) {
+            IconButton(
+                onClick = { /* TODO ADD ABILITY TO ADD SONGS + ARTISTS */ }) {
+                Icon(imageVector = Icons.Outlined.Add, contentDescription = "Add Button")
+            }
         }
     }
     // replace with your items...

@@ -41,7 +41,7 @@ class PlaylistActivity() : ComponentActivity() {
         // -------Connect to Spotify AppRemote-------
         // TODO include spotify in addition to Deezer
 
-        //--------Update Database---------
+        //--------Update AppDatabase---------
 
         // check if extras are not null
         Log.d("PlaylistActivity", "songId: ${intent.getStringExtra("songId")}")

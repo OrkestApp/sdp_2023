@@ -23,7 +23,7 @@ fun UsersList(viewModel: PlaylistViewModel) {
         // create a dummy User
         10
     ) {
-        // Temporary static list of users for demo, will be replaced by a list of users from cache and Database
+        // Temporary static list of users for demo, will be replaced by a list of users from cache and AppDatabase
         User("ehreich2", "", "", Profile("ehreich2", 1))
     }
     LazyColumn {

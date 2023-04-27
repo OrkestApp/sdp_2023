@@ -49,7 +49,6 @@ class AudioRecognition {
                .build()
        }
 
-
         private fun buildReadingBuffer(): ByteArray {
             // size of buffer to retrieve chunks of audio
             val bufferSize = AudioRecord.getMinBufferSize(
@@ -80,15 +79,18 @@ class AudioRecognition {
             //Build the buffer to store the audio chunks from the audioRecord (microphone)
             val readBuffer = buildReadingBuffer()
 
-            //Return the flow of AudioChunks, will be actually run when collected
+            //Return the flow of AudioChunks, will be actually run in a suspending way when collected
             return flow {
                 audioRecord.startRecording()
+                //Collect audio chunks while the coroutine is active
                 while (currentCoroutineContext().isActive) {
                     val actualRead = audioRecord.read(readBuffer, 0, readBuffer.size)
                     val byteArray = readBuffer.sliceArray(0 until actualRead)
                     val audioChunk = AudioChunk(byteArray, actualRead, System.currentTimeMillis())
                     emit(audioChunk)
                 }
+                //Stop the audioRecord when the coroutine is cancelled
+                // (either because of result, or user stopped recording)
                 audioRecord.release()
             }
         }

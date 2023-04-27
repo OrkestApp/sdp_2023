@@ -2,10 +2,13 @@ package com.github.orkest.Model
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.pm.PackageManager
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
+import android.util.Log
 import androidx.annotation.RequiresPermission
+import androidx.core.app.ActivityCompat
 import com.github.orkest.Constants
 import com.shazam.shazamkit.AudioSampleRateInHz
 import com.shazam.shazamkit.MatchResult
@@ -27,122 +30,67 @@ class AudioRecognition {
 
                 }
 
-        private fun Int.toByteAllocation(): Int {
-            return when (this) {
-                AudioFormat.ENCODING_PCM_16BIT -> 2
-                else -> throw IllegalArgumentException("Unsupported encoding")
-            }
-        }
+       @RequiresPermission(Manifest.permission.RECORD_AUDIO)
+       private fun buildAudioRecord(): AudioRecord {
+           //Set the audio source
+           val audioSource = MediaRecorder.AudioSource.UNPROCESSED
 
-        private fun ByteBuffer.putTrimming(byteArray: ByteArray) {
-            if (byteArray.size <= this.capacity() - this.position()) {
-                this.put(byteArray)
-            } else {
-                this.put(byteArray, 0, this.capacity() - this.position())
-            }
-        }
+           //Set the audio format
+           val audioFormat = AudioFormat.Builder()
+               .setChannelMask(AudioFormat.CHANNEL_IN_MONO)
+               .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
+               .setSampleRate(48_000)
+               .build()
 
-        /**
-         * Records audio for the maximum query duration and returns an [AudioChunk] with the recorded audio
-         * @return [AudioChunk] with the recorded audio
-         * @throws [SecurityException] if the app does not have the RECORD_AUDIO permission
-         */
-        @RequiresPermission(Manifest.permission.RECORD_AUDIO)
-        private fun audioChunkRecord(): AudioChunk {
-            val audioSource = MediaRecorder.AudioSource.UNPROCESSED
+           //Create and return the audio recording object based on the source and format
+           return AudioRecord.Builder()
+               .setAudioSource(audioSource)
+               .setAudioFormat(audioFormat)
+               .build()
+       }
 
-            val audioFormat = AudioFormat.Builder()
-                .setChannelMask(AudioFormat.CHANNEL_IN_MONO)
-                .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
-                .setSampleRate(48_000)
-                .build()
 
-            val audioRecord = AudioRecord.Builder()
-                .setAudioSource(audioSource)
-                .setAudioFormat(audioFormat)
-                .build()
-
-            val seconds = catalog.maximumQuerySignatureDurationInMs
-
-            // Final desired buffer size to allocate necessary seconds of audio
-            val size = audioFormat.sampleRate * audioFormat.encoding.toByteAllocation() * seconds
-            val destination = ByteBuffer.allocate(size.toInt())
-
-            // Small buffer to retrieve chunks of audio
+        private fun buildReadingBuffer(): ByteArray {
+            // size of buffer to retrieve chunks of audio
             val bufferSize = AudioRecord.getMinBufferSize(
-                48_000,
+                Constants.RECORDING_SAMPLE_RATE,
                 AudioFormat.CHANNEL_IN_MONO,
                 AudioFormat.ENCODING_PCM_16BIT
             )
 
-            audioRecord.startRecording()
-            val readBuffer = ByteArray(bufferSize)
-            while (destination.remaining()>0) {
-                val actualRead = audioRecord.read(readBuffer, 0, bufferSize)
-                val byteArray = readBuffer.sliceArray(0 until actualRead)
-                destination.putTrimming(byteArray)
-            }
-            audioRecord.release()
-
-            return AudioChunk(destination.array(), destination.position(), System.currentTimeMillis())
+            // Buffer to store retrieved chunks of audio
+            return ByteArray(bufferSize)
         }
 
-        //TODO: Check if this is a correct way to do dependency injection
         /**
          * Records AudioChunks continuously and returns a [Flow] of [AudioChunk]s
          * Must be called in the coroutineScope as the streaming session
+         * @throws [SecurityException] if the app does not have the RECORD_AUDIO permission
          */
         @RequiresPermission(Manifest.permission.RECORD_AUDIO)
-        fun recordingFlow(coroutineScope: CoroutineScope): Flow<AudioChunk> = flow {
-            while (currentCoroutineContext().isActive) {
-                emit(audioChunkRecord())
-                delay(100)
+        fun recordingFlow(coroutineScope: CoroutineScope): Flow<AudioChunk> {
+            //Build the audioRecord object
+            val audioRecord = buildAudioRecord()
+
+            //Check if the audioRecord is initialized correctly
+            require(audioRecord.state == AudioRecord.STATE_INITIALIZED) {
+                Log.d("AudioRecord","AudioRecord is not initialized")
             }
-        }
 
+            //Build the buffer to store the audio chunks from the audioRecord (microphone)
+            val readBuffer = buildReadingBuffer()
 
-        //TODO: add dependency injection for the recordingFlow
-        @RequiresPermission(Manifest.permission.RECORD_AUDIO)
-        suspend fun recognizeSong(recordingFlow: Flow<AudioChunk>,
-                                  coroutineScope: CoroutineScope): CompletableFuture<String>{
-
-            val currentSession = (ShazamKit.createStreamingSession(
-                catalog,
-                AudioSampleRateInHz.SAMPLE_RATE_48000,
-                Constants.SHAZAM_SESSION_READ_BUFFER_SIZE
-            ) as ShazamKitResult.Success).data
-
-
-            // val coroutineScope = CoroutineScope(Dispatchers.Default)
-
-            // records audio and flows it to the StreamingSession
-            coroutineScope.launch {
-                recordingFlow.collect { audioChunk ->
-                    currentSession.matchStream(
-                        audioChunk.buffer,
-                        audioChunk.meaningfulLengthInBytes,
-                        audioChunk.timestamp
-                    )
+            //Return the flow of AudioChunks, will be actually run when collected
+            return flow {
+                audioRecord.startRecording()
+                while (currentCoroutineContext().isActive) {
+                    val actualRead = audioRecord.read(readBuffer, 0, readBuffer.size)
+                    val byteArray = readBuffer.sliceArray(0 until actualRead)
+                    val audioChunk = AudioChunk(byteArray, actualRead, System.currentTimeMillis())
+                    emit(audioChunk)
                 }
+                audioRecord.release()
             }
-
-            val title = CompletableFuture<String>()
-            // collect the results
-            coroutineScope.launch {
-                currentSession.recognitionResults().collect { matchResult ->
-                    if (matchResult is MatchResult.Match) {
-                        title.complete(matchResult.matchedMediaItems[0].title!!)
-                    }
-                    if (matchResult is MatchResult.NoMatch) {
-                        title.complete("No match found")
-                    }
-
-                    if (matchResult is MatchResult.Error) {
-                        title.completeExceptionally(matchResult.exception)
-                    }
-                }
-            }
-            return title
         }
     }
 

@@ -19,6 +19,7 @@ import java.time.ZoneId
 class Constants {
     companion object{
 
+        const val DEFAULT_MAX_RECENT_DAYS: Long = 30
         var CURRENT_USER_PROVIDER: Providers = Providers.SPOTIFY
         private var currentLoggedUser: String = ""
         var CURRENT_LOGGED_USER: String

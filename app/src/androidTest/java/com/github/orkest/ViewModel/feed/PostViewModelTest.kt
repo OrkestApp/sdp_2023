@@ -20,7 +20,7 @@ class PostViewModelTest {
     companion object {
 
         private lateinit var postViewModel : PostViewModel
-        /*@BeforeClass
+        @BeforeClass
         @JvmStatic
         fun setupEmulator() {
 
@@ -30,7 +30,7 @@ class PostViewModelTest {
                 isPersistenceEnabled = false
             }
 
-        }*/
+        }
 
         @BeforeClass
         @JvmStatic
@@ -74,6 +74,35 @@ class PostViewModelTest {
 
         assert(posts.size == 1)
         assert(posts[0].postDescription == "Recent1")
+    }
+
+    @Test
+    fun getRecentPostsReturnsPostsInDescendingOrderOfDate(){
+        Constants.CURRENT_LOGGED_USER = "DummyUser"
+        postViewModel.updateSong(Constants.DUMMY_RUDE_BOY_SONG)
+        postViewModel.updatePostDescription(TextFieldValue("Recent1"))
+        postViewModel.addPost().get()
+        Thread.sleep(2000)
+
+        postViewModel.updateSong(Constants.DUMMY_RUDE_BOY_SONG)
+        postViewModel.updatePostDescription(TextFieldValue("Recent2"))
+        postViewModel.addPost().get()
+        Thread.sleep(2000)
+
+        postViewModel.updateSong(Constants.DUMMY_RUDE_BOY_SONG)
+        postViewModel.updatePostDescription(TextFieldValue("Recent3"))
+        postViewModel.addPost().get()
+        Thread.sleep(2000)
+
+        val posts = postViewModel.getRecentPosts(Constants.DUMMY_LAST_CONNECTED_TIME).get()
+        postViewModel.deletePost(posts[0]).get()
+        postViewModel.deletePost(posts[1]).get()
+        postViewModel.deletePost(posts[2]).get()
+
+        assert(posts.size == 3)
+        assert(posts[0].postDescription == "Recent3")
+        assert(posts[1].postDescription == "Recent2")
+        assert(posts[2].postDescription == "Recent1")
     }
 
     @Test

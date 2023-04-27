@@ -3,6 +3,7 @@ package com.github.orkest.ViewModel.post
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
 import com.github.orkest.Constants
+import com.github.orkest.Constants.Companion.DEFAULT_MAX_RECENT_DAYS
 import com.github.orkest.Model.*
 import java.time.LocalDateTime
 import java.util.concurrent.CompletableFuture
@@ -90,8 +91,9 @@ open class PostViewModel {
     /**
      * Returns a list of the most recent posts since the last connection of the user from the database
      */
-    open fun getRecentPosts(lastConnected: LocalDateTime): CompletableFuture<List<Post>>{
-        return dbAPI.getRecentPostsFromDataBase(lastConnected)
+    open fun getRecentPosts(lastConnected: LocalDateTime,
+                            maxDaysNb: Long = DEFAULT_MAX_RECENT_DAYS ): CompletableFuture<List<Post>>{
+        return dbAPI.getRecentPostsFromDataBase(lastConnected, maxDaysNb)
     }
 
     /**

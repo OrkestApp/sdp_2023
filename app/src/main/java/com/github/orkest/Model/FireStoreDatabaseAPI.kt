@@ -277,6 +277,26 @@ class FireStoreDatabaseAPI {
         return future
     }
 
+    private fun recentPostsQuery(month: Int, year: Int, day: Int): CompletableFuture<List<Post>>{
+        val future = CompletableFuture<List<Post>>()
+        val posts = db.collectionGroup("posts")
+        posts.whereEqualTo(FieldPath.of("date", "year"), year)
+            .whereEqualTo(FieldPath.of("date", "month"), month)
+            .whereGreaterThan(FieldPath.of("date", "dayOfMonth"), day)
+            .get().addOnSuccessListener {
+                // Get all posts documents as a list of posts objects
+                val list: MutableList<Post> = it.toObjects(Post::class.java)
+                //orders the list by date (most recent first)
+                list.sortByDescending { post -> post.date }
+                future.complete(list)
+            } //Propagates the exception in case of exception
+            .addOnFailureListener {
+                future.completeExceptionally(it)
+            }
+
+        return future
+    }
+
 
     //TODO: Add the condition on posts belonging to the user's friends
     /**
@@ -291,44 +311,25 @@ class FireStoreDatabaseAPI {
         require(maxDaysNb <= DEFAULT_MAX_RECENT_DAYS) { "maxDaysNb must be less or equal to $DEFAULT_MAX_RECENT_DAYS" }
 
         val futures = mutableListOf<CompletableFuture<List<Post>>>()
-        val posts = db.collectionGroup("posts")
-
         val maxDaysAgo = LocalDateTime.now().minusDays(maxDaysNb)
         val recentPostsTime = if (lastConnection.isAfter(maxDaysAgo)) lastConnection else maxDaysAgo
 
         val listMonths  = mutableListOf<Int>(recentPostsTime.monthValue)
-
         //If the recentPostsTime is not in the current month, we need to add the next month
         if (recentPostsTime.monthValue != LocalDateTime.now().monthValue)
-            listMonths.add(0,recentPostsTime.monthValue+1)
+            if (recentPostsTime.monthValue == 12)
+                listMonths.add(1)
+            else
+                listMonths.add(recentPostsTime.monthValue+1)
 
-
-        //Get all posts that were published after the recentPostsTime
-        //One query per month
+        //Get all posts that were published after the recentPostsTime - One query per month
         listMonths.forEach { month ->
             run {
-                val future = CompletableFuture<List<Post>>()
-                futures.add(future)
-                posts.whereEqualTo(FieldPath.of("date", "year"), recentPostsTime.year)
-                    .whereEqualTo(FieldPath.of("date", "month"), month)
-                    .whereGreaterThan(FieldPath.of("date", "dayOfMonth"),
-                        if (month == recentPostsTime.monthValue) recentPostsTime.dayOfMonth
-                        else 1
-                    )
-                    .get().addOnSuccessListener {
-                        // Get all posts documents as a list of posts objects
-                        val list: MutableList<Post> = it.toObjects(Post::class.java)
-                        //orders the list by date (most recent first)
-                        list.sortByDescending { post -> post.date }
-                        future.complete(list)
-                    } //Propagates the exception in case of exception
-                    .addOnFailureListener {
-                        future.completeExceptionally(it)
-                    }
-
+                futures.add(recentPostsQuery(month,
+                    recentPostsTime.year,
+                    if (month == recentPostsTime.monthValue) recentPostsTime.dayOfMonth else 1))
             }
         }
-
         //Transforms the list of futures into a future of list of posts
         return CompletableFuture.allOf(*futures.toTypedArray()).thenApply {
             val list = mutableListOf<Post>()

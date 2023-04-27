@@ -10,8 +10,8 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.orkest.Constants
-import com.github.orkest.Model.Profile
+import com.github.orkest.data.Constants
+import com.github.orkest.data.Profile
 import com.github.orkest.R
 import com.github.orkest.View.theme.OrkestTheme
 import com.github.orkest.ViewModel.profile.MockProfileViewModel

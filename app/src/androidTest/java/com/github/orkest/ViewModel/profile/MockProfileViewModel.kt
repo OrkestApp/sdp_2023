@@ -2,6 +2,7 @@ package com.github.orkest.ViewModel.profile
 
 import androidx.lifecycle.MutableLiveData
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement
+import com.github.orkest.ui.profile.ProfileViewModel
 import java.util.concurrent.CompletableFuture
 
 class MockProfileViewModel(user: String) : ProfileViewModel(user) {

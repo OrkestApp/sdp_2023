@@ -1,6 +1,6 @@
 package com.github.orkest
 
-import com.github.orkest.Model.Authorization
+import com.github.orkest.domain.Authorization
 import org.junit.Test
 import android.content.Intent
 import androidx.lifecycle.Lifecycle

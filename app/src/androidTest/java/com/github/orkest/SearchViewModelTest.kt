@@ -2,11 +2,11 @@ package com.github.orkest
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
-import com.github.orkest.Model.FireStoreDatabaseAPI
-import com.github.orkest.Model.Profile
-import com.github.orkest.Model.User
-import com.github.orkest.View.search.SearchUserView
-import com.github.orkest.ViewModel.search.SearchViewModel
+import com.github.orkest.domain.FireStoreDatabaseAPI
+import com.github.orkest.data.Profile
+import com.github.orkest.data.User
+import com.github.orkest.ui.search.SearchUserView
+import com.github.orkest.ui.search.SearchViewModel
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert

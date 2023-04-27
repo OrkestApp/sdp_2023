@@ -17,5 +17,14 @@ class AppEntities {
             val email: String,
             val password: String
         )
+
+        @Entity
+        data class SongEntity(
+            @PrimaryKey val id: Int,
+            @ColumnInfo(name = "Title") val name: String,
+            val Artist: String,
+            val Album: String,
+            val URL: Int
+        )
     }
 }

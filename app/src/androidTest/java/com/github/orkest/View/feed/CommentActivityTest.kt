@@ -4,18 +4,12 @@ import android.content.Intent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.navigation.compose.rememberNavController
-import com.github.orkest.Constants
-import com.github.orkest.Model.OrkestDate
-import com.github.orkest.Model.Post
-import com.github.orkest.View.auth.SignUpForm
-import com.github.orkest.ViewModel.auth.MockAuthViewModel
+import com.github.orkest.data.Constants
 import com.github.orkest.ViewModel.feed.MockPostViewModel
-import com.github.orkest.ViewModel.post.PostViewModel
+import com.github.orkest.ui.feed.CommentActivity
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mock
 
 internal class CommentActivityTest {
 

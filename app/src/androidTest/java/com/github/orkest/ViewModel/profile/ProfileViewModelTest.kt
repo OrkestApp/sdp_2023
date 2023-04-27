@@ -1,9 +1,10 @@
 package com.github.orkest.ViewModel.profile
 
-import com.github.orkest.Constants
-import com.github.orkest.Model.FireStoreDatabaseAPI
-import com.github.orkest.Model.Profile
-import com.github.orkest.Model.User
+import com.github.orkest.data.Constants
+import com.github.orkest.domain.FireStoreDatabaseAPI
+import com.github.orkest.data.Profile
+import com.github.orkest.data.User
+import com.github.orkest.ui.profile.ProfileViewModel
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking

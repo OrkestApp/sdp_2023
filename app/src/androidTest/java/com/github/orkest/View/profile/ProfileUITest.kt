@@ -1,5 +1,6 @@
 package com.github.orkest.View.profile
 
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.test.*
@@ -10,11 +11,16 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.orkest.Constants
-import com.github.orkest.Model.Profile
+import com.github.orkest.data.Constants
+import com.github.orkest.data.Profile
 import com.github.orkest.R
 import com.github.orkest.View.theme.OrkestTheme
 import com.github.orkest.ViewModel.profile.MockProfileViewModel
+import com.github.orkest.ui.profile.ProfileActivity
+import com.github.orkest.ui.profile.ProfileActivityScreen
+import com.github.orkest.ui.profile.ProfileActivitySetting
+import com.github.orkest.ui.profile.TopProfile
+import kotlinx.coroutines.CoroutineScope
 import org.junit.runner.RunWith
 import org.junit.Before
 
@@ -31,6 +37,7 @@ class ProfileUITest {
 
     @Before
     fun setup() {
+
         Constants.CURRENT_LOGGED_USER = "JohnSmith"
 
         John = Profile("JohnSmith", R.drawable.profile_picture, "I like everything", 10, 2)
@@ -97,7 +104,7 @@ class ProfileUITest {
         composeTestRule.setContent {
             val scaffoldState = rememberScaffoldState()
             val coroutineScope = rememberCoroutineScope()
-            OrkestTheme { topProfile(viewModel = viewModel, scaffoldState, coroutineScope) }
+            OrkestTheme { TopProfile(viewModel = viewModel, scaffoldState, coroutineScope) }
         }
         val newUsername = "Mike"
         val newBio = "New Bio"
@@ -120,7 +127,7 @@ class ProfileUITest {
         composeTestRule.setContent {
             val scaffoldState = rememberScaffoldState()
             val coroutineScope = rememberCoroutineScope()
-            OrkestTheme { topProfile(viewModel = viewModel, scaffoldState, coroutineScope) }
+            OrkestTheme { TopProfile(viewModel = viewModel, scaffoldState, coroutineScope) }
         }
         viewModel.setProfilePictureId(null)
         composeTestRule.onNodeWithContentDescription("${R.drawable.profile_picture}").assertIsDisplayed()
@@ -131,7 +138,7 @@ class ProfileUITest {
         composeTestRule.setContent {
             val scaffoldState = rememberScaffoldState()
             val coroutineScope = rememberCoroutineScope()
-            OrkestTheme { topProfile(viewModel = viewModel, scaffoldState, coroutineScope) }
+            OrkestTheme { TopProfile(viewModel = viewModel, scaffoldState, coroutineScope) }
         }
         viewModel.setNbFollowers(null)
         composeTestRule.onNodeWithText("${0}\nfollower").assertIsDisplayed()
@@ -142,7 +149,7 @@ class ProfileUITest {
         composeTestRule.setContent {
             val scaffoldState = rememberScaffoldState()
             val coroutineScope = rememberCoroutineScope()
-            OrkestTheme { topProfile(viewModel = viewModel, scaffoldState, coroutineScope) }
+            OrkestTheme { TopProfile(viewModel = viewModel, scaffoldState, coroutineScope) }
         }
         viewModel.setNbFollowings(null)
         composeTestRule.onNodeWithText("${0}\nfollowing").assertIsDisplayed()
@@ -153,7 +160,7 @@ class ProfileUITest {
         composeTestRule.setContent {
             val scaffoldState = rememberScaffoldState()
             val coroutineScope = rememberCoroutineScope()
-            OrkestTheme { topProfile(viewModel = viewModel, scaffoldState, coroutineScope) }
+            OrkestTheme { TopProfile(viewModel = viewModel, scaffoldState, coroutineScope) }
         }
         viewModel.setBio(null)
         composeTestRule.onNodeWithText("Description").assertIsDisplayed()
@@ -164,7 +171,7 @@ class ProfileUITest {
         composeTestRule.setContent {
             val scaffoldState = rememberScaffoldState()
             val coroutineScope = rememberCoroutineScope()
-            OrkestTheme { topProfile(viewModel = viewModel, scaffoldState, coroutineScope) }
+            OrkestTheme { TopProfile(viewModel = viewModel, scaffoldState, coroutineScope) }
         }
         composeTestRule.onNodeWithText("Edit Profile").assertIsDisplayed()
     }
@@ -174,7 +181,7 @@ class ProfileUITest {
         composeTestRule.setContent {
             val scaffoldState = rememberScaffoldState()
             val coroutineScope = rememberCoroutineScope()
-            OrkestTheme { topProfile(viewModel = newViewModel, scaffoldState, coroutineScope) }
+            OrkestTheme { TopProfile(viewModel = newViewModel, scaffoldState, coroutineScope) }
         }
         newViewModel.setIsUserFollowed(false)
         val button = composeTestRule.onNodeWithText("Follow")
@@ -188,7 +195,7 @@ class ProfileUITest {
         composeTestRule.setContent {
             val scaffoldState = rememberScaffoldState()
             val coroutineScope = rememberCoroutineScope()
-            OrkestTheme { topProfile(viewModel = newViewModel, scaffoldState, coroutineScope) }
+            OrkestTheme { TopProfile(viewModel = newViewModel, scaffoldState, coroutineScope) }
         }
         newViewModel.setIsUserFollowed(true)
         val button = composeTestRule.onNodeWithText("Unfollow")
@@ -206,8 +213,9 @@ class ProfileUITest {
         composeTestRule.setContent {
             val scaffoldState = rememberScaffoldState()
             val coroutineScope = rememberCoroutineScope()
-            OrkestTheme { topProfile(viewModel = viewModel, scaffoldState, coroutineScope) }
+            OrkestTheme { TopProfile(viewModel = viewModel, scaffoldState, coroutineScope) }
         }
+        Thread.sleep(4000)
         composeTestRule.onNodeWithText("Sign Out").assertIsDisplayed()
     }
 
@@ -219,7 +227,7 @@ class ProfileUITest {
         composeTestRule.setContent {
             val scaffoldState = rememberScaffoldState()
             val coroutineScope = rememberCoroutineScope()
-            OrkestTheme { topProfile(viewModel = viewModel, scaffoldState, coroutineScope) }
+            OrkestTheme { TopProfile(viewModel = viewModel, scaffoldState, coroutineScope) }
         }
         composeTestRule.onNodeWithText("Sign Out").performClick()
         composeTestRule.onNodeWithText("Sign in with Google").assertIsDisplayed()

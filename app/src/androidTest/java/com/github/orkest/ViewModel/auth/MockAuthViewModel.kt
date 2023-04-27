@@ -1,5 +1,6 @@
 package com.github.orkest.ViewModel.auth
 
+import com.github.orkest.ui.authentication.AuthViewModel
 import java.util.concurrent.CompletableFuture
 
 class MockAuthViewModel : AuthViewModel() {

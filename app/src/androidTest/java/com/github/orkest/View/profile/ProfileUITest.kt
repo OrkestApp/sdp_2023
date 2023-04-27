@@ -1,5 +1,6 @@
 package com.github.orkest.View.profile
 
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.test.*
@@ -15,6 +16,10 @@ import com.github.orkest.data.Profile
 import com.github.orkest.R
 import com.github.orkest.View.theme.OrkestTheme
 import com.github.orkest.ViewModel.profile.MockProfileViewModel
+import com.github.orkest.ui.profile.ProfileActivity
+import com.github.orkest.ui.profile.ProfileActivityScreen
+import com.github.orkest.ui.profile.ProfileActivitySetting
+import kotlinx.coroutines.CoroutineScope
 import org.junit.runner.RunWith
 import org.junit.Before
 
@@ -113,6 +118,10 @@ class ProfileUITest {
         composeTestRule.onNodeWithText("$newNbFollowings\nfollowings").assertIsDisplayed()
         composeTestRule.onNodeWithContentDescription("$newProfilePictureId").assertIsDisplayed()
         //composeTestRule.onNodeWithText("Sign Out").assertIsDisplayed()
+    }
+
+    private fun topProfile(viewModel: MockProfileViewModel, scaffoldState: ScaffoldState, coroutineScope: CoroutineScope) {
+
     }
 
     @Test

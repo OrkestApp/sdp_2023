@@ -7,7 +7,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
-import com.github.orkest.View.sharing.SharingComposeActivity
+import com.github.orkest.ui.sharing.SharingComposeActivity
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule

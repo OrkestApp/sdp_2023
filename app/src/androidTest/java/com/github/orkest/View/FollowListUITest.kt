@@ -9,7 +9,7 @@ import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.orkest.View.profile.ProfileActivity
+import com.github.orkest.ui.profile.ProfileActivity
 import com.github.orkest.ui.FollowListActivity
 import org.junit.Before
 import org.junit.Rule

@@ -2,6 +2,7 @@ package com.github.orkest.ViewModel.profile
 
 import androidx.lifecycle.MutableLiveData
 import androidx.test.internal.runner.junit4.statement.UiThreadStatement
+import com.github.orkest.ui.profile.ProfileViewModel
 import java.util.concurrent.CompletableFuture
 
 class MockProfileViewModel(user: String) : ProfileViewModel(user) {
@@ -54,15 +55,18 @@ class MockProfileViewModel(user: String) : ProfileViewModel(user) {
         return CompletableFuture.completedFuture(isUserFollowed.value)
     }
 
-    override fun follow(): CompletableFuture<Boolean> {
-        isUserFollowed.value = true
-        return CompletableFuture.completedFuture(true)
+
+    override fun updateCurrentUserFollowings(toFollow: Boolean): CompletableFuture<Boolean> {
+        isUserFollowed.value = toFollow
+        return super.updateCurrentUserFollowings(toFollow)
     }
 
-    override fun unfollow(): CompletableFuture<Boolean> {
-        isUserFollowed.value = false
-        return CompletableFuture.completedFuture(true)
+    override fun updateUserFollowers(toFollow: Boolean): CompletableFuture<Boolean> {
+        isUserFollowed.value = toFollow
+        return super.updateCurrentUserFollowings(toFollow)
     }
+
+
 
 
 }

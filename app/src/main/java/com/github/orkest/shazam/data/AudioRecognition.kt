@@ -23,25 +23,6 @@ class AudioRecognition {
 
     companion object {
 
-        /**
-         * Asks for the audio permission if it is not granted yet
-         * @param context the context of the application
-         * @param activity the activity that is asking for the permission
-         */
-        private fun askAudioPermission(context: Context, activity: Activity) {
-            if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO)
-                != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(activity,
-                    arrayOf(Manifest.permission.RECORD_AUDIO) ,
-                    ShazamConstants.REQUEST_RECORD_AUDIO_PERMISSION
-                );
-            }
-            else {
-                Log.d("AudioRecognition", "Permission already granted")
-                ShazamConstants.AudioPermissionGranted = true
-            }
-        }
-
        @RequiresPermission(Manifest.permission.RECORD_AUDIO)
        private fun buildAudioRecord(): AudioRecord {
            //Set the audio source
@@ -104,6 +85,32 @@ class AudioRecognition {
                 // (either because of result, or user stopped recording)
                 audioRecord.release()
             }
+        }
+
+        /**
+         * Collects recorded AudioChunks continuously and logs them
+         * @param coroutineScope the same coroutineScope as the streaming session
+         * @throws [SecurityException] if the app does not have the RECORD_AUDIO permission
+         */
+        @RequiresPermission(Manifest.permission.RECORD_AUDIO)
+        fun logsRecordedAudio(coroutineScope: CoroutineScope){
+            coroutineScope.launch {
+                recordingFlow(coroutineScope).collect {
+                    Log.d("HasOnesBuffer", it.buffer.sum().toString())
+                    Log.d("LengthBuffer", it.buffer.size.toString())
+                    Log.d("ShazamActivity", it.timestamp.toString())
+                }
+            }
+
+        }
+
+        /**
+         * Stops the collection of the recorded AudioChunks
+         * Must be called in the same coroutineScope as logsRecordedAudio
+         * @param coroutineScope the same coroutineScope as logsRecordedAudio
+         */
+        fun stopRecording(coroutineScope: CoroutineScope){
+            coroutineScope.cancel()
         }
     }
 

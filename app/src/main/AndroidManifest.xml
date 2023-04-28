@@ -15,15 +15,10 @@
         android:theme="@style/Theme.Orkest"
         tools:targetApi="31">
         <activity
-            android:name=".ShazamActivity"
+            android:name=".shazam.ui.ShazamActivity"
             android:exported="true"
             android:label="@string/title_activity_shazam"
             android:theme="@style/Theme.Orkest">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".ui.DeezerWelcomeActivity"

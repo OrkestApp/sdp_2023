@@ -6,6 +6,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -23,6 +24,7 @@ import com.github.orkest.shazam.data.AudioRecognition
 import com.github.orkest.shazam.domain.ShazamConstants
 import com.github.orkest.ui.theme.OrkestTheme
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 
@@ -40,43 +42,48 @@ class ShazamActivity : AppCompatActivity() {
                     color = MaterialTheme.colors.background
                 ) {
                     coroutineScope = rememberCoroutineScope()
-                    coroutineScope.launch {
-                        if (!ShazamConstants.recordPermissionGranted(this)
-                        ) {
-                            askRecordPermission(this)
-                        }
-                        else AudioRecognition.recordingFlow(coroutineScope)
-                    }
-
+                    recordAudio(this)
                 }
             }
         }
     }
 
+    /**
+     * Records AudioChunks continuously and asks for permission if needed
+     */
+     @SuppressLint("MissingPermission")
+     private fun recordAudio(activity: Activity) {
+        coroutineScope.launch {
+            val permission = ShazamConstants.recordPermissionGranted(activity)
+            if (!permission)
+                ShazamConstants.askRecordPermission(activity)
+             else
+                AudioRecognition.logsRecordedAudio(coroutineScope)
+        }
+    }
+
+    /**
+     * Callback for the result from requesting permissions.
+     * This method is invoked for every call on [ActivityCompat.requestPermissions]
+     */
+    @SuppressLint("MissingPermission")
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
         grantResults: IntArray
     ) {
+        Log.d("ShazamActivity", "onRequestPermissionsResult")
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == ShazamConstants.REQUEST_RECORD_AUDIO_PERMISSION) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission granted
-                AudioRecognition.recordingFlow(coroutineScope)
+                AudioRecognition.logsRecordedAudio(coroutineScope)
             } else {
                 // Permission denied
+                //TODO: Show a message to the user
                 Toast.makeText(this, "Permission denied to record audio", Toast.LENGTH_SHORT).show()
             }
         }
-    }
-
-    private fun askRecordPermission(activity: Activity){
-        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.RECORD_AUDIO)
-            != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(activity, arrayOf( Manifest.permission.RECORD_AUDIO),
-                ShazamConstants.REQUEST_RECORD_AUDIO_PERMISSION);
-        }
-
     }
 }
 

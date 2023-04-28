@@ -1,7 +1,8 @@
 package com.github.orkest.ViewModel.auth
 
 import androidx.compose.ui.text.input.TextFieldValue
-import com.github.orkest.Model.Providers
+import com.github.orkest.data.Providers
+import com.github.orkest.ui.authentication.AuthViewModel
 import org.junit.Before
 
 

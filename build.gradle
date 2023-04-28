@@ -12,6 +12,8 @@ buildscript {
         google()  // Google's Maven repository
         mavenCentral()  // Maven Central repository
         jcenter()
+        gradlePluginPortal()
+
     }
 
     dependencies {

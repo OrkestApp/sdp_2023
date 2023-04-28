@@ -1,9 +1,9 @@
 package com.github.orkest.ViewModel
 
 import android.util.Log
-import com.github.orkest.Model.DeezerApiIntegration
-import com.github.orkest.Model.DeezerModelClasses
-import com.github.orkest.Model.FireStoreDatabaseAPI
+import com.github.orkest.domain.DeezerApiIntegration
+import com.github.orkest.domain.DeezerModelClasses
+import com.github.orkest.domain.FireStoreDatabaseAPI
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import org.junit.Assert

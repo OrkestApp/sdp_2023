@@ -7,7 +7,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.test.core.app.ApplicationProvider
 import com.github.orkest.ViewModel.auth.MockAuthViewModel
 import junit.framework.TestCase.assertEquals
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

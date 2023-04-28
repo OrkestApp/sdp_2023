@@ -29,7 +29,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.github.orkest.Constants
+import com.github.orkest.data.Constants
 import com.github.orkest.R
 import com.github.orkest.ui.MainActivity
 import com.github.orkest.ui.authentication.AuthViewModel

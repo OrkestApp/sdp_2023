@@ -3,7 +3,7 @@ package com.github.orkest.Model
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.rule.GrantPermissionRule
-import com.github.orkest.shazam.data.AudioRecognition
+import com.github.orkest.shazam.data.AudioRecording
 import kotlinx.coroutines.*
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -31,7 +31,7 @@ class AudioRecognitionTest{
 
     @Test
     fun audioIsRecorded() {
-        val audio = AudioRecognition.recordingFlow(coroutine)
+        val audio = AudioRecording.recordingFlow(coroutine)
         var counter = 0
         println("Starting test")
         coroutine.launch {
@@ -41,6 +41,20 @@ class AudioRecognitionTest{
                 }
         }
         assertTrue(counter > 0)
+    }
+
+    @Test
+    fun audioIsStopped(){
+        val audio = AudioRecording.recordingFlow(coroutine)
+        var counter = 0
+        println("Starting test")
+        coroutine.launch {
+            audio.collect{
+                ++counter
+                AudioRecording.stopRecording(coroutine)
+            }
+        }
+        assertTrue(counter == 1 )
     }
 
 

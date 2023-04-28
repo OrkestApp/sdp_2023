@@ -1,25 +1,18 @@
 package com.github.orkest.shazam.data
 
 import android.Manifest
-import android.app.Activity
-import android.content.Context
-import android.content.pm.PackageManager
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.util.Log
 import androidx.annotation.RequiresPermission
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import com.github.orkest.data.Constants
 import com.github.orkest.shazam.domain.ShazamConstants
-import com.shazam.shazamkit.ShazamKit
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 
-class AudioRecognition {
+class AudioRecording {
 
     companion object {
 

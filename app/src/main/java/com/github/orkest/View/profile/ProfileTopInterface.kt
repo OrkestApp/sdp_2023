@@ -31,10 +31,7 @@ import kotlinx.coroutines.CoroutineScope
 import com.github.orkest.ViewModel.profile.ProfileViewModel
 import androidx.compose.ui.graphics.Color
 import com.github.orkest.View.FollowListActivity
-import androidx.core.content.ContextCompat.startActivity
 import com.github.orkest.Model.DeezerApiIntegration
-import com.github.orkest.Model.FireStoreDatabaseAPI
-import com.github.orkest.View.NavDrawerButton
 import com.github.orkest.View.auth.AuthActivity
 import com.github.orkest.View.notification.Notification
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -127,6 +124,8 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
                         //uncomment if un-caching is needed
                         GoogleSignIn.getClient(context, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut()
                         context.startActivity(intent)
+
+
                     }
                     //
                     Button(

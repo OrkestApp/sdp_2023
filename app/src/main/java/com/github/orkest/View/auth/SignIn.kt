@@ -29,6 +29,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.github.orkest.Constants
 import com.github.orkest.R
 import com.github.orkest.View.MainActivity
 import com.github.orkest.ViewModel.auth.AuthViewModel
@@ -65,6 +66,9 @@ fun SignIn (navController: NavController, viewModel: AuthViewModel) {
     val error = remember { mutableStateOf(false) }
     val errorMessage = remember { mutableStateOf("") }
     val waiting = remember { mutableStateOf(false) }
+
+
+
 
 
     val activityResultLauncher = rememberLauncherForActivityResult(
@@ -231,6 +235,9 @@ private fun updateUI(user: FirebaseUser?, navController: NavController,
         Log.d(TAG, "User is not null and is not in database")
         navController.navigate("signup")
 
+
+
+
     } else if (user != null && isInDatabase) {
 
         val intent = Intent(context, MainActivity::class.java)
@@ -244,3 +251,37 @@ private fun updateUI(user: FirebaseUser?, navController: NavController,
     }
 
 }
+
+/**
+ * Saves the user's credentials in SharedPreferences
+ */
+fun saveUserCredentials(context: Context, username: String, email: String) {
+    val sharedPref = context.getSharedPreferences("user_credentials", Context.MODE_PRIVATE)
+    with(sharedPref.edit()) {
+        putString("username", username)
+        putString("email", email)
+        apply()
+    }
+}
+
+
+/**
+ * Loads the user's credentials from SharedPreferences
+ */
+fun loadUserCredentials(context: Context): Pair<String?, String?> {
+    val sharedPref = context.getSharedPreferences("user_credentials", Context.MODE_PRIVATE)
+    val username = sharedPref.getString("username", null)
+    val email = sharedPref.getString("email", null)
+    return Pair(username, email)
+}
+
+/**
+ * Checks if the user is signed in offline
+ */
+fun isSignedInOffline(context: Context): Boolean {
+    val (username, email) = loadUserCredentials(context)
+    return username != null && email != null
+}
+
+
+

@@ -245,7 +245,8 @@ private fun updateUI(user: FirebaseUser?, navController: NavController,
         navController.navigate("signup")
 
 
-
+        // Save the user's credentials in SharedPreferences
+        saveUserCredentials(context, viewModel.getUsername().text, Firebase.auth.currentUser?.email.toString())
 
     } else if (user != null && isInDatabase) {
 
@@ -253,6 +254,9 @@ private fun updateUI(user: FirebaseUser?, navController: NavController,
         intent.putExtra("username",viewModel.getUsername().text)
         context.startActivity(intent)
         Log.d(TAG, "User is not null and is in database")
+
+        // Save the user's credentials in SharedPreferences
+        saveUserCredentials(context, viewModel.getUsername().text, Firebase.auth.currentUser?.email.toString())
 
     }
     else {

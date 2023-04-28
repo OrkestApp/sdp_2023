@@ -1,15 +1,13 @@
 package com.github.orkest.ViewModel
 
 import androidx.compose.ui.test.junit4.createComposeRule
-import com.github.orkest.Model.FireStoreDatabaseAPI
-import com.github.orkest.Model.Profile
-import com.github.orkest.Model.User
+import com.github.orkest.domain.FireStoreDatabaseAPI
+import com.github.orkest.data.Profile
+import com.github.orkest.data.User
 import org.junit.Before
 import org.junit.Rule
 import com.github.orkest.R
-import com.github.orkest.View.FollowListActivity
-import junit.framework.TestCase.assertEquals
-import org.junit.Test
+import com.github.orkest.ui.FollowListViewModel
 
 class FollowListViewModelTest {
 

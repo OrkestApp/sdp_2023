@@ -1,6 +1,5 @@
 package com.github.orkest
 
-import com.github.orkest.Model.FireStoreDatabaseAPI
 import org.junit.Test
 
 import org.junit.Assert.*

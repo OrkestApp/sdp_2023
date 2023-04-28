@@ -94,6 +94,51 @@ class SignInTest {
             .performClick()
     }
 
+    /**
+     * Check that offline signing in correctly stores and loads the credentials
+     */
+    @Test
+    fun offlineSignIn_correctlyStores() {
 
+        val context: Context = ApplicationProvider.getApplicationContext()
+
+        // Mock credentials
+        val username = "test"
+        val email = "test@test.ch"
+
+        // Save and load user credentials
+        saveUserCredentials(context, username, email)
+        val (savedUsername, savedEmail) = loadUserCredentials(context)
+
+        // Check if the provided user credentials do not match the saved ones
+        assertEquals(username, savedUsername)
+        assertEquals(email, savedEmail)
+
+        // Clear SharedPreferences after each test
+        val sharedPref = context.getSharedPreferences("user_credentials", Context.MODE_PRIVATE)
+        sharedPref.edit().clear().apply()
+    }
+
+    /**
+     * Checks if credentials are present in SharedPreferences
+     */
+    @Test
+    fun correctlyChecksOffline() {
+        val context: Context = ApplicationProvider.getApplicationContext()
+
+        // Mock credentials
+        val username = "test"
+        val email = "test@test.ch"
+
+        // Save user credentials
+        saveUserCredentials(context, username, email)
+
+        //check offline
+        assertEquals(true, isSignedInOffline(context))
+
+        // Clear SharedPreferences after each test
+        val sharedPref = context.getSharedPreferences("user_credentials", Context.MODE_PRIVATE)
+        sharedPref.edit().clear().apply()
+    }
 
 }

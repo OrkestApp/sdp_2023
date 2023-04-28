@@ -68,6 +68,15 @@ fun SignIn (navController: NavController, viewModel: AuthViewModel) {
     val waiting = remember { mutableStateOf(false) }
 
 
+    // Check if user is already cached in
+    if (isSignedInOffline(context)) {
+        val (username, _) = loadUserCredentials(context)
+        val intent = Intent(context, MainActivity::class.java)
+        intent.putExtra("username", username)
+        Constants.CURRENT_LOGGED_USER = username.toString()
+        context.startActivity(intent)
+        Log.d(TAG, "Logged in offline")
+    }
 
 
 

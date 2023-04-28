@@ -28,7 +28,7 @@ import com.github.orkest.View.feed.FeedActivity
 import com.github.orkest.ui.profile.ProfileActivity
 import com.github.orkest.ui.profile.ProfileActivityScreen
 import com.github.orkest.ui.search.SearchUserView
-import com.github.orkest.View.sharing.UsersList
+import com.github.orkest.ui.sharing.UsersList
 import com.github.orkest.ui.sharing.PlaylistViewModel
 import com.github.orkest.ui.feed.PostViewModel
 import com.github.orkest.ui.profile.ProfileViewModel

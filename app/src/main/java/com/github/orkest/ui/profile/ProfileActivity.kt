@@ -29,8 +29,7 @@ import com.github.orkest.data.Constants
 import com.github.orkest.data.Song
 import com.github.orkest.R
 import com.github.orkest.View.*
-import com.github.orkest.View.profile.ProfileTopInterface
-import com.github.orkest.View.theme.OrkestTheme
+import com.github.orkest.ui.theme.OrkestTheme
 import com.github.orkest.ui.CreateMenuDrawer
 import kotlinx.coroutines.CoroutineScope
 

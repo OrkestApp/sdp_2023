@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.orkest.data.Constants
 import com.github.orkest.View.feed.SongCard
-import com.github.orkest.View.theme.OrkestTheme
+import com.github.orkest.ui.theme.OrkestTheme
 
 
 //TODO: Implement correctly, this is just a simple version for testing and demo purposes

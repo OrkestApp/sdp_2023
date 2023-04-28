@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.sp
 import com.github.orkest.data.Profile
 import com.github.orkest.data.User
 import com.github.orkest.ui.profile.ProfileActivity
-import com.github.orkest.ui.sharing.ui.theme.OrkestTheme
+import com.github.orkest.ui.theme.OrkestTheme
 import com.github.orkest.R
 
 //Here for preview purposes. Will be deleted.

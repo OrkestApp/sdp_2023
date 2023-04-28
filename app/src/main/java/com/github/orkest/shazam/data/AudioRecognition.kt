@@ -1,4 +1,4 @@
-package com.github.orkest.Model
+package com.github.orkest.shazam.data
 
 import android.Manifest
 import android.app.Activity
@@ -8,11 +8,11 @@ import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.util.Log
-import android.widget.Toast
 import androidx.annotation.RequiresPermission
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.github.orkest.Constants
+import com.github.orkest.data.Constants
+import com.github.orkest.shazam.domain.ShazamConstants
 import com.shazam.shazamkit.ShazamKit
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
@@ -22,13 +22,6 @@ import kotlinx.coroutines.flow.flow
 class AudioRecognition {
 
     companion object {
-
-        private const val REQUEST_RECORD_AUDIO_PERMISSION = 200
-
-         val catalog =
-                ShazamKit.createCustomCatalog().apply {
-
-                }
 
         /**
          * Asks for the audio permission if it is not granted yet
@@ -40,11 +33,12 @@ class AudioRecognition {
                 != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(activity,
                     arrayOf(Manifest.permission.RECORD_AUDIO) ,
-                    REQUEST_RECORD_AUDIO_PERMISSION);
+                    ShazamConstants.REQUEST_RECORD_AUDIO_PERMISSION
+                );
             }
             else {
                 Log.d("AudioRecognition", "Permission already granted")
-                Constants.AudioPermissionGranted = true
+                ShazamConstants.AudioPermissionGranted = true
             }
         }
 
@@ -70,7 +64,7 @@ class AudioRecognition {
         private fun buildReadingBuffer(): ByteArray {
             // size of buffer to retrieve chunks of audio
             val bufferSize = AudioRecord.getMinBufferSize(
-                Constants.RECORDING_SAMPLE_RATE,
+                ShazamConstants.RECORDING_SAMPLE_RATE,
                 AudioFormat.CHANNEL_IN_MONO,
                 AudioFormat.ENCODING_PCM_16BIT
             )
@@ -114,8 +108,8 @@ class AudioRecognition {
     }
 
     data class AudioChunk (
-        val buffer: ByteArray = ByteArray(Constants.SHAZAM_SESSION_READ_BUFFER_SIZE),
-        val meaningfulLengthInBytes: Int = Constants.SHAZAM_SESSION_READ_BUFFER_SIZE,
+        val buffer: ByteArray = ByteArray(ShazamConstants.SHAZAM_SESSION_READ_BUFFER_SIZE),
+        val meaningfulLengthInBytes: Int = ShazamConstants.SHAZAM_SESSION_READ_BUFFER_SIZE,
         val timestamp: Long = System.currentTimeMillis()
     ) {
         override fun equals(other: Any?): Boolean {

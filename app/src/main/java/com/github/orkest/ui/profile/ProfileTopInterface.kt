@@ -1,4 +1,4 @@
-package com.github.orkest.View.profile
+package com.github.orkest.ui.profile
 
 import android.content.Context
 import android.content.Intent
@@ -28,7 +28,6 @@ import com.github.orkest.R
 import com.github.orkest.ui.EditProfileActivity
 import com.github.orkest.ui.NavDrawerButton
 import kotlinx.coroutines.CoroutineScope
-import com.github.orkest.ui.profile.ProfileViewModel
 import androidx.compose.ui.graphics.Color
 import com.github.orkest.ui.FollowListActivity
 import com.github.orkest.domain.DeezerApiIntegration
@@ -205,7 +204,8 @@ fun UserName(username: String?){
 fun Description(bio: String?){
     Text(
         text = bio ?: "Description",
-        fontSize = fontSize)
+        fontSize = fontSize
+    )
 }
 
 //Returns default int if the observer is null
@@ -263,7 +263,8 @@ fun EditButton(onClick:() -> Unit){
     ){
         Text(
             text ="Edit Profile",
-            fontSize = smallFontSize)
+            fontSize = smallFontSize
+        )
     }
 }
 

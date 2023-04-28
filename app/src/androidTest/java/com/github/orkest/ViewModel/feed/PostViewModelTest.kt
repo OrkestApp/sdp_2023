@@ -14,17 +14,17 @@ class PostViewModelTest {
     companion object {
 
         private lateinit var postViewModel : PostViewModel
-        @BeforeClass
-        @JvmStatic
-        fun setupEmulator() {
-
-            val db = FireStoreDatabaseAPI.db
-            db.useEmulator("10.0.2.2", 8080)
-            db.firestoreSettings = firestoreSettings {
-                isPersistenceEnabled = false
-            }
-
-        }
+//        @BeforeClass
+//        @JvmStatic
+//        fun setupEmulator() {
+//
+//            val db = FireStoreDatabaseAPI.db
+//            db.useEmulator("10.0.2.2", 8080)
+//            db.firestoreSettings = firestoreSettings {
+//                isPersistenceEnabled = false
+//            }
+//
+//        }
 
         @BeforeClass
         @JvmStatic

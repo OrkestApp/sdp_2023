@@ -14,6 +14,7 @@ import java.time.ZoneId
  */
 class Constants {
     companion object{
+        var AudioPermissionGranted: Boolean = false
         const val RECORDING_SAMPLE_RATE: Int  = 48_000
         const val SHAZAM_SESSION_READ_BUFFER_SIZE: Int = 4096
 

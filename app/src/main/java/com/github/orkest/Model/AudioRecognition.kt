@@ -1,34 +1,52 @@
 package com.github.orkest.Model
 
 import android.Manifest
-import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Context
 import android.content.pm.PackageManager
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresPermission
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.github.orkest.Constants
-import com.shazam.shazamkit.AudioSampleRateInHz
-import com.shazam.shazamkit.MatchResult
 import com.shazam.shazamkit.ShazamKit
-import com.shazam.shazamkit.ShazamKitResult
-import com.shazam.shazamkit.SignatureGenerator
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import java.nio.ByteBuffer
-import java.util.concurrent.CompletableFuture
+
 
 class AudioRecognition {
 
     companion object {
 
+        private const val REQUEST_RECORD_AUDIO_PERMISSION = 200
+
          val catalog =
                 ShazamKit.createCustomCatalog().apply {
 
                 }
+
+        /**
+         * Asks for the audio permission if it is not granted yet
+         * @param context the context of the application
+         * @param activity the activity that is asking for the permission
+         */
+        private fun askAudioPermission(context: Context, activity: Activity) {
+            if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO)
+                != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(activity,
+                    arrayOf(Manifest.permission.RECORD_AUDIO) ,
+                    REQUEST_RECORD_AUDIO_PERMISSION);
+            }
+            else {
+                Log.d("AudioRecognition", "Permission already granted")
+                Constants.AudioPermissionGranted = true
+            }
+        }
 
        @RequiresPermission(Manifest.permission.RECORD_AUDIO)
        private fun buildAudioRecord(): AudioRecord {
@@ -56,7 +74,6 @@ class AudioRecognition {
                 AudioFormat.CHANNEL_IN_MONO,
                 AudioFormat.ENCODING_PCM_16BIT
             )
-
             // Buffer to store retrieved chunks of audio
             return ByteArray(bufferSize)
         }

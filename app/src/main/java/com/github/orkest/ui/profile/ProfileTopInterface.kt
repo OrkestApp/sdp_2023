@@ -124,6 +124,11 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
                         //uncomment if un-caching is needed
                         GoogleSignIn.getClient(context, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut()
                         context.startActivity(intent)
+
+                        //
+                        cleanSigningCache(context)
+
+
                     }
                     //
                     Button(
@@ -151,6 +156,18 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
 
 private fun launchDeezerAuth(){
 
+}
+
+/**
+ * remove caching credentials
+ */
+fun cleanSigningCache(context : Context ){
+    val sharedPref = context.getSharedPreferences("user_credentials", Context.MODE_PRIVATE)
+    with(sharedPref.edit()) {
+        remove("username")
+        remove("email")
+        apply()
+    }
 }
 
 /**
@@ -278,6 +295,3 @@ fun ProfilePicture(profilePictureId: Int?){
             .clip(CircleShape)
     )
 }
-
-
-

@@ -125,7 +125,13 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
                         GoogleSignIn.getClient(context, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut()
                         context.startActivity(intent)
 
-
+                        //remove caching credentials
+                        val sharedPref = context.getSharedPreferences("user_credentials", Context.MODE_PRIVATE)
+                        with(sharedPref.edit()) {
+                            remove("username")
+                            remove("email")
+                            apply()
+                        }
                     }
                     //
                     Button(

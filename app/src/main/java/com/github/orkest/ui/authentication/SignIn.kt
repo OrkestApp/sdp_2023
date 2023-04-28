@@ -238,31 +238,24 @@ fun signIn(activityResultLauncher: ActivityResultLauncher<Intent>,
 private fun updateUI(user: FirebaseUser?, navController: NavController,
                      isInDatabase: Boolean, context: Context, viewModel: AuthViewModel
 ) {
-
-    if (user != null && !isInDatabase) {
-
-        Log.d(TAG, "User is not null and is not in database")
-        navController.navigate("signup")
-
-
+    if(user != null){
         // Save the user's credentials in SharedPreferences
         saveUserCredentials(context, viewModel.getUsername().text, Firebase.auth.currentUser?.email.toString())
 
-    } else if (user != null && isInDatabase) {
-
-        val intent = Intent(context, MainActivity::class.java)
-        context.startActivity(intent)
-        Log.d(TAG, "User is not null and is in database")
-
-        // Save the user's credentials in SharedPreferences
-        saveUserCredentials(context, viewModel.getUsername().text, Firebase.auth.currentUser?.email.toString())
-
-    }
-    else {
+        if(!isInDatabase){
+            Log.d(TAG, "User is not null and is not in database")
+            navController.navigate("signup")
+        }
+        else if(isInDatabase){
+            val intent = Intent(context, MainActivity::class.java)
+            context.startActivity(intent)
+            Log.d(TAG, "User is not null and is in database")
+        }
+    }else{
         Log.d(TAG, "User is null")
     }
-
 }
+
 
 /**
  * Saves the user's credentials in SharedPreferences

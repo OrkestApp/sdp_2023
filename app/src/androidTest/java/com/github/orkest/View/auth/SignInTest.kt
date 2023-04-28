@@ -5,6 +5,7 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.navigation.compose.rememberNavController
 import androidx.test.core.app.ApplicationProvider
+import com.github.orkest.View.profile.cleanSigningCache
 import com.github.orkest.ViewModel.auth.MockAuthViewModel
 import junit.framework.TestCase.assertEquals
 import org.junit.Before
@@ -134,6 +135,35 @@ class SignInTest {
 
         //check offline
         assertEquals(true, isSignedInOffline(context))
+
+        // Clear SharedPreferences after each test
+        val sharedPref = context.getSharedPreferences("user_credentials", Context.MODE_PRIVATE)
+        sharedPref.edit().clear().apply()
+    }
+
+    /**
+     * Correctly cleans the elements in SharedPreferences
+     */
+    @Test
+    fun correctlyCleansCache(){
+        val context: Context = ApplicationProvider.getApplicationContext()
+
+        // Mock credentials
+        val username = "test"
+        val email = "test@test.ch"
+
+        // Save user credentials
+        saveUserCredentials(context, username, email)
+
+        // Clear user credentials
+        cleanSigningCache(context)
+
+        // Load the new values
+        val (savedUsername, savedEmail) = loadUserCredentials(context)
+
+        // Check if the provided user credentials are empty
+        assertEquals(null, savedUsername)
+        assertEquals(null, savedEmail)
 
         // Clear SharedPreferences after each test
         val sharedPref = context.getSharedPreferences("user_credentials", Context.MODE_PRIVATE)

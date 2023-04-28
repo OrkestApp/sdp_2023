@@ -219,8 +219,6 @@ fun getGoogleSignInClient(context: Context): GoogleSignInClient {
     return GoogleSignIn.getClient(context, gso)
 }
 
-
-
 /**
  * the Sign In function when the the button is clicked on
  */
@@ -229,8 +227,6 @@ fun signIn(activityResultLauncher: ActivityResultLauncher<Intent>,
     val signInIntent = googleSignInClient.signInIntent
     activityResultLauncher.launch(signInIntent)
 }
-
-
 
 /**
  * Changes the intent depending on the user's credentials

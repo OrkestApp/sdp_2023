@@ -1,4 +1,4 @@
-package com.github.orkest.View.sharedMusic
+package com.github.orkest.ui.sharedMusic
 
 
 import androidx.compose.foundation.Image
@@ -63,7 +63,7 @@ fun sharedMusicPost(profile: Profile, song: Song, message: String) {
                 .clip(shape = RoundedCornerShape(roundedCornerValue))
                 .background(Color.hsl(54f, 1f, 0.5f))
                 ) {
-                    Column(Modifier.weight(1f)){ playMusic(song)}
+                    Column(Modifier.weight(1f)){ playMusic(song) }
                     AddToPlaylistButton()
             }
         }

@@ -30,7 +30,7 @@ import com.github.orkest.data.Constants
 import com.github.orkest.data.Post
 import com.github.orkest.data.Song
 import com.github.orkest.R
-import com.github.orkest.View.sharedMusic.sharedMusicPost
+import com.github.orkest.ui.sharedMusic.sharedMusicPost
 import com.github.orkest.ui.feed.PostViewModel
 import com.github.orkest.ui.feed.CommentActivity
 import com.github.orkest.ui.feed.CreatePost

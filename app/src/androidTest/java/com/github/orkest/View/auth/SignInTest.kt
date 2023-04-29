@@ -5,8 +5,12 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.navigation.compose.rememberNavController
 import androidx.test.core.app.ApplicationProvider
-import com.github.orkest.View.profile.cleanSigningCache
 import com.github.orkest.ViewModel.auth.MockAuthViewModel
+import com.github.orkest.ui.authentication.SignIn
+import com.github.orkest.ui.authentication.isSignedInOffline
+import com.github.orkest.ui.authentication.loadUserCredentials
+import com.github.orkest.ui.authentication.saveUserCredentials
+import com.github.orkest.ui.profile.cleanSigningCache
 import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Rule

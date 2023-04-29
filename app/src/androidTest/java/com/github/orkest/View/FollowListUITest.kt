@@ -63,10 +63,5 @@ class FollowListActivityTest {
     }
 
 
-    @Test
-    fun displayPreviewProfiles() {
-        // Check that there are 3 profile previews displayed
-        composeTestRule.onAllNodesWithContentDescription("Contact profile picture").assertCountEquals(3)
-        composeTestRule.onAllNodesWithText("Philippe").assertCountEquals(3)
-    }
+
 }

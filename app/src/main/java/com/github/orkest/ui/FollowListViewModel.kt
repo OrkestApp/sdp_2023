@@ -40,6 +40,4 @@ class FollowListViewModel(val username: String, val isFollowersList: Boolean) {
         return userListLiveData
     }
 
-
-
 }

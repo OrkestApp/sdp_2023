@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import com.github.orkest.data.Constants
+import com.github.orkest.domain.DeezerApiIntegration
 import com.github.orkest.domain.FireStoreDatabaseAPI
 
 class DeezerWelcomeActivity : AppCompatActivity(){
@@ -26,6 +27,7 @@ class DeezerWelcomeActivity : AppCompatActivity(){
      */
 
     private var code =""
+    private val db = FireStoreDatabaseAPI()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -39,12 +41,20 @@ class DeezerWelcomeActivity : AppCompatActivity(){
         val codeValue: String? = uri.getQueryParameter("code")
         if (codeValue != null) {
             code = codeValue
-            val future = FireStoreDatabaseAPI().storeTokenInDatabase(Constants.CURRENT_LOGGED_USER,codeValue) //store the token in the database
+            val future = db.storeDeezerInformationsInDatabase(Constants.CURRENT_LOGGED_USER,codeValue) //store the token in the database
             future.thenAccept { if ( ! it) {
                 Log.d("DB_OPERATION","Fail to store token in the database")
             }
                 else {
+                    db.getUserDeezerInformations(Constants.CURRENT_LOGGED_USER).thenAccept { data ->
+                        if(data.access_token != "" && data.access_token != null){
+                            val userIdFuture = DeezerApiIntegration().fetchTheUserIdInTheDeezerDatabase(data.access_token!!)
+                            userIdFuture.thenAccept {
+                                user ->
+                            }
 
+                        }
+                    }
             }
 
             }

@@ -28,6 +28,13 @@ class DeezerModelClasses {
 
     data class User(val id:String, val name:String, val tracklist: String,val type:String)
 
+    data class UserExtended(val id:String, val name:String, val lastname:String,val firstname:String,
+                            val email:String, val status:String, val birthday:String, val inscription_date:String,
+                            val gender:String, val link:String, val picture :String, val picture_small:String,
+                            val picture_medium:String, val picture_big:String, val picture_xl:String,val country:String,
+                            val lang:String,val is_kid:String, val explicit_content_level:String,val explicit_content_levels_available: List<String>,
+                            val tracklist:String, val type :String)
+
 
 
 }

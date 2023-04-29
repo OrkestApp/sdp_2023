@@ -61,8 +61,8 @@ class DeezerApiIntegration {
      * We will need this Id to update the playlist
      */
 
-    fun fetchTheUserIdInTheDeezerDatabase(access_token:String):CompletableFuture<User>{
-        val completableFuture = CompletableFuture<User>()
+    fun fetchTheUserIdInTheDeezerDatabase(access_token:String):CompletableFuture<DeezerModelClasses.UserExtended>{
+        val completableFuture = CompletableFuture<DeezerModelClasses.UserExtended>()
         Thread{
             val connection = URL("https://api.deezer.com/user/me?access_token=$access_token").openConnection() as HttpURLConnection
             connection.requestMethod = "GET"
@@ -73,7 +73,7 @@ class DeezerApiIntegration {
                 val response = inputStream.bufferedReader().use { it.readText() }
                 Log.d("HELLO", response.toString())
                 val json = Gson()
-                val user = json.fromJson(response, User::class.java)
+                val user = json.fromJson(response, DeezerModelClasses.UserExtended::class.java)
                 completableFuture.complete(user)
             } else {
                 // TODO  Handle the error case here...

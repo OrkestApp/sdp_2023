@@ -2,15 +2,13 @@ package com.github.orkest.domain
 
 import android.content.ContentValues.TAG
 import android.util.Log
-import com.github.orkest.data.Comment
-import com.github.orkest.data.Post
-import com.github.orkest.data.Song
-import com.github.orkest.data.User
+import com.github.orkest.data.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import java.time.LocalDateTime
 import java.util.concurrent.CompletableFuture
@@ -165,16 +163,30 @@ class FireStoreDatabaseAPI {
 
     //===========================SONG POST OPERATIONS======================
 
-    fun storeTokenInDatabase(username:String,token:String?): CompletableFuture<Boolean>{
+    fun storeDeezerInformationsInDatabase(username:String,token:String?,userId:String?="",playlistId:String=""): CompletableFuture<Boolean>{
         val completableFuture = CompletableFuture<Boolean>()
         val path = "deezerToken"
-        db.collection(path).document(username).set(hashMapOf ("token" to token,"id" to "","Playlist_Id" to "")).addOnSuccessListener {
+        db.collection(path).document(username).set(DeezerInformations(token,userId,playlistId)).addOnSuccessListener {
             completableFuture.complete(true)
         }.addOnFailureListener{
             completableFuture.complete(false)
         }
         return completableFuture
     }
+
+    fun getUserDeezerInformations(username: String):CompletableFuture<DeezerInformations>{
+        val completableFuture = CompletableFuture<DeezerInformations>()
+        val path = "deezerToken"
+        db.collection(path).document(username).get().addOnSuccessListener {
+            completableFuture.complete(it.toObject(DeezerInformations::class.java))
+        }.addOnFailureListener{
+            completableFuture.complete(DeezerInformations("","",""))
+        }
+        return completableFuture
+    }
+    
+
+
 
 
 

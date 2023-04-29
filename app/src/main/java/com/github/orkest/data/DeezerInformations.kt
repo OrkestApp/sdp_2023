@@ -6,4 +6,4 @@ package com.github.orkest.data
  * @userId is the unique identifier of the user Deezer Account
  * @playlistId is the unique identifier of the playlist that orkest will update
  */
-data class DeezerInformations(var access_token :String, var userId :String, var playlistId:String)
+data class DeezerInformations(var access_token :String?, var userId :String?, var playlistId:String?)

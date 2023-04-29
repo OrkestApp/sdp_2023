@@ -12,6 +12,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 
+/**
+ * A static class that handles the continuous recording from the microphone as a [Flow] of [AudioChunk]s
+ * This [Flow] can then be collected later on to handle the audio chunks as desired
+ * (i.e. send them to the Shazam API)
+ */
 class AudioRecording {
 
     companion object {
@@ -25,7 +30,7 @@ class AudioRecording {
            val audioFormat = AudioFormat.Builder()
                .setChannelMask(AudioFormat.CHANNEL_IN_MONO)
                .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
-               .setSampleRate(48_000)
+               .setSampleRate(ShazamConstants.RECORDING_SAMPLE_RATE)
                .build()
 
            //Create and return the audio recording object based on the source and format

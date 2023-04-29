@@ -46,6 +46,14 @@ class DeezerApiIntegrationTest {
         Log.d("HELLO", value.toString())
 
     }
+    /**
+     * tested
+     */
+    fun testGetUserIdIndatabase(){
+        val value = DeezerApiIntegration().fetchTheUserIdInTheDeezerDatabase("fre2MZQMJbgEjomDl7WusDOj3p0RIo3g0dhW4G1kVMG5Oa9CGV").get()
+        Log.d("TEST",value.id)
+        Log.d("TEST",value.name)
+    }
 
     /**
      * need to be run with emulator

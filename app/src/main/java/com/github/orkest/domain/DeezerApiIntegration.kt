@@ -71,12 +71,12 @@ class DeezerApiIntegration {
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 val inputStream = connection.inputStream
                 val response = inputStream.bufferedReader().use { it.readText() }
-                Log.d("HELLO", response.toString())
+
                 val json = Gson()
                 val user = json.fromJson(response, DeezerModelClasses.UserExtended::class.java)
                 completableFuture.complete(user)
             } else {
-                // TODO  Handle the error case here...
+            Log.d("DEEZER_API_FAIL", "Problems fetching the user in the deezer database")
             }
         }.start()
 

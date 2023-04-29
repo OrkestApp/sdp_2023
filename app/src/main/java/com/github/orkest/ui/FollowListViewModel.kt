@@ -6,17 +6,14 @@ import com.github.orkest.data.User
 import com.github.orkest.domain.FireStoreDatabaseAPI
 import java.util.concurrent.CompletableFuture
 
-class FollowListViewModel(val username: String, val isFollowersList: Boolean) {
+open class FollowListViewModel(val username: String, val isFollowersList: Boolean) {
 
     private val dbAPI = FireStoreDatabaseAPI()
-
-
-
 
     /**
      * Retrieves the list of users in the followers or followings list
      */
-    fun retrieveFollowList(): LiveData<MutableList<User>> {
+    open fun retrieveFollowList(): LiveData<MutableList<User>> {
         val userListLiveData = MutableLiveData<MutableList<User>>()
 
         dbAPI.fetchFollowList(username, isFollowersList).thenApplyAsync { followList ->

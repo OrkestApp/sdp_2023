@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -126,6 +127,7 @@ fun CreateProfilePreview(user: User){
         .fillMaxWidth()
         .clip(shape = RoundedCornerShape(roundedCornerValue))
         .background(Color.DarkGray)
+        .testTag("Profile Row")
     ) {
         Image(
             painter = painterResource(R.drawable.blank_profile_pic), //TODO: to change when we will be able to fetch the profile pictures from the database
@@ -144,7 +146,8 @@ fun CreateProfilePreview(user: User){
             verticalArrangement = Arrangement.Center) {
             Text(
                 text = user.username,
-                style = TextStyle(fontSize = textFontSize, fontWeight = FontWeight.Bold)
+                style = TextStyle(fontSize = textFontSize, fontWeight = FontWeight.Bold),
+                modifier = Modifier.testTag("Username")
             )
         }
     }

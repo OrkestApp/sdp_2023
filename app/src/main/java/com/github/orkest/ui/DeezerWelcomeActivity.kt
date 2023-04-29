@@ -4,13 +4,16 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Column
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
-import androidx.compose.material3.Button
+import androidx.compose.material.Button
 import androidx.compose.runtime.*
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import com.github.orkest.data.Constants
@@ -23,7 +26,6 @@ class DeezerWelcomeActivity : AppCompatActivity(){
      */
 
     private var code =""
-    private var username = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -35,35 +37,38 @@ class DeezerWelcomeActivity : AppCompatActivity(){
 
 
         val codeValue: String? = uri.getQueryParameter("code")
-        val future = FireStoreDatabaseAPI().storeTokenInDatabase(Constants.CURRENT_LOGGED_USER,codeValue) //store the token in the database
         if (codeValue != null) {
             code = codeValue
+            val future = FireStoreDatabaseAPI().storeTokenInDatabase(Constants.CURRENT_LOGGED_USER,codeValue) //store the token in the database
+            future.thenAccept { if ( ! it) {
+                Log.d("DB_OPERATION","Fail to store token in the database")
+            }
+            }
+        }
+        else{
+            Log.d("DEEZER_OAUTH_FAIL","token was empty")
         }
 
+
         setContent {
-            createViewForDeezer()
+            CreateViewForDeezer()
         }
     }
 
     //TODO compare typed username with Actual username
 
     @Composable
-    fun createViewForDeezer(){
-        var text by remember { mutableStateOf("Enter userName ") }
+    fun CreateViewForDeezer(){
         val context = LocalContext.current
         Column() {
-            TextField(value = text, onValueChange = { text = it; username=it})
-            Button(onClick = { compareUsernameWithDatabase(text);launchMainActivity(context)}, content = { Text("Start to use Deezer")})
+            Text(text = "Hello ${Constants.CURRENT_LOGGED_USER}")
+            Button(
+                onClick = { launchMainActivity(context)},
+                content = { Text("Start to use Deezer")},
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color.Yellow))
 
         }
 
-
-    }
-
-    private fun compareUsernameWithDatabase(text:String){
-        if(text == Constants.CURRENT_LOGGED_USER){
-            //TODO deeal with error case
-        }
 
     }
 
@@ -77,12 +82,9 @@ class DeezerWelcomeActivity : AppCompatActivity(){
     @Preview
     @Composable
     fun preview_DeezerWelcome(){
-        createViewForDeezer()
+        CreateViewForDeezer()
     }
 
-    private fun saveTokenInDatabase(){
-
-    }
 
 
 }

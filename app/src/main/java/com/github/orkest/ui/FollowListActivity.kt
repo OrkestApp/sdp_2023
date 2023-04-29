@@ -8,11 +8,14 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,8 +32,6 @@ import com.github.orkest.ui.profile.ProfileActivity
 import com.github.orkest.ui.sharing.ui.theme.OrkestTheme
 import com.github.orkest.R
 
-//Here for preview purposes. Will be deleted.
-val user = User(username = "Philippe", profile = Profile(profilePictureId = R.drawable.blank_profile_pic))
 
 private val paddingValue = 5.dp
 private val titleFontSize = 28.sp
@@ -63,10 +64,12 @@ class FollowListActivity: ComponentActivity() {
 @Composable
 fun FollowList(viewModel: FollowListViewModel){
     Column {
-        Row(Modifier
-            .fillMaxWidth()
-            .background(Color.Yellow)
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .background(Color.Yellow)
         ) {
+            //Get back button
             val context = LocalContext.current
             IconButton(onClick = {
                 // Gets back to the profile page of the user
@@ -84,6 +87,7 @@ fun FollowList(viewModel: FollowListViewModel){
             }
             Spacer(modifier = Modifier.width(largeSeparator))
 
+            //Title of the section: either "Followers" or "Followings"
             Column(
                 Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.Center){
@@ -97,25 +101,34 @@ fun FollowList(viewModel: FollowListViewModel){
 
         Spacer(modifier = Modifier.height(smallSeparator))
 
-        //Here only to show the feature. Will be deleted.
-        repeat(3){
-            CreateProfilePreview(user = user)
+        //Display the list of followers or followings
+        val userListLiveData = viewModel.retrieveFollowList()
+        val userListState by userListLiveData.observeAsState(emptyList())
+        
+        LazyColumn{
+            items(userListState){user -> 
+                CreateProfilePreview(user = user)
+            }
         }
-
     }
 }
 
 @Composable
 fun CreateProfilePreview(user: User){
+    val context = LocalContext.current
     Row(modifier = Modifier
         .padding(all = paddingValue)
-        .clickable {}
+        .clickable {
+            val intent = Intent(context, ProfileActivity::class.java)
+            intent.putExtra("username", user.username)
+            context.startActivity(intent)
+        }
         .fillMaxWidth()
         .clip(shape = RoundedCornerShape(roundedCornerValue))
         .background(Color.DarkGray)
     ) {
         Image(
-            painter = painterResource(user.profile.profilePictureId),
+            painter = painterResource(R.drawable.blank_profile_pic), //TODO: to change when we will be able to fetch the profile pictures from the database
             contentDescription = "Contact profile picture",
             modifier = Modifier
                 .size(itemSize)
@@ -136,79 +149,3 @@ fun CreateProfilePreview(user: User){
         }
     }
 }
-
-
-/**
-@Composable
-fun FollowListScreen(viewModel: FollowListViewModel) {
-    var userList by remember { mutableStateOf(mutableListOf<User>()) }
-
-    viewModel.retrieveFollowList().thenAccept {
-        userList = it
-    }
-
-    Column{
-        val context = LocalContext.current
-        IconButton(onClick = {
-                val intent = Intent(context, ProfileActivity::class.java)
-                intent.putExtra("username", viewModel.username)
-                context.startActivity(intent)})
-        {
-            Image(
-                painterResource(id = R.drawable.back_button),
-                contentDescription = "Back button",
-                modifier = Modifier
-                    .padding(10.dp)
-                    .height(100.dp)
-                    .width(100.dp)
-            )
-        }
-        Spacer(modifier = Modifier.height(20.dp))
-
-        LazyColumn {
-            items(userList) { user ->
-                val context = LocalContext.current
-                val intent = Intent(context, ProfileActivity::class.java)
-                intent.putExtra("username",user.username)
-                UserListItem(user = user, intent = intent)
-            }
-        }
-    }
-    
-}
-
-@Composable
-fun UserList(users: MutableList<User>) {
-    LazyColumn {
-        items(users) { user ->
-            val context = LocalContext.current
-            val intent = Intent(context, ProfileActivity::class.java)
-            intent.putExtra("username",user.username)
-            UserListItem(user = user, intent = intent)
-        }
-    }
-}
-
-@Composable
-fun UserListItem(user: User, intent: Intent){
-    val context = LocalContext.current
-    Row(modifier = Modifier
-        .padding(all = 10.dp)
-        .clickable { context.startActivity(intent) }
-        .fillMaxSize()){
-
-        Image(
-            painter = painterResource(user.profile.profilePictureId),
-            contentDescription = "Profile picture",
-            modifier = Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-        )
-
-        // Add a horizontal space between the image and the text
-        Spacer(modifier = Modifier.width(10.dp))
-
-        Text(text = user.username)
-    }
-}
-**/

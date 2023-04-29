@@ -43,6 +43,10 @@ class DeezerWelcomeActivity : AppCompatActivity(){
             future.thenAccept { if ( ! it) {
                 Log.d("DB_OPERATION","Fail to store token in the database")
             }
+                else {
+
+            }
+
             }
         }
         else{

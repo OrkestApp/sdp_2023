@@ -168,7 +168,7 @@ class FireStoreDatabaseAPI {
     fun storeTokenInDatabase(username:String,token:String?): CompletableFuture<Boolean>{
         val completableFuture = CompletableFuture<Boolean>()
         val path = "deezerToken"
-        db.collection(path).document(username).set(hashMapOf ("token" to token)).addOnSuccessListener {
+        db.collection(path).document(username).set(hashMapOf ("token" to token,"id" to "","Playlist_Id" to "")).addOnSuccessListener {
             completableFuture.complete(true)
         }.addOnFailureListener{
             completableFuture.complete(false)

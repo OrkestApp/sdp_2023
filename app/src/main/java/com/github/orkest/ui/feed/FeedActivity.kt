@@ -31,6 +31,7 @@ import com.github.orkest.data.Post
 import com.github.orkest.data.Song
 import com.github.orkest.R
 import com.github.orkest.View.sharedMusic.sharedMusicPost
+import com.github.orkest.ui.Camera
 import com.github.orkest.ui.feed.PostViewModel
 import com.github.orkest.ui.feed.CommentActivity
 import com.github.orkest.ui.feed.CreatePost
@@ -75,13 +76,31 @@ fun FeedActivity(viewModel: PostViewModel) {
 
     val context = LocalContext.current
 
-    //Add a button to create a new post
-    FloatingActionButton(
-        modifier = Modifier
-            .padding(10.dp),
-        onClick = { launchCreatePostActivity(context) }) {
-        Icon(painter = painterResource(id = R.drawable.add_button), contentDescription = "Add post")
+    Column {
+        //Add a button to create a new post
+        FloatingActionButton(
+            modifier = Modifier
+                .padding(10.dp),
+            onClick = { launchCreatePostActivity(context) }) {
+            Icon(
+                painter = painterResource(id = R.drawable.add_button),
+                contentDescription = "Add post"
+            )
+        }
+
+        //Add a button to access camera
+        FloatingActionButton(
+            modifier = Modifier
+                .padding(10.dp),
+            onClick = {
+                val intent = Intent(context, Camera::class.java)
+                context.startActivity(intent)
+            }) {
+            Icon(painter = painterResource(id = R.drawable.powerrangerblue), contentDescription = "Launch camera")
+        }
     }
+
+
 }
 
 fun launchCreatePostActivity(context: Context){

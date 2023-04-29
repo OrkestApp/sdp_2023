@@ -33,7 +33,7 @@ class MockPostViewModel : PostViewModel() {
         return future
     }
 
-    override fun getRecentPosts(date : LocalDateTime): CompletableFuture<List<Post>> {
+    override fun getRecentPosts(lastConnected : LocalDateTime, maxDaysNb: Long): CompletableFuture<List<Post>> {
         val future = CompletableFuture<List<Post>>()
         future.complete(listOf(post)) //, post, post))
         return future

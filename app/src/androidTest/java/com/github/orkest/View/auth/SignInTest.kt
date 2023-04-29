@@ -1,10 +1,17 @@
 package com.github.orkest.View.auth
 
+import android.content.Context
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.navigation.compose.rememberNavController
+import androidx.test.core.app.ApplicationProvider
 import com.github.orkest.ViewModel.auth.MockAuthViewModel
 import com.github.orkest.ui.authentication.SignIn
+import com.github.orkest.ui.authentication.isSignedInOffline
+import com.github.orkest.ui.authentication.loadUserCredentials
+import com.github.orkest.ui.authentication.saveUserCredentials
+import com.github.orkest.ui.profile.cleanSigningCache
+import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -18,12 +25,14 @@ class SignInTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
+    private lateinit var context: Context
     @Before
     fun setup(){
         // Start the app
         composeTestRule.setContent {
             SignIn(navController = rememberNavController(), MockAuthViewModel())
         }
+        context = ApplicationProvider.getApplicationContext()
     }
 
     /**
@@ -89,33 +98,80 @@ class SignInTest {
             .performClick()
     }
 
-
-
-
-
-
-
-    /////////////
-    /*
+    /**
+     * Check that offline signing in correctly stores and loads the credentials
+     */
     @Test
-    fun existingUsernameLaunchesMain(){
-        Intents.init()
-        composeTestRule.onNodeWithText("Current Username")
-            .performTextInput(MockAuthViewModel.EXISTING_USER)
+    fun offlineSignIn_correctlyStores() {
 
-        composeTestRule.onNodeWithText("Sign In").performClick()
-        Intents.intended((IntentMatchers.hasComponent(MainActivity::class.java.name)))
-        Intents.release()
+        val context: Context = ApplicationProvider.getApplicationContext()
+
+        // Mock credentials
+        val username = "test"
+        val email = "test@test.ch"
+
+        // Save and load user credentials
+        saveUserCredentials(context, username, email)
+        val (savedUsername, savedEmail) = loadUserCredentials(context)
+
+        // Check if the provided user credentials do not match the saved ones
+        assertEquals(username, savedUsername)
+        assertEquals(email, savedEmail)
+
+        // Clear SharedPreferences after each test
+        val sharedPref = context.getSharedPreferences("user_credentials", Context.MODE_PRIVATE)
+        sharedPref.edit().clear().apply()
     }
 
+    /**
+     * Checks if credentials are present in SharedPreferences
+     */
     @Test
-    fun noPermissionDisplaysError(){
-        composeTestRule.onNodeWithText("Current Username")
-            .performTextInput(MockAuthViewModel.NO_PERMISSIONS)
+    fun correctlyChecksOffline() {
+        val context: Context = ApplicationProvider.getApplicationContext()
 
-        composeTestRule.onNodeWithText("Sign In").performClick()
+        // Mock credentials
+        val username = "test"
+        val email = "test@test.ch"
 
-        composeTestRule.onNodeWithText("No permissions for this user!").assertIsDisplayed()
-    }*/
+        // Save user credentials
+        saveUserCredentials(context, username, email)
+
+        //check offline
+        assertEquals(true, isSignedInOffline(context))
+
+        // Clear SharedPreferences after each test
+        val sharedPref = context.getSharedPreferences("user_credentials", Context.MODE_PRIVATE)
+        sharedPref.edit().clear().apply()
+    }
+
+    /**
+     * Correctly cleans the elements in SharedPreferences
+     */
+    @Test
+    fun correctlyCleansCache(){
+        val context: Context = ApplicationProvider.getApplicationContext()
+
+        // Mock credentials
+        val username = "test"
+        val email = "test@test.ch"
+
+        // Save user credentials
+        saveUserCredentials(context, username, email)
+
+        // Clear user credentials
+        cleanSigningCache(context)
+
+        // Load the new values
+        val (savedUsername, savedEmail) = loadUserCredentials(context)
+
+        // Check if the provided user credentials are empty
+        assertEquals(null, savedUsername)
+        assertEquals(null, savedEmail)
+
+        // Clear SharedPreferences after each test
+        val sharedPref = context.getSharedPreferences("user_credentials", Context.MODE_PRIVATE)
+        sharedPref.edit().clear().apply()
+    }
 
 }

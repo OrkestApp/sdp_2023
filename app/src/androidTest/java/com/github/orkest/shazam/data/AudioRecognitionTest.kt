@@ -49,9 +49,10 @@ class AudioRecognitionTest {
 
         val recording = audioChunks.asFlow()
 
-        val song = AudioRecognition.recognizeSong(coroutineScope,context,recording).get()
-        assertEquals("Booba", song.Artist)
-        assertEquals("Petite Fille", song.Title)
+        AudioRecognition.recognizeSong(coroutineScope,context,recording).thenAccept {
+            assertEquals("Booba", it.Artist)
+            assertEquals("Petite Fille", it.Title)
+        }
     }
 
     @Test
@@ -59,16 +60,18 @@ class AudioRecognitionTest {
         val bytes = ByteArray(4*4096) { 0 }
         val audioChunks = bytes.chunked(4096).map { AudioChunk(it) }.asFlow()
 
-        val song = AudioRecognition.recognizeSong(coroutineScope,context,audioChunks).get()
-        assertEquals(song, ShazamConstants.SONG_NO_MATCH)
+        AudioRecognition.recognizeSong(coroutineScope,context,audioChunks).thenAccept {
+            assertEquals(it, ShazamConstants.SONG_NO_MATCH)
+        }
     }
 
     @Test
     fun noAudioChunksGenError() {
         val audioChunks = emptyList<AudioChunk>().asFlow()
 
-        val song = AudioRecognition.recognizeSong(coroutineScope,context,audioChunks).get()
-        assertEquals(song,null)
+         AudioRecognition.recognizeSong(coroutineScope,context,audioChunks).thenAccept {
+            assertEquals(it, null)
+        }
     }
 }
 

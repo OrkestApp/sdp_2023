@@ -40,6 +40,7 @@ class DeezerWelcomeActivity : AppCompatActivity(){
 
         val codeValue: String? = uri.getQueryParameter("code")
         if (codeValue != null) {
+            val hello = "xx"
             code = codeValue
             val future = db.storeDeezerInformationsInDatabase(Constants.CURRENT_LOGGED_USER,codeValue) //store the token in the database
             future.thenAccept { if ( ! it) {
@@ -50,7 +51,16 @@ class DeezerWelcomeActivity : AppCompatActivity(){
                         if(data.access_token != "" && data.access_token != null){
                             val userIdFuture = DeezerApiIntegration().fetchTheUserIdInTheDeezerDatabase(data.access_token!!)
                             userIdFuture.thenAccept {
-                                user ->
+                                user -> val playlistIdFuture = DeezerApiIntegration().createANewPlaylistOnTheUserProfile(user.id,data.access_token!!)
+                                playlistIdFuture.thenAccept {
+                                    playlistId ->
+                                    if (playlistId != "" && playlistId !=null){
+                                    db.storeDeezerInformationsInDatabase(Constants.CURRENT_LOGGED_USER,data.access_token!!, user.id,playlistId)
+                                    }
+                                    else {
+                                        Log.d("DEEZER_OAUTH_FAIL", "Failed to store deezer informations")
+                                    }
+                                }
                             }
 
                         }

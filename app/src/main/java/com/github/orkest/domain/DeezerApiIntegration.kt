@@ -89,8 +89,8 @@ class DeezerApiIntegration {
      * Need the access token of the user and use it to add a playlist to his Deezer profile, will able Orkest to share the music
      */
 
-    fun createANewPlaylistOnTheUserProfile(userId:String,access_token: String,playlistTitle: String="Orkest"):CompletableFuture<Boolean>{
-        val completableFuture = CompletableFuture<Boolean>()
+    fun createANewPlaylistOnTheUserProfile(userId:String,access_token: String,playlistTitle: String="Orkest"):CompletableFuture<String>{
+        val completableFuture = CompletableFuture<String>()
         Thread{
             val connection = URL("https://api.deezer.com/user/$userId/playlists?access_token=$access_token&title=$playlistTitle").openConnection() as HttpURLConnection
             connection.requestMethod = "POST"
@@ -100,11 +100,12 @@ class DeezerApiIntegration {
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 val inputStream = connection.inputStream
                 val response = inputStream.bufferedReader().use { it.readText() }
+                val regex = Regex("\\D+") // Define a regular expression to match non-digit characters
+                val cleared = regex.replace(response, "") // clear the string to a non -json format
                 Log.d("HELLO", response.toString())
-                //TODO NEED TO STORE THE PLAYLIST ID in the database so we can update it
-                completableFuture.complete(true)
+                completableFuture.complete(cleared)
             } else {
-                // TODO  Handle the error case here...
+                Log.d("DEEZER_API_FAIL", "Problems fetching the user in the deezer database")
             }
         }.start()
 

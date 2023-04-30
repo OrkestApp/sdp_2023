@@ -2,6 +2,8 @@ package com.github.orkest.ui
 
 
 import android.annotation.SuppressLint
+import android.content.Intent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.BottomNavigation
@@ -11,8 +13,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -25,6 +29,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.github.orkest.data.Constants
 
 import com.github.orkest.View.feed.FeedActivity
+import com.github.orkest.shazam.ui.ShazamSong
+import com.github.orkest.ui.feed.CreatePost
 import com.github.orkest.ui.profile.ProfileActivity
 import com.github.orkest.ui.profile.ProfileActivityScreen
 import com.github.orkest.ui.search.SearchUserView
@@ -42,8 +48,9 @@ class NavigationBar {
         private val viewModel = SearchViewModel()
         @SuppressLint("UnrememberedMutableState")
         @Composable
-        fun CreateNavigationBar(navController: NavHostController, currentUser: String) {
+        fun CreateNavigationBar(navController: NavHostController, currentUser: String, activity: MainActivity) {
 
+            val context = LocalContext.current
             Scaffold(
                 bottomBar = {
                     BottomNavigation(backgroundColor = Color.White) {
@@ -52,7 +59,7 @@ class NavigationBar {
                         NavigationBarClasses.listOfNavigationItems.forEach { item ->
                             BottomNavigationItem(
                                 icon = {
-                                    Icon(
+                                    Image(
                                         painter = painterResource(id = item.iconId),
                                         "",
                                         Modifier.size(25.dp)
@@ -87,9 +94,13 @@ class NavigationBar {
                 ) {
                     composable("HomePage") { FeedActivity(PostViewModel()) }
                     composable("SearchPage") { SearchUserView.SearchUi(viewModel = viewModel) }
-
+                    composable("ShazamPage") {
+                    //Launch intent to the shazamActivity
+//                        val intent = Intent(context, ShazamActivity::class.java)
+//                        context.startActivity(intent)
+                        ShazamSong(activity)
+                    }
                     composable("PlaylistPage") {
-
                         UsersList(PlaylistViewModel())
                     }
                     composable("ProfilePage") {

@@ -3,7 +3,7 @@ package com.github.orkest.Model
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.rule.GrantPermissionRule
-import com.github.orkest.shazam.data.AudioRecording
+import com.github.orkest.shazam.domain.AudioRecording
 import kotlinx.coroutines.*
 import org.junit.Assert.assertTrue
 import org.junit.Before

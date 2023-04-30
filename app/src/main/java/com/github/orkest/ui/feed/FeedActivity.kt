@@ -75,10 +75,11 @@ fun FeedActivity(viewModel: PostViewModel) {
 
     val context = LocalContext.current
 
-    //Add a button to create a new post
+    //Add a button to create a new post at the right lower corner
     FloatingActionButton(
         modifier = Modifier
-            .padding(10.dp),
+            .padding(10.dp)
+            .testTag("addPostButton"),
         onClick = { launchCreatePostActivity(context) }) {
         Icon(painter = painterResource(id = R.drawable.add_button), contentDescription = "Add post")
     }

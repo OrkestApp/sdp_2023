@@ -37,25 +37,25 @@ class DeezerWelcomeActivity : AppCompatActivity(){
 
         val uri: Uri = Uri.parse(deepLink)
 
+        //FOLLOWING OPERATIONS NEEDS TO BE DONE SEQUENCIALY BECAUSE THEY ALL NEED PREVIOUS RESULTS
 
         val codeValue: String? = uri.getQueryParameter("code")
         if (codeValue != null) {
-            val hello = "xx"
             code = codeValue
             val future = db.storeDeezerInformationsInDatabase(Constants.CURRENT_LOGGED_USER,codeValue) //store the token in the database
             future.thenAccept { if ( ! it) {
                 Log.d("DB_OPERATION","Fail to store token in the database")
             }
-                else {
+                else { // waits for the access token to be successfully stored in the database
                     db.getUserDeezerInformations(Constants.CURRENT_LOGGED_USER).thenAccept { data ->
                         if(data.access_token != "" && data.access_token != null){
                             val userIdFuture = DeezerApiIntegration().fetchTheUserIdInTheDeezerDatabase(data.access_token!!)
-                            userIdFuture.thenAccept {
+                            userIdFuture.thenAccept { // waits for the user Id fetch in the database
                                 user -> val playlistIdFuture = DeezerApiIntegration().createANewPlaylistOnTheUserProfile(user.id,data.access_token!!)
-                                playlistIdFuture.thenAccept {
+                                playlistIdFuture.thenAccept { // waits for the playlist to be created on the user's profile and then return the playlist ID
                                     playlistId ->
                                     if (playlistId != "" && playlistId !=null){
-                                    db.storeDeezerInformationsInDatabase(Constants.CURRENT_LOGGED_USER,data.access_token!!, user.id,playlistId)
+                                    db.storeDeezerInformationsInDatabase(Constants.CURRENT_LOGGED_USER,data.access_token!!, user.id,playlistId) // Finaly store all the user's deezer credentials in the database
                                     }
                                     else {
                                         Log.d("DEEZER_OAUTH_FAIL", "Failed to store deezer informations")

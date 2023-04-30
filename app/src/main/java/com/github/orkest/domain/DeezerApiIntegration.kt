@@ -128,7 +128,7 @@ class DeezerApiIntegration {
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 completableFuture.complete(true)
             } else {
-                // TODO  Handle the error case here...
+                Log.d("DEEZER_API_FAIL", "Problems adding a song to the database")
             }
         }.start()
 

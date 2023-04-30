@@ -1,6 +1,4 @@
-package com.github.orkest.shazam.data
-
-import com.github.orkest.shazam.domain.ShazamConstants
+package com.github.orkest.shazam.domain
 
 data class AudioChunk (
     val buffer: ByteArray = ByteArray(ShazamConstants.SHAZAM_SESSION_READ_BUFFER_SIZE),

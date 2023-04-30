@@ -1,4 +1,4 @@
-package com.github.orkest.shazam.domain
+package com.github.orkest.shazam.data
 
 import android.Manifest
 import android.media.AudioFormat
@@ -6,7 +6,8 @@ import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.util.Log
 import androidx.annotation.RequiresPermission
-import com.github.orkest.shazam.data.AudioChunk
+import com.github.orkest.shazam.domain.AudioChunk
+import com.github.orkest.shazam.domain.ShazamConstants
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

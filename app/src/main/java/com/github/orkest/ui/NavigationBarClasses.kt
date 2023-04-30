@@ -12,11 +12,11 @@ import com.github.orkest.R.*
 sealed class NavigationBarClasses(val route: String, @StringRes val resourceId: Int, val iconId : Int) {
     object HomePage : NavigationBarClasses("HomePage", string.HomePage, drawable.icons8_audio_wave2_100)
     object SearchPage : NavigationBarClasses("SearchPage", string.SearchPage, drawable.icons8_search)
-    object CreatePostPage : NavigationBarClasses("Shazam", string.ShazamPage, drawable.shazam)
+    object ShazamPage : NavigationBarClasses("ShazamPage", string.ShazamPage, drawable.shazam)
     object PlaylistPage : NavigationBarClasses("PlaylistPage", string.PlaylistPage, drawable.icons8_music_library_100)
     object ProfilePage : NavigationBarClasses("ProfilePage", string.ProfilePage, drawable.icons8_test_account_100)
     companion object {val  listOfNavigationItems = listOf(
-        HomePage, SearchPage,
+        HomePage, SearchPage, ShazamPage,
         PlaylistPage,
         ProfilePage
     )}

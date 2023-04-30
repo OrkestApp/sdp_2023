@@ -6,6 +6,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.rememberNavController
+import com.github.orkest.ui.MainActivity
 import com.github.orkest.ui.NavigationBar
 import org.junit.Rule
 import org.junit.Test
@@ -18,7 +19,7 @@ class navigationTabTest {
     @Test
     fun canAccessEveryNavigationTabFromMainActivity(){
         composeTestRule.setContent {
-            NavigationBar.CreateNavigationBar(navController = rememberNavController(),"")
+            NavigationBar.CreateNavigationBar(navController = rememberNavController(),"", MainActivity())
         }
 
         val searchTabAccess = composeTestRule.onNodeWithText("Search")

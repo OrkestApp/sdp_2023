@@ -41,6 +41,11 @@ class navigationTabTest {
         playlistTab.assertIsDisplayed()
         playlistTab.performClick()
 
+        val shazamTab = composeTestRule.onNodeWithText("Shazam")
+        shazamTab.assertIsDisplayed()
+        shazamTab.assertHasClickAction()
+
+
 
     }
 }

@@ -6,12 +6,15 @@ import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.github.orkest.data.Song
 
 class ShazamConstants {
     companion object{
         const val REQUEST_RECORD_AUDIO_PERMISSION = 200
         const val RECORDING_SAMPLE_RATE: Int  = 48_000
         const val SHAZAM_SESSION_READ_BUFFER_SIZE: Int = 4096
+
+        val SONG_NO_MATCH = Song("No Match", "No Match")
 
         /**
          * Returns true if the app has the RECORD_AUDIO permission.

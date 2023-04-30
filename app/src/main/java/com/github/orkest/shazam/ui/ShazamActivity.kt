@@ -2,83 +2,78 @@ package com.github.orkest.shazam.ui
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.pm.PackageManager
-import android.os.Bundle
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.compose.setContent
-import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Modifier
-import androidx.core.app.ActivityCompat
+import androidx.compose.ui.platform.LocalContext
+import com.github.orkest.data.Song
+import com.github.orkest.shazam.data.AudioRecognition
 import com.github.orkest.shazam.data.AudioRecording
 import com.github.orkest.shazam.domain.ShazamConstants
-import com.github.orkest.ui.theme.OrkestTheme
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 
-class ShazamActivity : AppCompatActivity() {
-    lateinit var coroutineScope : CoroutineScope
+    /**
+     * Composable function for shazaming a song, should be launched in the background of the picture taking activity
+     * Records AudioChunks continuously and asks for permission if needed
+     */
+     @SuppressLint("MissingPermission")
+     @Composable
+    fun ShazamSong(activity: Activity) {
 
-    @SuppressLint("MissingPermission")
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            OrkestTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
-                    coroutineScope = rememberCoroutineScope()
-                    recordAudio(this)
+        val context = LocalContext.current
+        val coroutineScope = rememberCoroutineScope()
+        LaunchedEffect(Unit) {
+            coroutineScope.launch {
+                val permission = ShazamConstants.recordPermissionGranted(context)
+                //Asks for recording permission if not given
+                if (!permission)
+                    ShazamConstants.askRecordPermission(activity)
+                else {
+                    Toast.makeText(context, "Shazaming ...", Toast.LENGTH_LONG).show()
+
+                    //Starts the recording and the recognition
+                    val title = AudioRecognition.recognizeSong(coroutineScope, activity,
+                        AudioRecording.recordingFlow(coroutineScope)
+                    )
+
+                    //Handles the result of the recognition
+                    title.whenComplete { song, error ->
+                        handleRecognitionResult(song, error, context) }
+
                 }
             }
         }
     }
 
     /**
-     * Records AudioChunks continuously and asks for permission if needed
+     * Handles the result of the recognition
+     * Displays different toasts depending on the result
+     * @param song the song found
+     * @param error the error
+     * @param context the context
      */
-     @SuppressLint("MissingPermission")
-     private fun recordAudio(activity: Activity) {
-        coroutineScope.launch {
-            val permission = ShazamConstants.recordPermissionGranted(activity)
-            if (!permission)
-                ShazamConstants.askRecordPermission(activity)
-             else
-                AudioRecording.logsRecordedAudio(coroutineScope)
-        }
-    }
+    private fun handleRecognitionResult(song: Song, error: Throwable?, context: Context) {
 
-    /**
-     * Callback for the result from requesting permissions.
-     * This method is invoked for every call on [ActivityCompat.requestPermissions]
-     */
-    @SuppressLint("MissingPermission")
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        Log.d("ShazamActivity", "onRequestPermissionsResult")
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == ShazamConstants.REQUEST_RECORD_AUDIO_PERMISSION) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted
-                AudioRecording.logsRecordedAudio(coroutineScope)
+        if (error != null) {
+            Log.d("ShazamActivity", "Error : $error")
+        } else {
+            Log.d("ShazamActivity", "Song : $song")
+            //NO MATCH WAS MADE
+            if (song == ShazamConstants.SONG_NO_MATCH) {
+                Toast.makeText(
+                    context, "No match found for this song",
+                    Toast.LENGTH_LONG
+                ).show()
             } else {
-                // Permission denied
-                //TODO: Show a message to the user
-                Toast.makeText(this, "Permission denied to record audio", Toast.LENGTH_SHORT).show()
+                //MATCH WAS MADE
+                Toast.makeText(
+                    context, "Song found : ${song.Title} by ${song.Artist}",
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
     }
-}
-
-
-

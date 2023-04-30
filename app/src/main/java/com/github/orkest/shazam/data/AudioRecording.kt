@@ -6,6 +6,7 @@ import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.util.Log
 import androidx.annotation.RequiresPermission
+import com.github.orkest.shazam.domain.AudioChunk
 import com.github.orkest.shazam.domain.ShazamConstants
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
@@ -78,6 +79,7 @@ class AudioRecording {
                     val byteArray = readBuffer.sliceArray(0 until actualRead)
                     val audioChunk = AudioChunk(byteArray, actualRead, System.currentTimeMillis())
                     emit(audioChunk)
+                    delay(10)
                 }
                 //Stop the audioRecord when the coroutine is cancelled
                 // (either because of result, or user stopped recording)
@@ -109,30 +111,6 @@ class AudioRecording {
          */
         fun stopRecording(coroutineScope: CoroutineScope){
             coroutineScope.cancel()
-        }
-    }
-
-    data class AudioChunk (
-        val buffer: ByteArray = ByteArray(ShazamConstants.SHAZAM_SESSION_READ_BUFFER_SIZE),
-        val meaningfulLengthInBytes: Int = ShazamConstants.SHAZAM_SESSION_READ_BUFFER_SIZE,
-        val timestamp: Long = System.currentTimeMillis()
-    ) {
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (javaClass != other?.javaClass) return false
-
-            other as AudioChunk
-
-            return buffer.contentEquals(other.buffer) &&
-                    meaningfulLengthInBytes == other.meaningfulLengthInBytes &&
-                    timestamp == other.timestamp
-        }
-
-        override fun hashCode(): Int {
-            var result = buffer.contentHashCode()
-            result = 31 * result + meaningfulLengthInBytes
-            result = 31 * result + timestamp.hashCode()
-            return result
         }
     }
 }

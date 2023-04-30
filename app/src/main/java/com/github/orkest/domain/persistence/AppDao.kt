@@ -9,8 +9,6 @@ import java.nio.charset.CodingErrorAction.REPLACE
 
 
 
-
-
 class AppDao {
 
     companion object{
@@ -19,13 +17,13 @@ class AppDao {
         @Dao
         interface UserDao{
             @Query("SELECT * FROM user")
-            fun getAllStories(): LiveData<List<AppEntities.Companion.UserEntity?>?>?
+            fun getAllStories(): LiveData<List<AppEntities.Companion.UserEntity>>
         }
 
         @Dao
         interface SongDao{
-            @Query("SELECT * FROM song")
-            fun getAllSongs(): LiveData<List<AppEntities.Companion.SongEntity?>?>?
+            @Query("SELECT * FROM SongEntity")
+            fun getAllSongs(): List<AppEntities.Companion.SongEntity>
 
             @Insert(onConflict = OnConflictStrategy.REPLACE)
             fun insertAll(vararg songs: AppEntities.Companion.SongEntity)

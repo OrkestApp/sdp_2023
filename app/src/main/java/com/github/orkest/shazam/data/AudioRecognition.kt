@@ -59,6 +59,7 @@ class AudioRecognition {
                     Log.d("AudioRecognition", "waiting for results")
                     currentSession.recognitionResults().collect { matchResult ->
                         collectMatchResult(matchResult, song)
+                        AudioRecording.stopRecording(coroutineScope)
                     }
                 }
             }

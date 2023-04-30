@@ -73,7 +73,7 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                 ProfilePicture(viewModel.profilePictureId.observeAsState().value)
+                ProfilePicture(viewModel.profilePictureId.observeAsState().value)
             }
 
             //Add a horizontal space between the image and the user's info
@@ -123,6 +123,11 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
                         //uncomment if un-caching is needed
                         GoogleSignIn.getClient(context, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut()
                         context.startActivity(intent)
+
+                        //
+                        cleanSigningCache(context)
+
+
                     }
                     //
                     Button(
@@ -150,6 +155,18 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
 
 private fun launchDeezerAuth(){
 
+}
+
+/**
+ * remove caching credentials
+ */
+fun cleanSigningCache(context : Context ){
+    val sharedPref = context.getSharedPreferences("user_credentials", Context.MODE_PRIVATE)
+    with(sharedPref.edit()) {
+        remove("username")
+        remove("email")
+        apply()
+    }
 }
 
 /**
@@ -204,8 +221,7 @@ fun UserName(username: String?){
 fun Description(bio: String?){
     Text(
         text = bio ?: "Description",
-        fontSize = fontSize
-    )
+        fontSize = fontSize)
 }
 
 //Returns default int if the observer is null
@@ -263,8 +279,7 @@ fun EditButton(onClick:() -> Unit){
     ){
         Text(
             text ="Edit Profile",
-            fontSize = smallFontSize
-        )
+            fontSize = smallFontSize)
     }
 }
 
@@ -279,6 +294,3 @@ fun ProfilePicture(profilePictureId: Int?){
             .clip(CircleShape)
     )
 }
-
-
-

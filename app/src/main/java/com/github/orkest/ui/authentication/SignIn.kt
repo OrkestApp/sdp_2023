@@ -29,6 +29,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.github.orkest.data.Constants
 import com.github.orkest.R
 import com.github.orkest.ui.MainActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -64,6 +65,17 @@ fun SignIn (navController: NavController, viewModel: AuthViewModel) {
     val error = remember { mutableStateOf(false) }
     val errorMessage = remember { mutableStateOf("") }
     val waiting = remember { mutableStateOf(false) }
+
+
+    // Check if user is already cached in
+    if (isSignedInOffline(context)) {
+        val (username, _) = loadUserCredentials(context)
+        val intent = Intent(context, MainActivity::class.java)
+        Constants.CURRENT_LOGGED_USER = username.toString()
+        context.startActivity(intent)
+        Log.d(TAG, "Logged in offline")
+    }
+
 
 
     val activityResultLauncher = rememberLauncherForActivityResult(
@@ -206,8 +218,6 @@ fun getGoogleSignInClient(context: Context): GoogleSignInClient {
     return GoogleSignIn.getClient(context, gso)
 }
 
-
-
 /**
  * the Sign In function when the the button is clicked on
  */
@@ -217,30 +227,61 @@ fun signIn(activityResultLauncher: ActivityResultLauncher<Intent>,
     activityResultLauncher.launch(signInIntent)
 }
 
-
-
 /**
  * Changes the intent depending on the user's credentials
  */
 private fun updateUI(user: FirebaseUser?, navController: NavController,
                      isInDatabase: Boolean, context: Context, viewModel: AuthViewModel
 ) {
+    if(user != null){
+        // Save the user's credentials in SharedPreferences
+        saveUserCredentials(context, viewModel.getUsername().text, Firebase.auth.currentUser?.email.toString())
 
-    if (user != null && !isInDatabase) {
-
-        Log.d(TAG, "User is not null and is not in database")
-        navController.navigate("signup")
-
-    } else if (user != null && isInDatabase) {
-
-        val intent = Intent(context, MainActivity::class.java)
-        intent.putExtra("username",viewModel.getUsername().text)
-        context.startActivity(intent)
-        Log.d(TAG, "User is not null and is in database")
-
-    }
-    else {
+        if(!isInDatabase){
+            Log.d(TAG, "User is not null and is not in database")
+            navController.navigate("signup")
+        }
+        else if(isInDatabase){
+            val intent = Intent(context, MainActivity::class.java)
+            context.startActivity(intent)
+            Log.d(TAG, "User is not null and is in database")
+        }
+    }else{
         Log.d(TAG, "User is null")
     }
-
 }
+
+
+/**
+ * Saves the user's credentials in SharedPreferences
+ */
+fun saveUserCredentials(context: Context, username: String, email: String) {
+    val sharedPref = context.getSharedPreferences("user_credentials", Context.MODE_PRIVATE)
+    with(sharedPref.edit()) {
+        putString("username", username)
+        putString("email", email)
+        apply()
+    }
+}
+
+
+/**
+ * Loads the user's credentials from SharedPreferences
+ */
+fun loadUserCredentials(context: Context): Pair<String?, String?> {
+    val sharedPref = context.getSharedPreferences("user_credentials", Context.MODE_PRIVATE)
+    val username = sharedPref.getString("username", null)
+    val email = sharedPref.getString("email", null)
+    return Pair(username, email)
+}
+
+/**
+ * Checks if the user is signed in offline
+ */
+fun isSignedInOffline(context: Context): Boolean {
+    val (username, email) = loadUserCredentials(context)
+    return username != null && email != null
+}
+
+
+

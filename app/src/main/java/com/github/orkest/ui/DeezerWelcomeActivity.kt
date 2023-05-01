@@ -30,15 +30,10 @@ class DeezerWelcomeActivity : AppCompatActivity(){
     private val db = FireStoreDatabaseAPI()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         val intent: Intent = intent
         val deepLink: String = intent.data.toString()
-
-
         val uri: Uri = Uri.parse(deepLink)
-
         //FOLLOWING OPERATIONS NEEDS TO BE DONE SEQUENCIALY BECAUSE THEY ALL NEED PREVIOUS RESULTS
-
         val codeValue: String? = uri.getQueryParameter("code")
         if (codeValue != null) {
             code = codeValue
@@ -78,9 +73,6 @@ class DeezerWelcomeActivity : AppCompatActivity(){
             CreateViewForDeezer()
         }
     }
-
-    //TODO compare typed username with Actual username
-
     @Composable
     fun CreateViewForDeezer(){
         val context = LocalContext.current
@@ -90,17 +82,11 @@ class DeezerWelcomeActivity : AppCompatActivity(){
                 onClick = { launchMainActivity(context)},
                 content = { Text("Start to use Deezer")},
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color.Yellow))
-
         }
-
-
     }
-
-
     private fun launchMainActivity(context: Context){
         val intent = Intent(context, MainActivity::class.java)
         startActivity(intent)
-
     }
 
     @Preview

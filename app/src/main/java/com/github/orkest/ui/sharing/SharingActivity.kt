@@ -66,6 +66,8 @@ class SharingComposeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
+        //TODO ERASE DEBUG
+        Log.d("DEEZER" , intent.getStringExtra(Intent.EXTRA_TEXT)!!)
         when (intent?.action) {
             Intent.ACTION_SEND -> {
                 if ("text/plain" == intent.type) {

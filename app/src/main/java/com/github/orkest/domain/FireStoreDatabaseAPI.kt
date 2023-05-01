@@ -8,6 +8,7 @@ import com.github.orkest.data.Comment
 import com.github.orkest.data.Post
 import com.github.orkest.data.Song
 import com.github.orkest.data.User
+import com.github.orkest.data.DeezerInformations
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference

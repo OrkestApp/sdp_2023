@@ -33,5 +33,15 @@ class AppDao {
             @Query("DELETE FROM SongEntity")
             fun clear()
         }
+
+        @Dao
+        interface PostDao{
+
+            @Query("SELECT * FROM Posts P WHERE P.date > 30days AND P.date > lastConnection")
+            fun getRecentPosts()
+
+            @Insert(AppEntities.Companion.PostEntitity::class)
+            fun insertPosts(vararg posts: AppEntities.Companion.PostEntitity)
+        }
     }
 }

@@ -31,7 +31,7 @@ import com.github.orkest.data.Post
 import com.github.orkest.data.Song
 import com.github.orkest.R
 import com.github.orkest.View.sharedMusic.sharedMusicPost
-import com.github.orkest.ui.Camera
+import com.github.orkest.ui.Camera.CameraView
 import com.github.orkest.ui.feed.PostViewModel
 import com.github.orkest.ui.feed.CommentActivity
 import com.github.orkest.ui.feed.CreatePost
@@ -93,7 +93,7 @@ fun FeedActivity(viewModel: PostViewModel) {
             modifier = Modifier
                 .padding(10.dp),
             onClick = {
-                val intent = Intent(context, Camera::class.java)
+                val intent = Intent(context, CameraView::class.java)
                 context.startActivity(intent)
             }) {
             Icon(painter = painterResource(id = R.drawable.powerrangerblue), contentDescription = "Launch camera")

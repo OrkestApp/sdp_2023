@@ -1,11 +1,11 @@
 package com.github.orkest.ViewModel.feed
 
 import androidx.compose.ui.text.input.TextFieldValue
-import com.github.orkest.Constants
-import com.github.orkest.Model.Comment
-import com.github.orkest.Model.OrkestDate
-import com.github.orkest.Model.Post
-import com.github.orkest.ViewModel.post.PostViewModel
+import com.github.orkest.data.Constants
+import com.github.orkest.data.Comment
+import com.github.orkest.data.OrkestDate
+import com.github.orkest.data.Post
+import com.github.orkest.ui.feed.PostViewModel
 import java.time.LocalDateTime
 import java.util.concurrent.CompletableFuture
 
@@ -33,7 +33,7 @@ class MockPostViewModel : PostViewModel() {
         return future
     }
 
-    override fun getRecentPosts(date : LocalDateTime): CompletableFuture<List<Post>> {
+    override fun getRecentPosts(lastConnected : LocalDateTime, maxDaysNb: Long): CompletableFuture<List<Post>> {
         val future = CompletableFuture<List<Post>>()
         future.complete(listOf(post)) //, post, post))
         return future

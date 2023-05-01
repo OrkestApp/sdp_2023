@@ -5,9 +5,10 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
-import com.github.orkest.Model.Providers
-import com.github.orkest.View.MainActivity
+import com.github.orkest.data.Providers
+import com.github.orkest.ui.MainActivity
 import com.github.orkest.ViewModel.auth.MockAuthViewModel
+import com.github.orkest.ui.authentication.SignUpForm
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

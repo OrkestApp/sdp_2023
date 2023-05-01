@@ -3,6 +3,8 @@ package com.github.orkest.View.feed
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import com.github.orkest.ViewModel.feed.MockPostViewModel
+import com.github.orkest.ui.feed.CreatePost
+import com.github.orkest.ui.feed.EditPostScreen
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule

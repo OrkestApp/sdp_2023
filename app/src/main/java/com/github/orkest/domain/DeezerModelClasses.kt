@@ -36,7 +36,7 @@ class DeezerModelClasses {
                         val link:String, val picture :String,val picture_small: String,val picture_medium: String,
                         val picture_big: String,val picture_xl: String,val checksum:String,
                         val tracklist: String,val creation_date :String,val md5_image: String,
-                        val picture_type : String,val user: com.github.orkest.Model.User, val type: String)
+                        val picture_type : String,val user: User, val type: String)
 
     /**
      * This class is used to deserialize a user from the Deezer API

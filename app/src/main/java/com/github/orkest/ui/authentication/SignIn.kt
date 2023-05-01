@@ -1,4 +1,4 @@
-package com.github.orkest.View.auth
+package com.github.orkest.ui.authentication
 
 import android.app.Activity.RESULT_OK
 import android.content.Context
@@ -32,7 +32,6 @@ import androidx.navigation.NavController
 import com.github.orkest.data.Constants
 import com.github.orkest.R
 import com.github.orkest.ui.MainActivity
-import com.github.orkest.ui.authentication.AuthViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions

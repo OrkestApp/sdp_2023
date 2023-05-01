@@ -24,7 +24,7 @@ import com.github.orkest.data.Constants
 import com.github.orkest.domain.Authorization.Companion.getLoginActivityTokenIntent
 import com.github.orkest.domain.Authorization.Companion.requestUserAuthorization
 import com.github.orkest.ui.search.SearchUserView
-import com.github.orkest.ui.sharing.ui.theme.OrkestTheme
+import com.github.orkest.ui.theme.OrkestTheme
 import com.github.orkest.ui.search.SearchViewModel
 import com.github.orkest.ui.sharing.PlaylistActivity
 import com.spotify.sdk.android.auth.AuthorizationClient

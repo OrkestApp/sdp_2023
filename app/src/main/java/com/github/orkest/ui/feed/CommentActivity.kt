@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
 import com.github.orkest.data.Comment
 import com.github.orkest.R
-import com.github.orkest.View.theme.OrkestTheme
+import com.github.orkest.ui.theme.OrkestTheme
 
 
 class CommentActivity : ComponentActivity() {

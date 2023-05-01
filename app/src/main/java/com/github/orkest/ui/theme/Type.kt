@@ -1,4 +1,4 @@
-package com.github.orkest.View.theme
+package com.github.orkest.ui.theme
 
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle

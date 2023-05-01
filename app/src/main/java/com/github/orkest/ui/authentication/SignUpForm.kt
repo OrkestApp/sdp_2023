@@ -1,4 +1,4 @@
-package com.github.orkest.View.auth
+package com.github.orkest.ui.authentication
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -33,9 +33,8 @@ import coil.compose.rememberImagePainter
 import com.github.orkest.data.Providers
 import com.github.orkest.R
 import com.github.orkest.ui.MainActivity
-import com.github.orkest.View.theme.OrkestTheme
-import com.github.orkest.View.theme.White
-import com.github.orkest.ui.authentication.AuthViewModel
+import com.github.orkest.ui.theme.OrkestTheme
+import com.github.orkest.ui.theme.White
 
 
 /**

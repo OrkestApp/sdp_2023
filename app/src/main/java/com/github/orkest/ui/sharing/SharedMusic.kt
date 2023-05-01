@@ -1,4 +1,4 @@
-package com.github.orkest.View.sharing
+package com.github.orkest.ui.sharing
 
 import android.content.Intent
 import androidx.compose.runtime.Composable
@@ -9,8 +9,6 @@ import com.github.orkest.data.Constants
 import com.github.orkest.data.Profile
 import com.github.orkest.data.User
 import com.github.orkest.ui.search.SearchUserView
-import com.github.orkest.ui.sharing.PlaylistViewModel
-import com.github.orkest.ui.sharing.PlaylistActivity
 
 /**
  * This function is used to display the list of users
@@ -24,8 +22,8 @@ fun UsersList(viewModel: PlaylistViewModel) {
         // create a dummy User
         10
     ) {
-        // Temporary static list of users for demo, will be replaced by a list of users from cache and AppDatabase
-        User("ehreich2", "", "", Profile("ehreich2", 1))
+        // Temporary static list of users for demo, will be replaced by a list of users from cache and Database
+        User("emile", "", "", Profile("emile", 1))
     }
     LazyColumn {
         items(messages) { user ->

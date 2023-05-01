@@ -284,7 +284,7 @@ class FireStoreDatabaseAPI {
         val posts = db.collectionGroup("posts")
         posts.whereEqualTo(FieldPath.of("date", "year"), year)
             .whereEqualTo(FieldPath.of("date", "month"), month)
-            .whereGreaterThan(FieldPath.of("date", "dayOfMonth"), day)
+            .whereGreaterThanOrEqualTo(FieldPath.of("date", "dayOfMonth"), day)
             .get().addOnSuccessListener {
                 // Get all posts documents as a list of posts objects
                 val list: MutableList<Post> = it.toObjects(Post::class.java)

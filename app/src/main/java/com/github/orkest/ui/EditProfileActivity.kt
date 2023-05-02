@@ -37,6 +37,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import com.github.orkest.data.Constants
 import com.github.orkest.ui.theme.OrkestTheme
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
@@ -221,7 +222,8 @@ fun EditProfileImage() {
             imageUri.value = it.toString()
             val storage = FirebaseStorage.getInstance()
             val storageRef = storage.reference
-            val scremRef = storageRef.child("screm2.jpg")
+
+            val scremRef = storageRef.child("User-${Constants.CURRENT_LOGGED_USER[0].uppercase()}/${Constants.CURRENT_LOGGED_USER}/pic.jpg")
 
             val getScremRef = storage.getReferenceFromUrl("gs://sdp-orkest-firebase.appspot.com/screm.jpg")
 

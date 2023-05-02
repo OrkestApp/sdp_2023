@@ -15,11 +15,6 @@
         android:theme="@style/Theme.Orkest"
         tools:targetApi="31">
         <activity
-            android:name=".CloudStorageActivity"
-            android:exported="false"
-            android:label="@string/title_activity_cloud_storage"
-            android:theme="@style/Theme.Orkest" />
-        <activity
             android:name=".shazam.ui.ShazamActivity"
             android:exported="true"
             android:label="@string/title_activity_shazam"

@@ -3,7 +3,9 @@ package com.github.orkest.ViewModel.feed
 import androidx.compose.ui.text.input.TextFieldValue
 import com.github.orkest.data.Constants
 import com.github.orkest.data.Comment
+import com.github.orkest.domain.FireStoreDatabaseAPI
 import com.github.orkest.ui.feed.PostViewModel
+import com.google.firebase.firestore.ktx.firestoreSettings
 import org.junit.BeforeClass
 import org.junit.Test
 import java.time.LocalDateTime

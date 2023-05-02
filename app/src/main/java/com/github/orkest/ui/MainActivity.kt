@@ -34,8 +34,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         ShazamConstants.askRecordPermission(this)
-        Notification(this, null).createNotificationChannel()
-        Notification(this, null).promptUserToEnableNotifications(this)
+        Notification(this,null).createNotificationChannel()
+        Notification(this,null).promptUserToEnableNotifications()
     }
     override fun onStart() {
         super.onStart()

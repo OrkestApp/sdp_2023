@@ -72,7 +72,8 @@ fun FollowList(viewModel: FollowListViewModel){
                 // Gets back to the profile page of the user
                 val intent = Intent(context, ProfileActivity::class.java)
                 intent.putExtra("username", viewModel.username)
-                context.startActivity(intent)})
+                context.startActivity(intent)
+            })
             {
                 Image(
                     painterResource(id = R.drawable.back_button),

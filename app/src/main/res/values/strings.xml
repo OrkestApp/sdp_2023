@@ -29,4 +29,5 @@
     <string name="title_activity_shared_music">SharedMusic</string>
     <string name="title_activity_playlist">PlaylistActivity</string>
     <string name="title_activity_shazam">ShazamActivity</string>
+    <string name="title_activity_cloud_storage">CloudStorageActivity</string>
 </resources>

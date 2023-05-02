@@ -211,7 +211,7 @@ private fun onConfirmListener(context: Context, error: MutableState<Boolean>, er
  */
 fun getGoogleSignInClient(context: Context): GoogleSignInClient {
     val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-        .requestIdToken(context.resources.getString(R.string.default_web_client_id))
+        .requestIdToken("0")//context.resources.getString(R.string.default_web_client_id)) TODO
         .requestEmail()
         .build()
 

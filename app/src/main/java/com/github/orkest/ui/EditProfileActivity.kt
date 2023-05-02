@@ -1,7 +1,12 @@
 package com.github.orkest.ui
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
+import android.widget.ImageView
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -29,10 +34,17 @@ import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material.DrawerValue
 import androidx.compose.runtime.*
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import com.github.orkest.ui.theme.OrkestTheme
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.io.File
+import java.net.URI
 
 const val PADDING_FROM_SCREEN_BORDER = 10
 
@@ -79,7 +91,7 @@ fun EditProfileScreen(activity: ComponentActivity) {
         scaffoldState = scaffoldState,
         topBar = { TopBar(activity, coroutineScope = coroutineScope, scaffoldState = scaffoldState) },
         // The content displayed inside the drawer when you click on the hamburger menu button
-        drawerContent = { CreateMenuDrawer() },
+        //drawerContent = { CreateMenuDrawer() },
 
         content = { padding ->
             Modifier
@@ -198,12 +210,28 @@ fun EditProfileImage() {
         imageUri.value.ifEmpty { R.drawable.blank_profile_pic }
     )
 
+    val context = LocalContext.current
+
     // will be used to access the images library on your phone and set a new picture
     val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent())
+        contract = ActivityResultContracts.GetContent()
+    )
     {
-        uri: Uri? -> uri?.let { imageUri.value = it.toString() }
+        uri: Uri? -> uri?.let {
+            imageUri.value = it.toString()
+            val storage = FirebaseStorage.getInstance()
+            val storageRef = storage.reference
+            val scremRef = storageRef.child("screm2.jpg")
+
+            val getScremRef = storage.getReferenceFromUrl("gs://sdp-orkest-firebase.appspot.com/screm.jpg")
+
+            //getScremRef.getFile(File("image/"))
+
+            scremRef.putFile(it)
+        }
     }
+
+
 
     Column(
         modifier = Modifier
@@ -222,17 +250,18 @@ fun EditProfileImage() {
                 painter = painter,
                 contentDescription = null,
                 modifier = Modifier.wrapContentSize(),
-                contentScale = ContentScale.Crop)
+                contentScale = ContentScale.Crop
+            )
         }
         // clickable Text offering the possibility to change profile pic
         Text(
             text = "edit picture",
-            modifier = Modifier.clickable { launcher.launch("image/*") }
+            modifier = Modifier.clickable {
+                launcher.launch("image/*")
+            }
         )
     }
 }
-
-
 
 
 /**

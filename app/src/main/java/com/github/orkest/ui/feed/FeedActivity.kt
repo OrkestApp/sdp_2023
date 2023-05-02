@@ -45,7 +45,7 @@ fun FeedActivity(viewModel: PostViewModel) {
 
     //Add a list of posts
     var listPosts by remember {
-        mutableStateOf( ArrayList<Post>().toList())
+        mutableStateOf(ArrayList<Post>().toList())
     } //Add the .toList() to always store an immutable collection to avoid unpredictable behavior
 
     //Fetch posts from database
@@ -67,7 +67,8 @@ fun FeedActivity(viewModel: PostViewModel) {
                 sharedMusicPost(
                     profile = Constants.MOCK_USER.profile,
                     song = Constants.DUMMY_RUDE_BOY_SONG,
-                    message = "Amazing music! Check it out.")
+                    message = "Amazing music! Check it out."
+                )
             }
         }
     }
@@ -75,14 +76,24 @@ fun FeedActivity(viewModel: PostViewModel) {
 
     val context = LocalContext.current
 
-    //Add a button to create a new post
-    FloatingActionButton(
-        modifier = Modifier
-            .padding(10.dp),
-        onClick = { launchCreatePostActivity(context) }) {
-        Icon(painter = painterResource(id = R.drawable.add_button), contentDescription = "Add post")
+    //Add a button to create a new post at the right lower corner
+    Box(modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.TopEnd) {
+        FloatingActionButton(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(10.dp)
+                .testTag("addPostButton"),
+            backgroundColor = Color.White,
+            onClick = { launchCreatePostActivity(context) }) {
+            Icon(
+                painter = painterResource(id = R.drawable.add_button),
+                contentDescription = "Add post"
+            )
+        }
     }
 }
+
 
 fun launchCreatePostActivity(context: Context){
     val intent = Intent(context, CreatePost::class.java)
@@ -239,7 +250,10 @@ private fun Reaction(post: Post){
         //Create the comment button
         val context = LocalContext.current
         IconButton(
-            modifier = Modifier.testTag("comment_button").height(20.dp).width(20.dp),
+            modifier = Modifier
+                .testTag("comment_button")
+                .height(20.dp)
+                .width(20.dp),
             onClick = { context.startActivity(Intent(context, CommentActivity::class.java)
                 .putExtra("post_date", post.date.toString())
                 .putExtra("post_username", post.username))

@@ -17,7 +17,7 @@ import com.github.orkest.ui.search.SearchUserView
  * @param viewModel the view model
  */
 @Composable
-fun UsersList(viewModel: PlaylistViewModel) {
+fun UsersList() {
     val messages = List(
         // create a dummy User
         10

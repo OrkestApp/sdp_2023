@@ -60,6 +60,8 @@ class FollowListActivityTest{
         composeTestRule.onNodeWithContentDescription("Back button").performClick()
         // Verify that the FollowListActivity is closed
         assertTrue(activityScenario.state.isAtLeast(Lifecycle.State.DESTROYED))
+        Intents.release()
+        activityScenario.close()
     }
 
     @Test

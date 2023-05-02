@@ -22,10 +22,12 @@
     <string name="SearchPage">Search</string>
     <string name="ProfilePage">Profile</string>
     <string name="PlaylistPage">Playlist</string>
+    <string name="ShazamPage">Shazam</string>
     <string name="title_activity_profile">ProfileActivity</string>
     <string name="title_activity_edit_profile">EditProfileActivity</string>
     <string name="title_activity_sharing_compose">SharingComposeActivity</string>
     <string name="title_activity_create_post">CreatePost</string>
     <string name="title_activity_shared_music">SharedMusic</string>
     <string name="title_activity_playlist">PlaylistActivity</string>
+    <string name="title_activity_shazam">ShazamActivity</string>
 </resources>

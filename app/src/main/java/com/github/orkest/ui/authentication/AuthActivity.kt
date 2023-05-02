@@ -11,10 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.github.orkest.View.theme.OrkestTheme
+import com.github.orkest.ui.theme.OrkestTheme
 import androidx.navigation.compose.composable
-import com.github.orkest.View.auth.SignIn
-import com.github.orkest.View.auth.SignUpForm
 
 
 /**
@@ -53,7 +51,7 @@ fun AuthMain(viewModel: AuthViewModel, navController: NavHostController) {
 
     NavHost(navController = navController, startDestination = "signIn") {
         composable("signup") { SignUpForm(viewModel) }
-        composable("signIn") { SignIn(navController,viewModel)}
+        composable("signIn") { SignIn(navController,viewModel) }
     }
 }
 

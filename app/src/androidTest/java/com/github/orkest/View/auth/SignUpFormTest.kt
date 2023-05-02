@@ -8,6 +8,7 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
 import com.github.orkest.data.Providers
 import com.github.orkest.ui.MainActivity
 import com.github.orkest.ViewModel.auth.MockAuthViewModel
+import com.github.orkest.ui.authentication.SignUpForm
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

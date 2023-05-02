@@ -18,7 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat.startActivity
 import com.github.orkest.domain.DeezerApiIntegration
 import com.github.orkest.data.Song
-import com.github.orkest.ui.sharing.ui.theme.OrkestTheme
+import com.github.orkest.ui.theme.OrkestTheme
 import com.spotify.android.appremote.api.SpotifyAppRemote
 
 /*

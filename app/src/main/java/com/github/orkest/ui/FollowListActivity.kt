@@ -27,7 +27,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.github.orkest.data.Profile
 import com.github.orkest.data.User
 import com.github.orkest.ui.profile.ProfileActivity
 import com.github.orkest.ui.theme.OrkestTheme

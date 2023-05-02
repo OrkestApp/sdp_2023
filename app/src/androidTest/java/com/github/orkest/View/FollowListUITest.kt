@@ -2,7 +2,6 @@ package com.github.orkest.View
 
 import android.content.Intent
 import androidx.compose.ui.test.*
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LiveData
@@ -11,7 +10,6 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.core.app.launchActivity
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
-import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.orkest.data.User
@@ -19,7 +17,7 @@ import com.github.orkest.ui.FollowList
 import com.github.orkest.ui.profile.ProfileActivity
 import com.github.orkest.ui.FollowListActivity
 import com.github.orkest.ui.FollowListViewModel
-import com.github.orkest.ui.sharing.ui.theme.OrkestTheme
+import com.github.orkest.ui.theme.OrkestTheme
 import junit.framework.TestCase.assertTrue
 import org.junit.Before
 import org.junit.Rule

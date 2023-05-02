@@ -2,6 +2,7 @@ package com.github.orkest.ui.feed
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.lifecycle.MutableLiveData
 import com.github.orkest.data.Constants
 import com.github.orkest.data.Constants.Companion.DEFAULT_MAX_RECENT_DAYS
 import com.github.orkest.data.Comment
@@ -25,6 +26,10 @@ open class PostViewModel {
 
     private var post_username = ""
     private var post_date = ""
+
+    // Likes variables
+    open val isPostLiked  = MutableLiveData<Boolean>()
+    open var nbLikes = MutableLiveData<Int>()
 
     open fun setPostUsername(usr: String) {
         post_username = usr
@@ -66,6 +71,8 @@ open class PostViewModel {
         this.song.value = song
     }
 
+    /**==============comment functions===================*/
+
     open fun getComments(): CompletableFuture<List<Comment>> {
         return dbAPI.getPostCommentsFromDataBase(post_username, post_date)
     }
@@ -77,6 +84,27 @@ open class PostViewModel {
     /*fun removeComment(comm: String): Boolean {
         return post.comments.removeIf { x: Comment -> x.date == id }
     }*/
+
+    /**===============================================*/
+
+
+
+
+    /**==============like functions===================*/
+
+    //Pour les afficher
+    open fun getUsersThatLikedPost(): CompletableFuture<List<String>> {
+        return dbAPI.getPostLikeListFromDatabase(post_username, post_date)
+    }
+
+    //pour rajouter ou enlever
+    open fun updateLikesList(toAdd: Boolean): CompletableFuture<Boolean>{
+        return dbAPI.setUserInPostLikeListInDatabase(post_username, post_date, Constants.CURRENT_LOGGED_USER, toAdd)
+    }
+
+    /**===============================================*/
+
+
 
     /**
      * Adds a post to the database
@@ -123,6 +151,7 @@ open class PostViewModel {
         post.postDescription = postDescription.value.text
         post.date = OrkestDate(LocalDateTime.now())
         post.song = song.value
+        post.likes = 0
 
         return post
     }

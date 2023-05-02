@@ -186,11 +186,6 @@ open class FireStoreDatabaseAPI {
         return completableFuture
     }
 
-
-
-
-
-
     private fun getPostCollectionRef(username: String): CollectionReference{
         val firstLetter = username[0].uppercase()
         //TODO: Discuss other option: "posts/user-$firstLetter/$username"
@@ -245,6 +240,7 @@ open class FireStoreDatabaseAPI {
         return future
     }
 
+
     /**
      * @param username the username of the user we want to get the posts from
      * @return a completable future of a list of post that match the username
@@ -286,6 +282,7 @@ open class FireStoreDatabaseAPI {
 
         return future
     }
+
 
     private fun recentPostsQuery(month: Int, year: Int, day: Int): CompletableFuture<List<Post>>{
         val future = CompletableFuture<List<Post>>()
@@ -396,4 +393,75 @@ open class FireStoreDatabaseAPI {
 
         return future
     }
+
+    //===========================LIKE POST OPERATIONS======================
+
+    /**
+     * Returns the set of users that liked this post
+     */
+    fun getPostLikeListFromDatabase(post_username: String, post_date: String): CompletableFuture<List<String>>{
+        val future = CompletableFuture<List<String>>()
+        val usersPosts = getPostCollectionRef(post_username).document(post_date).collection("likes")
+
+        usersPosts.get().addOnSuccessListener{
+            // Get all the usernames of the users that liked the post
+            val list: MutableList<String> =  it.toObjects(String::class.java)
+            future.complete(list)
+        }
+            .addOnFailureListener{
+                future.completeExceptionally(it)
+            }
+        return future
+    }
+
+    /**
+     * @param postUser: the username of the owner of the post
+     * @param post_data: the date in which the post has been published
+     * @param likeUser: the user that liked the post
+     * @param toAdd: Boolean that tells us if we should add or delete the user from the post likes list
+     * Sets the username of the user that liked/disliked the post in the "likes" collection
+     * */
+    fun setUserInPostLikeListInDatabase(postUser: String, post_date: String, likeUser: String, toAdd: Boolean) : CompletableFuture<Boolean>{
+        val future = CompletableFuture<Boolean>()
+        var postDocument = getPostCollectionRef(postUser).document("${post_date}/likes")
+
+        if(toAdd){
+            postDocument.set(likeUser).addOnSuccessListener { future.complete(true) }
+                .addOnFailureListener { future.completeExceptionally(it) }
+        } else {
+            postDocument = getPostCollectionRef(postUser).document("${post_date}/likes/${likeUser}")
+            postDocument.delete().addOnSuccessListener { future.complete(true) }
+                .addOnFailureListener { future.completeExceptionally(it) }
+        }
+        return future
+    }
+
+    /**
+     * Get the number of likes of a post from the database
+     * */
+    fun setPostNbLikesInDatabase(post: Post): CompletableFuture<Int> {
+        val future = CompletableFuture<Int>()
+
+
+        return future
+    }
+
+    /**
+     * Returns whether or not the given user has already liked the post
+     * */
+    fun isUserInTheLikeList(post_username: String, post_date: String, username: String): CompletableFuture<Boolean>{
+        val future = CompletableFuture<Boolean>()
+        val usersPosts = getPostCollectionRef(post_username).document(post_date).collection("likes")
+
+        usersPosts.get().addOnSuccessListener{
+            val list: MutableList<String> =  it.toObjects(String::class.java)
+            if (list.contains(username)) { future.complete(true) }
+            else { future.complete(false) }
+        }
+            .addOnFailureListener{
+                future.completeExceptionally(it)
+            }
+        return future
+    }
+
 }

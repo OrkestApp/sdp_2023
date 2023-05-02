@@ -240,11 +240,28 @@ private fun PlayButton(song: Song){
 }
 
 @Composable
+private fun LikeButton(post: Post){
+    Column {
+        Icon(
+            painter = painterResource(id = R.drawable.black_like_icon),
+            contentDescription = "Like button",
+            tint = Color.White,
+            modifier = Modifier
+                .testTag("like_button")
+                .height(20.dp)
+                .width(20.dp)
+                .clickable { },
+        )
+        Text(text = "${post.likes}", color = Color.White, modifier = Modifier.padding(5.dp))
+    }
+}
+
+@Composable
 private fun Reaction(post: Post){
     //val context = LocalContext.current
     Column(modifier = Modifier.padding(20.dp)) {
         // Create the like button
-        ReactionIcon(R.drawable.black_like_icon,"Like button", "like_button" )
+        LikeButton(post = post)
         Spacer(modifier = Modifier.height(10.dp))
 
         //Create the comment button
@@ -269,14 +286,14 @@ private fun Reaction(post: Post){
         Spacer(modifier = Modifier.height(10.dp))
 
         //Create the share button
-        ReactionIcon(R.drawable.share_icon,"Share button", "share_button" )
+        ReactionIcon(R.drawable.share_icon,"Share button", "share_button") {/*TODO*/ }
     }
 }
 
 /* TODO modularize in next sprint */
 
 @Composable
-private fun ReactionIcon(iconId: Int, contentDescription:String, testTag: String) {
+private fun ReactionIcon(iconId: Int, contentDescription:String, testTag: String, onClick: () -> Unit) {
     Icon(painter = painterResource(id = iconId),
         contentDescription = contentDescription,
         tint = Color.White,
@@ -284,7 +301,8 @@ private fun ReactionIcon(iconId: Int, contentDescription:String, testTag: String
             .testTag(testTag)
             .height(20.dp)
             .width(20.dp)
-            .clickable { })
+            .clickable { onClick },
+    )
 }
 
 

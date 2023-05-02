@@ -1,14 +1,12 @@
 package com.github.orkest.ui.feed
 
+import android.content.ContentValues
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.MutableLiveData
-import com.github.orkest.data.Constants
+import com.github.orkest.data.*
 import com.github.orkest.data.Constants.Companion.DEFAULT_MAX_RECENT_DAYS
-import com.github.orkest.data.Comment
-import com.github.orkest.data.OrkestDate
-import com.github.orkest.data.Post
-import com.github.orkest.data.Song
 import com.github.orkest.domain.FireStoreDatabaseAPI
 import java.time.LocalDateTime
 import java.util.concurrent.CompletableFuture
@@ -28,8 +26,85 @@ open class PostViewModel {
     private var post_date = ""
 
     // Likes variables
-    open val isPostLiked  = MutableLiveData<Boolean>()
+    open val isPostLiked = MutableLiveData<Boolean>()
     open var nbLikes = MutableLiveData<Int>()
+
+
+    /**==============like functions===================*/
+
+    //Pour les afficher
+    open fun getPostLikeListPost(): CompletableFuture<List<String>> {
+        return dbAPI.getPostLikeListFromDatabase(post_username, post_date)
+    }
+
+    open fun isPostLiked(post: Post): CompletableFuture<Boolean>{
+        return dbAPI.isUserInTheLikeList(post.username, post.date.toString(), current_username)
+    }
+
+    /**
+     * This function is in the viewModel as it needs to update the data of the viewModel
+     */
+    fun setPostNbLikesInDatabase(post: Post, toAdd: Boolean): CompletableFuture<Boolean> {
+        val future = CompletableFuture<Boolean>()
+
+        dbAPI.getPostCollectionRef(post.username).document(post.date.toString()).get().addOnSuccessListener { document ->
+            if (document != null && document.exists()) {
+                val post = document.toObject(Post::class.java)
+                if (post != null) {
+
+                    if (toAdd) {
+                        post.nbLikes += 1
+                        post.likeList.add(current_username)
+                    } else {
+                        if (post.nbLikes > 0) post.nbLikes -= 1
+                        post.likeList.remove(current_username)
+                    }
+
+                    //Update database
+                    dbAPI.getPostCollectionRef(post.username).document(post.date.toString()).update(
+                        "nbLikes",
+                        post.nbLikes,
+                        "likeList",
+                        post.likeList
+                    )
+                        .addOnSuccessListener { future.complete(true) }
+                        .addOnFailureListener { e ->
+                            Log.w(ContentValues.TAG, "Error getting post likes data", e)
+                            future.complete(false) }
+                }
+            }
+
+        } .addOnFailureListener { e ->
+            Log.w(ContentValues.TAG, "Error getting user data", e)
+            future.complete(false)
+        }
+
+        return future
+    }
+
+    /**===============================================*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     open fun setPostUsername(usr: String) {
         post_username = usr
@@ -64,7 +139,7 @@ open class PostViewModel {
         postDescription.value = description
     }
 
-   /**
+    /**
      * Updates the value of the song after the user set it on the view
      */
     fun updateSong(song: Song) {
@@ -89,20 +164,6 @@ open class PostViewModel {
 
 
 
-
-    /**==============like functions===================*/
-
-    //Pour les afficher
-    open fun getUsersThatLikedPost(): CompletableFuture<List<String>> {
-        return dbAPI.getPostLikeListFromDatabase(post_username, post_date)
-    }
-
-    //pour rajouter ou enlever
-    open fun updateLikesList(toAdd: Boolean): CompletableFuture<Boolean>{
-        return dbAPI.setUserInPostLikeListInDatabase(post_username, post_date, Constants.CURRENT_LOGGED_USER, toAdd)
-    }
-
-    /**===============================================*/
 
 
 
@@ -151,7 +212,6 @@ open class PostViewModel {
         post.postDescription = postDescription.value.text
         post.date = OrkestDate(LocalDateTime.now())
         post.song = song.value
-        post.likes = 0
 
         return post
     }

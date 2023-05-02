@@ -15,6 +15,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,6 +41,7 @@ import com.github.orkest.ui.feed.CreatePost
  * Composable function for the feed screen
  * Represents the view of the MVVM pattern
  */
+
 @Composable
 fun FeedActivity(viewModel: PostViewModel) {
 
@@ -63,12 +65,13 @@ fun FeedActivity(viewModel: PostViewModel) {
     ) {
         items(listPosts) { post ->
             Column {//TODO SUPPRESS, only here for preview purposes
-                DisplayPost(post = post)
-                sharedMusicPost(
+
+                DisplayPost(viewModel = viewModel, post = post)
+                /*sharedMusicPost(
                     profile = Constants.MOCK_USER.profile,
                     song = Constants.DUMMY_RUDE_BOY_SONG,
                     message = "Amazing music! Check it out."
-                )
+                )*/
             }
         }
     }
@@ -106,7 +109,7 @@ fun launchCreatePostActivity(context: Context){
  * @param post the post to display
  */
 @Composable
-fun DisplayPost(post: Post){
+fun DisplayPost(viewModel: PostViewModel, post: Post){
 
     Row(modifier = Modifier
         .padding(start = 10.dp, top = 10.dp, end = 10.dp)
@@ -118,7 +121,7 @@ fun DisplayPost(post: Post){
             // Display the user profile pic
             ProfilePic(post.profilePicId)
             //Display the reaction buttons
-            Reaction(post)
+            Reaction(viewModel, post)
         }
 
         Column(modifier = Modifier.padding(10.dp, top = 10.dp, end = 10.dp)) {
@@ -240,28 +243,50 @@ private fun PlayButton(song: Song){
 }
 
 @Composable
-private fun LikeButton(post: Post){
-    Column {
-        Icon(
-            painter = painterResource(id = R.drawable.black_like_icon),
-            contentDescription = "Like button",
-            tint = Color.White,
-            modifier = Modifier
-                .testTag("like_button")
-                .height(20.dp)
-                .width(20.dp)
-                .clickable { },
-        )
-        Text(text = "${post.likes}", color = Color.White, modifier = Modifier.padding(5.dp))
+private fun LikeButton(viewModel: PostViewModel, post: Post, isPostLiked: Boolean?){
+
+    if(isPostLiked == null) {Text(text = "") } //Empty body, here waiting for the future that fetch isUserFollowed to complete
+    else {
+        val buttonColor = if (isPostLiked) Color.Yellow else Color.White
+
+        Column {
+            Icon(
+                painter = painterResource(id = R.drawable.black_like_icon),
+                contentDescription = "Like button",
+                tint = buttonColor,
+                modifier = Modifier
+                    .testTag("like_button")
+                    .height(20.dp)
+                    .width(20.dp)
+                    .clickable { likeOrDislikePost(viewModel, post, isPostLiked) },
+            )
+            Text(
+                text = "${post.nbLikes}",
+                color = buttonColor,
+                modifier = Modifier.padding(5.dp)
+            )
+        }
+    }
+}
+
+private fun likeOrDislikePost(viewModel: PostViewModel, post: Post, isPostLiked: Boolean){
+    var isPostLikedForReal = false
+    viewModel.setPostNbLikesInDatabase(post, !isPostLiked).thenApply {
+        isPostLikedForReal = !isPostLiked
     }
 }
 
 @Composable
-private fun Reaction(post: Post){
+private fun Reaction(viewModel: PostViewModel, post: Post){
     //val context = LocalContext.current
     Column(modifier = Modifier.padding(20.dp)) {
+        var isPostLiked by remember { mutableStateOf(false) }
+
+        viewModel.isPostLiked(post).thenAccept {
+            isPostLiked = it
+        }
         // Create the like button
-        LikeButton(post = post)
+        LikeButton(viewModel, post = post, isPostLiked)
         Spacer(modifier = Modifier.height(10.dp))
 
         //Create the comment button

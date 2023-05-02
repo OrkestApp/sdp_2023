@@ -1,5 +1,6 @@
 package com.github.orkest.domain
 
+import android.content.ContentValues
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.net.ConnectivityManager
@@ -186,7 +187,7 @@ open class FireStoreDatabaseAPI {
         return completableFuture
     }
 
-    private fun getPostCollectionRef(username: String): CollectionReference{
+    fun getPostCollectionRef(username: String): CollectionReference{
         val firstLetter = username[0].uppercase()
         //TODO: Discuss other option: "posts/user-$firstLetter/$username"
         //Chose this for now because easier for group queries
@@ -414,54 +415,30 @@ open class FireStoreDatabaseAPI {
         return future
     }
 
-    /**
-     * @param postUser: the username of the owner of the post
-     * @param post_data: the date in which the post has been published
-     * @param likeUser: the user that liked the post
-     * @param toAdd: Boolean that tells us if we should add or delete the user from the post likes list
-     * Sets the username of the user that liked/disliked the post in the "likes" collection
-     * */
-    fun setUserInPostLikeListInDatabase(postUser: String, post_date: String, likeUser: String, toAdd: Boolean) : CompletableFuture<Boolean>{
-        val future = CompletableFuture<Boolean>()
-        var postDocument = getPostCollectionRef(postUser).document("${post_date}/likes")
-
-        if(toAdd){
-            postDocument.set(likeUser).addOnSuccessListener { future.complete(true) }
-                .addOnFailureListener { future.completeExceptionally(it) }
-        } else {
-            postDocument = getPostCollectionRef(postUser).document("${post_date}/likes/${likeUser}")
-            postDocument.delete().addOnSuccessListener { future.complete(true) }
-                .addOnFailureListener { future.completeExceptionally(it) }
-        }
-        return future
-    }
 
     /**
      * Get the number of likes of a post from the database
      * */
-    fun setPostNbLikesInDatabase(post: Post): CompletableFuture<Int> {
-        val future = CompletableFuture<Int>()
 
-
-        return future
-    }
 
     /**
      * Returns whether or not the given user has already liked the post
      * */
-    fun isUserInTheLikeList(post_username: String, post_date: String, username: String): CompletableFuture<Boolean>{
+    fun isUserInTheLikeList(post_username: String, post_date: String, username: String): CompletableFuture<Boolean> {
         val future = CompletableFuture<Boolean>()
-        val usersPosts = getPostCollectionRef(post_username).document(post_date).collection("likes")
-
-        usersPosts.get().addOnSuccessListener{
-            val list: MutableList<String> =  it.toObjects(String::class.java)
-            if (list.contains(username)) { future.complete(true) }
-            else { future.complete(false) }
-        }
-            .addOnFailureListener{
-                future.completeExceptionally(it)
-            }
+        getPostCollectionRef(post_username).document(post_date).get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    val post = document.toObject(Post::class.java)
+                    if (post != null) {
+                        val list: MutableList<String> = post.likeList
+                        if (list.contains(username)) { future.complete(true) }
+                        else { future.complete(false) }
+                    }
+                }
+            }.addOnFailureListener { e ->
+                Log.w(TAG, "Error getting post data", e)
+                future.complete(false) }
         return future
     }
-
 }

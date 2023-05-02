@@ -55,7 +55,7 @@ class FollowListActivity: ComponentActivity() {
             val username = intent.getStringExtra("username").toString()
             val isFollowers = intent.getBooleanExtra("isFollowers", false)
             OrkestTheme {
-                FollowList(viewModel = FollowListViewModel(username, isFollowers))
+                FollowList(this, viewModel = FollowListViewModel(username, isFollowers))
             }
         }
     }
@@ -63,7 +63,7 @@ class FollowListActivity: ComponentActivity() {
 
 
 @Composable
-fun FollowList(viewModel: FollowListViewModel){
+fun FollowList(activity: ComponentActivity, viewModel: FollowListViewModel){
     Column {
         Row(
             Modifier
@@ -71,12 +71,10 @@ fun FollowList(viewModel: FollowListViewModel){
                 .background(Color.Yellow)
         ) {
             //Get back button
-            val context = LocalContext.current
             IconButton(onClick = {
                 // Gets back to the profile page of the user
-                val intent = Intent(context, ProfileActivity::class.java)
-                intent.putExtra("username", viewModel.username)
-                context.startActivity(intent)})
+                activity.finish()
+            })
             {
                 Image(
                     painterResource(id = R.drawable.back_button),

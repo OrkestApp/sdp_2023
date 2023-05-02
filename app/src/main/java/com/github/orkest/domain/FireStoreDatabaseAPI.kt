@@ -6,11 +6,8 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.util.Log
+import com.github.orkest.data.*
 import com.github.orkest.data.Constants.Companion.DEFAULT_MAX_RECENT_DAYS
-import com.github.orkest.data.Comment
-import com.github.orkest.data.Post
-import com.github.orkest.data.Song
-import com.github.orkest.data.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
@@ -419,14 +416,29 @@ open class FireStoreDatabaseAPI {
     /**
      * Get the number of likes of a post from the database
      * */
+    fun getNbLikesForPostFromDatabase(post: Post): CompletableFuture<Int>{
+        val future = CompletableFuture<Int>()
+        getPostCollectionRef(post.username).document(post.date.toString()).get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    val post = document.toObject(Post::class.java)
+                    if (post != null) {
+                        future.complete(post.nbLikes)
+                    }
+                }
+            }.addOnFailureListener { e ->
+                Log.w(TAG, "Error getting post data", e)
+                future.complete(0) }
+        return future
+    }
 
 
     /**
      * Returns whether or not the given user has already liked the post
      * */
-    fun isUserInTheLikeList(post_username: String, post_date: String, username: String): CompletableFuture<Boolean> {
+    fun isUserInTheLikeList(post: Post, username: String): CompletableFuture<Boolean> {
         val future = CompletableFuture<Boolean>()
-        getPostCollectionRef(post_username).document(post_date).get()
+        getPostCollectionRef(post.username).document(post.date.toString()).get()
             .addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
                     val post = document.toObject(Post::class.java)
@@ -441,4 +453,44 @@ open class FireStoreDatabaseAPI {
                 future.complete(false) }
         return future
     }
+
+    fun updatePostLikesInDatabase(post: Post, like: Boolean): CompletableFuture<Boolean> {
+        val future = CompletableFuture<Boolean>()
+
+        getPostCollectionRef(post.username).document(post.date.toString()).get()
+            .addOnSuccessListener { document ->
+            if (document != null && document.exists()) {
+                val post = document.toObject(Post::class.java)
+                if (post != null) {
+
+                    if (like) {
+                        post.nbLikes += 1
+                        post.likeList.add(Constants.CURRENT_LOGGED_USER)
+                    } else {
+                        if (post.nbLikes > 0) post.nbLikes -= 1
+                        post.likeList.remove(Constants.CURRENT_LOGGED_USER)
+                    }
+
+                    //Update database
+                    getPostCollectionRef(post.username).document(post.date.toString()).update(
+                        "nbLikes",
+                        post.nbLikes,
+                        "likeList",
+                        post.likeList
+                    )
+                        .addOnSuccessListener { future.complete(true) }
+                        .addOnFailureListener { e ->
+                            Log.w(ContentValues.TAG, "Error getting post likes data", e)
+                            future.complete(false) }
+                }
+            }
+
+        } .addOnFailureListener { e ->
+            Log.w(TAG, "Error getting user data", e)
+            future.complete(false)
+        }
+
+        return future
+    }
+
 }

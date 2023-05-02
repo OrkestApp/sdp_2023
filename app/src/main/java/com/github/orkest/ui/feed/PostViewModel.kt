@@ -31,55 +31,19 @@ open class PostViewModel {
 
 
     /**==============like functions===================*/
-
-    //Pour les afficher
-    open fun getPostLikeListPost(): CompletableFuture<List<String>> {
-        return dbAPI.getPostLikeListFromDatabase(post_username, post_date)
-    }
-
     open fun isPostLiked(post: Post): CompletableFuture<Boolean>{
-        return dbAPI.isUserInTheLikeList(post.username, post.date.toString(), current_username)
+        return dbAPI.isUserInTheLikeList(post, current_username)
     }
 
     /**
-     * This function is in the viewModel as it needs to update the data of the viewModel
+     *
      */
-    fun setPostNbLikesInDatabase(post: Post, toAdd: Boolean): CompletableFuture<Boolean> {
-        val future = CompletableFuture<Boolean>()
+    open fun updatePostLikes(post: Post, like: Boolean): CompletableFuture<Boolean> {
+        return dbAPI.updatePostLikesInDatabase(post, like)
+    }
 
-        dbAPI.getPostCollectionRef(post.username).document(post.date.toString()).get().addOnSuccessListener { document ->
-            if (document != null && document.exists()) {
-                val post = document.toObject(Post::class.java)
-                if (post != null) {
-
-                    if (toAdd) {
-                        post.nbLikes += 1
-                        post.likeList.add(current_username)
-                    } else {
-                        if (post.nbLikes > 0) post.nbLikes -= 1
-                        post.likeList.remove(current_username)
-                    }
-
-                    //Update database
-                    dbAPI.getPostCollectionRef(post.username).document(post.date.toString()).update(
-                        "nbLikes",
-                        post.nbLikes,
-                        "likeList",
-                        post.likeList
-                    )
-                        .addOnSuccessListener { future.complete(true) }
-                        .addOnFailureListener { e ->
-                            Log.w(ContentValues.TAG, "Error getting post likes data", e)
-                            future.complete(false) }
-                }
-            }
-
-        } .addOnFailureListener { e ->
-            Log.w(ContentValues.TAG, "Error getting user data", e)
-            future.complete(false)
-        }
-
-        return future
+    open fun getNbLikes(post: Post): CompletableFuture<Int>{
+        return dbAPI.getNbLikesForPostFromDatabase(post)
     }
 
     /**===============================================*/

@@ -2,6 +2,7 @@ package com.github.orkest.View.feed
 
 import android.content.Context
 import android.content.Intent
+import android.util.MutableBoolean
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,11 +28,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.MutableLiveData
 import com.github.orkest.data.Constants
 import com.github.orkest.data.Post
 import com.github.orkest.data.Song
 import com.github.orkest.R
-import com.github.orkest.ui.sharedMusic.sharedMusicPost
 import com.github.orkest.ui.feed.PostViewModel
 import com.github.orkest.ui.feed.CommentActivity
 import com.github.orkest.ui.feed.CreatePost
@@ -104,18 +105,23 @@ fun launchCreatePostActivity(context: Context){
 }
 
 
+
+
+
 /**
  * Composable function to display a post, can be reused for the profile page
  * @param post the post to display
  */
 @Composable
-fun DisplayPost(viewModel: PostViewModel, post: Post){
+fun DisplayPost(viewModel: PostViewModel, post: Post) {
 
-    Row(modifier = Modifier
-        .padding(start = 10.dp, top = 10.dp, end = 10.dp)
-        .clip(shape = RoundedCornerShape(20.dp))
-        .background(Color.DarkGray)
-        .fillMaxWidth()){
+    Row(
+        modifier = Modifier
+            .padding(start = 10.dp, top = 10.dp, end = 10.dp)
+            .clip(shape = RoundedCornerShape(20.dp))
+            .background(Color.DarkGray)
+            .fillMaxWidth()
+    ) {
 
         Column {
             // Display the user profile pic
@@ -138,36 +144,38 @@ fun DisplayPost(viewModel: PostViewModel, post: Post){
 }
 
 @Composable
-private fun Username(username: String){
+private fun Username(username: String) {
     //Add the user's username
     Text(text = username, fontSize = 14.sp, fontWeight = FontWeight.Bold,
         color = Color.White,
         modifier = Modifier
-            .clickable {  })
+            .clickable { })
 }
 
 @Composable
-private fun ProfilePic(profilePicId : Int){
-        //Add the user's profile pic
-        Image(
-            painter = painterResource(id = profilePicId),
-            contentDescription = "Profile Picture of the user",
-            modifier = Modifier
-                .padding(start = 10.dp, top = 10.dp)
-                .height(40.dp)
-                .width(40.dp)
-                .clip(shape = CircleShape)
-                .clickable { }
-        )
+private fun ProfilePic(profilePicId: Int) {
+    //Add the user's profile pic
+    Image(
+        painter = painterResource(id = profilePicId),
+        contentDescription = "Profile Picture of the user",
+        modifier = Modifier
+            .padding(start = 10.dp, top = 10.dp)
+            .height(40.dp)
+            .width(40.dp)
+            .clip(shape = CircleShape)
+            .clickable { }
+    )
 }
 
 @Composable
-private fun PostDescription(postDescription: String){
-        //Add the post's content
-        Text(text = postDescription,
-            fontSize = 15.sp,
-            color = Color.White,
-            maxLines = 2)
+private fun PostDescription(postDescription: String) {
+    //Add the post's content
+    Text(
+        text = postDescription,
+        fontSize = 15.sp,
+        color = Color.White,
+        maxLines = 2
+    )
 }
 
 
@@ -177,30 +185,32 @@ private fun PostDescription(postDescription: String){
  * @param song the song to display
  */
 @Composable
-fun SongCard(song: Song){
+fun SongCard(song: Song) {
 
     //Row containing the song's album pic, info and play button
-        Row(horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                //.wrapContentSize()
-                .clip(shape = RoundedCornerShape(20.dp))
-                .background(Color.hsl(54f, 1f, 0.5f))
-                .padding(end = 10.dp)){
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            //.wrapContentSize()
+            .clip(shape = RoundedCornerShape(20.dp))
+            .background(Color.hsl(54f, 1f, 0.5f))
+            .padding(end = 10.dp)
+    ) {
 
-            //Add the song's info at the left of the card
-            SongInfo(song)
+        //Add the song's info at the left of the card
+        SongInfo(song)
 
-            Spacer(modifier = Modifier.width(5.dp))
+        Spacer(modifier = Modifier.width(5.dp))
 
-            //Add a play button at the right of the card
-            PlayButton(song)
-        }
+        //Add a play button at the right of the card
+        PlayButton(song)
+    }
 }
 
 @Composable
-private fun SongInfo(song: Song){
+private fun SongInfo(song: Song) {
 
     Row(Modifier.padding(10.dp)) {
         //Add the song's picture at the left of the card
@@ -227,11 +237,11 @@ private fun SongInfo(song: Song){
 }
 
 @Composable
-private fun PlayButton(song: Song){
+private fun PlayButton(song: Song) {
     val isPlayed = remember { mutableStateOf(false) }
     val context = LocalContext.current
     Icon(painter = if (!isPlayed.value) painterResource(id = R.drawable.play_button)
-                    else painterResource(id = R.drawable.pause_button),
+    else painterResource(id = R.drawable.pause_button),
         contentDescription = if (!isPlayed.value) "Play button" else "Pause button",
         modifier = Modifier
             .height(50.dp)
@@ -243,50 +253,48 @@ private fun PlayButton(song: Song){
 }
 
 @Composable
-private fun LikeButton(viewModel: PostViewModel, post: Post, isPostLiked: Boolean?){
+private fun LikeButton(viewModel: PostViewModel, post: Post) {
 
-    if(isPostLiked == null) {Text(text = "") } //Empty body, here waiting for the future that fetch isUserFollowed to complete
-    else {
-        val buttonColor = if (isPostLiked) Color.Yellow else Color.White
+    val isPostLiked = remember{ mutableStateOf(false) }
+    val nbLikes = remember { mutableStateOf(post.nbLikes) }
 
-        Column {
-            Icon(
-                painter = painterResource(id = R.drawable.black_like_icon),
-                contentDescription = "Like button",
-                tint = buttonColor,
-                modifier = Modifier
-                    .testTag("like_button")
-                    .height(20.dp)
-                    .width(20.dp)
-                    .clickable { likeOrDislikePost(viewModel, post, isPostLiked) },
-            )
-            Text(
-                text = "${post.nbLikes}",
-                color = buttonColor,
-                modifier = Modifier.padding(5.dp)
-            )
-        }
+    viewModel.isPostLiked(post).thenAccept { isPostLiked.value = it }
+
+    val buttonColor = if (isPostLiked.value) Color.Yellow else Color.White
+
+    Column {
+        Icon(
+            painter = painterResource(id = R.drawable.black_like_icon),
+            contentDescription = "Like button",
+            tint = buttonColor,
+            modifier = Modifier
+                .testTag("like_button")
+                .height(20.dp)
+                .width(20.dp)
+                .clickable {
+                    viewModel.updatePostLikes(post, !isPostLiked.value)
+                    viewModel.getNbLikes(post).thenApply {
+                        nbLikes.value = it
+                    }
+                    isPostLiked.value = !isPostLiked.value
+                },
+        )
+        Text(
+            text = "${nbLikes.value}",
+            color = buttonColor,
+            modifier = Modifier.padding(5.dp)
+        )
     }
-}
 
-private fun likeOrDislikePost(viewModel: PostViewModel, post: Post, isPostLiked: Boolean){
-    var isPostLikedForReal = false
-    viewModel.setPostNbLikesInDatabase(post, !isPostLiked).thenApply {
-        isPostLikedForReal = !isPostLiked
-    }
 }
 
 @Composable
-private fun Reaction(viewModel: PostViewModel, post: Post){
+private fun Reaction(viewModel: PostViewModel, post: Post) {
     //val context = LocalContext.current
     Column(modifier = Modifier.padding(20.dp)) {
-        var isPostLiked by remember { mutableStateOf(false) }
 
-        viewModel.isPostLiked(post).thenAccept {
-            isPostLiked = it
-        }
         // Create the like button
-        LikeButton(viewModel, post = post, isPostLiked)
+        LikeButton(viewModel, post = post)
         Spacer(modifier = Modifier.height(10.dp))
 
         //Create the comment button
@@ -296,9 +304,12 @@ private fun Reaction(viewModel: PostViewModel, post: Post){
                 .testTag("comment_button")
                 .height(20.dp)
                 .width(20.dp),
-            onClick = { context.startActivity(Intent(context, CommentActivity::class.java)
-                .putExtra("post_date", post.date.toString())
-                .putExtra("post_username", post.username))
+            onClick = {
+                context.startActivity(
+                    Intent(context, CommentActivity::class.java)
+                        .putExtra("post_date", post.date.toString())
+                        .putExtra("post_username", post.username)
+                )
             }
         ) {
             androidx.compose.material3.Icon(
@@ -311,15 +322,21 @@ private fun Reaction(viewModel: PostViewModel, post: Post){
         Spacer(modifier = Modifier.height(10.dp))
 
         //Create the share button
-        ReactionIcon(R.drawable.share_icon,"Share button", "share_button") {/*TODO*/ }
+        ReactionIcon(R.drawable.share_icon, "Share button", "share_button") {/*TODO*/ }
     }
 }
 
 /* TODO modularize in next sprint */
 
 @Composable
-private fun ReactionIcon(iconId: Int, contentDescription:String, testTag: String, onClick: () -> Unit) {
-    Icon(painter = painterResource(id = iconId),
+private fun ReactionIcon(
+    iconId: Int,
+    contentDescription: String,
+    testTag: String,
+    onClick: () -> Unit
+) {
+    Icon(
+        painter = painterResource(id = iconId),
         contentDescription = contentDescription,
         tint = Color.White,
         modifier = Modifier
@@ -329,6 +346,7 @@ private fun ReactionIcon(iconId: Int, contentDescription:String, testTag: String
             .clickable { onClick },
     )
 }
+
 
 
 @Preview

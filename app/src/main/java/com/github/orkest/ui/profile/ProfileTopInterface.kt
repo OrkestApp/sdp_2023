@@ -118,7 +118,7 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
 
                         //notification
 
-                        Notification(context, null).sendNotification("Sign Out", "You have been signed out", "Sign Out", "Sign Out", 1)
+                        Notification(context,null).sendNotification("Sign Out", "You have been signed out", "Sign Out", "Sign Out", 1)
 
                         //uncomment if un-caching is needed
                         GoogleSignIn.getClient(context, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut()

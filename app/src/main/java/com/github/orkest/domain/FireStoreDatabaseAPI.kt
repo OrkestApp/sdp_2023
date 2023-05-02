@@ -1,8 +1,10 @@
 package com.github.orkest.domain
 
 import android.content.ContentValues.TAG
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.util.Log
-import com.github.orkest.data.Constants
 import com.github.orkest.data.Constants.Companion.DEFAULT_MAX_RECENT_DAYS
 import com.github.orkest.data.Comment
 import com.github.orkest.data.Post
@@ -17,12 +19,18 @@ import com.google.firebase.ktx.Firebase
 import java.time.LocalDateTime
 import java.util.concurrent.CompletableFuture
 
-class FireStoreDatabaseAPI {
+open class FireStoreDatabaseAPI {
 
     companion object{
         val db = Firebase.firestore
     }
 
+    fun isOnline(context: Context): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val network = connectivityManager.activeNetwork ?: return false
+        val networkCapabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+        return networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+    }
 
     //============================USER OPERATIONS==========================================
 

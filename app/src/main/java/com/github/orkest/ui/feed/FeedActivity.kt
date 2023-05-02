@@ -258,7 +258,8 @@ private fun LikeButton(viewModel: PostViewModel, post: Post) {
     val isPostLiked = remember{ mutableStateOf(false) }
     val nbLikes = remember { mutableStateOf(post.nbLikes) }
 
-    viewModel.isPostLiked(post).thenAccept { isPostLiked.value = it }
+    viewModel.isPostLiked(post).thenApply { isPostLiked.value = it }
+    viewModel.getNbLikes(post).thenApply { nbLikes.value = it }
 
     val buttonColor = if (isPostLiked.value) Color.Yellow else Color.White
 
@@ -272,11 +273,12 @@ private fun LikeButton(viewModel: PostViewModel, post: Post) {
                 .height(20.dp)
                 .width(20.dp)
                 .clickable {
-                    viewModel.updatePostLikes(post, !isPostLiked.value)
-                    viewModel.getNbLikes(post).thenApply {
-                        nbLikes.value = it
+                    viewModel.updatePostLikes(post, !isPostLiked.value).thenApply {
+                        isPostLiked.value = !isPostLiked.value
+                        viewModel.getNbLikes(post).thenApply {
+                            nbLikes.value = it
+                        }
                     }
-                    isPostLiked.value = !isPostLiked.value
                 },
         )
         Text(

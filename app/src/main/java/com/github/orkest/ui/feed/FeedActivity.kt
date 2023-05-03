@@ -48,7 +48,7 @@ import kotlinx.coroutines.launch
 fun FeedActivity(viewModel: PostViewModel) {
 
     //Add a list of posts
-    var listPosts by remember {
+    val listPosts = remember {
         mutableStateOf(ArrayList<Post>().toList())
     } //Add the .toList() to always store an immutable collection to avoid unpredictable behavior
 
@@ -60,6 +60,8 @@ fun FeedActivity(viewModel: PostViewModel) {
     val isRefreshing = remember { mutableStateOf(false) }
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isRefreshing.value)
 
+    refreshData(viewModel, listPosts)
+
     // Wrap the LazyColumn with SwipeRefresh
     SwipeRefresh(
         state = swipeRefreshState,
@@ -68,13 +70,7 @@ fun FeedActivity(viewModel: PostViewModel) {
                 // Update isRefreshing to true
                 isRefreshing.value = true
 
-                // Refresh your data here
-                viewModel.getRecentPosts(Constants.DUMMY_LAST_CONNECTED_TIME)
-                    .whenComplete { t, u ->
-                        if (t != null) {
-                            listPosts = t
-                        }
-                    }
+                refreshData(viewModel, listPosts)
 
                 // Update isRefreshing to false
                 isRefreshing.value = false
@@ -87,7 +83,7 @@ fun FeedActivity(viewModel: PostViewModel) {
                 .fillMaxSize()
                 .background(Color.LightGray)
         ) {
-            items(listPosts) { post ->
+            items(listPosts.value) { post ->
                 Column {//TODO SUPPRESS, only here for preview purposes
                     DisplayPost(post = post)
                     sharedMusicPost(
@@ -119,6 +115,20 @@ fun FeedActivity(viewModel: PostViewModel) {
             )
         }
     }
+}
+
+/**
+ * Function to refresh the data displayed in the feed
+ * @param viewModel the view model to get the data from
+ * @param listPosts the list of posts to update
+ */
+private fun refreshData(viewModel: PostViewModel, listPosts: MutableState<List<Post>>) {
+    viewModel.getRecentPosts(Constants.DUMMY_LAST_CONNECTED_TIME)
+        .whenComplete { t, u ->
+            if (t != null) {
+                listPosts.value = t
+            }
+        }
 }
 
 

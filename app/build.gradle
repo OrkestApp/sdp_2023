@@ -288,7 +288,8 @@ dependencies {
     // optional - Paging 3 Integration
     implementation("androidx.room:room-paging:$room_version")
 
-
+    //refreshing
+    implementation 'com.google.accompanist:accompanist-swiperefresh:0.25.1'
 }
 
 tasks.withType(Test) {

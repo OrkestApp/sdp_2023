@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
 import com.github.orkest.R
+import com.github.orkest.data.Constants
 import com.github.orkest.ui.theme.OrkestTheme
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
@@ -224,20 +225,18 @@ fun EditProfileImage() {
             val storage = FirebaseStorage.getInstance()
             val storageRef = storage.reference
 
-            //val scremRef = storageRef.child("User-${Constants.CURRENT_LOGGED_USER[0].uppercase()}/${Constants.CURRENT_LOGGED_USER}/pic.jpg")
+            val profilePicRef = storageRef.child("User-${Constants.CURRENT_LOGGED_USER[0].uppercase()}/${Constants.CURRENT_LOGGED_USER}/pic.jpg")
 
-            val getScremRef = storageRef.child("screm.jpg")
 
-            //getScremRef.getFile(File("image/"))
+            profilePicRef.putFile(it)
 
-            //scremRef.putFile(it)
-
-            val ONE_MEGABYTE: Long = 10 * 1024 * 1024
+            /*val ONE_MEGABYTE: Long = 10 * 1024 * 1024
             getScremRef.getBytes(ONE_MEGABYTE).addOnSuccessListener {
+                // transform byte array into BitMap and then to ImageBitmap
                 bitmap.value = BitmapFactory.decodeByteArray(it, 0, it.size).asImageBitmap()
             }.addOnFailureListener {
-
-            }
+                Log.e("storage", "failed to fetch picture from database")
+            }*/
 
             /*val rootPath: File = File(Environment.getExternalStorageDirectory(), "ohnah")
             if (!rootPath.exists()) {

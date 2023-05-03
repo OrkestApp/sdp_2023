@@ -233,12 +233,12 @@ fun signIn(activityResultLauncher: ActivityResultLauncher<Intent>,
 private fun updateUI(user: FirebaseUser?, navController: NavController,
                      isInDatabase: Boolean, context: Context, viewModel: AuthViewModel
 ) {
-    if(user != null){
+    if(user!=null){
         if(!isInDatabase){
             Log.d(TAG, "User is not null and is not in database")
             navController.navigate("signup")
         }
-        else if(isInDatabase){
+        else{
             val intent = Intent(context, MainActivity::class.java)
             // Save the user's credentials in SharedPreferences
             saveUserCredentials(context, viewModel.getUsername().text, Firebase.auth.currentUser?.email.toString())

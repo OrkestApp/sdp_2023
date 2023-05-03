@@ -27,48 +27,32 @@ open class PostViewModel {
 
     // Likes variables
     open val isPostLiked = MutableLiveData<Boolean>()
-    open var nbLikes = MutableLiveData<Int>()
 
 
     /**==============like functions===================*/
+
+    /**
+     * Returns whether or not the current user has already liked the post
+     * */
     open fun isPostLiked(post: Post): CompletableFuture<Boolean>{
         return dbAPI.isUserInTheLikeList(post, current_username)
     }
 
     /**
-     *
+     * This function updates the nbLikes and likeList of the given post depending on whether the current user wants to like or dislike the post
      */
     open fun updatePostLikes(post: Post, like: Boolean): CompletableFuture<Boolean> {
         return dbAPI.updatePostLikesInDatabase(post, like)
     }
 
+    /**
+     * Gets the number of likes for the given post
+     */
     open fun getNbLikes(post: Post): CompletableFuture<Int>{
         return dbAPI.getNbLikesForPostFromDatabase(post)
     }
 
     /**===============================================*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     open fun setPostUsername(usr: String) {
         post_username = usr
@@ -125,10 +109,6 @@ open class PostViewModel {
     }*/
 
     /**===============================================*/
-
-
-
-
 
 
     /**

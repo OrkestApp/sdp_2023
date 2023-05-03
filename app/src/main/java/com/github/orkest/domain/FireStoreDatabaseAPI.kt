@@ -395,25 +395,6 @@ open class FireStoreDatabaseAPI {
     //===========================LIKE POST OPERATIONS======================
 
     /**
-     * Returns the set of users that liked this post
-     */
-    fun getPostLikeListFromDatabase(post_username: String, post_date: String): CompletableFuture<List<String>>{
-        val future = CompletableFuture<List<String>>()
-        val usersPosts = getPostCollectionRef(post_username).document(post_date).collection("likes")
-
-        usersPosts.get().addOnSuccessListener{
-            // Get all the usernames of the users that liked the post
-            val list: MutableList<String> =  it.toObjects(String::class.java)
-            future.complete(list)
-        }
-            .addOnFailureListener{
-                future.completeExceptionally(it)
-            }
-        return future
-    }
-
-
-    /**
      * Get the number of likes of a post from the database
      * */
     fun getNbLikesForPostFromDatabase(post: Post): CompletableFuture<Int>{
@@ -431,7 +412,6 @@ open class FireStoreDatabaseAPI {
                 future.complete(0) }
         return future
     }
-
 
     /**
      * Returns whether or not the given user has already liked the post
@@ -454,6 +434,12 @@ open class FireStoreDatabaseAPI {
         return future
     }
 
+    /**
+     * This function updates the nbLikes and likeList of the given post depending on whether the user wants to like or dislike the post
+     * The user is always CURRENT_LOGGED_USER because he/she is the only one who can react to a post when logged in
+     * @param post: the post to which we want to like or dislike the content
+     * @param like: boolean that indicates if the user wants to like or dislike the post
+     */
     fun updatePostLikesInDatabase(post: Post, like: Boolean): CompletableFuture<Boolean> {
         val future = CompletableFuture<Boolean>()
 
@@ -492,5 +478,4 @@ open class FireStoreDatabaseAPI {
 
         return future
     }
-
 }

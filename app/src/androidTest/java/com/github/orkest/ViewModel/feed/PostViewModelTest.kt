@@ -3,6 +3,8 @@ package com.github.orkest.ViewModel.feed
 import androidx.compose.ui.text.input.TextFieldValue
 import com.github.orkest.data.Constants
 import com.github.orkest.data.Comment
+import com.github.orkest.data.OrkestDate
+import com.github.orkest.data.Post
 import com.github.orkest.domain.FireStoreDatabaseAPI
 import com.github.orkest.ui.feed.PostViewModel
 import com.google.firebase.firestore.ktx.firestoreSettings
@@ -12,21 +14,23 @@ import java.time.LocalDateTime
 
 class PostViewModelTest {
 
+    //For these tests to work, you should decomment the setUpEmulator function (if only running this class)
 
     companion object {
 
         private lateinit var postViewModel : PostViewModel
-//        @BeforeClass
-//        @JvmStatic
-//        fun setupEmulator() {
-//
-//            val db = FireStoreDatabaseAPI.db
-//            db.useEmulator("10.0.2.2", 8080)
-//            db.firestoreSettings = firestoreSettings {
-//                isPersistenceEnabled = false
-//            }
-//
-//        }
+        /*
+        @BeforeClass
+        @JvmStatic
+        fun setupEmulator() {
+
+            val db = FireStoreDatabaseAPI.db
+            db.useEmulator("10.0.2.2", 8080)
+            db.firestoreSettings = firestoreSettings {
+                isPersistenceEnabled = false
+            }
+
+        }*/
 
         @BeforeClass
         @JvmStatic
@@ -124,6 +128,7 @@ class PostViewModelTest {
         postViewModel.deletePost(postViewModel.getPost()).get()
     }
 
+    /*===================Comment function tests===========================*/
 
     @Test
     fun updateCommentAddsCommentInDatabase() {
@@ -150,4 +155,55 @@ class PostViewModelTest {
     private var testComments = mutableListOf(Comment(text="test"))
     private val newComments = mutableListOf(Comment(text="test"), Comment(text="new"))
 
+
+    /*===================Like function tests===========================*/
+
+    private val date = OrkestDate(LocalDateTime.of(1923, 2,3,2,2))
+    @Test
+    fun isPostLikedReturnsCorrectValueWhenLiked(){
+        //Create post and update its values
+        val post = Post(username = "DummyUser", date = date, nbLikes = 1, likeList = mutableListOf(Constants.CURRENT_LOGGED_USER))
+        FireStoreDatabaseAPI().addPostInDataBase(post).get()
+
+        postViewModel.isPostLiked(post).thenApply { assert(it == true) }
+    }
+
+    @Test
+    fun isPostLikedReturnsCorrectValueWhenUnLiked(){
+        val post = Post(username = "DummyUser", date = date, nbLikes = 1, likeList = mutableListOf("JohnDoe"))
+        FireStoreDatabaseAPI().addPostInDataBase(post).get()
+
+        //The current logged in user is not on the like list of this post so it should return false
+        postViewModel.isPostLiked(post).thenApply { assert(it == false) }
+    }
+
+    @Test
+    fun updatePostLikesWorksForLikeAction(){
+        val post = Post(username = "DummyUser",date = date,  nbLikes = 0, likeList = mutableListOf())
+        FireStoreDatabaseAPI().addPostInDataBase(post).get()
+
+        postViewModel.updatePostLikes(post = post, like = true).thenApply {
+            assert(post.nbLikes == 1)
+            assert(post.likeList.contains(Constants.CURRENT_LOGGED_USER))
+        }
+    }
+
+    @Test
+    fun updatePostLikesWorksForDislikeAction(){
+        val post = Post(username = "DummyUser", date = date, nbLikes = 2, likeList = mutableListOf(Constants.CURRENT_LOGGED_USER, "OtherUser"))
+        FireStoreDatabaseAPI().addPostInDataBase(post).get()
+
+        postViewModel.updatePostLikes(post = post, like = false).thenApply {
+            assert(post.nbLikes == 1)
+            assert(post.likeList.size == 1)
+            assert(post.likeList.contains("OtherUser"))
+        }
+    }
+
+    @Test
+    fun getNbLikesReturnsCorrectValue(){
+        val post = Post(username = "DummyUser", date = date, nbLikes = 10)
+        FireStoreDatabaseAPI().addPostInDataBase(post).get()
+        postViewModel.getNbLikes(post).thenApply { assert(it == 10) }
+    }
 }

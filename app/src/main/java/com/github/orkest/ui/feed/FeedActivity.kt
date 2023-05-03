@@ -104,10 +104,6 @@ fun launchCreatePostActivity(context: Context){
     context.startActivity(intent)
 }
 
-
-
-
-
 /**
  * Composable function to display a post, can be reused for the profile page
  * @param post the post to display
@@ -255,15 +251,18 @@ private fun PlayButton(song: Song) {
 @Composable
 private fun LikeButton(viewModel: PostViewModel, post: Post) {
 
+    //Declaring variables to update the UI
     val isPostLiked = remember{ mutableStateOf(false) }
     val nbLikes = remember { mutableStateOf(post.nbLikes) }
 
+    //Fetching initial values from database
     viewModel.isPostLiked(post).thenApply { isPostLiked.value = it }
     viewModel.getNbLikes(post).thenApply { nbLikes.value = it }
 
     val buttonColor = if (isPostLiked.value) Color.Yellow else Color.White
 
     Column {
+        //Displaying the like button
         Icon(
             painter = painterResource(id = R.drawable.black_like_icon),
             contentDescription = "Like button",
@@ -274,17 +273,18 @@ private fun LikeButton(viewModel: PostViewModel, post: Post) {
                 .width(20.dp)
                 .clickable {
                     viewModel.updatePostLikes(post, !isPostLiked.value).thenApply {
+                        //Updating the isPostLiked value accordingly
                         isPostLiked.value = !isPostLiked.value
-                        viewModel.getNbLikes(post).thenApply {
-                            nbLikes.value = it
-                        }
+                        //Updating the value of getNbLikes only after the updatePostLikes future has been completed
+                        viewModel.getNbLikes(post).thenApply { nbLikes.value = it }
                     }
                 },
         )
+        //Displaying the number of likes for this post
         Text(
             text = "${nbLikes.value}",
             color = buttonColor,
-            modifier = Modifier.padding(5.dp)
+            modifier = Modifier.padding(5.dp).testTag("Number of likes")
         )
     }
 

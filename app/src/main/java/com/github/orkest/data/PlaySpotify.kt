@@ -62,5 +62,7 @@ open class PlaySpotify {
             val uri = songToUri(song)
             mSpotifyAppRemote?.playerApi?.play(uri)
         }
+
+
     }
 }

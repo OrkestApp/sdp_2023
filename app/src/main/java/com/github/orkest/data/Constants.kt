@@ -2,6 +2,7 @@ package com.github.orkest.data
 
 import android.content.Context
 import androidx.compose.runtime.MutableState
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -35,8 +36,6 @@ class Constants {
             LocalDateTime.of(2021, 5, 1, 12, 0)
 
         val COLOR_BACKGROUND = Color.hsl(54f, 1f, 0.5f)
-
-
 
         /**
          * Function to play a song on the user's provider app

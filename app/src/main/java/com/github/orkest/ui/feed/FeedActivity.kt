@@ -85,14 +85,9 @@ fun FeedActivity(viewModel: PostViewModel) {
                 .background(Color.LightGray)
         ) {
             items(listPosts.value) { post ->
-                Column {//TODO SUPPRESS, only here for preview purposes
-                    DisplayPost(post = post)
-                    sharedMusicPost(
-                        profile = Constants.MOCK_USER.profile,
-                        song = Constants.DUMMY_RUDE_BOY_SONG,
-                        message = "Amazing music! Check it out."
-                    )
-                }
+
+                DisplayPost(post = post)
+
             }
         }
     }
@@ -100,7 +95,7 @@ fun FeedActivity(viewModel: PostViewModel) {
 
     val context = LocalContext.current
 
-    //Add a button to create a new post at the right lower corner
+    //Add a button to create a new post at the top end corner
     Box(modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.TopEnd) {
         FloatingActionButton(
@@ -114,17 +109,6 @@ fun FeedActivity(viewModel: PostViewModel) {
                 painter = painterResource(id = R.drawable.add_button),
                 contentDescription = "Add post"
             )
-        }
-
-        //Add a button to access camera
-        FloatingActionButton(
-            modifier = Modifier
-                .padding(10.dp),
-            onClick = {
-                val intent = Intent(context, CameraView::class.java)
-                context.startActivity(intent)
-            }) {
-            Icon(painter = painterResource(id = R.drawable.powerrangerblue), contentDescription = "Launch camera")
         }
     }
 

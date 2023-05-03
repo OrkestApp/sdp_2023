@@ -1,6 +1,7 @@
 package com.github.orkest.ui.Camera
 
 
+import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.compose.foundation.Image
 import android.net.Uri
@@ -34,13 +35,13 @@ import com.github.orkest.data.Constants
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import com.github.orkest.ui.MainActivity
 import kotlin.properties.Delegates
 
 //This class represents a camera component activity
 class CameraView: ComponentActivity() {
 
     private val viewModel: CameraViewModel = CameraViewModel()
-    var lensFacing: CameraSelector =  CameraSelector.DEFAULT_FRONT_CAMERA
 
     private val roundedCornerValue = 20.dp
     private val paddingValue = 16.dp
@@ -66,7 +67,9 @@ class CameraView: ComponentActivity() {
                 )
             } else {
                 // If an image is not yet captured, a `CameraPreview` composable is displayed.
-                CameraPreview(lifecycleOwner = this,
+                CameraPreview(
+                    activity = this,
+                    lifecycleOwner = this,
                     onImageCaptured = { uri ->
                         capturedImageUri = uri
                     })
@@ -78,6 +81,7 @@ class CameraView: ComponentActivity() {
 
     @Composable
     fun CameraPreview(
+        activity: ComponentActivity,
         lifecycleOwner: LifecycleOwner,
         onImageCaptured: (Uri) -> Unit
     ) {
@@ -110,7 +114,7 @@ class CameraView: ComponentActivity() {
                     cameraProvider.unbindAll()
                     cameraProvider.bindToLifecycle(
                         lifecycleOwner,
-                        lensFacing,
+                        viewModel.lensFacing,
                         preview,
                         viewModel.imageCapture
                     )
@@ -131,8 +135,8 @@ class CameraView: ComponentActivity() {
                 IconButton(
                     onClick = {
                         // Toggle the lens facing between front and back camera
-                        lensFacing =
-                            if (lensFacing == CameraSelector.DEFAULT_BACK_CAMERA) {
+                        viewModel.lensFacing =
+                            if (viewModel.lensFacing == CameraSelector.DEFAULT_BACK_CAMERA) {
                                 CameraSelector.DEFAULT_FRONT_CAMERA
                             } else {
                                 CameraSelector.DEFAULT_BACK_CAMERA
@@ -140,7 +144,7 @@ class CameraView: ComponentActivity() {
                         cameraProvider.unbindAll()
                         cameraProvider.bindToLifecycle(
                             lifecycleOwner,
-                            lensFacing,
+                            viewModel.lensFacing,
                             preview,
                             viewModel.imageCapture
                         )
@@ -160,8 +164,12 @@ class CameraView: ComponentActivity() {
                 Text(text= "No camera on this device", modifier = Modifier.align(Alignment.Center).testTag("No Camera Text"))
             }
 
+            val context = LocalContext.current
             //Add back button to get back to previous activity. Once we know which one it is, it will be implemented.
-            BackButton({/*TODO*/},
+            BackButton({
+                val intent = Intent(context, MainActivity::class.java)
+                context.startActivity(intent)
+                       },
                 Modifier
                     .padding(paddingValue)
                     .align(Alignment.TopStart)

@@ -30,6 +30,7 @@ import com.github.orkest.data.Constants
 
 import com.github.orkest.View.feed.FeedActivity
 import com.github.orkest.shazam.ui.ShazamSong
+import com.github.orkest.ui.Camera.CameraView
 import com.github.orkest.ui.feed.CreatePost
 import com.github.orkest.ui.profile.ProfileActivity
 import com.github.orkest.ui.profile.ProfileActivityScreen
@@ -99,9 +100,10 @@ class NavigationBar {
 //                        val intent = Intent(context, ShazamActivity::class.java)
 //                        context.startActivity(intent)
                         ShazamSong(activity)
+                        val intent = Intent(context, CameraView::class.java)
+                        context.startActivity(intent)
                     }
                     composable("PlaylistPage") {
-
                         UsersList()
                     }
                     composable("ProfilePage") {

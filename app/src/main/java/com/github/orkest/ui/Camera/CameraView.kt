@@ -28,8 +28,9 @@ import coil.compose.rememberImagePainter
 import com.github.orkest.R
 import com.github.orkest.data.Constants
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import com.github.orkest.ui.sharing.ui.theme.OrkestTheme
 
 //This class represents a camera component activity
 class CameraView: ComponentActivity() {
@@ -56,7 +57,9 @@ class CameraView: ComponentActivity() {
                     onImageCaptured = { uri ->
                         capturedImageUri = uri
                     })
+
             }
+
         }
     }
 
@@ -75,7 +78,9 @@ class CameraView: ComponentActivity() {
         var preview: Preview? = null
         lateinit var previewView : PreviewView
 
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .testTag("Camera Preview Box")) {
             //Creates camera preview to allow the user to take a picture
             AndroidView(factory = {
                 //Get  instance of the camera provider to bind the camera preview to the device's camera
@@ -94,13 +99,14 @@ class CameraView: ComponentActivity() {
                     viewModel.imageCapture
                 )
                 previewView
-            })
+            }, modifier = Modifier.testTag("Camera Preview"))
 
             // Add a button to take the picture
             TakePictureButton(onTakePictureClick = { viewModel.imagePreview(onImageCaptured, context)}, modifier = Modifier
                 .padding(paddingValue)
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
+                .testTag("Take Picture Button")
                 )
 
             // Add the switch camera icon
@@ -122,7 +128,8 @@ class CameraView: ComponentActivity() {
                 },
                 modifier = Modifier
                     .padding(paddingValue)
-                    .align(Alignment.TopEnd))
+                    .align(Alignment.TopEnd)
+                    .testTag("Switch Camera Button"))
              {
                 Image(
                     painterResource(id = R.drawable.switch_camera_icon),
@@ -131,10 +138,11 @@ class CameraView: ComponentActivity() {
             }
 
             //Add back button to get back to previous activity. Once we know which one it is, it will be implemented.
-            backButton({/*TODO*/},
+            BackButton({/*TODO*/},
                 Modifier
                     .padding(paddingValue)
-                    .align(Alignment.TopStart))
+                    .align(Alignment.TopStart)
+                    .testTag("Back Button"))
         }
     }
 
@@ -150,19 +158,20 @@ class CameraView: ComponentActivity() {
             Image(
                 painter = rememberImagePainter(data = capturedImageUri),
                 contentDescription = "Captured Image",
-                contentScale = ContentScale.FillBounds,
                 modifier = Modifier.fillMaxSize()
             )
 
             //Back button to get back to the camera preview
-            backButton(onBackClick = onBackClick, modifier = Modifier
+            BackButton(onBackClick = onBackClick, modifier = Modifier
                 .padding(paddingValue)
-                .align(Alignment.TopStart))
+                .align(Alignment.TopStart)
+                .testTag("Back Button"))
 
             // Save button for the taken picture
             SaveButton(onSaveClick = {viewModel.savePicture(capturedImageUri, context)}, modifier = Modifier
                 .padding(paddingValue)
                 .align(Alignment.BottomCenter)
+                .testTag("Save Button")
                 )
         }
     }
@@ -210,7 +219,7 @@ class CameraView: ComponentActivity() {
     }
 
     @Composable
-    fun backButton(onBackClick: () -> Unit, modifier: Modifier){
+    fun BackButton(onBackClick: () -> Unit, modifier: Modifier){
         //Add back button
         IconButton(
             onClick = onBackClick,

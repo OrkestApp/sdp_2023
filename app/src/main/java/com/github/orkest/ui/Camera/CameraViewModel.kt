@@ -21,7 +21,7 @@ class CameraViewModel {
     //The camera's lens facing direction
     var lensFacing: CameraSelector =  CameraSelector.DEFAULT_BACK_CAMERA
     //The captured image
-    val imageCapture: ImageCapture = ImageCapture.Builder().build()
+    var imageCapture: ImageCapture = ImageCapture.Builder().build()
 
     fun imagePreview(onImageCaptured: (Uri) -> Unit, context: Context){
         // Create a temporary file to store the captured image

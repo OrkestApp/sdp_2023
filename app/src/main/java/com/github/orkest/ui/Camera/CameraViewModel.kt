@@ -3,6 +3,7 @@ package com.github.orkest.ui.Camera
 import android.content.ContentValues
 import android.content.ContentValues.TAG
 import android.content.Context
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
@@ -23,7 +24,6 @@ class CameraViewModel {
     var lensFacing: CameraSelector =  CameraSelector.DEFAULT_FRONT_CAMERA
     //The captured image
     var imageCapture: ImageCapture = ImageCapture.Builder().build()
-
 
     /**
      * This code captures an image using the camera,

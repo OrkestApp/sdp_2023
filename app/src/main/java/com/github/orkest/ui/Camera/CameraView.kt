@@ -1,6 +1,7 @@
 package com.github.orkest.ui.Camera
 
 
+import android.content.pm.PackageManager
 import androidx.compose.foundation.Image
 import android.net.Uri
 import android.os.Bundle
@@ -30,7 +31,7 @@ import com.github.orkest.data.Constants
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
-import com.github.orkest.ui.sharing.ui.theme.OrkestTheme
+import kotlin.properties.Delegates
 
 //This class represents a camera component activity
 class CameraView: ComponentActivity() {
@@ -39,8 +40,13 @@ class CameraView: ComponentActivity() {
 
     private val roundedCornerValue = 20.dp
     private val paddingValue = 16.dp
+
+    var hasCamera by Delegates.notNull<Boolean>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        hasCamera = packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
+
         setContent {
             // The state of the captured image is kept in a mutableStateOf variable.
             var capturedImageUri by remember { mutableStateOf<Uri?>(null) }
@@ -63,61 +69,36 @@ class CameraView: ComponentActivity() {
         }
     }
 
-
     @Composable
     fun CameraPreview(
         lifecycleOwner: LifecycleOwner,
         onImageCaptured: (Uri) -> Unit
     ) {
-        // Get the application context and initialize the camera provider and image capture instances.
-        val context = LocalContext.current
-        val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
-        //Instance of the camera provider
-        val cameraProvider = cameraProviderFuture.get()
-        // Initialize variables for the camera preview and preview view.
-        var preview: Preview? = null
-        lateinit var previewView : PreviewView
 
         Box(modifier = Modifier
             .fillMaxSize()
             .testTag("Camera Preview Box")) {
-            //Creates camera preview to allow the user to take a picture
-            AndroidView(factory = {
-                //Get  instance of the camera provider to bind the camera preview to the device's camera
-                previewView = PreviewView(context)
-                previewView.layoutParams = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT
-                )
-                preview = Preview.Builder().build()
-                preview?.setSurfaceProvider(previewView.surfaceProvider)
-                cameraProvider.unbindAll()
-                cameraProvider.bindToLifecycle(
-                    lifecycleOwner,
-                    viewModel.lensFacing,
-                    preview,
-                    viewModel.imageCapture
-                )
-                previewView
-            }, modifier = Modifier.testTag("Camera Preview"))
+            if(hasCamera) {
+                // Get the application context and initialize the camera provider and image capture instances.
+                val context = LocalContext.current
 
-            // Add a button to take the picture
-            TakePictureButton(onTakePictureClick = { viewModel.imagePreview(onImageCaptured, context)}, modifier = Modifier
-                .padding(paddingValue)
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .testTag("Take Picture Button")
-                )
+                val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
+                //Instance of the camera provider
+                val cameraProvider = cameraProviderFuture.get()
+                // Initialize variables for the camera preview and preview view.
+                var preview: Preview? = null
+                lateinit var previewView : PreviewView
 
-            // Add the switch camera icon
-            IconButton(
-                onClick = {
-                    // Toggle the lens facing between front and back camera
-                    viewModel.lensFacing = if (viewModel.lensFacing == CameraSelector.DEFAULT_BACK_CAMERA) {
-                        CameraSelector.DEFAULT_FRONT_CAMERA
-                    } else {
-                        CameraSelector.DEFAULT_BACK_CAMERA
-                    }
+                //Creates camera preview to allow the user to take a picture
+                AndroidView(factory = {
+                    //Get  instance of the camera provider to bind the camera preview to the device's camera
+                    previewView = PreviewView(context)
+                    previewView.layoutParams = ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                    )
+                    preview = Preview.Builder().build()
+                    preview?.setSurfaceProvider(previewView.surfaceProvider)
                     cameraProvider.unbindAll()
                     cameraProvider.bindToLifecycle(
                         lifecycleOwner,
@@ -125,16 +106,50 @@ class CameraView: ComponentActivity() {
                         preview,
                         viewModel.imageCapture
                     )
-                },
-                modifier = Modifier
-                    .padding(paddingValue)
-                    .align(Alignment.TopEnd)
-                    .testTag("Switch Camera Button"))
-             {
-                Image(
-                    painterResource(id = R.drawable.switch_camera_icon),
-                    contentDescription = "Switch Camera"
+                    previewView
+                }, modifier = Modifier.testTag("Camera Preview"))
+
+                // Add a button to take the picture
+                TakePictureButton(
+                    onTakePictureClick = { viewModel.imagePreview(onImageCaptured, context) },
+                    modifier = Modifier
+                        .padding(paddingValue)
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .testTag("Take Picture Button")
                 )
+
+                // Add the switch camera icon
+                IconButton(
+                    onClick = {
+                        // Toggle the lens facing between front and back camera
+                        viewModel.lensFacing =
+                            if (viewModel.lensFacing == CameraSelector.DEFAULT_BACK_CAMERA) {
+                                CameraSelector.DEFAULT_FRONT_CAMERA
+                            } else {
+                                CameraSelector.DEFAULT_BACK_CAMERA
+                            }
+                        cameraProvider.unbindAll()
+                        cameraProvider.bindToLifecycle(
+                            lifecycleOwner,
+                            viewModel.lensFacing,
+                            preview,
+                            viewModel.imageCapture
+                        )
+                    },
+                    modifier = Modifier
+                        .padding(paddingValue)
+                        .align(Alignment.TopEnd)
+                        .testTag("Switch Camera Button")
+                )
+                {
+                    Image(
+                        painterResource(id = R.drawable.switch_camera_icon),
+                        contentDescription = "Switch Camera"
+                    )
+                }
+            } else {
+                Text(text= "No camera on this device", modifier = Modifier.align(Alignment.Center).testTag("No Camera Text"))
             }
 
             //Add back button to get back to previous activity. Once we know which one it is, it will be implemented.

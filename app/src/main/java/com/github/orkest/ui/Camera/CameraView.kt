@@ -177,33 +177,6 @@ class CameraView: ComponentActivity() {
     }
 
     @Composable
-    fun SwitchCameraIcon(cameraProvider: ProcessCameraProvider, lifecycleOwner: LifecycleOwner, preview: Preview?, modifier: Modifier){
-        IconButton(
-            onClick = {
-                // Toggle the lens facing between front and back camera
-                viewModel.lensFacing = if (viewModel.lensFacing == CameraSelector.DEFAULT_BACK_CAMERA) {
-                    CameraSelector.DEFAULT_FRONT_CAMERA
-                } else {
-                    CameraSelector.DEFAULT_BACK_CAMERA
-                }
-                cameraProvider.unbindAll()
-                cameraProvider.bindToLifecycle(
-                    lifecycleOwner,
-                    viewModel.lensFacing,
-                    preview,
-                    viewModel.imageCapture
-                )
-            },
-            modifier = modifier
-        ) {
-            Image(
-                painterResource(id = R.drawable.switch_camera_icon),
-                contentDescription = "Switch Camera"
-            )
-        }
-    }
-
-    @Composable
     fun SaveButton(onSaveClick: ()-> Unit, modifier: Modifier){
         Button(
             onClick = onSaveClick,

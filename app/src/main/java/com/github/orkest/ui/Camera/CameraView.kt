@@ -45,7 +45,10 @@ class CameraView: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        hasCamera = packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
+        val hasFrontCamera = packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT)
+        val hasBackCamera = packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
+
+        hasCamera = hasFrontCamera and(hasBackCamera)
 
         setContent {
             // The state of the captured image is kept in a mutableStateOf variable.

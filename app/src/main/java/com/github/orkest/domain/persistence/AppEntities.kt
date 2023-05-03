@@ -26,7 +26,7 @@ class AppEntities {
             @ColumnInfo(name = "Title") val name: String,
             val Artist: String,
             val Album: String,
-            val URL: Int
+            val URL: String
         )
 
         @Entity

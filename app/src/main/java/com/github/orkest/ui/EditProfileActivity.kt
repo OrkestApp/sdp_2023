@@ -30,7 +30,7 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material.DrawerValue
 import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.Preview
-import com.github.orkest.View.theme.OrkestTheme
+import com.github.orkest.ui.theme.OrkestTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 

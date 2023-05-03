@@ -1,7 +1,11 @@
 package com.github.orkest.domain
 
 import android.content.ContentValues.TAG
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.util.Log
+import com.github.orkest.data.Constants.Companion.DEFAULT_MAX_RECENT_DAYS
 import com.github.orkest.data.Comment
 import com.github.orkest.data.Post
 import com.github.orkest.data.Song
@@ -15,12 +19,18 @@ import com.google.firebase.ktx.Firebase
 import java.time.LocalDateTime
 import java.util.concurrent.CompletableFuture
 
-class FireStoreDatabaseAPI {
+open class FireStoreDatabaseAPI {
 
     companion object{
         val db = Firebase.firestore
     }
 
+    fun isOnline(context: Context): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val network = connectivityManager.activeNetwork ?: return false
+        val networkCapabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+        return networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+    }
 
     //============================USER OPERATIONS==========================================
 
@@ -277,31 +287,17 @@ class FireStoreDatabaseAPI {
         return future
     }
 
-
-    /**
-     * @param lastConnection the last time the user was connected
-     * @return a completable future of a list of post that were recently published
-     */
-    fun getRecentPostsFromDataBase(lastConnection: LocalDateTime): CompletableFuture<List<Post>> {
-        //TODO: Add the condition on posts belonging to the user's friends
+    private fun recentPostsQuery(month: Int, year: Int, day: Int): CompletableFuture<List<Post>>{
         val future = CompletableFuture<List<Post>>()
         val posts = db.collectionGroup("posts")
-
-        val currentTime = LocalDateTime.now()
-
-        //TODO: Make this logic better and refactor it + discuss it with team (corner cases like end of month/end of year not covered)
-        //TODO: See if there is a workaround the interdiction to combine plage queries on different fields
-
-        //Get all posts that were published after the last connection of the user, and that are from the current month
-        posts.whereEqualTo(FieldPath.of("date","year"), currentTime.year)
-            .whereEqualTo(FieldPath.of("date","month"), currentTime.monthValue)
-            .whereGreaterThan(FieldPath.of("date","dayOfMonth"),
-                if (currentTime.year > lastConnection.year &&
-                    currentTime.monthValue > lastConnection.monthValue) 1 else
-                        lastConnection.dayOfMonth).get()
-            .addOnSuccessListener {
+        posts.whereEqualTo(FieldPath.of("date", "year"), year)
+            .whereEqualTo(FieldPath.of("date", "month"), month)
+            .whereGreaterThanOrEqualTo(FieldPath.of("date", "dayOfMonth"), day)
+            .get().addOnSuccessListener {
                 // Get all posts documents as a list of posts objects
                 val list: MutableList<Post> = it.toObjects(Post::class.java)
+                //orders the list by date (most recent first)
+                list.sortByDescending { post -> post.date }
                 future.complete(list)
             } //Propagates the exception in case of exception
             .addOnFailureListener {
@@ -309,6 +305,47 @@ class FireStoreDatabaseAPI {
             }
 
         return future
+    }
+
+
+    //TODO: Add the condition on posts belonging to the user's friends
+    /**
+     * Returns the list of posts that were published after the last connection of the user
+     * and from the last [maxDaysNb] days
+     * @param lastConnection the last time the user was connected
+     * @param maxDaysNb the max number of days we want to get the posts from, default and max value is 30
+     * @return a completable future of a list of post that were recently published
+     */
+    fun getRecentPostsFromDataBase(lastConnection: LocalDateTime, maxDaysNb: Long = DEFAULT_MAX_RECENT_DAYS): CompletableFuture<List<Post>> {
+        //Preconditions to check
+        require(maxDaysNb <= DEFAULT_MAX_RECENT_DAYS) { "maxDaysNb must be less or equal to $DEFAULT_MAX_RECENT_DAYS" }
+
+        val futures = mutableListOf<CompletableFuture<List<Post>>>()
+        val maxDaysAgo = LocalDateTime.now().minusDays(maxDaysNb)
+        val recentPostsTime = if (lastConnection.isAfter(maxDaysAgo)) lastConnection else maxDaysAgo
+
+        val listMonths  = mutableListOf<Int>(recentPostsTime.monthValue)
+        //If the recentPostsTime is not in the current month, we need to add the next month
+        if (recentPostsTime.monthValue != LocalDateTime.now().monthValue)
+            if (recentPostsTime.monthValue == 12)
+                listMonths.add(1)
+            else
+                listMonths.add(recentPostsTime.monthValue+1)
+
+        //Get all posts that were published after the recentPostsTime - One query per month
+        listMonths.forEach { month ->
+            run {
+                futures.add(recentPostsQuery(month,
+                    recentPostsTime.year,
+                    if (month == recentPostsTime.monthValue) recentPostsTime.dayOfMonth else 1))
+            }
+        }
+        //Transforms the list of futures into a future of list of posts
+        return CompletableFuture.allOf(*futures.toTypedArray()).thenApply {
+            val list = mutableListOf<Post>()
+            futures.forEach { list.addAll(it.get()) }
+            list
+        }
     }
 
     /**

@@ -1,4 +1,4 @@
-package com.github.orkest.View.sharing
+package com.github.orkest.ui.sharing
 
 import android.content.Intent
 import androidx.compose.runtime.Composable
@@ -9,8 +9,6 @@ import com.github.orkest.data.Constants
 import com.github.orkest.data.Profile
 import com.github.orkest.data.User
 import com.github.orkest.ui.search.SearchUserView
-import com.github.orkest.ui.sharing.PlaylistViewModel
-import com.github.orkest.ui.sharing.PlaylistActivity
 
 /**
  * This function is used to display the list of users
@@ -19,7 +17,7 @@ import com.github.orkest.ui.sharing.PlaylistActivity
  * @param viewModel the view model
  */
 @Composable
-fun UsersList(viewModel: PlaylistViewModel) {
+fun UsersList() {
     val messages = List(
         // create a dummy User
         10

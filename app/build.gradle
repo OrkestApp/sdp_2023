@@ -106,6 +106,7 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:3.12.4'
     testImplementation 'org.mockito:mockito-inline:3.12.4'
     testImplementation "io.mockk:mockk:1.12.0"
+    androidTestImplementation 'org.mockito:mockito-android:3.10.0'
 
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
@@ -249,6 +250,15 @@ dependencies {
 
     androidTestImplementation('androidx.test.espresso:espresso-intents:3.4.0')
 
+    //Dependencies for shazamKit
+    implementation files('../libs/shazamkit-android-release.aar')
+    //implementation(name: "shazamkit-android-release", ext: "aar")
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.1'
+    implementation 'com.squareup.okhttp3:okhttp:4.9.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    
     // Room components
     var room_version = "2.5.1"
 
@@ -286,6 +296,8 @@ dependencies {
 
 
 
+    //refreshing
+    implementation 'com.google.accompanist:accompanist-swiperefresh:0.25.1'
 }
 
 tasks.withType(Test) {

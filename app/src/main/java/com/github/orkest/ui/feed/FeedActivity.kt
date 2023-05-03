@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.FloatingActionButton
@@ -30,11 +31,14 @@ import com.github.orkest.data.Constants
 import com.github.orkest.data.Post
 import com.github.orkest.data.Song
 import com.github.orkest.R
-import com.github.orkest.View.sharedMusic.sharedMusicPost
 import com.github.orkest.ui.Camera.CameraView
+import com.github.orkest.ui.sharedMusic.sharedMusicPost
 import com.github.orkest.ui.feed.PostViewModel
 import com.github.orkest.ui.feed.CommentActivity
 import com.github.orkest.ui.feed.CreatePost
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import kotlinx.coroutines.launch
 
 
 /**
@@ -45,30 +49,50 @@ import com.github.orkest.ui.feed.CreatePost
 fun FeedActivity(viewModel: PostViewModel) {
 
     //Add a list of posts
-    var listPosts by remember {
-        mutableStateOf( ArrayList<Post>().toList())
+    val listPosts = remember {
+        mutableStateOf(ArrayList<Post>().toList())
     } //Add the .toList() to always store an immutable collection to avoid unpredictable behavior
 
-    //Fetch posts from database
-    //viewModel.getUserPosts("Yas")
-    viewModel.getRecentPosts(Constants.DUMMY_LAST_CONNECTED_TIME)
-        .whenComplete { t, u ->
-            if (t != null) {
-                listPosts = t
+    // Remember the coroutine scope and the lazy list state
+    val coroutineScope = rememberCoroutineScope()
+    val lazyListState = rememberLazyListState()
+
+    // Remember the swipe refresh state
+    val isRefreshing = remember { mutableStateOf(false) }
+    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isRefreshing.value)
+
+    refreshData(viewModel, listPosts)
+
+    // Wrap the LazyColumn with SwipeRefresh
+    SwipeRefresh(
+        state = swipeRefreshState,
+        onRefresh = {
+            coroutineScope.launch {
+                // Update isRefreshing to true
+                isRefreshing.value = true
+
+                refreshData(viewModel, listPosts)
+
+                // Update isRefreshing to false
+                isRefreshing.value = false
             }
         }
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.LightGray)
     ) {
-        items(listPosts) { post ->
-            Column {//TODO SUPPRESS, only here for preview purposes
-                DisplayPost(post = post)
-                sharedMusicPost(
-                    profile = Constants.MOCK_USER.profile,
-                    song = Constants.DUMMY_RUDE_BOY_SONG,
-                    message = "Amazing music! Check it out.")
+        LazyColumn(
+            state = lazyListState,
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.LightGray)
+        ) {
+            items(listPosts.value) { post ->
+                Column {//TODO SUPPRESS, only here for preview purposes
+                    DisplayPost(post = post)
+                    sharedMusicPost(
+                        profile = Constants.MOCK_USER.profile,
+                        song = Constants.DUMMY_RUDE_BOY_SONG,
+                        message = "Amazing music! Check it out."
+                    )
+                }
             }
         }
     }
@@ -76,11 +100,15 @@ fun FeedActivity(viewModel: PostViewModel) {
 
     val context = LocalContext.current
 
-    Column {
-        //Add a button to create a new post
+    //Add a button to create a new post at the right lower corner
+    Box(modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.TopEnd) {
         FloatingActionButton(
             modifier = Modifier
-                .padding(10.dp),
+                .align(Alignment.TopEnd)
+                .padding(10.dp)
+                .testTag("addPostButton"),
+            backgroundColor = Color.White,
             onClick = { launchCreatePostActivity(context) }) {
             Icon(
                 painter = painterResource(id = R.drawable.add_button),
@@ -102,6 +130,21 @@ fun FeedActivity(viewModel: PostViewModel) {
 
 
 }
+
+/**
+ * Function to refresh the data displayed in the feed
+ * @param viewModel the view model to get the data from
+ * @param listPosts the list of posts to update
+ */
+private fun refreshData(viewModel: PostViewModel, listPosts: MutableState<List<Post>>) {
+    viewModel.getRecentPosts(Constants.DUMMY_LAST_CONNECTED_TIME)
+        .whenComplete { t, u ->
+            if (t != null) {
+                listPosts.value = t
+            }
+        }
+}
+
 
 fun launchCreatePostActivity(context: Context){
     val intent = Intent(context, CreatePost::class.java)
@@ -258,7 +301,10 @@ private fun Reaction(post: Post){
         //Create the comment button
         val context = LocalContext.current
         IconButton(
-            modifier = Modifier.testTag("comment_button").height(20.dp).width(20.dp),
+            modifier = Modifier
+                .testTag("comment_button")
+                .height(20.dp)
+                .width(20.dp),
             onClick = { context.startActivity(Intent(context, CommentActivity::class.java)
                 .putExtra("post_date", post.date.toString())
                 .putExtra("post_username", post.username))

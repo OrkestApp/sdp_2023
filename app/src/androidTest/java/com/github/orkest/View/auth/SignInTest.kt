@@ -5,8 +5,13 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.navigation.compose.rememberNavController
 import androidx.test.core.app.ApplicationProvider
-import com.github.orkest.View.profile.cleanSigningCache
 import com.github.orkest.ViewModel.auth.MockAuthViewModel
+import com.github.orkest.ui.authentication.SignIn
+import com.github.orkest.ui.authentication.isSignedInOffline
+import com.github.orkest.ui.authentication.loadUserCredentials
+import com.github.orkest.ui.authentication.saveUserCredentials
+import com.github.orkest.ui.notification.Notification
+import com.github.orkest.ui.profile.cleanSigningCache
 import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -168,6 +173,29 @@ class SignInTest {
         // Clear SharedPreferences after each test
         val sharedPref = context.getSharedPreferences("user_credentials", Context.MODE_PRIVATE)
         sharedPref.edit().clear().apply()
+    }
+
+
+    /**
+     * Check if createNotificationChannel() works a
+     */
+    @Test
+    fun createNotificationChannelWorks() {
+        val context: Context = ApplicationProvider.getApplicationContext()
+        val notification = Notification(context,null)
+
+        notification.createNotificationChannel()
+    }
+
+    /**
+     * Check if sendNotification() works
+     */
+    @Test
+    fun sendNotificationWorks() {
+        val context: Context = ApplicationProvider.getApplicationContext()
+        val notification = Notification(context,null)
+
+        notification.sendNotification("Sign Out", "You have been signed out", "Sign Out", "Sign Out", 1)
     }
 
 }

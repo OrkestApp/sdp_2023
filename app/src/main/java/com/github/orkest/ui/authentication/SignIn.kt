@@ -1,4 +1,4 @@
-package com.github.orkest.View.auth
+package com.github.orkest.ui.authentication
 
 import android.app.Activity.RESULT_OK
 import android.content.Context
@@ -32,7 +32,6 @@ import androidx.navigation.NavController
 import com.github.orkest.data.Constants
 import com.github.orkest.R
 import com.github.orkest.ui.MainActivity
-import com.github.orkest.ui.authentication.AuthViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -234,16 +233,15 @@ fun signIn(activityResultLauncher: ActivityResultLauncher<Intent>,
 private fun updateUI(user: FirebaseUser?, navController: NavController,
                      isInDatabase: Boolean, context: Context, viewModel: AuthViewModel
 ) {
-    if(user != null){
-        // Save the user's credentials in SharedPreferences
-        saveUserCredentials(context, viewModel.getUsername().text, Firebase.auth.currentUser?.email.toString())
-
+    if(user!=null){
         if(!isInDatabase){
             Log.d(TAG, "User is not null and is not in database")
             navController.navigate("signup")
         }
-        else if(isInDatabase){
+        else{
             val intent = Intent(context, MainActivity::class.java)
+            // Save the user's credentials in SharedPreferences
+            saveUserCredentials(context, viewModel.getUsername().text, Firebase.auth.currentUser?.email.toString())
             context.startActivity(intent)
             Log.d(TAG, "User is not null and is in database")
         }
@@ -281,7 +279,7 @@ fun loadUserCredentials(context: Context): Pair<String?, String?> {
  */
 fun isSignedInOffline(context: Context): Boolean {
     val (username, email) = loadUserCredentials(context)
-    return username != null && email != null
+    return username != null && username.isNotEmpty() && email != null && email.isNotEmpty()
 }
 
 

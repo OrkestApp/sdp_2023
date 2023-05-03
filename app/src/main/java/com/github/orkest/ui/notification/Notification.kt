@@ -33,24 +33,24 @@ class Notification(private val context: Context, private val alertDialogListener
      * Build the notification manager to enable notifications
      * The choice will be saved in the phone's parameters
      */
-    fun promptUserToEnableNotifications(activity: Context) {
-        val alertDialog = AlertDialog.Builder(activity)
+    fun promptUserToEnableNotifications() {
+        val alertDialog = AlertDialog.Builder(context)
             .setTitle("Enable Notifications")
             .setMessage("To receive important updates, please enable notifications for this app.")
             .setPositiveButton("Enable", null)
             .setNegativeButton("Cancel", null)
             .create()
 
-        val notificationManager = NotificationManagerCompat.from(activity)
+        val notificationManager = NotificationManagerCompat.from(context)
         if (!notificationManager.areNotificationsEnabled()) {
             alertDialog.setOnShowListener {
                 alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).apply {
                     setTextColor(Color.BLUE)
                     setOnClickListener {
                         val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
-                            putExtra(Settings.EXTRA_APP_PACKAGE, activity.packageName)
+                            putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
                         }
-                        activity.startActivity(intent)
+                        context.startActivity(intent)
                         alertDialog.dismiss()
                     }
                 }

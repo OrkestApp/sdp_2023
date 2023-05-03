@@ -1,6 +1,5 @@
 package com.github.orkest.View.profile
 
-import androidx.compose.material.ScaffoldState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.test.*
@@ -14,13 +13,12 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.orkest.data.Constants
 import com.github.orkest.data.Profile
 import com.github.orkest.R
-import com.github.orkest.View.theme.OrkestTheme
+import com.github.orkest.ui.theme.OrkestTheme
 import com.github.orkest.ViewModel.profile.MockProfileViewModel
 import com.github.orkest.ui.profile.ProfileActivity
 import com.github.orkest.ui.profile.ProfileActivityScreen
 import com.github.orkest.ui.profile.ProfileActivitySetting
 import com.github.orkest.ui.profile.TopProfile
-import kotlinx.coroutines.CoroutineScope
 import org.junit.runner.RunWith
 import org.junit.Before
 

@@ -1,4 +1,4 @@
-package com.github.orkest.View.auth
+package com.github.orkest.ui.authentication
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -33,9 +33,10 @@ import coil.compose.rememberImagePainter
 import com.github.orkest.data.Providers
 import com.github.orkest.R
 import com.github.orkest.ui.MainActivity
-import com.github.orkest.View.theme.OrkestTheme
-import com.github.orkest.View.theme.White
-import com.github.orkest.ui.authentication.AuthViewModel
+import com.github.orkest.ui.theme.OrkestTheme
+import com.github.orkest.ui.theme.White
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 
 /**
@@ -190,6 +191,8 @@ private fun onConfirmListener(context: Context, error: MutableState<Boolean>, er
             if(result) {
                 Constants.CURRENT_LOGGED_USER = viewModel.getUsername().text
                 Constants.CURRENT_USER_PROVIDER = viewModel.getProvider()
+                // Save the user's credentials in SharedPreferences
+                saveUserCredentials(context, Constants.CURRENT_LOGGED_USER, Firebase.auth.currentUser?.email.toString())
                 //Launches intent to the main Activity
                 val intent = Intent(context, MainActivity::class.java)
                 context.startActivity(intent)

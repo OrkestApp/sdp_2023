@@ -93,9 +93,6 @@ class CameraView: ComponentActivity() {
                 //Instance of the camera provider
                 val cameraProvider = cameraProviderFuture.get()
 
-
-
-
                 // Initialize variables for the camera preview and preview view.
                 var preview: Preview? = null
                 lateinit var previewView : PreviewView

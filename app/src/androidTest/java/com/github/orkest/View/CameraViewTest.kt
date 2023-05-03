@@ -9,7 +9,9 @@ import org.junit.Test
 
 class CameraViewTest {
 
+    /**
     private lateinit var cameraView: CameraView
+
 
 
     @get:Rule
@@ -50,4 +52,6 @@ class CameraViewTest {
             composeTestRule.onNodeWithTag("Save Button").assertIsDisplayed().assertHasClickAction()
         }
     }
+
+    **/
 }

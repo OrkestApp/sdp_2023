@@ -1,29 +1,40 @@
 package com.github.orkest.ui
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import com.github.orkest.data.User
 import com.github.orkest.domain.FireStoreDatabaseAPI
+import java.util.concurrent.CompletableFuture
 
-class FollowListViewModel(val username: String, val isFollowersList: Boolean) {
+open class FollowListViewModel(val username: String, val isFollowersList: Boolean) {
 
     private val dbAPI = FireStoreDatabaseAPI()
-    /**
 
     /**
      * Retrieves the list of users in the followers or followings list
      */
-    fun retrieveFollowList(): CompletableFuture<MutableList<User>>{
-        val future = CompletableFuture<MutableList<User>>()
-        val userList = mutableListOf<User>()
+    open fun retrieveFollowList(): LiveData<MutableList<User>> {
+        val userListLiveData = MutableLiveData<MutableList<User>>()
 
-        dbAPI.fetchFollowList(username, isFollowersList).thenApply { followList ->
+        dbAPI.fetchFollowList(username, isFollowersList).thenApplyAsync { followList ->
+            val userList = mutableListOf<User>()
+            val userSearchFutures = mutableListOf<CompletableFuture<User>>()
+
             followList.forEach { username ->
-                dbAPI.searchUserInDatabase(username).thenApply { user ->
+                val userSearchFuture = dbAPI.searchUserInDatabase(username)
+                userSearchFutures.add(userSearchFuture)
+                userSearchFuture.thenAccept { user ->
                     userList.add(user)
                 }
             }
-            future.complete(userList)
+
+            //Updates the returned list when all users have been added
+            CompletableFuture.allOf(*userSearchFutures.toTypedArray()).thenRun {
+                userListLiveData.postValue(userList)
+            }
         }
-        return future
+
+        return userListLiveData
     }
-    **/
 
 }

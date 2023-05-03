@@ -1,5 +1,7 @@
 package com.github.orkest.ui
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -25,6 +27,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
@@ -206,6 +210,7 @@ fun EditProfileImage() {
     val painter = rememberImagePainter(
         imageUri.value.ifEmpty { R.drawable.blank_profile_pic }
     )
+    val bitmap: MutableState<ImageBitmap?> = rememberSaveable { mutableStateOf(null) }
 
     val context = LocalContext.current
 
@@ -227,7 +232,14 @@ fun EditProfileImage() {
 
             //scremRef.putFile(it)
 
-            val rootPath: File = File(Environment.getExternalStorageDirectory(), "ohnah")
+            val ONE_MEGABYTE: Long = 10 * 1024 * 1024
+            getScremRef.getBytes(ONE_MEGABYTE).addOnSuccessListener {
+                bitmap.value = BitmapFactory.decodeByteArray(it, 0, it.size).asImageBitmap()
+            }.addOnFailureListener {
+
+            }
+
+            /*val rootPath: File = File(Environment.getExternalStorageDirectory(), "ohnah")
             if (!rootPath.exists()) {
                 rootPath.mkdirs()
                 Log.e("path", "gahdamn ${rootPath}")
@@ -235,9 +247,11 @@ fun EditProfileImage() {
 
             Log.e("path", "gahdamn $rootPath")
 
-            val localFile = File(rootPath, "screm.jpg")
+            val localFile = File(rootPath, "screm.jpg")*/
 
-            getScremRef.getFile(localFile)
+
+
+            /*getScremRef.getFile(localFile)
                 .addOnSuccessListener(OnSuccessListener<FileDownloadTask.TaskSnapshot?> {
                     Log.e("firebase ", ";local tem file created  created $localFile")
                     //  updateDb(timestamp,localFile.toString(),position);
@@ -246,7 +260,7 @@ fun EditProfileImage() {
                         "firebase ",
                         ";local tem file not created  created $exception"
                     )
-                })
+                })*/
         }
     }
 
@@ -265,12 +279,15 @@ fun EditProfileImage() {
                 .padding(8.dp)
                 .size(100.dp))
         {
-            Image(
-                painter = painter,
-                contentDescription = null,
-                modifier = Modifier.wrapContentSize(),
-                contentScale = ContentScale.Crop
-            )
+            bitmap.value?.let {
+                Image(
+                    //painter = painter,
+                    bitmap = bitmap.value!!,
+                    contentDescription = null,
+                    modifier = Modifier.wrapContentSize(),
+                    contentScale = ContentScale.Crop
+                )
+            }
         }
         // clickable Text offering the possibility to change profile pic
         Text(

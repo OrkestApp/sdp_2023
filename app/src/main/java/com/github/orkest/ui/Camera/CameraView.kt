@@ -5,6 +5,9 @@ import android.content.pm.PackageManager
 import androidx.compose.foundation.Image
 import android.net.Uri
 import android.os.Bundle
+import androidx.camera.core.CameraInfo
+
+import android.util.Log
 import android.view.ViewGroup
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -37,6 +40,7 @@ import kotlin.properties.Delegates
 class CameraView: ComponentActivity() {
 
     private val viewModel: CameraViewModel = CameraViewModel()
+    var lensFacing: CameraSelector =  CameraSelector.DEFAULT_FRONT_CAMERA
 
     private val roundedCornerValue = 20.dp
     private val paddingValue = 16.dp
@@ -88,6 +92,10 @@ class CameraView: ComponentActivity() {
                 val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
                 //Instance of the camera provider
                 val cameraProvider = cameraProviderFuture.get()
+
+
+
+
                 // Initialize variables for the camera preview and preview view.
                 var preview: Preview? = null
                 lateinit var previewView : PreviewView
@@ -105,7 +113,7 @@ class CameraView: ComponentActivity() {
                     cameraProvider.unbindAll()
                     cameraProvider.bindToLifecycle(
                         lifecycleOwner,
-                        viewModel.lensFacing,
+                        lensFacing,
                         preview,
                         viewModel.imageCapture
                     )
@@ -126,8 +134,8 @@ class CameraView: ComponentActivity() {
                 IconButton(
                     onClick = {
                         // Toggle the lens facing between front and back camera
-                        viewModel.lensFacing =
-                            if (viewModel.lensFacing == CameraSelector.DEFAULT_BACK_CAMERA) {
+                        lensFacing =
+                            if (lensFacing == CameraSelector.DEFAULT_BACK_CAMERA) {
                                 CameraSelector.DEFAULT_FRONT_CAMERA
                             } else {
                                 CameraSelector.DEFAULT_BACK_CAMERA
@@ -135,7 +143,7 @@ class CameraView: ComponentActivity() {
                         cameraProvider.unbindAll()
                         cameraProvider.bindToLifecycle(
                             lifecycleOwner,
-                            viewModel.lensFacing,
+                            lensFacing,
                             preview,
                             viewModel.imageCapture
                         )

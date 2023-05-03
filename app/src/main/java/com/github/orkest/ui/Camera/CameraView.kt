@@ -15,7 +15,9 @@ import androidx.activity.compose.setContent
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.IconButton
@@ -68,7 +70,6 @@ class CameraView: ComponentActivity() {
             } else {
                 // If an image is not yet captured, a `CameraPreview` composable is displayed.
                 CameraPreview(
-                    activity = this,
                     lifecycleOwner = this,
                     onImageCaptured = { uri ->
                         capturedImageUri = uri
@@ -81,7 +82,6 @@ class CameraView: ComponentActivity() {
 
     @Composable
     fun CameraPreview(
-        activity: ComponentActivity,
         lifecycleOwner: LifecycleOwner,
         onImageCaptured: (Uri) -> Unit
     ) {
@@ -125,9 +125,9 @@ class CameraView: ComponentActivity() {
                 TakePictureButton(
                     onTakePictureClick = { viewModel.imagePreview(onImageCaptured, context) },
                     modifier = Modifier
-                        .padding(paddingValue)
+                        .padding(20.dp)
+                        .size(100.dp)
                         .align(Alignment.BottomCenter)
-                        .fillMaxWidth()
                         .testTag("Take Picture Button")
                 )
 
@@ -161,11 +161,13 @@ class CameraView: ComponentActivity() {
                     )
                 }
             } else {
-                Text(text= "No camera on this device", modifier = Modifier.align(Alignment.Center).testTag("No Camera Text"))
+                Text(text= "No camera on this device", modifier = Modifier
+                    .align(Alignment.Center)
+                    .testTag("No Camera Text"))
             }
 
             val context = LocalContext.current
-            //Add back button to get back to previous activity. Once we know which one it is, it will be implemented.
+            //Add back button to get back to previous activity.
             BackButton({
                 val intent = Intent(context, MainActivity::class.java)
                 context.startActivity(intent)
@@ -202,6 +204,7 @@ class CameraView: ComponentActivity() {
             SaveButton(onSaveClick = {viewModel.savePicture(capturedImageUri, context)}, modifier = Modifier
                 .padding(paddingValue)
                 .align(Alignment.BottomCenter)
+                .fillMaxWidth()
                 .testTag("Save Button")
                 )
         }
@@ -241,11 +244,15 @@ class CameraView: ComponentActivity() {
         Button(
             onClick = onTakePictureClick,
             modifier = modifier,
-            shape = RoundedCornerShape(roundedCornerValue),
-            colors = ButtonDefaults.buttonColors(containerColor = Constants.COLOR_BACKGROUND, contentColor = Color.Black)
-
+            shape = CircleShape,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.White,
+                contentColor = Color.Black,
+            ),
+            border = BorderStroke(10.dp, Constants.COLOR_BACKGROUND)
         ) {
-            Text(text = "Take Picture", fontWeight = FontWeight.Bold)
+            Image(painterResource(id = R.drawable.take_picture_icon),
+            contentDescription = "Take Picture Button")
         }
     }
 }

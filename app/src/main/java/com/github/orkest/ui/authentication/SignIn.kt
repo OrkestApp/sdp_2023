@@ -234,15 +234,14 @@ private fun updateUI(user: FirebaseUser?, navController: NavController,
                      isInDatabase: Boolean, context: Context, viewModel: AuthViewModel
 ) {
     if(user != null){
-        // Save the user's credentials in SharedPreferences
-        saveUserCredentials(context, viewModel.getUsername().text, Firebase.auth.currentUser?.email.toString())
-
         if(!isInDatabase){
             Log.d(TAG, "User is not null and is not in database")
             navController.navigate("signup")
         }
         else if(isInDatabase){
             val intent = Intent(context, MainActivity::class.java)
+            // Save the user's credentials in SharedPreferences
+            saveUserCredentials(context, viewModel.getUsername().text, Firebase.auth.currentUser?.email.toString())
             context.startActivity(intent)
             Log.d(TAG, "User is not null and is in database")
         }
@@ -280,7 +279,7 @@ fun loadUserCredentials(context: Context): Pair<String?, String?> {
  */
 fun isSignedInOffline(context: Context): Boolean {
     val (username, email) = loadUserCredentials(context)
-    return username != null && email != null
+    return username != null && username.isNotEmpty() && email != null && email.isNotEmpty()
 }
 
 

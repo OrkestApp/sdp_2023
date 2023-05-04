@@ -88,7 +88,7 @@ fun FeedActivity(viewModel: PostViewModel) {
                 .background(Color.LightGray)
         ) {
             items(listPosts.value) { post ->
-                DisplayPost(post = post)
+                DisplayPost(post = post, viewModel = viewModel)
 
             }
         }

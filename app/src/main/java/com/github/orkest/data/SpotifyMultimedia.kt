@@ -43,7 +43,7 @@ class SpotifyMultimedia {
                 val imagesArray = jsonObject?.getJSONArray("images")
                 val url = imagesArray?.getJSONObject(0)?.getString("url")
                 Log.d("Spotify multimedia", "Album")
-                SharingComposeActivity.spotifySongName = url.toString()
+                SharingComposeActivity.songName = url.toString()
                 Log.d("Spotify multimedia", "Album: $url")
                 future.complete(url)
 
@@ -82,7 +82,7 @@ class SpotifyMultimedia {
                 val imagesArray = jsonObject?.getJSONArray("images")
                 val url = imagesArray?.getJSONObject(0)?.getString("url")
                 Log.d("Spotify multimedia", "Artist")
-                SharingComposeActivity.spotifySongName = url.toString()
+                SharingComposeActivity.songName = url.toString()
                 Log.d("Spotify multimedia", "Artist: $url")
                 future.complete(url)
 

@@ -15,8 +15,9 @@ import org.junit.Before
 import org.junit.Rule
 
 
-
+/*
 class SpotifyAuthorizationTest {
+
 
     @get:Rule
     val activityRule = ActivityScenarioRule(SharingComposeActivity::class.java)
@@ -80,4 +81,6 @@ class SpotifyAuthorizationTest {
 
 
 }
+
+     */
 

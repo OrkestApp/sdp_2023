@@ -31,7 +31,6 @@ import com.github.orkest.data.Constants
 import com.github.orkest.data.Post
 import com.github.orkest.data.Song
 import com.github.orkest.R
-import com.github.orkest.ui.sharedMusic.sharedMusicPost
 import com.github.orkest.ui.feed.PostViewModel
 import com.github.orkest.ui.feed.CommentActivity
 import com.github.orkest.ui.feed.CreatePost
@@ -85,14 +84,8 @@ fun FeedActivity(viewModel: PostViewModel) {
                 .background(Color.LightGray)
         ) {
             items(listPosts.value) { post ->
-                Column {//TODO SUPPRESS, only here for preview purposes
-                    DisplayPost(post = post)
-                    sharedMusicPost(
-                        profile = Constants.MOCK_USER.profile,
-                        song = Constants.DUMMY_RUDE_BOY_SONG,
-                        message = "Amazing music! Check it out."
-                    )
-                }
+                DisplayPost(post = post)
+
             }
         }
     }

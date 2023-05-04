@@ -34,7 +34,7 @@ class CreatePost : ComponentActivity() {
 
                     val song = Song()
                     //Get the song name, artist, and album from the intent
-
+                    //--------------Intent handling------------------
                     if (intent.hasExtra(Constants.SONG_NAME))
                         song.Title = intent.getStringExtra(Constants.SONG_NAME) ?: "Unknown"
 

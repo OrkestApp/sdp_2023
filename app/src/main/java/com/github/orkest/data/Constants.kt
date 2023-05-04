@@ -5,7 +5,9 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.core.content.ContextCompat
 import com.github.orkest.R
+import com.github.orkest.domain.DeezerApiIntegration
 import java.time.LocalDateTime
 import java.time.ZoneId
 
@@ -15,9 +17,9 @@ import java.time.ZoneId
 class Constants {
     companion object{
 
-        val SONG_NAME: String = "SONG_NAME"
-        val SONG_ARTIST: String = "SONG_ARTIST"
-        val SONG_ALBUM: String = "SONG_ALBUM"
+        const val SONG_NAME: String = "SONG_NAME"
+        const val SONG_ARTIST: String = "SONG_ARTIST"
+        const val SONG_ALBUM: String = "SONG_ALBUM"
 
 
         const val DEFAULT_MAX_RECENT_DAYS: Long = 30
@@ -50,14 +52,12 @@ class Constants {
                 isPlayed.value = !isPlayed.value
             }
 
-            //TODO: Uncomment this when the deezer integration is merged
-
-//            if (Constants.CURRENT_USER_PROVIDER == Providers.DEEZER) {
-//                DeezerApiIntegration.launchDeezerToPlaySong(song.name, song.artist).whenComplete { intent, _ ->
-//                    context.startActivity(intent)
-//                    isPlayed.value = !isPlayed.value
-//                }
-//            }
+            if (Constants.CURRENT_USER_PROVIDER == Providers.DEEZER) {
+                val player = DeezerApiIntegration()
+                ContextCompat.startActivity(context, player.launchDeezerToPlaySong(song.Title)
+                                            .get(), null)
+                isPlayed.value = !isPlayed.value
+            }
         }
 
 

@@ -14,24 +14,30 @@ import com.github.orkest.shazam.data.AudioRecognition
 import com.github.orkest.shazam.data.AudioRecording
 import com.github.orkest.shazam.domain.ShazamConstants
 import kotlinx.coroutines.launch
+import java.util.concurrent.CompletableFuture
 
 
-    /**
+/**
      * Composable function for shazaming a song, should be launched in the background of the picture taking activity
      * Records AudioChunks continuously and asks for permission if needed
      */
      @SuppressLint("MissingPermission")
      @Composable
-    fun ShazamSong(activity: Activity) {
+    fun ShazamSong(activity: Activity): CompletableFuture<Song> {
 
         val context = LocalContext.current
         val coroutineScope = rememberCoroutineScope()
+
+        val futureSong = CompletableFuture<Song>()
         LaunchedEffect(Unit) {
             coroutineScope.launch {
                 val permission = ShazamConstants.recordPermissionGranted(context)
                 //Asks for recording permission if not given
-                if (!permission)
+                if (!permission){
                     ShazamConstants.askRecordPermission(activity)
+                futureSong.completeExceptionally(Exception("No permission to record audio"))
+                }
+
                 else {
                     Toast.makeText(context, "Shazaming ...", Toast.LENGTH_LONG).show()
 
@@ -42,11 +48,13 @@ import kotlinx.coroutines.launch
 
                     //Handles the result of the recognition
                     title.whenComplete { song, error ->
-                        handleRecognitionResult(song, error, context) }
+                        futureSong.complete(handleRecognitionResult(song, error, context))
+                    }
 
                 }
             }
         }
+        return futureSong
     }
 
     /**
@@ -56,10 +64,11 @@ import kotlinx.coroutines.launch
      * @param error the error
      * @param context the context
      */
-    private fun handleRecognitionResult(song: Song, error: Throwable?, context: Context) {
+    private fun handleRecognitionResult(song: Song, error: Throwable?, context: Context): Song {
 
         if (error != null) {
             Log.d("ShazamActivity", "Error : $error")
+            return ShazamConstants.SONG_NO_MATCH
         } else {
             Log.d("ShazamActivity", "Song : $song")
             //NO MATCH WAS MADE
@@ -75,5 +84,7 @@ import kotlinx.coroutines.launch
                     Toast.LENGTH_LONG
                 ).show()
             }
+
+            return song
         }
     }

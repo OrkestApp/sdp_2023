@@ -41,11 +41,14 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
         FireStoreDatabaseAPI().searchUserInDatabase(Constants.CURRENT_LOGGED_USER).whenComplete() { user, _ ->
             if (user != null) {
-                Constants.CURRENT_USER_PROVIDER = Providers.valueOf(user.serviceProvider)
+                Constants.CURRENT_USER_PROVIDER = Providers.valueOf(user.serviceProvider.uppercase())
+                Log.d("Provider", Constants.CURRENT_USER_PROVIDER.toString())
+
+                if (Constants.CURRENT_USER_PROVIDER == Providers.SPOTIFY)
+                    PlaySpotify.setupSpotifyAppRemote(this)
             }
         }
-        if (Constants.CURRENT_USER_PROVIDER == Providers.SPOTIFY)
-             PlaySpotify.setupSpotifyAppRemote(this)
+
     }
 
     /**

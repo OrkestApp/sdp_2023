@@ -67,27 +67,30 @@ class SharingComposeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        when (intent?.action) {
-            Intent.ACTION_SEND -> {
-                if ("text/plain" == intent.type) {
-                    Log.d("Debug", "got text")
-                    handleSendText(intent) // Handle text being sent
-                }
-            }
-        }
-        // ----------------- Intent handling -----------------
 
-
-        // ----------------- Spotify API -----------------
-        spotifyAuthorization()
-
-        // Get the song name from the intent
+        // Get the song name from the intent ----------------- Intent from Orkest -----------------
         if (intent.hasExtra(Constants.SONG_NAME)) {
             spotifySongName = intent.getStringExtra(Constants.SONG_NAME).toString()
+            if (intent.hasExtra(Constants.SONG_ARTIST)) {
+                spotifySongArtist = intent.getStringExtra(Constants.SONG_ARTIST).toString()
+            }
+        } else {
+
+
+            // ----------------- Intent handling from spotify for songID -----------------
+            when (intent?.action) {
+                Intent.ACTION_SEND -> {
+                    if ("text/plain" == intent.type) {
+                        Log.d("Debug", "got text")
+                        handleSendText(intent) // Handle text being sent
+                    }
+                }
+            }
+
+            // ----------------- Spotify API -----------------
+            spotifyAuthorization()
         }
-        if (intent.hasExtra(Constants.SONG_ARTIST)) {
-            spotifySongArtist = intent.getStringExtra(Constants.SONG_ARTIST).toString()
-        }
+
         // ----------------- Compose UI -----------------
         setContent {
             OrkestTheme {

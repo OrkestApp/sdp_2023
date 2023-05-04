@@ -17,9 +17,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat.startActivity
 import androidx.room.Room
+import com.github.orkest.data.Profile
 import com.github.orkest.domain.DeezerApiIntegration
 import com.github.orkest.data.Song
 import com.github.orkest.domain.persistence.AppDatabase
+import com.github.orkest.ui.sharedMusic.sharedMusicPost
 import com.github.orkest.ui.theme.OrkestTheme
 import com.spotify.android.appremote.api.SpotifyAppRemote
 
@@ -127,17 +129,28 @@ fun Playlist(playlistViewModel: PlaylistViewModel,
         items(songList) { song ->
             // TODO enhance UI
             Row(modifier =
-            Modifier.clickable {
-                // play song
-                val player = DeezerApiIntegration()
-                startActivity(context, player.launchDeezerToPlaySong(song.Title).get(), null)
+            Modifier
+                .clickable {
+                    // play song
+                    val player = DeezerApiIntegration()
+                    startActivity(context,
+                        player
+                            .launchDeezerToPlaySong(song.Title)
+                            .get(),
+                        null
+                    )
 
-            }.fillMaxSize()
+                }
+                .fillMaxSize()
             )
             {
-                Text(text = song.Title)
-                Text(text = song.Artist)
+                sharedMusicPost(profile = Profile(
+                    username = receiverUsername ),
+                    song = song,
+                    message = "Dummy")
             }
+
+
         }
     }
 

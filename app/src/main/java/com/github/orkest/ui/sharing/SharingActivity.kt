@@ -79,6 +79,7 @@ class SharingComposeActivity : ComponentActivity() {
                 val songNameWithArtist = stringWithoutHeader.substringBeforeLast("\uD83D\uDD25")
                 spotifySongName = songNameWithArtist // TODO RENAME VAR
 
+
                 Log.d("Deezer debug", songNameWithArtist)
             }
         }catch (e : java.lang.NullPointerException){

@@ -1,13 +1,12 @@
 package com.github.orkest.ui.feed
 
+import android.content.ContentValues
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
-import com.github.orkest.data.Constants
+import androidx.lifecycle.MutableLiveData
+import com.github.orkest.data.*
 import com.github.orkest.data.Constants.Companion.DEFAULT_MAX_RECENT_DAYS
-import com.github.orkest.data.Comment
-import com.github.orkest.data.OrkestDate
-import com.github.orkest.data.Post
-import com.github.orkest.data.Song
 import com.github.orkest.domain.FireStoreDatabaseAPI
 import java.time.LocalDateTime
 import java.util.concurrent.CompletableFuture
@@ -25,6 +24,42 @@ open class PostViewModel {
 
     private var post_username = ""
     private var post_date = ""
+
+    // Likes variables
+    open val isPostLiked = MutableLiveData<Boolean>()
+
+
+    /**==============like functions===================*/
+
+    /**
+     * Returns whether or not the current user has already liked the post
+     * */
+    open fun isPostLiked(post: Post): CompletableFuture<Boolean>{
+        return dbAPI.isUserInTheLikeList(post, current_username)
+    }
+
+    /**
+     * This function updates the nbLikes and likeList of the given post depending on whether the current user wants to like or dislike the post
+     */
+    open fun updatePostLikes(post: Post, like: Boolean): CompletableFuture<Boolean> {
+        return dbAPI.updatePostLikesInDatabase(post, like)
+    }
+
+    /**
+     * Gets the number of likes for the given post
+     */
+    open fun getNbLikes(post: Post): CompletableFuture<Int>{
+        return dbAPI.getNbLikesForPostFromDatabase(post)
+    }
+
+    /**
+     * Gets the like list for the given post
+     */
+    open fun getLikeList(post: Post): CompletableFuture<MutableList<String>>{
+        return dbAPI.getLikeList(post)
+    }
+
+    /**===============================================*/
 
     open fun setPostUsername(usr: String) {
         post_username = usr
@@ -59,12 +94,14 @@ open class PostViewModel {
         postDescription.value = description
     }
 
-   /**
+    /**
      * Updates the value of the song after the user set it on the view
      */
     fun updateSong(song: Song) {
         this.song.value = song
     }
+
+    /**==============comment functions===================*/
 
     open fun getComments(): CompletableFuture<List<Comment>> {
         return dbAPI.getPostCommentsFromDataBase(post_username, post_date)
@@ -77,6 +114,9 @@ open class PostViewModel {
     /*fun removeComment(comm: String): Boolean {
         return post.comments.removeIf { x: Comment -> x.date == id }
     }*/
+
+    /**===============================================*/
+
 
     /**
      * Adds a post to the database

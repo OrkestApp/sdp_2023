@@ -50,8 +50,7 @@ class SpotifyAuthorizationTest {
         // Define the extra text and the action for the intent
 
         // add spotify song
-        Log.d("LA CON DE TES MORTS", "Hello")
-        Log.d("LA CON DE TES MORTS", Constants.CURRENT_LOGGED_USER)
+
         val extraText = "https://open.spotify.com/track/2TpxZ7JUBn3uw46aR7qd6V?si=2b8e1b8b5f2a4f0f"
         val action = Intent.ACTION_SEND
 

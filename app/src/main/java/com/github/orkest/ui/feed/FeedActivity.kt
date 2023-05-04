@@ -85,9 +85,14 @@ fun FeedActivity(viewModel: PostViewModel) {
                 .background(Color.LightGray)
         ) {
             items(listPosts.value) { post ->
-
-                DisplayPost(post = post)
-
+                Column {//TODO SUPPRESS, only here for preview purposes
+                    DisplayPost(post = post)
+                    sharedMusicPost(
+                        profile = Constants.MOCK_USER.profile,
+                        song = Constants.DUMMY_RUDE_BOY_SONG,
+                        message = "Amazing music! Check it out."
+                    )
+                }
             }
         }
     }

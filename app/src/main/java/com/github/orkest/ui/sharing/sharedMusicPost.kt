@@ -57,7 +57,7 @@ fun sharedMusicPost(profile: Profile, song: Song, message: String) {
                     Message(message = message)
                 }
                 Spacer(modifier = Modifier.width(separator))
-                //SongCover(pictureId = song.pictureId)
+                SongCover(pictureId = -1) //TODO to change to actual song value
             }
             Spacer(modifier = Modifier.height(separator))
             Row(modifier = Modifier

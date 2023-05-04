@@ -8,5 +8,6 @@ data class Post(var username: String = "",
                 var profilePicId: Int = R.drawable.blank_profile_pic,
                 var postDescription: String = "Post Description",
                 var song: Song = Song(),
-                var likes: Int = 0,
+                var nbLikes: Int = 0,
+                var likeList: MutableList<String> = ArrayList(),
                 var nbComments : Int = 0)

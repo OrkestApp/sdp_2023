@@ -409,7 +409,7 @@ open class FireStoreDatabaseAPI {
                 }
             }.addOnFailureListener { e ->
                 Log.w(TAG, "Error getting post data", e)
-                future.complete(0) }
+                future.completeExceptionally(e) }
         return future
     }
 
@@ -430,7 +430,7 @@ open class FireStoreDatabaseAPI {
                 }
             }.addOnFailureListener { e ->
                 Log.w(TAG, "Error getting post data", e)
-                future.complete(false) }
+                future.completeExceptionally(e) }
         return future
     }
 
@@ -466,16 +466,36 @@ open class FireStoreDatabaseAPI {
                     )
                         .addOnSuccessListener { future.complete(true) }
                         .addOnFailureListener { e ->
-                            Log.w(ContentValues.TAG, "Error getting post likes data", e)
-                            future.complete(false) }
+                            Log.w(TAG, "Error getting post likes data", e)
+                            future.completeExceptionally(e) }
                 }
             }
 
         } .addOnFailureListener { e ->
             Log.w(TAG, "Error getting user data", e)
-            future.complete(false)
+                future.completeExceptionally(e)
         }
 
+        return future
+    }
+
+    /**
+     * This function returns the like list for a post
+     */
+    fun getLikeList(post: Post): CompletableFuture<MutableList<String>>{
+        val future = CompletableFuture<MutableList<String>>()
+        getPostCollectionRef(post.username).document(post.date.toString()).get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    val post = document.toObject(Post::class.java)
+                    if (post != null) {
+                        val list: MutableList<String> = post.likeList
+                        future.complete(list)
+                    }
+                }
+            }.addOnFailureListener { e ->
+                Log.w(TAG, "Error getting post data", e)
+                future.completeExceptionally(e) }
         return future
     }
 }

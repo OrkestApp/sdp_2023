@@ -52,6 +52,13 @@ open class PostViewModel {
         return dbAPI.getNbLikesForPostFromDatabase(post)
     }
 
+    /**
+     * Gets the like list for the given post
+     */
+    open fun getLikeList(post: Post): CompletableFuture<MutableList<String>>{
+        return dbAPI.getLikeList(post)
+    }
+
     /**===============================================*/
 
     open fun setPostUsername(usr: String) {

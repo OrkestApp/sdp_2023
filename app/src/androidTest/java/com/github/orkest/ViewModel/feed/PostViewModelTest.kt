@@ -19,6 +19,7 @@ class PostViewModelTest {
     companion object {
 
         private lateinit var postViewModel : PostViewModel
+
         /*
         @BeforeClass
         @JvmStatic
@@ -162,48 +163,57 @@ class PostViewModelTest {
     @Test
     fun isPostLikedReturnsCorrectValueWhenLiked(){
         //Create post and update its values
-        val post = Post(username = "DummyUser", date = date, nbLikes = 1, likeList = mutableListOf(Constants.CURRENT_LOGGED_USER))
+        val post = Post(username = "Joe", date = date, nbLikes = 1, likeList = mutableListOf(Constants.CURRENT_LOGGED_USER))
         FireStoreDatabaseAPI().addPostInDataBase(post).get()
 
-        postViewModel.isPostLiked(post).thenApply { assert(it == true) }
+        val result = postViewModel.isPostLiked(post).get()
+        assert(result == true)
     }
 
     @Test
     fun isPostLikedReturnsCorrectValueWhenUnLiked(){
-        val post = Post(username = "DummyUser", date = date, nbLikes = 1, likeList = mutableListOf("JohnDoe"))
+        val post = Post(username = "Joe", date = date, nbLikes = 1, likeList = mutableListOf("JohnDoe"))
         FireStoreDatabaseAPI().addPostInDataBase(post).get()
 
         //The current logged in user is not on the like list of this post so it should return false
-        postViewModel.isPostLiked(post).thenApply { assert(it == false) }
+        val result = postViewModel.isPostLiked(post).get()
+        assert(result == false)
     }
 
     @Test
     fun updatePostLikesWorksForLikeAction(){
-        val post = Post(username = "DummyUser",date = date,  nbLikes = 0, likeList = mutableListOf())
+        val post = Post(username = "Joe",date = date,  nbLikes = 0, likeList = mutableListOf())
         FireStoreDatabaseAPI().addPostInDataBase(post).get()
 
-        postViewModel.updatePostLikes(post = post, like = true).thenApply {
-            assert(post.nbLikes == 1)
-            assert(post.likeList.contains(Constants.CURRENT_LOGGED_USER))
-        }
+        postViewModel.updatePostLikes(post = post, like = true).get()
+
+        val nbLikes = postViewModel.getNbLikes(post).get()
+        assert(nbLikes == 1)
+
+        val isPostLiked = postViewModel.isPostLiked(post).get()
+        assert(isPostLiked == true)
     }
 
     @Test
     fun updatePostLikesWorksForDislikeAction(){
-        val post = Post(username = "DummyUser", date = date, nbLikes = 2, likeList = mutableListOf(Constants.CURRENT_LOGGED_USER, "OtherUser"))
+        val post = Post(username = "Joe", date = date, nbLikes = 2, likeList = mutableListOf(Constants.CURRENT_LOGGED_USER, "OtherUser"))
         FireStoreDatabaseAPI().addPostInDataBase(post).get()
 
-        postViewModel.updatePostLikes(post = post, like = false).thenApply {
-            assert(post.nbLikes == 1)
-            assert(post.likeList.size == 1)
-            assert(post.likeList.contains("OtherUser"))
-        }
+        postViewModel.updatePostLikes(post = post, like = false).get()
+
+        val nbLikes = postViewModel.getNbLikes(post).get()
+        assert(nbLikes == 1)
+
+        val likeList = postViewModel.getLikeList(post).get()
+        assert(likeList.size == 1)
+        assert(likeList.contains("OtherUser"))
     }
 
     @Test
     fun getNbLikesReturnsCorrectValue(){
-        val post = Post(username = "DummyUser", date = date, nbLikes = 10)
+        val post = Post(username = "Joe", date = date, nbLikes = 10)
         FireStoreDatabaseAPI().addPostInDataBase(post).get()
-        postViewModel.getNbLikes(post).thenApply { assert(it == 10) }
+        val result = postViewModel.getNbLikes(post).get()
+        assert(result == 10)
     }
 }

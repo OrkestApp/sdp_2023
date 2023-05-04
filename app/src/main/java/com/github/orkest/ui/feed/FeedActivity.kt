@@ -34,6 +34,7 @@ import com.github.orkest.data.Constants
 import com.github.orkest.data.Post
 import com.github.orkest.data.Song
 import com.github.orkest.R
+import com.github.orkest.ui.Camera.CameraView
 import com.github.orkest.ui.feed.PostViewModel
 import com.github.orkest.ui.feed.CommentActivity
 import com.github.orkest.ui.feed.CreatePost
@@ -103,7 +104,7 @@ fun FeedActivity(viewModel: PostViewModel) {
 
     val context = LocalContext.current
 
-    //Add a button to create a new post at the right lower corner
+    //Add a button to create a new post at the top end corner
     Box(modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.TopEnd) {
         FloatingActionButton(
@@ -119,6 +120,8 @@ fun FeedActivity(viewModel: PostViewModel) {
             )
         }
     }
+
+
 }
 
 /**

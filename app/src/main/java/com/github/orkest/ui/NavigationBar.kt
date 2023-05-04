@@ -101,7 +101,8 @@ class NavigationBar {
                         ShazamSong(activity)
                     }
                     composable("PlaylistPage") {
-                        UsersList(PlaylistViewModel())
+
+                        UsersList()
                     }
                     composable("ProfilePage") {
                             ProfileActivityScreen(ProfileActivity(), viewModel = ProfileViewModel(

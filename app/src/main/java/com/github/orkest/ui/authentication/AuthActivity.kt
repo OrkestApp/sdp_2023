@@ -1,6 +1,8 @@
 package com.github.orkest.ui.authentication
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +15,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.github.orkest.ui.theme.OrkestTheme
 import androidx.navigation.compose.composable
+import com.github.orkest.data.Constants
+import com.github.orkest.ui.MainActivity
 
 
 /**
@@ -35,8 +39,17 @@ class AuthActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val navController = rememberNavController()
-                    AuthMain(viewModel, navController)
+
+                    // Check if user is already cached in
+                    if (isSignedInOffline(this)) {
+                        val (username, _) = loadUserCredentials(this)
+                        val intent = Intent(this, MainActivity::class.java)
+                        Constants.CURRENT_LOGGED_USER = username.toString()
+                        this.startActivity(intent)
+                    }else{
+                        val navController = rememberNavController()
+                        AuthMain(viewModel, navController)
+                    }
                 }
             }
         }

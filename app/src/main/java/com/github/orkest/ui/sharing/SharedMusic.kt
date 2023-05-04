@@ -15,10 +15,10 @@ import com.github.orkest.ui.search.SearchUserView
  * This function is used to display the list of users
  * that shared a song with the current user.
  *
- * @param viewModel the view model
+
  */
 @Composable
-fun UsersList(viewModel: PlaylistViewModel) {
+fun UsersList() {
     var messages by remember { mutableStateOf(mutableListOf("")) }
     FireStoreDatabaseAPI().fetchFollowList(Constants.CURRENT_LOGGED_USER,true).thenAccept {
         messages = it

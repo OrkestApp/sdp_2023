@@ -1,8 +1,12 @@
 package com.github.orkest.domain
 
+import android.content.ContentValues
 import android.content.ContentValues.TAG
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.util.Log
-import com.github.orkest.data.Constants
+import com.github.orkest.data.*
 import com.github.orkest.data.Constants.Companion.DEFAULT_MAX_RECENT_DAYS
 import com.github.orkest.data.Comment
 import com.github.orkest.data.Post
@@ -19,12 +23,18 @@ import com.google.firebase.ktx.Firebase
 import java.time.LocalDateTime
 import java.util.concurrent.CompletableFuture
 
-class FireStoreDatabaseAPI {
+open class FireStoreDatabaseAPI {
 
     companion object{
         val db = Firebase.firestore
     }
 
+    fun isOnline(context: Context): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val network = connectivityManager.activeNetwork ?: return false
+        val networkCapabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+        return networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+    }
 
     //============================USER OPERATIONS==========================================
 
@@ -253,6 +263,7 @@ class FireStoreDatabaseAPI {
         return future
     }
 
+
     /**
      * @param username the username of the user we want to get the posts from
      * @return a completable future of a list of post that match the username
@@ -295,12 +306,13 @@ class FireStoreDatabaseAPI {
         return future
     }
 
+
     private fun recentPostsQuery(month: Int, year: Int, day: Int): CompletableFuture<List<Post>>{
         val future = CompletableFuture<List<Post>>()
         val posts = db.collectionGroup("posts")
         posts.whereEqualTo(FieldPath.of("date", "year"), year)
             .whereEqualTo(FieldPath.of("date", "month"), month)
-            .whereGreaterThan(FieldPath.of("date", "dayOfMonth"), day)
+            .whereGreaterThanOrEqualTo(FieldPath.of("date", "dayOfMonth"), day)
             .get().addOnSuccessListener {
                 // Get all posts documents as a list of posts objects
                 val list: MutableList<Post> = it.toObjects(Post::class.java)
@@ -402,6 +414,113 @@ class FireStoreDatabaseAPI {
                 future.completeExceptionally(it)
             }
 
+        return future
+    }
+
+    //===========================LIKE POST OPERATIONS======================
+
+    /**
+     * Get the number of likes of a post from the database
+     * */
+    fun getNbLikesForPostFromDatabase(post: Post): CompletableFuture<Int>{
+        val future = CompletableFuture<Int>()
+        getPostCollectionRef(post.username).document(post.date.toString()).get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    val post = document.toObject(Post::class.java)
+                    if (post != null) {
+                        future.complete(post.nbLikes)
+                    }
+                }
+            }.addOnFailureListener { e ->
+                Log.w(TAG, "Error getting post data", e)
+                future.completeExceptionally(e) }
+        return future
+    }
+
+    /**
+     * Returns whether or not the given user has already liked the post
+     * */
+    fun isUserInTheLikeList(post: Post, username: String): CompletableFuture<Boolean> {
+        val future = CompletableFuture<Boolean>()
+        getPostCollectionRef(post.username).document(post.date.toString()).get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    val post = document.toObject(Post::class.java)
+                    if (post != null) {
+                        val list: MutableList<String> = post.likeList
+                        if (list.contains(username)) { future.complete(true) }
+                        else { future.complete(false) }
+                    }
+                }
+            }.addOnFailureListener { e ->
+                Log.w(TAG, "Error getting post data", e)
+                future.completeExceptionally(e) }
+        return future
+    }
+
+    /**
+     * This function updates the nbLikes and likeList of the given post depending on whether the user wants to like or dislike the post
+     * The user is always CURRENT_LOGGED_USER because he/she is the only one who can react to a post when logged in
+     * @param post: the post to which we want to like or dislike the content
+     * @param like: boolean that indicates if the user wants to like or dislike the post
+     */
+    fun updatePostLikesInDatabase(post: Post, like: Boolean): CompletableFuture<Boolean> {
+        val future = CompletableFuture<Boolean>()
+
+        getPostCollectionRef(post.username).document(post.date.toString()).get()
+            .addOnSuccessListener { document ->
+            if (document != null && document.exists()) {
+                val post = document.toObject(Post::class.java)
+                if (post != null) {
+
+                    if (like) {
+                        post.nbLikes += 1
+                        post.likeList.add(Constants.CURRENT_LOGGED_USER)
+                    } else {
+                        if (post.nbLikes > 0) post.nbLikes -= 1
+                        post.likeList.remove(Constants.CURRENT_LOGGED_USER)
+                    }
+
+                    //Update database
+                    getPostCollectionRef(post.username).document(post.date.toString()).update(
+                        "nbLikes",
+                        post.nbLikes,
+                        "likeList",
+                        post.likeList
+                    )
+                        .addOnSuccessListener { future.complete(true) }
+                        .addOnFailureListener { e ->
+                            Log.w(TAG, "Error getting post likes data", e)
+                            future.completeExceptionally(e) }
+                }
+            }
+
+        } .addOnFailureListener { e ->
+            Log.w(TAG, "Error getting user data", e)
+                future.completeExceptionally(e)
+        }
+
+        return future
+    }
+
+    /**
+     * This function returns the like list for a post
+     */
+    fun getLikeList(post: Post): CompletableFuture<MutableList<String>>{
+        val future = CompletableFuture<MutableList<String>>()
+        getPostCollectionRef(post.username).document(post.date.toString()).get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    val post = document.toObject(Post::class.java)
+                    if (post != null) {
+                        val list: MutableList<String> = post.likeList
+                        future.complete(list)
+                    }
+                }
+            }.addOnFailureListener { e ->
+                Log.w(TAG, "Error getting post data", e)
+                future.completeExceptionally(e) }
         return future
     }
 }

@@ -17,9 +17,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat.startActivity
 import com.github.orkest.data.Profile
+import com.github.orkest.ui.sharedMusic.sharedMusicPost
+import androidx.room.Room
 import com.github.orkest.domain.DeezerApiIntegration
 import com.github.orkest.data.Song
-import com.github.orkest.ui.sharedMusic.sharedMusicPost
+import com.github.orkest.domain.persistence.AppDatabase
 import com.github.orkest.ui.theme.OrkestTheme
 import com.spotify.android.appremote.api.SpotifyAppRemote
 
@@ -28,9 +30,9 @@ import com.spotify.android.appremote.api.SpotifyAppRemote
  */
 class PlaylistActivity() : ComponentActivity() {
 
-//
 
-    private val playlistViewModel = PlaylistViewModel()
+
+    private lateinit var playlistViewModel : PlaylistViewModel
     private var spotifySongId = ""
     private var mSpotifyAppRemote: SpotifyAppRemote? = null
 
@@ -40,6 +42,13 @@ class PlaylistActivity() : ComponentActivity() {
         // TODO include spotify in addition to Deezer
 
         //--------Update AppDatabase---------
+
+        val appDao = Room.databaseBuilder(
+            this,
+            AppDatabase::class.java, "database-orkest"
+        ).build().songsDao()
+
+        playlistViewModel = PlaylistViewModel(appDao)
 
         // check if extras are not null
         Log.d("PlaylistActivity", "songId: ${intent.getStringExtra("songId")}")
@@ -55,13 +64,15 @@ class PlaylistActivity() : ComponentActivity() {
             playlistViewModel.storeSong(
                 song,
                 intent.getStringExtra("senderUsername") ?: "sender1",
-                intent.getStringExtra("receiverUsername") ?: "sender1"
+                intent.getStringExtra("receiverUsername") ?: "sender1",
+                this
             )
             /*
             playlistViewModel.storeSong(
                 song,
                 intent.getStringExtra("receiverUsername") ?: "xx",
-                intent.getStringExtra("senderUsername") ?: "xx"
+                intent.getStringExtra("senderUsername") ?: "xx",
+                this
             )
 
              */
@@ -109,7 +120,7 @@ fun Playlist(playlistViewModel: PlaylistViewModel,
     val context = LocalContext.current
 
     var songList by remember { mutableStateOf(listOf<Song>()) }
-    playlistViewModel.fetchSongs(senderUsername, receiverUsername)
+    playlistViewModel.fetchSongs(senderUsername, receiverUsername, context)
         .whenComplete { songs, _ ->
             songs?.let {
                 songList = it

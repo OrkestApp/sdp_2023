@@ -66,18 +66,6 @@ fun SignIn (navController: NavController, viewModel: AuthViewModel) {
     val errorMessage = remember { mutableStateOf("") }
     val waiting = remember { mutableStateOf(false) }
 
-
-    // Check if user is already cached in
-    if (isSignedInOffline(context)) {
-        val (username, _) = loadUserCredentials(context)
-        val intent = Intent(context, MainActivity::class.java)
-        Constants.CURRENT_LOGGED_USER = username.toString()
-        context.startActivity(intent)
-        Log.d(TAG, "Logged in offline")
-    }
-
-
-
     val activityResultLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -233,16 +221,15 @@ fun signIn(activityResultLauncher: ActivityResultLauncher<Intent>,
 private fun updateUI(user: FirebaseUser?, navController: NavController,
                      isInDatabase: Boolean, context: Context, viewModel: AuthViewModel
 ) {
-    if(user != null){
-        // Save the user's credentials in SharedPreferences
-        saveUserCredentials(context, viewModel.getUsername().text, Firebase.auth.currentUser?.email.toString())
-
+    if(user!=null){
         if(!isInDatabase){
             Log.d(TAG, "User is not null and is not in database")
             navController.navigate("signup")
         }
-        else if(isInDatabase){
+        else{
             val intent = Intent(context, MainActivity::class.java)
+            // Save the user's credentials in SharedPreferences
+            saveUserCredentials(context, viewModel.getUsername().text, Firebase.auth.currentUser?.email.toString())
             context.startActivity(intent)
             Log.d(TAG, "User is not null and is in database")
         }
@@ -280,7 +267,7 @@ fun loadUserCredentials(context: Context): Pair<String?, String?> {
  */
 fun isSignedInOffline(context: Context): Boolean {
     val (username, email) = loadUserCredentials(context)
-    return username != null && email != null
+    return username != null && username.isNotEmpty() && email != null && email.isNotEmpty()
 }
 
 

@@ -1,6 +1,8 @@
 package com.github.orkest.ViewModel
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.lifecycle.Observer
 import com.github.orkest.domain.FireStoreDatabaseAPI
 import com.github.orkest.data.Profile
 import com.github.orkest.data.User
@@ -8,6 +10,8 @@ import org.junit.Before
 import org.junit.Rule
 import com.github.orkest.R
 import com.github.orkest.ui.FollowListViewModel
+import junit.framework.TestCase.*
+import org.junit.Test
 
 class FollowListViewModelTest {
 
@@ -34,32 +38,56 @@ class FollowListViewModelTest {
     )
 
     @get:Rule
-    var composeTestRule =  createComposeRule()
+    var composeTestRule = createComposeRule()
+
+    @get:Rule
+    val instantExecutorRule = InstantTaskExecutorRule()
 
     @Before
-    fun setUp(){
-
+    fun setUp() {
         dbAPI.addUserInDatabase(user1).get()
         dbAPI.addUserInDatabase(user2).get()
         dbAPI.addUserInDatabase(user3).get()
     }
 
-    /**@Test
-    fun followersUsernameListIsFetchedCorrectly(){
-        viewModel = FollowListViewModel(username = user1.username, isFollowersList = true)
-        dbAPI.fetchFollowList(user1.username, true).thenApply{
-            assertEquals(user1.followers, it)
-        }
-
-
-    }**/
-
-    /**
     @Test
-    fun followersUserListIsFetchedCorrectly(){
-        viewModel = FollowListViewModel(username = user1.username, isFollowersList = true)
-        assertEquals(user1.followers, viewModel.retrieveFollowList()) // on compare des users !!!
-    }**/
+    fun testRetrieveFollowingsList() {
+        viewModel = FollowListViewModel(user1.username, false)
 
+        val followListLiveData = viewModel.retrieveFollowList()
+        val followListObserver = Observer<MutableList<User>> { followList ->
+            assertNotNull(followList)
+            assertEquals(2, followList.size)
+            assertTrue(followList[0].username == "user2")
+            assertTrue(followList[1].username == "user3")
+        }
+        //Observes the list to finish fetching all the users from database and then apply the tests
+        followListLiveData.observeForever(followListObserver)
 
+        // Wait for LiveData to be updated
+        Thread.sleep(1000)
+
+        // Remove the observer
+        followListLiveData.removeObserver(followListObserver)
+    }
+
+    @Test
+    fun testRetrieveFollowersList() {
+        val viewModel = FollowListViewModel(user1.username, true)
+
+        val followListLiveData = viewModel.retrieveFollowList()
+        val followListObserver = Observer<MutableList<User>> { followList ->
+            assertNotNull(followList)
+            assertEquals(1, followList.size)
+            assertTrue(followList[0].username == "user3")
+        }
+        //Observes the list to finish fetching all the users from database and then apply the tests
+        followListLiveData.observeForever(followListObserver)
+
+        // Wait for LiveData to be updated
+        Thread.sleep(1000)
+
+        // Remove the observer
+        followListLiveData.removeObserver(followListObserver)
+    }
 }

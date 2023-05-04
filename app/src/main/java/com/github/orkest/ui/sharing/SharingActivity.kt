@@ -39,7 +39,7 @@ import java.util.concurrent.CompletableFuture
 
 class SharingComposeActivity : ComponentActivity() {
 
-    private var accessToken : String = String()        // access token for Spotify API
+    var accessToken : String = String()        // access token for Spotify API
     private var authorizationCode : String = String()  // authorization code for token request
     private var spotifySongID : String = String()      // spotify song ID
 
@@ -78,7 +78,9 @@ class SharingComposeActivity : ComponentActivity() {
                 val stringDeezerHeader = "I've found a song for you... "
                 val stringWithoutHeader = deezerStringText.drop(stringDeezerHeader.length)
                 val songNameWithArtist = stringWithoutHeader.substringBeforeLast("\uD83D\uDD25")
-                spotifySongName = songNameWithArtist // TODO RENAME VAR
+                val songName = songNameWithArtist.substringBefore(" by ")
+                val artistName = songNameWithArtist.substringAfterLast(" by ")
+                spotifySongName = songName + " " + artistName // TODO RENAME VAR
 
 
                 Log.d("Deezer debug", songNameWithArtist)

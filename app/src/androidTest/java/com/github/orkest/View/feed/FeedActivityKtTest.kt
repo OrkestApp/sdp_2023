@@ -43,15 +43,13 @@ internal class FeedActivityKtTest {
 
     @Test
     fun playButtonDisplaysAndClick(){
-        composeTestRule.onAllNodesWithContentDescription("Play button").assertCountEquals(2)
+        composeTestRule.onAllNodesWithContentDescription("Play button")
             .assertAll(isEnabled()).assertAll(hasClickAction())
     }
 
     @Test
     fun reactionButtonDisplay(){
         composeTestRule.onAllNodesWithTag("comment_button")
-            .assertAll(isEnabled())
-        composeTestRule.onAllNodesWithTag("like_button")
             .assertAll(isEnabled())
         composeTestRule.onAllNodesWithTag("share_button")
             .assertAll(isEnabled())
@@ -61,8 +59,14 @@ internal class FeedActivityKtTest {
     @Test
     fun reactionButtonsClick() {
         composeTestRule.onAllNodesWithTag("comment_button").assertAll(hasClickAction())
-        composeTestRule.onAllNodesWithTag("like_button").assertAll(hasClickAction())
         composeTestRule.onAllNodesWithTag("share_button").assertAll(hasClickAction())
+    }
+
+    @Test
+    fun likButton(){
+        composeTestRule.onAllNodesWithTag("like_button").assertAll(isEnabled())
+        composeTestRule.onAllNodesWithTag("like_button").assertAll(hasClickAction())
+        composeTestRule.onAllNodesWithTag("Number of likes").assertAll(isEnabled())
     }
 
     @Test

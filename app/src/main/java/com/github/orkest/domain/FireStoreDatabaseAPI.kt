@@ -81,6 +81,12 @@ open class FireStoreDatabaseAPI {
      */
     fun fetchFollowList(username: String, isFollowersList: Boolean): CompletableFuture<MutableList<String>>{
         val future = CompletableFuture<MutableList<String>>()
+        if(username ==""){
+            future.complete(mutableListOf(""))
+            return future
+
+        }
+
 
         getUserDocumentRef(username).get().addOnSuccessListener { document ->
             if(document != null && document.exists()){

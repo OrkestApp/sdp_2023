@@ -15,7 +15,7 @@ import org.junit.Before
 import org.junit.Rule
 
 
-/*
+
 class SpotifyAuthorizationTest {
 
 
@@ -44,7 +44,7 @@ class SpotifyAuthorizationTest {
         assert(codeVerifier.length <= 128)
     }
 
-    /*
+
     @Test
     fun testShareSong(){
         // Define the extra text and the action for the intent
@@ -75,11 +75,11 @@ class SpotifyAuthorizationTest {
 
     }
 
-     */
+
 
 
 
 }
 
-     */
+
 

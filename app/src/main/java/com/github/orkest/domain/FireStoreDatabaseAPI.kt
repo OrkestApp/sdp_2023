@@ -8,11 +8,17 @@ import android.net.NetworkCapabilities
 import android.util.Log
 import com.github.orkest.data.*
 import com.github.orkest.data.Constants.Companion.DEFAULT_MAX_RECENT_DAYS
+import com.github.orkest.data.Comment
+import com.github.orkest.data.Post
+import com.github.orkest.data.Song
+import com.github.orkest.data.User
+import com.github.orkest.data.DeezerInformations
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import java.time.LocalDateTime
 import java.util.concurrent.CompletableFuture
@@ -75,6 +81,12 @@ open class FireStoreDatabaseAPI {
      */
     fun fetchFollowList(username: String, isFollowersList: Boolean): CompletableFuture<MutableList<String>>{
         val future = CompletableFuture<MutableList<String>>()
+        if(username ==""){
+            future.complete(mutableListOf(""))
+            return future
+
+        }
+
 
         getUserDocumentRef(username).get().addOnSuccessListener { document ->
             if(document != null && document.exists()){
@@ -173,10 +185,10 @@ open class FireStoreDatabaseAPI {
 
     //===========================SONG POST OPERATIONS======================
 
-    fun storeTokenInDatabase(username:String,token:String?): CompletableFuture<Boolean>{
+    fun storeDeezerInformationsInDatabase(username:String,token:String?,userId:String?="",playlistId:String=""): CompletableFuture<Boolean>{
         val completableFuture = CompletableFuture<Boolean>()
         val path = "deezerToken"
-        db.collection(path).document(username).set(hashMapOf ("token" to token)).addOnSuccessListener {
+        db.collection(path).document(username).set(DeezerInformations(token,userId,playlistId)).addOnSuccessListener {
             completableFuture.complete(true)
         }.addOnFailureListener{
             completableFuture.complete(false)
@@ -184,7 +196,26 @@ open class FireStoreDatabaseAPI {
         return completableFuture
     }
 
-    fun getPostCollectionRef(username: String): CollectionReference{
+    fun getUserDeezerInformations(username: String):CompletableFuture<DeezerInformations>{
+        val completableFuture = CompletableFuture<DeezerInformations>()
+        val path = "deezerToken"
+        db.collection(path).document(username).get().addOnSuccessListener {
+            completableFuture.complete(it.toObject(DeezerInformations::class.java))
+        }.addOnFailureListener{
+            completableFuture.complete(DeezerInformations("","",""))
+        }
+        return completableFuture
+    }
+    
+
+
+
+
+
+
+
+
+    private fun getPostCollectionRef(username: String): CollectionReference{
         val firstLetter = username[0].uppercase()
         //TODO: Discuss other option: "posts/user-$firstLetter/$username"
         //Chose this for now because easier for group queries

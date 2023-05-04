@@ -21,8 +21,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.os.bundleOf
 import com.github.orkest.data.Constants
+import com.github.orkest.data.Providers
 import com.github.orkest.domain.Authorization.Companion.getLoginActivityTokenIntent
 import com.github.orkest.domain.Authorization.Companion.requestUserAuthorization
+import com.github.orkest.domain.FireStoreDatabaseAPI
 import com.github.orkest.ui.search.SearchUserView
 import com.github.orkest.ui.theme.OrkestTheme
 import com.github.orkest.ui.search.SearchViewModel
@@ -66,6 +68,26 @@ class SharingComposeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
+        //TODO ERASE DEBUG
+        //Log.d("DEEZER" , intent.getStringExtra(Intent.EXTRA_TEXT)!!)
+
+        try {
+            val deezerStringText = intent.getStringExtra(Intent.EXTRA_TEXT)!!
+            if(deezerStringText.contains("Deezer") && Constants.CURRENT_USER_PROVIDER ==Providers.DEEZER){
+                Log.d("DEEZER SONG",deezerStringText)
+                val stringDeezerHeader = "I've found a song for you... "
+                val stringWithoutHeader = deezerStringText.drop(stringDeezerHeader.length)
+                val songNameWithArtist = stringWithoutHeader.substringBeforeLast("\uD83D\uDD25")
+                val songName = songNameWithArtist.substringBefore(" by ")
+                val artistName = songNameWithArtist.substringAfterLast(" by ")
+                spotifySongName = songName + " " + artistName // TODO RENAME VAR
+
+
+                Log.d("Deezer debug", songNameWithArtist)
+            }
+        }catch (e : java.lang.NullPointerException){
+
+        }
         when (intent?.action) {
             Intent.ACTION_SEND -> {
                 if ("text/plain" == intent.type) {
@@ -75,7 +97,13 @@ class SharingComposeActivity : ComponentActivity() {
             }
         }
         // ----------------- Spotify API -----------------
-        spotifyAuthorization()
+        if(Constants.CURRENT_USER_PROVIDER==Providers.SPOTIFY){
+            Log.d("TEST DEEZER","ENTER WRONG LOOP")
+            spotifyAuthorization()
+        }
+
+
+
         // ----------------- Compose UI -----------------
         setContent {
             OrkestTheme {
@@ -216,9 +244,15 @@ fun UserSelection(){
     val viewModel = SearchViewModel()
     var text by remember { mutableStateOf("search User") }
     var list by remember { mutableStateOf(mutableListOf("")) }
-
+    /*
     viewModel.searchUserInDatabase(text).thenAccept {
         list = it.map { user -> user.username }.toMutableList()
+    }
+
+     */
+    //Show all the followers of the CURRENT_LOGGED_USER
+    FireStoreDatabaseAPI().fetchFollowList(Constants.CURRENT_LOGGED_USER,false).thenAccept {
+        list = it
     }
     Column(modifier = Modifier.fillMaxSize())
     {

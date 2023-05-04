@@ -38,10 +38,23 @@ class MainActivity : AppCompatActivity() {
         Notification(this,null).promptUserToEnableNotifications()
     }
     override fun onStart() {
+
         super.onStart()
-        FireStoreDatabaseAPI().searchUserInDatabase(Constants.CURRENT_LOGGED_USER).whenComplete() { user, _ ->
+        Log.d("USER",Constants.CURRENT_LOGGED_USER)
+        FireStoreDatabaseAPI().searchUserInDatabase(Constants.CURRENT_LOGGED_USER).thenAccept { user ->
+            Log.d("USER PROV",user.serviceProvider)
             if (user != null) {
-                Constants.CURRENT_USER_PROVIDER = Providers.valueOf(user.serviceProvider)
+                Log.d("USER PROV INSIDE",user.serviceProvider)
+                if(user.serviceProvider== "Deezer"){
+                    Constants.CURRENT_USER_PROVIDER = Providers.DEEZER
+                }
+                else if(user.serviceProvider == "Spotify"){
+                    Constants.CURRENT_USER_PROVIDER = Providers.SPOTIFY
+                }
+                else {
+                    Constants.CURRENT_USER_PROVIDER = Providers.APPLE_MUSIC
+                }
+
             }
         }
         if (Constants.CURRENT_USER_PROVIDER == Providers.SPOTIFY)

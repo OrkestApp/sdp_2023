@@ -28,7 +28,6 @@ import com.github.orkest.domain.FireStoreDatabaseAPI
 import com.github.orkest.ui.search.SearchUserView
 import com.github.orkest.ui.theme.OrkestTheme
 import com.github.orkest.ui.search.SearchViewModel
-import com.github.orkest.ui.sharing.PlaylistActivity
 import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationResponse
 import okhttp3.*
@@ -45,7 +44,8 @@ class SharingComposeActivity : ComponentActivity() {
 
     // spotify song name
     companion object {
-        var spotifySongName : String = String()
+        var songName : String = "Unknown song"
+        var songArtist : String = "Unknown artist"
     }
 
 
@@ -68,38 +68,52 @@ class SharingComposeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        //TODO ERASE DEBUG
-        //Log.d("DEEZER" , intent.getStringExtra(Intent.EXTRA_TEXT)!!)
 
-        try {
-            val deezerStringText = intent.getStringExtra(Intent.EXTRA_TEXT)!!
-            if(deezerStringText.contains("Deezer") && Constants.CURRENT_USER_PROVIDER ==Providers.DEEZER){
-                Log.d("DEEZER SONG",deezerStringText)
-                val stringDeezerHeader = "I've found a song for you... "
-                val stringWithoutHeader = deezerStringText.drop(stringDeezerHeader.length)
-                val songNameWithArtist = stringWithoutHeader.substringBeforeLast("\uD83D\uDD25")
-                val songName = songNameWithArtist.substringBefore(" by ")
-                val artistName = songNameWithArtist.substringAfterLast(" by ")
-                spotifySongName = songName + " " + artistName // TODO RENAME VAR
-
-
-                Log.d("Deezer debug", songNameWithArtist)
+        // Get the song name from the intent ----------------- Intent from Orkest -----------------
+        if (intent.hasExtra(Constants.SONG_NAME)) {
+            songName = intent.getStringExtra(Constants.SONG_NAME).toString()
+            if (intent.hasExtra(Constants.SONG_ARTIST)) {
+                songArtist = intent.getStringExtra(Constants.SONG_ARTIST).toString()
             }
-        }catch (e : java.lang.NullPointerException){
+        }  else {
 
-        }
-        when (intent?.action) {
-            Intent.ACTION_SEND -> {
-                if ("text/plain" == intent.type) {
-                    Log.d("Debug", "got text")
-                    handleSendText(intent) // Handle text being sent
+
+            // ----------------- Intent handling from spotify or Deezer for songID -----------------
+
+            //Log.d("DEEZER" , intent.getStringExtra(Intent.EXTRA_TEXT)!!)
+
+            try {
+                val deezerStringText = intent.getStringExtra(Intent.EXTRA_TEXT)!!
+                if (deezerStringText.contains("Deezer") && Constants.CURRENT_USER_PROVIDER == Providers.DEEZER) {
+                    Log.d("DEEZER SONG", deezerStringText)
+                    val stringDeezerHeader = "I've found a song for you... "
+                    val stringWithoutHeader = deezerStringText.drop(stringDeezerHeader.length)
+                    val songNameWithArtist = stringWithoutHeader.substringBeforeLast("\uD83D\uDD25")
+                    songName = songNameWithArtist.substringBefore(" by ")
+                    songArtist = songNameWithArtist.substringAfterLast(" by ")
+
+
+                    Log.d("Deezer debug", songNameWithArtist)
+                }
+            } catch (e: java.lang.NullPointerException) {
+
+            }
+
+            when (intent?.action) {
+                Intent.ACTION_SEND -> {
+                    if ("text/plain" == intent.type) {
+                        Log.d("Debug", "got text")
+                        handleSendText(intent) // Handle text being sent
+                    }
                 }
             }
-        }
-        // ----------------- Spotify API -----------------
-        if(Constants.CURRENT_USER_PROVIDER==Providers.SPOTIFY){
-            Log.d("TEST DEEZER","ENTER WRONG LOOP")
-            spotifyAuthorization()
+
+            // ----------------- Spotify API -----------------
+
+            if (Constants.CURRENT_USER_PROVIDER == Providers.SPOTIFY) {
+                Log.d("TEST DEEZER", "ENTER WRONG LOOP")
+                spotifyAuthorization()
+            }
         }
 
 
@@ -229,7 +243,7 @@ class SharingComposeActivity : ComponentActivity() {
                 val trackName = jsonObject?.getString("name")
 
                 Log.d("ShareActivity", "Track name: $trackName")
-                spotifySongName = trackName.toString()
+                songName = trackName.toString()
                 future.complete(trackName)
 
             }
@@ -270,11 +284,12 @@ fun UserSelection(){
                 val context = LocalContext.current
 
                 // send username and name of the song
-                Log.d("STORING", "Song name: $spotifySongName")
+                Log.d("STORING", "Song name: $songName")
                 val intent = Intent(context, PlaylistActivity::class.java)
                 intent.putExtras(
                     bundleOf(
-                        "songName" to spotifySongName,
+                        "songName" to songName,
+                        "songArtist" to songArtist,
                         "songID" to spotifySongID,
                         "senderUsername" to Constants.CURRENT_LOGGED_USER,
                         "receiverUsername" to username

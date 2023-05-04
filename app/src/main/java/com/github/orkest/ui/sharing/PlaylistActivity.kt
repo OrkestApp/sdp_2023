@@ -1,27 +1,38 @@
 package com.github.orkest.ui.sharing
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
 import com.github.orkest.data.Profile
 import com.github.orkest.ui.sharedMusic.sharedMusicPost
 import androidx.room.Room
+import com.github.orkest.R
+import com.github.orkest.View.feed.launchCreatePostActivity
+import com.github.orkest.data.Constants
 import com.github.orkest.domain.DeezerApiIntegration
 import com.github.orkest.data.Song
 import com.github.orkest.domain.persistence.AppDatabase
+import com.github.orkest.ui.MainActivity
+import com.github.orkest.ui.sharedMusic.sharedMusicPost
 import com.github.orkest.ui.theme.OrkestTheme
 import com.spotify.android.appremote.api.SpotifyAppRemote
 
@@ -50,34 +61,21 @@ class PlaylistActivity() : ComponentActivity() {
 
         playlistViewModel = PlaylistViewModel(appDao)
 
+        val song = Song()
+
         // check if extras are not null
         Log.d("PlaylistActivity", "songId: ${intent.getStringExtra("songId")}")
-        intent.getStringExtra("songName")?.let {
-            // update database
-            val song = Song(
-                Title = it,
-                Artist = "Unknown Artist",
-                Album = "Unknown Album",
-                URL = "Unknown ID")
+        intent.getStringExtra("songName")?.let { song.Title = it }
+        intent.getStringExtra("songArtist")?.let { song.Artist = it }
 
-            // store song in a way that both users can see them in their pages
-            playlistViewModel.storeSong(
-                song,
-                intent.getStringExtra("senderUsername") ?: "sender1",
-                intent.getStringExtra("receiverUsername") ?: "sender1",
-                this
-            )
-            /*
-            playlistViewModel.storeSong(
-                song,
-                intent.getStringExtra("receiverUsername") ?: "xx",
-                intent.getStringExtra("senderUsername") ?: "xx",
-                this
-            )
+        // store song in a way that both users can see them in their pages
+        playlistViewModel.storeSong(
+            song,
+            intent.getStringExtra("senderUsername") ?: "sender1",
+            intent.getStringExtra("receiverUsername") ?: "sender1",
+            this
+        )
 
-             */
-
-        }
         //--------------UI----------------
         setContent {
             OrkestTheme {
@@ -127,6 +125,9 @@ fun Playlist(playlistViewModel: PlaylistViewModel,
             }
         }
 
+    //Add a title to the page
+    Text(text = "Songs Shared With You by $receiverUsername")
+
     LazyColumn {
 
         items(songList) { song ->
@@ -134,16 +135,7 @@ fun Playlist(playlistViewModel: PlaylistViewModel,
             Row(modifier =
             Modifier
                 .clickable {
-                    // play song
-                    val player = DeezerApiIntegration()
-                    Log.d("HELLO SONG TITLE", song.Title)
-                    startActivity(context,
-                        player
-                            .launchDeezerToPlaySong(song.Title)
-                            .get(),
-                        null
-                    )
-
+                   Constants.playMusicButtonClicked(song, mutableStateOf(false), context)
                 }
                 .fillMaxSize()
             )
@@ -154,24 +146,28 @@ fun Playlist(playlistViewModel: PlaylistViewModel,
                     message = "Dummy")
             }
 
-
         }
     }
 
-//        for (song in songList) {
-//            // TODO enhance UI
-//            Row(modifier =
-//            Modifier.clickable {
-//                // play song
-//                val player = DeezerApiIntegration()
-//                startActivity(context, player.launchDeezerToPlaySong(song.Title).get(), null)
-//
-//            }.fillMaxSize())
-//            {
-//                Text(text = song.Title)
-//                Text(text = song.Artist)
-//            }
-//        }
+    //Add a button to go back to the main Activity
+        Box(contentAlignment = Alignment.BottomEnd) {
+            FloatingActionButton(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(10.dp)
+                    .testTag("addPostButton"),
+                backgroundColor = Color.White,
+                onClick = {
+                    val intent = Intent(context, MainActivity::class.java)
+                    startActivity(context, intent, null)
+                }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_home_black_24dp),
+                    contentDescription = "Go to Home"
+                )
+            }
+        }
+
     }
 
 

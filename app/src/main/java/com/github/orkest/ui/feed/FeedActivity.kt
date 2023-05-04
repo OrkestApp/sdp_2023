@@ -38,7 +38,7 @@ import com.github.orkest.ui.Camera.CameraView
 import com.github.orkest.ui.feed.PostViewModel
 import com.github.orkest.ui.feed.CommentActivity
 import com.github.orkest.ui.feed.CreatePost
-import com.github.orkest.ui.sharedMusic.sharedMusicPost
+import com.github.orkest.ui.sharing.SharingComposeActivity
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
@@ -89,14 +89,8 @@ fun FeedActivity(viewModel: PostViewModel) {
                 .background(Color.LightGray)
         ) {
             items(listPosts.value) { post ->
-                Column {//TODO SUPPRESS, only here for preview purposes
-                    DisplayPost(viewModel= viewModel, post = post)
-                    sharedMusicPost(
-                        profile = Constants.MOCK_USER.profile,
-                        song = Constants.DUMMY_RUDE_BOY_SONG,
-                        message = "Amazing music! Check it out."
-                    )
-                }
+                DisplayPost(post = post, viewModel = viewModel)
+
             }
         }
     }
@@ -363,30 +357,29 @@ private fun Reaction(viewModel: PostViewModel, post: Post) {
 
         Spacer(modifier = Modifier.height(10.dp))
 
+
         //Create the share button
-        ReactionIcon(R.drawable.share_icon, "Share button", "share_button") {/*TODO*/ }
+        ReactionIcon(R.drawable.share_icon,"Share button", "share_button"){
+            //Launch an intent to the sharingActivity
+            context.startActivity(Intent(context, SharingComposeActivity::class.java)
+                .putExtra(Constants.SONG_NAME, post.song.Title)
+                .putExtra(Constants.SONG_ARTIST, post.song.Artist))
+        }
     }
 }
 
 /* TODO modularize in next sprint */
 
 @Composable
-private fun ReactionIcon(
-    iconId: Int,
-    contentDescription: String,
-    testTag: String,
-    onClick: () -> Unit
-) {
-    Icon(
-        painter = painterResource(id = iconId),
+private fun ReactionIcon(iconId: Int, contentDescription:String, testTag: String, onClick: () -> Unit = {}){
+    Icon(painter = painterResource(id = iconId),
         contentDescription = contentDescription,
         tint = Color.White,
         modifier = Modifier
             .testTag(testTag)
             .height(20.dp)
             .width(20.dp)
-            .clickable { onClick },
-    )
+            .clickable { onClick()})
 }
 
 

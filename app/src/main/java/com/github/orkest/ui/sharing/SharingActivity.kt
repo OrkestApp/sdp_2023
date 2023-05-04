@@ -37,7 +37,7 @@ import java.util.concurrent.CompletableFuture
 
 class SharingComposeActivity : ComponentActivity() {
 
-    private var accessToken : String = String()        // access token for Spotify API
+    var accessToken : String = String()        // access token for Spotify API
     private var authorizationCode : String = String()  // authorization code for token request
     private var spotifySongID : String = String()      // spotify song ID
 

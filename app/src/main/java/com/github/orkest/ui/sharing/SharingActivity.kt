@@ -21,12 +21,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.os.bundleOf
 import com.github.orkest.data.Constants
+import com.github.orkest.data.Providers
 import com.github.orkest.domain.Authorization.Companion.getLoginActivityTokenIntent
 import com.github.orkest.domain.Authorization.Companion.requestUserAuthorization
+import com.github.orkest.domain.FireStoreDatabaseAPI
 import com.github.orkest.ui.search.SearchUserView
 import com.github.orkest.ui.theme.OrkestTheme
 import com.github.orkest.ui.search.SearchViewModel
-import com.github.orkest.ui.sharing.PlaylistActivity
 import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationResponse
 import okhttp3.*
@@ -43,8 +44,8 @@ class SharingComposeActivity : ComponentActivity() {
 
     // spotify song name
     companion object {
-        var spotifySongName : String = String()
-        var spotifySongArtist : String = String()
+        var songName : String = "Unknown song"
+        var songArtist : String = "Unknown artist"
     }
 
 
@@ -70,14 +71,34 @@ class SharingComposeActivity : ComponentActivity() {
 
         // Get the song name from the intent ----------------- Intent from Orkest -----------------
         if (intent.hasExtra(Constants.SONG_NAME)) {
-            spotifySongName = intent.getStringExtra(Constants.SONG_NAME).toString()
+            songName = intent.getStringExtra(Constants.SONG_NAME).toString()
             if (intent.hasExtra(Constants.SONG_ARTIST)) {
-                spotifySongArtist = intent.getStringExtra(Constants.SONG_ARTIST).toString()
+                songArtist = intent.getStringExtra(Constants.SONG_ARTIST).toString()
             }
-        } else {
+        }  else {
 
 
-            // ----------------- Intent handling from spotify for songID -----------------
+            // ----------------- Intent handling from spotify or Deezer for songID -----------------
+
+            //Log.d("DEEZER" , intent.getStringExtra(Intent.EXTRA_TEXT)!!)
+
+            try {
+                val deezerStringText = intent.getStringExtra(Intent.EXTRA_TEXT)!!
+                if (deezerStringText.contains("Deezer") && Constants.CURRENT_USER_PROVIDER == Providers.DEEZER) {
+                    Log.d("DEEZER SONG", deezerStringText)
+                    val stringDeezerHeader = "I've found a song for you... "
+                    val stringWithoutHeader = deezerStringText.drop(stringDeezerHeader.length)
+                    val songNameWithArtist = stringWithoutHeader.substringBeforeLast("\uD83D\uDD25")
+                    songName = songNameWithArtist.substringBefore(" by ")
+                    songArtist = songNameWithArtist.substringAfterLast(" by ")
+
+
+                    Log.d("Deezer debug", songNameWithArtist)
+                }
+            } catch (e: java.lang.NullPointerException) {
+
+            }
+
             when (intent?.action) {
                 Intent.ACTION_SEND -> {
                     if ("text/plain" == intent.type) {
@@ -88,8 +109,14 @@ class SharingComposeActivity : ComponentActivity() {
             }
 
             // ----------------- Spotify API -----------------
-            spotifyAuthorization()
+
+            if (Constants.CURRENT_USER_PROVIDER == Providers.SPOTIFY) {
+                Log.d("TEST DEEZER", "ENTER WRONG LOOP")
+                spotifyAuthorization()
+            }
         }
+
+
 
         // ----------------- Compose UI -----------------
         setContent {
@@ -216,7 +243,7 @@ class SharingComposeActivity : ComponentActivity() {
                 val trackName = jsonObject?.getString("name")
 
                 Log.d("ShareActivity", "Track name: $trackName")
-                spotifySongName = trackName.toString()
+                songName = trackName.toString()
                 future.complete(trackName)
 
             }
@@ -231,9 +258,15 @@ fun UserSelection(){
     val viewModel = SearchViewModel()
     var text by remember { mutableStateOf("search User") }
     var list by remember { mutableStateOf(mutableListOf("")) }
-
+    /*
     viewModel.searchUserInDatabase(text).thenAccept {
         list = it.map { user -> user.username }.toMutableList()
+    }
+
+     */
+    //Show all the followers of the CURRENT_LOGGED_USER
+    FireStoreDatabaseAPI().fetchFollowList(Constants.CURRENT_LOGGED_USER,false).thenAccept {
+        list = it
     }
     Column(modifier = Modifier.fillMaxSize())
     {
@@ -251,11 +284,12 @@ fun UserSelection(){
                 val context = LocalContext.current
 
                 // send username and name of the song
-                Log.d("STORING", "Song name: $spotifySongName")
+                Log.d("STORING", "Song name: $songName")
                 val intent = Intent(context, PlaylistActivity::class.java)
                 intent.putExtras(
                     bundleOf(
-                        "songName" to spotifySongName,
+                        "songName" to songName,
+                        "songArtist" to songArtist,
                         "songID" to spotifySongID,
                         "senderUsername" to Constants.CURRENT_LOGGED_USER,
                         "receiverUsername" to username

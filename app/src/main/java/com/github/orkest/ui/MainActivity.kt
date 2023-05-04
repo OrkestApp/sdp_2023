@@ -38,8 +38,11 @@ class MainActivity : AppCompatActivity() {
         Notification(this,null).promptUserToEnableNotifications()
     }
     override fun onStart() {
+
         super.onStart()
-        FireStoreDatabaseAPI().searchUserInDatabase(Constants.CURRENT_LOGGED_USER).whenComplete() { user, _ ->
+        Log.d("USER",Constants.CURRENT_LOGGED_USER)
+        FireStoreDatabaseAPI().searchUserInDatabase(Constants.CURRENT_LOGGED_USER).thenAccept { user ->
+            Log.d("USER PROV",user.serviceProvider)
             if (user != null) {
                 Constants.CURRENT_USER_PROVIDER = Providers.valueOf(user.serviceProvider.uppercase())
                 Log.d("Provider", Constants.CURRENT_USER_PROVIDER.toString())

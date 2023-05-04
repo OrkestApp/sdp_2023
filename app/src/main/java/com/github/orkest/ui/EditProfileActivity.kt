@@ -1,10 +1,14 @@
 package com.github.orkest.ui
 
-import android.graphics.Bitmap
+import android.content.Intent
 import android.graphics.BitmapFactory
+import android.graphics.BitmapRegionDecoder
+import android.graphics.ImageDecoder
+import android.media.Image
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import android.os.Environment
+import android.provider.MediaStore
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -35,20 +39,22 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContentProviderCompat.requireContext
 import coil.compose.rememberImagePainter
 import com.github.orkest.R
 import com.github.orkest.data.Constants
+import com.github.orkest.domain.FireStoreDatabaseAPI
 import com.github.orkest.ui.theme.OrkestTheme
-import com.google.android.gms.tasks.OnFailureListener
-import com.google.android.gms.tasks.OnSuccessListener
-import com.google.firebase.storage.FileDownloadTask
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.io.File
 
 
 const val PADDING_FROM_SCREEN_BORDER = 10
+val storageRef = FireStoreDatabaseAPI().storageRef
+val profilePicRef = com.github.orkest.ui.profile.storageRef.child("User-${Constants.CURRENT_LOGGED_USER[0].uppercase()}/${Constants.CURRENT_LOGGED_USER}/profile_pic.jpg")
+
+var editPic: Uri = Uri.EMPTY
 
 class EditProfileActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -115,12 +121,13 @@ fun EditProfileScreen(activity: ComponentActivity) {
 @Composable
 fun NavDrawerButton(coroutineScope: CoroutineScope, scaffoldState: ScaffoldState) {
     IconButton(
-        onClick = { coroutineScope.launch {
-            if (scaffoldState.drawerState.currentValue == DrawerValue.Closed)
-                scaffoldState.drawerState.open()
-            else
-                scaffoldState.drawerState.close()
-        }
+        onClick = {
+            coroutineScope.launch {
+                if (scaffoldState.drawerState.currentValue == DrawerValue.Closed)
+                    scaffoldState.drawerState.open()
+                else
+                    scaffoldState.drawerState.close()
+            }
         }
     ) {
         Icon(imageVector = Icons.Rounded.Menu, contentDescription = "Drawer Icon")
@@ -177,7 +184,10 @@ fun TopBar(activity: ComponentActivity, coroutineScope: CoroutineScope, scaffold
                 // "save" clickable text (button)
                 Text(
                     text = "Save",
-                    modifier = Modifier.clickable { /* TODO */ },
+                    modifier = Modifier.clickable {
+                        saveChanges()
+                        activity.finish()
+                    },
                     fontSize = 20.sp
                 )
             }
@@ -188,6 +198,12 @@ fun TopBar(activity: ComponentActivity, coroutineScope: CoroutineScope, scaffold
     )
 }
 
+// TODO update bio in database too
+fun saveChanges() {
+    if(!editPic.equals(Uri.EMPTY)) {
+        profilePicRef.putFile(editPic)
+    }
+}
 
 
 /**
@@ -207,11 +223,10 @@ fun MainBody() {
 @Composable
 @OptIn(coil.annotation.ExperimentalCoilApi::class)
 fun EditProfileImage() {
-    val imageUri = rememberSaveable { mutableStateOf("") }
-    val painter = rememberImagePainter(
-        imageUri.value.ifEmpty { R.drawable.blank_profile_pic }
-    )
-    val bitmap: MutableState<ImageBitmap?> = rememberSaveable { mutableStateOf(null) }
+
+    val bitmap: MutableState<ImageBitmap?> = remember {
+        mutableStateOf(null)
+    }
 
     val context = LocalContext.current
 
@@ -221,45 +236,9 @@ fun EditProfileImage() {
     )
     {
         uri: Uri? -> uri?.let {
-            imageUri.value = it.toString()
-            val storage = FirebaseStorage.getInstance()
-            val storageRef = storage.reference
-
-            val profilePicRef = storageRef.child("User-${Constants.CURRENT_LOGGED_USER[0].uppercase()}/${Constants.CURRENT_LOGGED_USER}/pic.jpg")
-
-
-            profilePicRef.putFile(it)
-
-            /*val ONE_MEGABYTE: Long = 10 * 1024 * 1024
-            getScremRef.getBytes(ONE_MEGABYTE).addOnSuccessListener {
-                // transform byte array into BitMap and then to ImageBitmap
-                bitmap.value = BitmapFactory.decodeByteArray(it, 0, it.size).asImageBitmap()
-            }.addOnFailureListener {
-                Log.e("storage", "failed to fetch picture from database")
-            }*/
-
-            /*val rootPath: File = File(Environment.getExternalStorageDirectory(), "ohnah")
-            if (!rootPath.exists()) {
-                rootPath.mkdirs()
-                Log.e("path", "gahdamn ${rootPath}")
-            }
-
-            Log.e("path", "gahdamn $rootPath")
-
-            val localFile = File(rootPath, "screm.jpg")*/
-
-
-
-            /*getScremRef.getFile(localFile)
-                .addOnSuccessListener(OnSuccessListener<FileDownloadTask.TaskSnapshot?> {
-                    Log.e("firebase ", ";local tem file created  created $localFile")
-                    //  updateDb(timestamp,localFile.toString(),position);
-                }).addOnFailureListener(OnFailureListener { exception ->
-                    Log.e(
-                        "firebase ",
-                        ";local tem file not created  created $exception"
-                    )
-                })*/
+            //profilePicRef.putFile(it)
+            editPic = it
+            bitmap.value = MediaStore.Images.Media.getBitmap(context.getContentResolver() , it).asImageBitmap();
         }
     }
 
@@ -280,9 +259,8 @@ fun EditProfileImage() {
         {
             bitmap.value?.let {
                 Image(
-                    //painter = painter,
                     bitmap = bitmap.value!!,
-                    contentDescription = null,
+                    contentDescription = "edit_profile_pic",
                     modifier = Modifier.wrapContentSize(),
                     contentScale = ContentScale.Crop
                 )
@@ -389,10 +367,10 @@ fun MenuDrawer(
 }
 
 
-@Preview(showBackground = true)
+/*@Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
     EditProfileSetting {
-        EditProfileScreen(EditProfileActivity())
+        EditProfileScreen(EditProfileActivity(), )
     }
-}
+}*/

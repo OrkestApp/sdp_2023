@@ -2,6 +2,8 @@ package com.github.orkest.ui.profile
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -12,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,8 +32,12 @@ import com.github.orkest.ui.EditProfileActivity
 import com.github.orkest.ui.NavDrawerButton
 import kotlinx.coroutines.CoroutineScope
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import com.github.orkest.ui.FollowListActivity
 import com.github.orkest.domain.DeezerApiIntegration
+import com.github.orkest.domain.FireStoreDatabaseAPI
 import com.github.orkest.ui.authentication.AuthActivity
 import com.github.orkest.ui.notification.Notification
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -51,6 +58,10 @@ private val buttonSettings = Modifier
     .width((3 * topInterfaceHeight) / 4)
 private val followColor = Color(0xFFFEE600) // bright yellow
 
+val storageRef = FireStoreDatabaseAPI().storageRef
+
+
+
 /**
  * The top interface of the user's profile displaying the user's information
  * username, bio, number of followers, number of followings, profile picture
@@ -65,7 +76,6 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
         viewModel.username.value
     }
 
-
     Column(Modifier
         .padding(paddingValue)){
         Row(Modifier.height(IntrinsicSize.Min)){//allows to make fillMaxHeight relatively
@@ -73,7 +83,7 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                ProfilePicture(viewModel.profilePictureId.observeAsState().value)
+                ProfilePicture(viewModel.user)
             }
 
             //Add a horizontal space between the image and the user's info
@@ -100,7 +110,6 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
         }
 
         Spacer(modifier = Modifier.height(separator))
-
 
         Row{
 
@@ -284,13 +293,35 @@ fun EditButton(onClick:() -> Unit){
 }
 
 @Composable
-fun ProfilePicture(profilePictureId: Int?){
-    val picture = profilePictureId ?: R.drawable.profile_picture
-    Image(
-        painter = painterResource(id = picture),
-        contentDescription = "$picture",
+fun ProfilePicture(username: String){
+    val context = LocalContext.current
+
+    val bitmap: MutableState<ImageBitmap?> = remember {
+        mutableStateOf(null)
+    }
+
+    val profilePicRef = storageRef.child("User-${username[0].uppercase()}/${username}/profile_pic.jpg")
+
+    val ONE_MEGABYTE: Long = 10 * 1024 * 1024
+    profilePicRef.getBytes(ONE_MEGABYTE).addOnSuccessListener {
+        bitmap.value = BitmapFactory.decodeByteArray(it, 0, it.size).asImageBitmap()
+    }.addOnFailureListener {
+        Log.e("firebase storage", "Failed to fetch picture from firebase storage")
+    }
+    androidx.compose.material3.Card(
+        shape = CircleShape,
         modifier = Modifier
-            .width((3 * topInterfaceHeight) / 4)
-            .clip(CircleShape)
+            .padding(8.dp)
+            .size(100.dp)
     )
+    {
+        bitmap.value?.let {
+            Image(
+                bitmap = bitmap.value!!,
+                contentDescription = "profile_picture",
+                modifier = Modifier.wrapContentSize(),
+                contentScale = ContentScale.Crop
+            )
+        }
+    }
 }

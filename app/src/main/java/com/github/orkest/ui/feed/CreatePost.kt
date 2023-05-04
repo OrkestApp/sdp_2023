@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.orkest.data.Constants
 import com.github.orkest.View.feed.SongCard
+import com.github.orkest.data.Song
 import com.github.orkest.ui.theme.OrkestTheme
 
 
@@ -30,6 +31,21 @@ class CreatePost : ComponentActivity() {
                     color = MaterialTheme.colors.background
                 ) {
                     val viewModel = PostViewModel()
+
+                    val song = Song()
+                    //Get the song name, artist, and album from the intent
+
+                    if (intent.hasExtra(Constants.SONG_NAME))
+                        song.Title = intent.getStringExtra(Constants.SONG_NAME) ?: "Unknown"
+
+                    if (intent.hasExtra(Constants.SONG_ARTIST))
+                        song.Artist = intent.getStringExtra(Constants.SONG_ARTIST) ?: "Unknown"
+
+                    if (intent.hasExtra(Constants.SONG_ALBUM))
+                        song.Album = intent.getStringExtra(Constants.SONG_ALBUM) ?: "Unknown"
+
+                    viewModel.updateSong(song)
+
                     EditPostScreen(viewModel = viewModel, activity = this)
                 }
             }

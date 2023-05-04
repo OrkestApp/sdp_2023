@@ -35,6 +35,7 @@ import com.github.orkest.ui.sharedMusic.sharedMusicPost
 import com.github.orkest.ui.feed.PostViewModel
 import com.github.orkest.ui.feed.CommentActivity
 import com.github.orkest.ui.feed.CreatePost
+import com.github.orkest.ui.sharing.SharingComposeActivity
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
@@ -305,15 +306,21 @@ private fun Reaction(post: Post){
 
         Spacer(modifier = Modifier.height(10.dp))
 
+
         //Create the share button
-        ReactionIcon(R.drawable.share_icon,"Share button", "share_button" )
+        ReactionIcon(R.drawable.share_icon,"Share button", "share_button"){
+            //Launch an intent to the sharingActivity
+            context.startActivity(Intent(context, SharingComposeActivity::class.java)
+                .putExtra(Constants.SONG_NAME, post.song.Title)
+                .putExtra(Constants.SONG_ARTIST, post.song.Artist))
+        }
     }
 }
 
 /* TODO modularize in next sprint */
 
 @Composable
-private fun ReactionIcon(iconId: Int, contentDescription:String, testTag: String) {
+private fun ReactionIcon(iconId: Int, contentDescription:String, testTag: String, onClick: () -> Unit = {}){
     Icon(painter = painterResource(id = iconId),
         contentDescription = contentDescription,
         tint = Color.White,
@@ -321,7 +328,7 @@ private fun ReactionIcon(iconId: Int, contentDescription:String, testTag: String
             .testTag(testTag)
             .height(20.dp)
             .width(20.dp)
-            .clickable { })
+            .clickable { onClick()})
 }
 
 

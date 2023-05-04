@@ -44,6 +44,7 @@ class SharingComposeActivity : ComponentActivity() {
     // spotify song name
     companion object {
         var spotifySongName : String = String()
+        var spotifySongArtist : String = String()
     }
 
 
@@ -74,8 +75,19 @@ class SharingComposeActivity : ComponentActivity() {
                 }
             }
         }
+        // ----------------- Intent handling -----------------
+
+
         // ----------------- Spotify API -----------------
         spotifyAuthorization()
+
+        // Get the song name from the intent
+        if (intent.hasExtra(Constants.SONG_NAME)) {
+            spotifySongName = intent.getStringExtra(Constants.SONG_NAME).toString()
+        }
+        if (intent.hasExtra(Constants.SONG_ARTIST)) {
+            spotifySongArtist = intent.getStringExtra(Constants.SONG_ARTIST).toString()
+        }
         // ----------------- Compose UI -----------------
         setContent {
             OrkestTheme {

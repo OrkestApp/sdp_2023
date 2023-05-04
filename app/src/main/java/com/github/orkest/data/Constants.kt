@@ -15,6 +15,11 @@ import java.time.ZoneId
 class Constants {
     companion object{
 
+        val SONG_NAME: String = "SONG_NAME"
+        val SONG_ARTIST: String = "SONG_ARTIST"
+        val SONG_ALBUM: String = "SONG_ALBUM"
+
+
         const val DEFAULT_MAX_RECENT_DAYS: Long = 30
         var CURRENT_USER_PROVIDER: Providers = Providers.SPOTIFY
         private var currentLoggedUser: String = ""

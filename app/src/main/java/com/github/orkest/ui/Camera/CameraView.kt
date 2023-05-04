@@ -6,9 +6,6 @@ import android.content.pm.PackageManager
 import androidx.compose.foundation.Image
 import android.net.Uri
 import android.os.Bundle
-import androidx.camera.core.CameraInfo
-
-import android.util.Log
 import android.view.ViewGroup
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -37,6 +34,8 @@ import com.github.orkest.data.Constants
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.core.content.ContextCompat
+import android.Manifest
 import com.github.orkest.ui.MainActivity
 import kotlin.properties.Delegates
 
@@ -47,15 +46,14 @@ class CameraView: ComponentActivity() {
 
     private val roundedCornerValue = 20.dp
     private val paddingValue = 16.dp
-
-    var hasCamera by Delegates.notNull<Boolean>()
+    
+    val hasCamera = (ContextCompat.checkSelfPermission(
+        this,
+        Manifest.permission.CAMERA
+    ) != PackageManager.PERMISSION_GRANTED
+            )
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val hasFrontCamera = packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT)
-        val hasBackCamera = packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
-
-        hasCamera = hasFrontCamera and(hasBackCamera)
 
         setContent {
             // The state of the captured image is kept in a mutableStateOf variable.

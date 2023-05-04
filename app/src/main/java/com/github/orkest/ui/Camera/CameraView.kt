@@ -46,14 +46,15 @@ class CameraView: ComponentActivity() {
 
     private val roundedCornerValue = 20.dp
     private val paddingValue = 16.dp
-    
-    val hasCamera = (ContextCompat.checkSelfPermission(
-        this,
-        Manifest.permission.CAMERA
-    ) != PackageManager.PERMISSION_GRANTED
-            )
+
+    var hasCamera by Delegates.notNull<Boolean>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        hasCamera = (ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.CAMERA
+        ) != PackageManager.PERMISSION_GRANTED)
 
         setContent {
             // The state of the captured image is kept in a mutableStateOf variable.

@@ -117,7 +117,7 @@ fun Playlist(playlistViewModel: PlaylistViewModel,
             // TODO enhance UI
             Row(modifier =
             Modifier.clickable {
-                // play song
+                // play song TODO Change for spotify
                 val player = DeezerApiIntegration()
                 startActivity(context, player.launchDeezerToPlaySong(song.Title).get(), null)
 

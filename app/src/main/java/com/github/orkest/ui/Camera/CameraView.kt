@@ -36,6 +36,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.core.content.ContextCompat
 import android.Manifest
+import android.util.Log
 import com.github.orkest.ui.MainActivity
 import kotlin.properties.Delegates
 
@@ -51,10 +52,8 @@ class CameraView: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        hasCamera = (ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.CAMERA
-        ) != PackageManager.PERMISSION_GRANTED)
+
+        hasCamera = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)
 
         setContent {
             // The state of the captured image is kept in a mutableStateOf variable.

@@ -74,6 +74,7 @@ class SharingComposeActivity : ComponentActivity() {
         try {
             val deezerStringText = intent.getStringExtra(Intent.EXTRA_TEXT)!!
             if(deezerStringText.contains("Deezer") && Constants.CURRENT_USER_PROVIDER ==Providers.DEEZER){
+                Log.d("DEEZER SONG",deezerStringText)
                 val stringDeezerHeader = "I've found a song for you... "
                 val stringWithoutHeader = deezerStringText.drop(stringDeezerHeader.length)
                 val songNameWithArtist = stringWithoutHeader.substringBeforeLast("\uD83D\uDD25")

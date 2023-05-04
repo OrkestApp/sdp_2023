@@ -57,11 +57,14 @@ class PlaylistActivity() : ComponentActivity() {
                 intent.getStringExtra("senderUsername") ?: "sender1",
                 intent.getStringExtra("receiverUsername") ?: "sender1"
             )
+            /*
             playlistViewModel.storeSong(
                 song,
                 intent.getStringExtra("receiverUsername") ?: "xx",
                 intent.getStringExtra("senderUsername") ?: "xx"
             )
+
+             */
 
         }
         //--------------UI----------------
@@ -122,6 +125,7 @@ fun Playlist(playlistViewModel: PlaylistViewModel,
                 .clickable {
                     // play song
                     val player = DeezerApiIntegration()
+                    Log.d("HELLO SONG TITLE", song.Title)
                     startActivity(context,
                         player
                             .launchDeezerToPlaySong(song.Title)

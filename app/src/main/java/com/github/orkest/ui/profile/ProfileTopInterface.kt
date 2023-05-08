@@ -76,6 +76,7 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
         viewModel.username.value
     }
 
+
     Column(Modifier
         .padding(paddingValue)){
         Row(Modifier.height(IntrinsicSize.Min)){//allows to make fillMaxHeight relatively
@@ -110,6 +111,7 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
         }
 
         Spacer(modifier = Modifier.height(separator))
+
 
         Row{
 

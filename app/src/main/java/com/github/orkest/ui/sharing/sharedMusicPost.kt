@@ -10,9 +10,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontWeight
@@ -21,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import com.github.orkest.data.Profile
 import com.github.orkest.data.Song
 import com.github.orkest.R
+import com.github.orkest.data.Constants
 
 
 private val separator = 10.dp
@@ -75,7 +78,7 @@ fun playMusic(song: Song) {
     Row(modifier = Modifier
         .padding(5.dp)
         .clip(shape = RoundedCornerShape(roundedCornerValue))) {
-            PlayButton()
+            PlayButton(song)
             Spacer(modifier = Modifier.width(separator))
             Text(text = song.Title, fontWeight = FontWeight.Bold, fontSize = fontSize)
             Text(" - ", fontSize = fontSize)
@@ -152,12 +155,15 @@ fun SongInfo(author: String, album: String){
 }
 
 @Composable
-private fun PlayButton(){
+private fun PlayButton(song: Song){
+    val context = LocalContext.current
     Icon(painter = painterResource(id = R.drawable.play_button),
         contentDescription = "Play button",
         modifier = Modifier
             .height(20.dp)
             .width(20.dp)
             .clip(shape = RoundedCornerShape(roundedCornerValue))
-            .clickable { })
+            .clickable { Constants.playMusicButtonClicked(song,
+                mutableStateOf(false),
+                context) })
 }

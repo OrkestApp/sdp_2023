@@ -42,7 +42,6 @@ import kotlinx.coroutines.launch
 
 
 const val PADDING_FROM_SCREEN_BORDER = 10
-var editPic: Uri = Uri.EMPTY
 
 class EditProfileActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -174,7 +173,7 @@ fun TopBar(activity: ComponentActivity, viewModel: EditProfileViewModel, corouti
                 // "cancel" clickable text (button)
                 Text(
                     text = "Cancel",
-                    modifier = Modifier.clickable {activity.finish() },
+                    modifier = Modifier.clickable { activity.finish() },
                     fontSize = 20.sp
                 )
 
@@ -197,9 +196,6 @@ fun TopBar(activity: ComponentActivity, viewModel: EditProfileViewModel, corouti
 
 // TODO update bio in database too
 fun saveChanges(viewModel: EditProfileViewModel) {
-    /*if(editPic != Uri.EMPTY) {
-        viewModel.storageAPI.uploadProfilePic(editPic)
-    }*/
     viewModel.updateStorage()
 }
 
@@ -223,6 +219,9 @@ fun MainBody() {
 fun EditProfileImage(viewModel: EditProfileViewModel) {
 
     val picData = viewModel.profilePicture.value
+
+    //TODO create a function for this
+    //transforms ByteArray to BitMap
     val pic = BitmapFactory.decodeByteArray(picData, 0, picData!!.size).asImageBitmap()
 
     val bitmap: MutableState<ImageBitmap?> = remember {
@@ -237,9 +236,9 @@ fun EditProfileImage(viewModel: EditProfileViewModel) {
     )
     {
         uri: Uri? -> uri?.let {
-            editPic = it
             bitmap.value = MediaStore.Images.Media.getBitmap(context.contentResolver, it).asImageBitmap();
-            //viewModel.setProfilePic(bitmap.value!!)
+
+            // set the new profile picture (fetched by reading bytes of the URI) in the viewmodel
             context.contentResolver.openInputStream(it)?.readBytes()
                 ?.let { it1 -> viewModel.setProfilePic(it1) }
         }

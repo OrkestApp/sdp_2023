@@ -13,6 +13,10 @@ class EditProfileViewModel {
     open var profilePicture = MutableLiveData<ByteArray?>()
     open var bio = MutableLiveData<String>()
 
+    /**
+     * Called when user saves changes made in the EditProfileActivity.
+     * Updates the firestore DB and the firebase storage with the new data
+     */
     fun updateStorage() {
         profilePicture.value?.let { storageAPI.uploadProfilePic(it) }
         // TODO save new bio in db

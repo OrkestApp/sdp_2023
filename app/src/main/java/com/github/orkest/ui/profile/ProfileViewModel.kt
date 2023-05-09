@@ -59,10 +59,12 @@ open class ProfileViewModel(val user: String) : ViewModel(), Serializable {
         }
     }
 
+    /**
+     * Get profile picture of the user whose profile you're currently visiting
+     */
     fun fetchProfilePic(): Task<ByteArray> {
         return firebaseStorage.fetchProfilePic(user)
     }
-
 
 
     /**

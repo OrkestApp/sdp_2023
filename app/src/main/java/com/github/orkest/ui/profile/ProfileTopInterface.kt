@@ -79,8 +79,13 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
         viewModel.username.value
     }
 
+    /*
+    variable forcing the EditButton composable to wait for picture from database to be fetched
+    before allowing user to enter EditProfileActivity
+     */
     var fetched = false
 
+    // get user's profile picture
     var profilePic = MutableLiveData<ByteArray?>()
     viewModel.fetchProfilePic().addOnSuccessListener {
         profilePic.value = it
@@ -128,6 +133,10 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
 
             if(viewModel.username.value == Constants.CURRENT_LOGGED_USER) {
                 EditButton {
+                    /*
+                    if profile picture has been fetched from database then allow to enter
+                    the EditProfileActivity
+                    */
                     if (fetched) {
                         val intent = Intent(context, EditProfileActivity::class.java)
                         intent.putExtra("profilePic", profilePic.value)
@@ -325,7 +334,7 @@ fun ProfilePicture(viewModel: ProfileViewModel){
     viewModel.fetchProfilePic().addOnSuccessListener {
         bitmap.value = BitmapFactory.decodeByteArray(it, 0, it.size).asImageBitmap()
     }
-    //TODO --------------------------------------
+    //-------------------------------------------
 
 
     androidx.compose.material3.Card(

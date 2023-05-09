@@ -63,10 +63,6 @@ open class ProfileViewModel(val user: String) : ViewModel(), Serializable {
         return firebaseStorage.fetchProfilePic(user)
     }
 
-    fun getProfilePic(): ByteArray? {
-        return profilePic.value
-    }
-
 
 
     /**

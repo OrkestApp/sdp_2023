@@ -39,10 +39,11 @@ class FirebaseStorageAPI {
         return uploadFile(path, uri)
     }
 
-    fun uploadPostVideo(uri: Uri): UploadTask {
+    fun uploadVideo(uri: Uri): UploadTask {
         val path = "User-${Constants.CURRENT_LOGGED_USER[0].uppercase()}/${Constants.CURRENT_LOGGED_USER}/post1.jpg"
         return uploadFile("", uri)
     }
+
 
     // ============== FETCHING FROM STORAGE ==============
 
@@ -54,7 +55,7 @@ class FirebaseStorageAPI {
     }
 
     fun fetchProfilePic(username: String): Task<ByteArray> {
-        val path = "User-${Constants.CURRENT_LOGGED_USER[0].uppercase()}/${Constants.CURRENT_LOGGED_USER}/profile_pic.jpg"
+        val path = "User-${username[0].uppercase()}/${username}/profile_pic.jpg"
         return fetchPic(path)
     }
 

@@ -3,6 +3,7 @@ package com.github.orkest.ui.profile
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
+import android.media.Image
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -35,6 +36,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import com.github.orkest.ui.FollowListActivity
 import com.github.orkest.domain.DeezerApiIntegration
 import com.github.orkest.domain.FireStoreDatabaseAPI
@@ -76,6 +79,14 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
         viewModel.username.value
     }
 
+    var fetched = false
+
+    var profilePic = MutableLiveData<ByteArray?>()
+    viewModel.fetchProfilePic().addOnSuccessListener {
+        profilePic.value = it
+        fetched = true
+    }
+
 
     Column(Modifier
         .padding(paddingValue)){
@@ -84,7 +95,7 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                ProfilePicture(viewModel.user)
+                ProfilePicture(viewModel)
             }
 
             //Add a horizontal space between the image and the user's info
@@ -117,8 +128,12 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
 
             if(viewModel.username.value == Constants.CURRENT_LOGGED_USER) {
                 EditButton {
-                    val intent = Intent(context, EditProfileActivity::class.java)
-                    context.startActivity(intent)
+                    if (fetched) {
+                        val intent = Intent(context, EditProfileActivity::class.java)
+                        intent.putExtra("profilePic", profilePic.value)
+                        intent.putExtra("bio", viewModel.bio.value)
+                        context.startActivity(intent)
+                    }
                 }
                 Spacer(modifier = Modifier.width(separator))
                 Row(){
@@ -295,21 +310,24 @@ fun EditButton(onClick:() -> Unit){
 }
 
 @Composable
-fun ProfilePicture(username: String){
-    val context = LocalContext.current
+fun ProfilePicture(viewModel: ProfileViewModel){
 
+
+    //TODO --------------------------------------
+    // the following block of code is analogous to the one on line ~80
+    // what I would like to achieve is to have a bitmap which observes the state of the profilePic
+    // in the profileviewmodel so that it updates the image when the profile pic has been fetched
+    // from the storage. I do not know how to do that yet.
     val bitmap: MutableState<ImageBitmap?> = remember {
         mutableStateOf(null)
     }
 
-    val profilePicRef = storageRef.child("User-${username[0].uppercase()}/${username}/profile_pic.jpg")
-
-    val ONE_MEGABYTE: Long = 10 * 1024 * 1024
-    profilePicRef.getBytes(ONE_MEGABYTE).addOnSuccessListener {
+    viewModel.fetchProfilePic().addOnSuccessListener {
         bitmap.value = BitmapFactory.decodeByteArray(it, 0, it.size).asImageBitmap()
-    }.addOnFailureListener {
-        Log.e("firebase storage", "Failed to fetch picture from firebase storage")
     }
+    //TODO --------------------------------------
+
+
     androidx.compose.material3.Card(
         shape = CircleShape,
         modifier = Modifier
@@ -319,11 +337,13 @@ fun ProfilePicture(username: String){
     {
         bitmap.value?.let {
             Image(
+                //painter = painter,
                 bitmap = bitmap.value!!,
                 contentDescription = "profile_picture",
                 modifier = Modifier.wrapContentSize(),
                 contentScale = ContentScale.Crop
             )
         }
+
     }
 }

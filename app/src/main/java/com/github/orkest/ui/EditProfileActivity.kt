@@ -1,19 +1,15 @@
 package com.github.orkest.ui
 
-import android.content.Intent
 import android.graphics.BitmapFactory
-import android.graphics.BitmapRegionDecoder
-import android.graphics.ImageDecoder
-import android.media.Image
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -36,32 +32,33 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContentProviderCompat.requireContext
-import coil.compose.rememberImagePainter
-import com.github.orkest.R
-import com.github.orkest.data.Constants
-import com.github.orkest.domain.FireStoreDatabaseAPI
+import com.github.orkest.ui.profile.EditProfileViewModel
+import com.github.orkest.ui.profile.ProfileViewModel
 import com.github.orkest.ui.theme.OrkestTheme
-import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 
 const val PADDING_FROM_SCREEN_BORDER = 10
-val storageRef = FireStoreDatabaseAPI().storageRef
-val profilePicRef = com.github.orkest.ui.profile.storageRef.child("User-${Constants.CURRENT_LOGGED_USER[0].uppercase()}/${Constants.CURRENT_LOGGED_USER}/profile_pic.jpg")
-
 var editPic: Uri = Uri.EMPTY
 
 class EditProfileActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        val viewModel = EditProfileViewModel()
+        intent.getStringExtra("bio")?.let { viewModel.setBio(it) }
+        intent.getByteArrayExtra("profilePic")?.let { viewModel.setProfilePic(it) }
+
+
         super.onCreate(savedInstanceState)
         setContent {
             EditProfileSetting {
-                EditProfileScreen(this)
+                if (viewModel != null) {
+                    EditProfileScreen(this, viewModel)
+                }
             }
         }
     }
@@ -88,7 +85,7 @@ fun EditProfileSetting(content: @Composable () -> Unit) {
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditProfileScreen(activity: ComponentActivity) {
+fun EditProfileScreen(activity: ComponentActivity, viewModel: EditProfileViewModel) {
 
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
@@ -97,7 +94,7 @@ fun EditProfileScreen(activity: ComponentActivity) {
     Scaffold(
         // keep track of the state of the scaffold (whether it is opened or closed)
         scaffoldState = scaffoldState,
-        topBar = { TopBar(activity, coroutineScope = coroutineScope, scaffoldState = scaffoldState) },
+        topBar = { TopBar(activity, viewModel = viewModel, coroutineScope = coroutineScope, scaffoldState = scaffoldState) },
         // The content displayed inside the drawer when you click on the hamburger menu button
         //drawerContent = { CreateMenuDrawer() },
 
@@ -107,7 +104,7 @@ fun EditProfileScreen(activity: ComponentActivity) {
                 .padding(padding)
             Column() {
                 // profile pic and edit button
-                EditProfileImage()
+                EditProfileImage(viewModel)
                 Divider()
                 MainBody()
             }
@@ -163,7 +160,7 @@ fun CreateMenuDrawer() {
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(activity: ComponentActivity, coroutineScope: CoroutineScope, scaffoldState: ScaffoldState) {
+fun TopBar(activity: ComponentActivity, viewModel: EditProfileViewModel, coroutineScope: CoroutineScope, scaffoldState: ScaffoldState) {
 
     TopAppBar(
         title = {
@@ -185,7 +182,7 @@ fun TopBar(activity: ComponentActivity, coroutineScope: CoroutineScope, scaffold
                 Text(
                     text = "Save",
                     modifier = Modifier.clickable {
-                        saveChanges()
+                        saveChanges(viewModel)
                         activity.finish()
                     },
                     fontSize = 20.sp
@@ -199,10 +196,11 @@ fun TopBar(activity: ComponentActivity, coroutineScope: CoroutineScope, scaffold
 }
 
 // TODO update bio in database too
-fun saveChanges() {
-    if(!editPic.equals(Uri.EMPTY)) {
-        profilePicRef.putFile(editPic)
-    }
+fun saveChanges(viewModel: EditProfileViewModel) {
+    /*if(editPic != Uri.EMPTY) {
+        viewModel.storageAPI.uploadProfilePic(editPic)
+    }*/
+    viewModel.updateStorage()
 }
 
 
@@ -222,10 +220,13 @@ fun MainBody() {
  */
 @Composable
 @OptIn(coil.annotation.ExperimentalCoilApi::class)
-fun EditProfileImage() {
+fun EditProfileImage(viewModel: EditProfileViewModel) {
+
+    val picData = viewModel.profilePicture.value
+    val pic = BitmapFactory.decodeByteArray(picData, 0, picData!!.size).asImageBitmap()
 
     val bitmap: MutableState<ImageBitmap?> = remember {
-        mutableStateOf(null)
+        mutableStateOf(pic)
     }
 
     val context = LocalContext.current
@@ -236,9 +237,11 @@ fun EditProfileImage() {
     )
     {
         uri: Uri? -> uri?.let {
-            //profilePicRef.putFile(it)
             editPic = it
-            bitmap.value = MediaStore.Images.Media.getBitmap(context.getContentResolver() , it).asImageBitmap();
+            bitmap.value = MediaStore.Images.Media.getBitmap(context.contentResolver, it).asImageBitmap();
+            //viewModel.setProfilePic(bitmap.value!!)
+            context.contentResolver.openInputStream(it)?.readBytes()
+                ?.let { it1 -> viewModel.setProfilePic(it1) }
         }
     }
 

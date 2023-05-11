@@ -45,6 +45,7 @@ import com.github.orkest.ui.authentication.AuthActivity
 import com.github.orkest.ui.notification.Notification
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 
 import java.util.concurrent.CompletableFuture
@@ -86,11 +87,12 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
     var fetched = false
 
     // get user's profile picture
-    var profilePic = MutableLiveData<ByteArray?>()
-    viewModel.fetchProfilePic().addOnSuccessListener {
+    //var profilePic = MutableLiveData<ByteArray?>()
+    /*viewModel.fetchProfilePic().addOnSuccessListener {
         profilePic.value = it
         fetched = true
-    }
+    }*/
+    val fetchPic = viewModel.fetchProfilePic()
 
 
     Column(Modifier
@@ -100,7 +102,7 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                ProfilePicture(viewModel)
+                ProfilePicture(fetchPic)//viewModel)
             }
 
             //Add a horizontal space between the image and the user's info
@@ -137,9 +139,15 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
                     if profile picture has been fetched from database then allow to enter
                     the EditProfileActivity
                     */
-                    if (fetched) {
+                    /*if (fetched) {
                         val intent = Intent(context, EditProfileActivity::class.java)
                         intent.putExtra("profilePic", profilePic.value)
+                        intent.putExtra("bio", viewModel.bio.value)
+                        context.startActivity(intent)
+                    }*/
+                    fetchPic.addOnSuccessListener {
+                        val intent = Intent(context, EditProfileActivity::class.java)
+                        intent.putExtra("profilePic", it)
                         intent.putExtra("bio", viewModel.bio.value)
                         context.startActivity(intent)
                     }
@@ -319,7 +327,7 @@ fun EditButton(onClick:() -> Unit){
 }
 
 @Composable
-fun ProfilePicture(viewModel: ProfileViewModel){
+fun ProfilePicture(task: Task<ByteArray>) {//viewModel: ProfileViewModel){
 
 
     //TODO --------------------------------------
@@ -331,7 +339,10 @@ fun ProfilePicture(viewModel: ProfileViewModel){
         mutableStateOf(null)
     }
 
-    viewModel.fetchProfilePic().addOnSuccessListener {
+    /*viewModel.fetchProfilePic().addOnSuccessListener {
+        bitmap.value = BitmapFactory.decodeByteArray(it, 0, it.size).asImageBitmap()
+    }*/
+    task.addOnSuccessListener {
         bitmap.value = BitmapFactory.decodeByteArray(it, 0, it.size).asImageBitmap()
     }
     //-------------------------------------------

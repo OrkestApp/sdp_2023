@@ -3,7 +3,6 @@ package com.github.orkest.ui.Camera
 import android.content.ContentValues
 import android.content.ContentValues.TAG
 import android.content.Context
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
@@ -12,10 +11,8 @@ import android.widget.Toast
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
-import androidx.camera.core.Preview
-import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.video.Quality
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.LifecycleOwner
 import java.io.File
 
 class CameraViewModel {
@@ -30,7 +27,7 @@ class CameraViewModel {
      * saves it to a temporary file,
      * and then converts the file to a URI to display it on the screen.
      */
-    fun imagePreview(onImageCaptured: (Uri) -> Unit, context: Context){
+    fun captureImage(onImageCaptured: (Uri) -> Unit, context: Context){
         // Create a temporary file to store the captured image
         val imageFile = File.createTempFile("image", ".jpg", context.cacheDir)
         val metadata = ImageCapture.Metadata()
@@ -79,5 +76,17 @@ class CameraViewModel {
                 Toast.makeText(context, "Failed to save image", Toast.LENGTH_SHORT).show()
             }}
     }
+
+    // A helper function to translate Quality to a string
+    fun Quality.qualityToString() : String {
+        return when (this) {
+            Quality.UHD -> "UHD"
+            Quality.FHD -> "FHD"
+            Quality.HD -> "HD"
+            Quality.SD -> "SD"
+            else -> throw IllegalArgumentException()
+        }
+    }
+
 
 }

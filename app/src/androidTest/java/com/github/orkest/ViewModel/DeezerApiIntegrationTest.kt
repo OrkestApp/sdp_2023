@@ -1,12 +1,12 @@
 package com.github.orkest.ViewModel
 
 import android.util.Log
-import com.github.orkest.domain.DeezerApiIntegration
-import com.github.orkest.domain.DeezerModelClasses
-import com.github.orkest.domain.FireStoreDatabaseAPI
+import com.github.orkest.domain.*
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import org.junit.Assert
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertThrows
 import org.junit.Test
 
 class DeezerApiIntegrationTest {
@@ -21,7 +21,7 @@ class DeezerApiIntegrationTest {
      * This test need to be performed online
      */
     fun JSONresponseIsParsedCorrectly(){
-        val value = DeezerApiIntegration().searchSongInDeezerDatabse("petite fille").get()
+        val value = DeezerApiIntegration(DeezerMockAPi.DeezerMockApiImplemented()).searchSongInDeezerDatabse("petite fille").get()
         print(value.data[0])
 
         Assert.assertEquals("Petite fille",value.data[0].title)
@@ -33,7 +33,7 @@ class DeezerApiIntegrationTest {
      */
 
     fun JsonResponseforUSerId(){
-        val value = DeezerApiIntegration().addANewSongToOrkestPlayList("fre2MZQMJbgEjomDl7WusDOj3p0RIo3g0dhW4G1kVMG5Oa9CGV","11300267884","533497102").get()
+        val value = DeezerApiIntegration(DeezerMockAPi.DeezerMockApiImplemented()).addANewSongToOrkestPlayList("fre2MZQMJbgEjomDl7WusDOj3p0RIo3g0dhW4G1kVMG5Oa9CGV","11300267884","533497102").get()
         Log.d("HELLO", value.toString())
 
     }
@@ -42,7 +42,7 @@ class DeezerApiIntegrationTest {
      * tested
      */
     fun createPlaylist(){
-        val value = DeezerApiIntegration().createANewPlaylistOnTheUserProfile("2297625024","frsizHK2HlrzljGuf9s09gV0sF1Wbf7fWCnQe4w1wFbDI0zCkqV").get()
+        val value = DeezerApiIntegration(DeezerMockAPi.DeezerMockApiImplemented()).createANewPlaylistOnTheUserProfile("2297625024","frsizHK2HlrzljGuf9s09gV0sF1Wbf7fWCnQe4w1wFbDI0zCkqV").get()
         Log.d("HELLO", value.toString())
 
     }
@@ -50,7 +50,7 @@ class DeezerApiIntegrationTest {
      * tested
      */
     fun testGetUserIdIndatabase(){
-        val value = DeezerApiIntegration().fetchTheUserIdInTheDeezerDatabase("fre2MZQMJbgEjomDl7WusDOj3p0RIo3g0dhW4G1kVMG5Oa9CGV").get()
+        val value = DeezerApiIntegration(DeezerMockAPi.DeezerMockApiImplemented()).fetchTheUserIdInTheDeezerDatabase("fre2MZQMJbgEjomDl7WusDOj3p0RIo3g0dhW4G1kVMG5Oa9CGV").get()
         Log.d("TEST",value.id)
         Log.d("TEST",value.name)
     }
@@ -93,7 +93,7 @@ class DeezerApiIntegrationTest {
                  "}"
 
 
-        val user = DeezerApiIntegration().deserialise<DeezerModelClasses.User>(jsonStringFromDeezer)
+        val user = DeezerApiIntegration(DeezerMockAPi.DeezerMockApiImplemented()).deserialise<DeezerModelClasses.User>(jsonStringFromDeezer)
         Assert.assertEquals(user.id,"2297625024")
         Assert.assertEquals(user.name,"Zermelo-101")
 
@@ -128,7 +128,7 @@ class DeezerApiIntegrationTest {
                 "    }"
 
 
-        val playlist = DeezerApiIntegration().deserialise<DeezerModelClasses.Playlist>(jsonStringFromDeezer)
+        val playlist = DeezerApiIntegration(DeezerMockAPi.DeezerMockApiImplemented()).deserialise<DeezerModelClasses.Playlist>(jsonStringFromDeezer)
         Assert.assertEquals(playlist.id, "3645740262")
         Assert.assertEquals(playlist.nb_tracks, "38")
 
@@ -179,12 +179,89 @@ class DeezerApiIntegrationTest {
                   "      \"type\": \"track\"\n" +
                   "    }"
 
-        val track = DeezerApiIntegration().deserialise<DeezerModelClasses.Track>(jsonStringFromDeezer)
+        val track = DeezerApiIntegration(DeezerMockAPi.DeezerMockApiImplemented()).deserialise<DeezerModelClasses.Track>(jsonStringFromDeezer)
 
         Assert.assertEquals(track.title,"Petite fille")
         Assert.assertEquals(track.id,"434591652")
         Assert.assertEquals(track.album.title,"Trône")
       }
+    @Test
+    fun mockSearchInDatabase(){
+        val mockDeezerIntegration = DeezerApiIntegration(DeezerMockAPi.DeezerMockApiImplemented())
+
+        val x = mockDeezerIntegration.searchSongInDeezerDatabse("pettite fille").get()
+        assertEquals("Booba",x.data[0].artist.name)
+        assertEquals("Petite fille",x.data[0].title)
+    }
+    @Test
+    fun mockSearchInDatabaseWithEmptySongName(){
+        val mockDeezerIntegration = DeezerApiIntegration(DeezerMockAPi.DeezerMockApiImplemented())
+
+        assertThrows(java.util.concurrent.CompletionException::class.java){mockDeezerIntegration.searchSongInDeezerDatabse(null).join()}
+
+    }
+
+    @Test
+    fun mockFetchId(){
+        val mockDeezerIntegration = DeezerApiIntegration(DeezerMockAPi.DeezerMockApiImplemented())
+        val x = mockDeezerIntegration.fetchTheUserIdInTheDeezerDatabase("adadad").get()
+        assertEquals("Zermelo-101",x.name)
+        assertEquals("2297625024",x.id)
+    }
+
+    @Test
+    fun mockFetchIdWithEmptyAccessToken(){
+        val mockDeezerIntegration = DeezerApiIntegration(DeezerMockAPi.DeezerMockApiImplemented())
+
+        assertThrows(java.util.concurrent.CompletionException::class.java) { -> mockDeezerIntegration.fetchTheUserIdInTheDeezerDatabase("").join()}
+
+    }
+
+    @Test
+    fun mockAddPlaylistToUserProfile(){
+        val mockDeezerIntegration = DeezerApiIntegration(DeezerMockAPi.DeezerMockApiImplemented())
+        val response = mockDeezerIntegration.createANewPlaylistOnTheUserProfile("dummy","dummy").get()
+        assertEquals("3645740262",response)
+    }
+
+    @Test
+    fun mockAddPlaylistToUserProfileFailWithEmptyUserId(){
+        val mockDeezerIntegration = DeezerApiIntegration(DeezerMockAPi.DeezerMockApiImplemented())
+        assertThrows(java.util.concurrent.CompletionException::class.java){mockDeezerIntegration.createANewPlaylistOnTheUserProfile("","dummy").join()}
+    }
+    @Test
+    fun mockAddPlaylistToUserProfileFailWithEmptyAccessToken(){
+        val mockDeezerIntegration = DeezerApiIntegration(DeezerMockAPi.DeezerMockApiImplemented())
+        assertThrows(java.util.concurrent.CompletionException::class.java){mockDeezerIntegration.createANewPlaylistOnTheUserProfile("dummy","").join()}
+    }
+
+
+    @Test
+    fun mockAddANewSongToThePlaylist(){
+        val mockDeezerIntegration = DeezerApiIntegration(DeezerMockAPi.DeezerMockApiImplemented())
+        val success  = mockDeezerIntegration.addANewSongToOrkestPlayList("dummy","dummy", "dummy").get()
+        assertEquals(true,success)
+    }
+
+    @Test
+    fun mockAddANewSOngToThePlaylistFailWithEmptyAccessToken(){
+        val mockDeezerIntegration = DeezerApiIntegration(DeezerMockAPi.DeezerMockApiImplemented())
+        assertThrows(java.util.concurrent.CompletionException::class.java){mockDeezerIntegration.addANewSongToOrkestPlayList("","dummy", "dummy").join()}
+    }
+
+    @Test
+    fun mockAddANewSOngToThePlaylistFailWithEmptyPlaylistId(){
+        val mockDeezerIntegration = DeezerApiIntegration(DeezerMockAPi.DeezerMockApiImplemented())
+        assertThrows(java.util.concurrent.CompletionException::class.java){mockDeezerIntegration.addANewSongToOrkestPlayList("dummy","", "dummy").join()}
+        assertThrows(java.util.concurrent.CompletionException::class.java){mockDeezerIntegration.addANewSongToOrkestPlayList("dummy","", "").join()}
+    }
+
+    @Test
+    fun mockAddANewSOngToThePlaylistFailWithEmptyTrackId(){
+        val mockDeezerIntegration = DeezerApiIntegration(DeezerMockAPi.DeezerMockApiImplemented())
+        assertThrows(java.util.concurrent.CompletionException::class.java){mockDeezerIntegration.addANewSongToOrkestPlayList("dummy","dummy", "").join()}
+        assertThrows(java.util.concurrent.CompletionException::class.java){mockDeezerIntegration.addANewSongToOrkestPlayList("dummy","", "").join()}
+    }
 
 
 }

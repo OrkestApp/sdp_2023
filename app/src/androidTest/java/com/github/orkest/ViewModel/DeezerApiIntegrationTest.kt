@@ -12,6 +12,9 @@ import org.junit.Test
 class DeezerApiIntegrationTest {
 
 
+    /**
+     * Need to artificialy create the data classes so they can be considered as tested
+     */
 
     /**
      *
@@ -192,6 +195,53 @@ class DeezerApiIntegrationTest {
         val x = mockDeezerIntegration.searchSongInDeezerDatabse("pettite fille").get()
         assertEquals("Booba",x.data[0].artist.name)
         assertEquals("Petite fille",x.data[0].title)
+        assertEquals("434591652",x.data[0].id)
+        assertEquals("215",x.data[0].duration)
+        assertEquals(0,x.data[0].explicit_content_cover)
+        assertEquals(1,x.data[0].explicit_content_lyrics)
+        assertEquals(true,x.data[0].explicit_lyrics)
+        assertEquals("https://www.deezer.com/track/434591652",x.data[0].link)
+        assertEquals("https://cdns-preview-3.dzcdn.net/stream/c-35affe970bf6efc970d8bfd56fcb09f6-5.mp3",x.data[0].preview)
+        assertEquals("c35627fb50640d971702930cf469f594",x.data[0].md5_image)
+        assertEquals("865026",x.data[0].rank)
+        assertEquals(true,x.data[0].readable)
+        assertEquals("Petite fille",x.data[0].title_short)
+        assertEquals("",x.data[0].title_version)
+        assertEquals("track",x.data[0].type)
+
+        //Need to create the dataclasses artificially  to improve code coverage
+        val createAlbum = DeezerModelClasses.Album("","","","","","","","","","")
+        assertEquals("390",x.data[0].artist.id)
+        assertEquals("Booba",x.data[0].artist.name)
+        assertEquals("https://www.deezer.com/artist/390",x.data[0].artist.link)
+        assertEquals("https://api.deezer.com/artist/390/image",x.data[0].artist.picture)
+        assertEquals("https://e-cdns-images.dzcdn.net/images/artist/38b687e97c6874e744d305ef2ca8d0d0/56x56-000000-80-0-0.jpg",x.data[0].artist.picture_small)
+        assertEquals("https://e-cdns-images.dzcdn.net/images/artist/38b687e97c6874e744d305ef2ca8d0d0/250x250-000000-80-0-0.jpg",x.data[0].artist.picture_medium)
+        assertEquals("https://e-cdns-images.dzcdn.net/images/artist/38b687e97c6874e744d305ef2ca8d0d0/500x500-000000-80-0-0.jpg",x.data[0].artist.picture_big)
+        assertEquals("https://e-cdns-images.dzcdn.net/images/artist/38b687e97c6874e744d305ef2ca8d0d0/1000x1000-000000-80-0-0.jpg",x.data[0].artist.picture_xl)
+        assertEquals("https://api.deezer.com/artist/390/top?limit=50",x.data[0].artist.tracklist)
+        assertEquals("artist",x.data[0].artist.type)
+
+        val createArtist = DeezerModelClasses.Artist("","","","","","","",",","","")
+        assertEquals("52475732",x.data[0].album.id)
+        assertEquals("Trône",x.data[0].album.title)
+        assertEquals("https://api.deezer.com/album/52475732/image",x.data[0].album.cover)
+        assertEquals("https://e-cdns-images.dzcdn.net/images/cover/c35627fb50640d971702930cf469f594/56x56-000000-80-0-0.jpg",x.data[0].album.cover_small)
+        assertEquals("https://e-cdns-images.dzcdn.net/images/cover/c35627fb50640d971702930cf469f594/250x250-000000-80-0-0.jpg",x.data[0].album.cover_medium)
+        assertEquals("https://e-cdns-images.dzcdn.net/images/cover/c35627fb50640d971702930cf469f594/500x500-000000-80-0-0.jpg",x.data[0].album.cover_big)
+        assertEquals("https://e-cdns-images.dzcdn.net/images/cover/c35627fb50640d971702930cf469f594/1000x1000-000000-80-0-0.jpg",x.data[0].album.cover_xl)
+        assertEquals("c35627fb50640d971702930cf469f594",x.data[0].album.md5_image)
+        assertEquals("https://api.deezer.com/album/52475732/tracks",x.data[0].album.tracklist)
+        assertEquals("album",x.data[0].album.type)
+
+        val createTrack = DeezerModelClasses.Track("",true,"","","","","","",true,
+            1,0,"","",createArtist,createAlbum,"")
+
+        val createUser = DeezerModelClasses.User("","","","")
+
+        val createPlaylist = DeezerModelClasses.Playlist("","",true,"","","","","","","","","","","","",createUser,"")
+
+
     }
     @Test
     fun mockSearchInDatabaseWithEmptySongName(){
@@ -205,8 +255,32 @@ class DeezerApiIntegrationTest {
     fun mockFetchId(){
         val mockDeezerIntegration = DeezerApiIntegration(DeezerMockAPi.DeezerMockApiImplemented())
         val x = mockDeezerIntegration.fetchTheUserIdInTheDeezerDatabase("adadad").get()
+
+        val create = DeezerModelClasses.UserExtended("","","","","","","","","","","","","","","","","","","",
+            listOf(""),"","")
         assertEquals("Zermelo-101",x.name)
         assertEquals("2297625024",x.id)
+        assertEquals("Rocher",x.lastname)
+        assertEquals("Jean-françois",x.firstname)
+        assertEquals("jf-rocher@outlook.fr",x.email)
+        assertEquals("2",x.status)
+        assertEquals("0000-00-00",x.birthday)
+        assertEquals("2018-09-04",x.inscription_date)
+        assertEquals("",x.gender)
+        assertEquals("https://www.deezer.com/profile/2297625024",x.link)
+        assertEquals("https://api.deezer.com/user/2297625024/image",x.picture)
+        assertEquals("https://e-cdns-images.dzcdn.net/images/user/5136e5875050a362da76693a723290a0/56x56-000000-80-0-0.jpg",x.picture_small)
+        assertEquals("https://e-cdns-images.dzcdn.net/images/user/5136e5875050a362da76693a723290a0/250x250-000000-80-0-0.jpg",x.picture_medium)
+        assertEquals("https://e-cdns-images.dzcdn.net/images/user/5136e5875050a362da76693a723290a0/500x500-000000-80-0-0.jpg",x.picture_big)
+        assertEquals("https://e-cdns-images.dzcdn.net/images/user/5136e5875050a362da76693a723290a0/1000x1000-000000-80-0-0.jpg",x.picture_xl)
+        assertEquals("CH",x.country)
+        assertEquals("en",x.lang)
+        assertEquals("false",x.is_kid)
+        assertEquals("explicit_display",x.explicit_content_level)
+        assertEquals(listOf("explicit_display","explicit_no_recommendation","explicit_hide"),x.explicit_content_levels_available)
+        assertEquals("https://api.deezer.com/user/2297625024/flow",x.tracklist)
+        assertEquals("user",x.type)
+
     }
 
     @Test

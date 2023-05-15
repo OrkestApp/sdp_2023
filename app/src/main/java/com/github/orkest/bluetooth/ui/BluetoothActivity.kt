@@ -8,21 +8,26 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
 import com.github.orkest.bluetooth.data.BluetoothServiceManager
-import com.github.orkest.bluetooth.domain.BluetoothInterface
 import com.github.orkest.bluetooth.ui.ui.theme.OrkestTheme
 
 class BluetoothActivity : ComponentActivity() {
+
+    private lateinit var bluetoothAdapter: BluetoothAdapter
+    private lateinit var bluetoothManager: BluetoothManager
+    private lateinit var bluetoothServiceManager: BluetoothServiceManager
 
     private var requestBluetooth = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
@@ -34,11 +39,22 @@ class BluetoothActivity : ComponentActivity() {
         }
     }
 
+    private var discovery = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+
+        // discoverable
+        Log.d("BluetoothActivity", "Bluetooth adapter: $bluetoothAdapter")
+        bluetoothServiceManager.discoverDevices(bluetoothAdapter, this, receiver)
+    }
+
     private val receiver = object : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent) {
+
+            intent.action?.let { Log.d("BluetoothActivity", it) }
             when(intent.action) {
+
                 BluetoothDevice.ACTION_FOUND -> {
+                    Log.d("BluetoothActivity", "BluetoothDevice.ACTION_FOUND")
                     // Discovery has found a device. Get the BluetoothDevice
                     // object and its info from the Intent.
                     val device: BluetoothDevice? =
@@ -52,6 +68,7 @@ class BluetoothActivity : ComponentActivity() {
                         return
                     } else {
                         device?.name
+                        Log.d("BluetoothActivity", "Device name: ${device?.name}")
                     }
                     val deviceHardwareAddress = device?.address // MAC address
                     }
@@ -60,30 +77,29 @@ class BluetoothActivity : ComponentActivity() {
         }
 
 
+    @RequiresApi(Build.VERSION_CODES.S)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         // -------------------------------------------------------------------------------------
         // setup bluetooth
 
-        val bluetoothServiceManager = BluetoothServiceManager()
+        bluetoothServiceManager = BluetoothServiceManager()
+        bluetoothManager = getSystemService(BluetoothManager::class.java)
+        bluetoothAdapter = bluetoothManager.adapter
 
-        val bluetoothManager: BluetoothManager = getSystemService(BluetoothManager::class.java)
-        val bluetoothAdapter: BluetoothAdapter? = bluetoothManager.adapter
-        if (bluetoothAdapter == null) {
-            // Device doesn't support Bluetooth
-            Log.e("BluetoothActivity", "Device doesn't support Bluetooth")
+        if (!bluetoothAdapter.isEnabled) {
+            val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+            requestBluetooth.launch(enableBtIntent)
         }
-//        if (bluetoothAdapter?.isEnabled == false) {
-        Log.d("BluetoothActivity", "Bluetooth enabled")
-        val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-        requestBluetooth.launch(enableBtIntent)
-//        }
-
-        if (bluetoothAdapter != null) {
-
-            bluetoothServiceManager.discoverDevices(bluetoothAdapter, this, receiver)
+        // check for permissions
+        val permissions = bluetoothServiceManager.checkPermissionGranted(this)
+        if (!permissions) {
+            bluetoothServiceManager.askBluetoothPermission(this)
         }
+        val discoverableIntent: Intent = Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE).apply {
+            putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300)
+        }
+        discovery.launch(discoverableIntent)
 
         // -------------------------------------------------------------------------------------
 

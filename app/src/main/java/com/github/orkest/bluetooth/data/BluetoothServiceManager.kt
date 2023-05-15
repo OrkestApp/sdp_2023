@@ -4,14 +4,13 @@ package com.github.orkest.bluetooth.data
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
+import android.bluetooth.BluetoothManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.util.Log
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat.RECEIVER_EXPORTED
-import androidx.core.content.ContextCompat.registerReceiver
 import com.github.orkest.bluetooth.domain.BluetoothInterface
 
 class BluetoothServiceManager : BluetoothInterface {
@@ -40,11 +39,17 @@ class BluetoothServiceManager : BluetoothInterface {
         // Discover devices
         // Register for broadcasts when a device is discovered.
         val filter = IntentFilter(BluetoothDevice.ACTION_FOUND)
-        registerReceiver(context, receiver, filter, RECEIVER_EXPORTED)
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)
+        context.registerReceiver(receiver, filter)
 
-
-
-
+        if (context.checkSelfPermission("android.permission.ACCESS_COARSE_LOCATION") == PackageManager.PERMISSION_GRANTED) {
+            val bluetoothManager = context.getSystemService(BluetoothManager::class.java);
+            if (bluetoothManager != null) {
+                val mBleAdapter = bluetoothManager.adapter
+                val discoveryStarted = mBleAdapter.startDiscovery()
+                Log.d("BluetoothServiceManager", "Discovery started: $discoveryStarted")
+            }
+        }
     }
 
     override fun connectDevice() {

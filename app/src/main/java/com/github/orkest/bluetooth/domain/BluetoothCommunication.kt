@@ -1,5 +1,6 @@
 package com.github.orkest.bluetooth.domain
 
+import android.bluetooth.BluetoothSocket
 import com.google.common.primitives.Bytes
 
 interface BluetoothCommunication: Runnable {

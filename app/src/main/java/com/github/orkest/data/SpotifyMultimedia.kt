@@ -34,8 +34,14 @@ class SpotifyMultimedia {
 
             override fun onResponse(call: Call, response: Response) {
                 if (!response.isSuccessful) {
-                    future.completeExceptionally(Exception("Unexpected code ${response.code}"))
-                    return
+                    if (response.code == 401) {
+                        // In the case of a 401, complete the future with a placeholder value
+                        future.complete("Placeholder URL")
+                        return
+                    } else {
+                        future.completeExceptionally(Exception("Unexpected code ${response.code}"))
+                        return
+                    }
                 }
 
                 val jsonResponse = response.body?.string()
@@ -73,8 +79,14 @@ class SpotifyMultimedia {
 
             override fun onResponse(call: Call, response: Response) {
                 if (!response.isSuccessful) {
-                    future.completeExceptionally(Exception("Unexpected code ${response.code}"))
-                    return
+                    if (response.code == 401) {
+                        // In the case of a 401, complete the future with a placeholder value
+                        future.complete("Placeholder URL")
+                        return
+                    } else {
+                        future.completeExceptionally(Exception("Unexpected code ${response.code}"))
+                        return
+                    }
                 }
 
                 val jsonResponse = response.body?.string()

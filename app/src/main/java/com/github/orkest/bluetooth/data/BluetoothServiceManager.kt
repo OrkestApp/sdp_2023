@@ -7,16 +7,32 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.util.Log
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import com.github.orkest.bluetooth.domain.BluetoothInterface
 
 class BluetoothServiceManager : BluetoothInterface {
 
-    override fun discoverDevices(bluetoothAdapter: BluetoothAdapter, context: Context, receiver: BroadcastReceiver) {
+    override fun discoverDevices(
+        context: Context,
+        receiver: BroadcastReceiver,
+        requestBluetooth: ActivityResultLauncher<Intent>
+    ) {
 
+        // -------------------------------------------------------------------------------------
+        // setup bluetooth
+        val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        val bluetoothAdapter = bluetoothManager.adapter
+
+        if (!bluetoothAdapter.isEnabled) {
+            val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+            requestBluetooth.launch(enableBtIntent)
+        }
         // start by querying paired devices
         val pairedDevices: MutableSet<BluetoothDevice>? = if (ActivityCompat.checkSelfPermission(
                 context,
@@ -50,6 +66,7 @@ class BluetoothServiceManager : BluetoothInterface {
                 Log.d("BluetoothServiceManager", "Discovery started: $discoveryStarted")
             }
         }
+
     }
 
     override fun connectDevice() {

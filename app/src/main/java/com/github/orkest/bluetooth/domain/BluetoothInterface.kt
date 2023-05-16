@@ -5,8 +5,11 @@ import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -41,7 +44,10 @@ interface BluetoothInterface {
 
     }
 
-    fun discoverDevices(bluetoothAdapter: BluetoothAdapter, context: Context, receiver: BroadcastReceiver)
+    fun discoverDevices(context: Context,
+                        receiver: BroadcastReceiver,
+                        requestBluetooth: ActivityResultLauncher<Intent>
+    )
 
     fun connectDevice()
 

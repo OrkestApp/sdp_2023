@@ -4,6 +4,9 @@ import com.github.orkest.data.SpotifyMultimedia
 import org.junit.Before
 import org.junit.Test
 
+/**
+ * Test class for SpotifyMultimedia
+ */
 class MockSpotifyMultimediaTest {
 
     private var accessToken = "random"       // access token for Spotify API

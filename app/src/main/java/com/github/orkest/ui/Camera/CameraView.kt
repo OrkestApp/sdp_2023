@@ -71,7 +71,8 @@ class CameraView: ComponentActivity() {
                     lifecycleOwner = this,
                     onImageCaptured = { uri ->
                         capturedImageUri = uri
-                    })
+                    },
+                    hasCamera = hasCamera)
 
             }
 
@@ -81,7 +82,8 @@ class CameraView: ComponentActivity() {
     @Composable
     fun CameraPreview(
         lifecycleOwner: LifecycleOwner,
-        onImageCaptured: (Uri) -> Unit
+        onImageCaptured: (Uri) -> Unit,
+        hasCamera: Boolean
     ) {
 
         Box(modifier = Modifier

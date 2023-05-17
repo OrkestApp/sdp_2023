@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture
 /*
     * ViewModel for the PlaylistActivity
 */
-class PlaylistViewModel(private val songDao: AppDao.Companion.SongDao) : ViewModel() {
+open class PlaylistViewModel(private val songDao: AppDao.Companion.SongDao) : ViewModel() {
 
     private val dbAPI = FireStoreDatabaseAPI()
 

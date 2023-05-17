@@ -149,42 +149,54 @@ class CameraView: ComponentActivity(){
                 val cameraProvider = cameraProviderFuture.get()
 
                 // Initialize variables for the camera preview and preview view.
-                var preview: Preview? = null
+                val preview: Preview?
 
                 var recording: Recording? = remember { null }
-                var previewView: PreviewView = remember { PreviewView(context) }
+                val previewView: PreviewView = remember { PreviewView(context) }
                 val videoCapture: MutableState<VideoCapture<Recorder>?> = remember { mutableStateOf(null) }
                 val recordingStarted: MutableState<Boolean> = remember { mutableStateOf(false) }
 
                 val selectedMode: MutableState<Boolean> = remember { mutableStateOf(false) }
+                lateinit var videoCaptureRecorder:  VideoCapture<Recorder>
+
+                previewView.layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                )
+                preview = Preview.Builder().build().apply { setSurfaceProvider(previewView.surfaceProvider) }
+
 
                 val recorder = Recorder.Builder()
                     .setExecutor(mainExecutor)
                     .setQualitySelector(qualitySelector)
                     .build()
-                val videoCaptureRecorder = VideoCapture.withOutput(recorder)
+                videoCaptureRecorder = VideoCapture.withOutput(recorder)
 
-
-                //Creates camera preview to allow the user to take a picture
-                AndroidView(factory = {
-                    //Get  instance of the camera provider to bind the camera preview to the device's camera
-                    previewView = PreviewView(context)
-                    previewView.layoutParams = ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT
-                    )
-                    preview = Preview.Builder().build()
-                    preview?.setSurfaceProvider(previewView.surfaceProvider)
-
+                
+                if(selectedMode.value){
                     cameraProvider.unbindAll()
                     cameraProvider.bindToLifecycle(
                         lifecycleOwner,
                         viewModel.lensFacing,
                         preview,
-                        if(selectedMode.value) videoCaptureRecorder else viewModel.imageCapture
+                        videoCaptureRecorder
                     )
-                    previewView
-                }, modifier = Modifier.testTag("Camera Preview"))
+                } else {
+                    cameraProvider.unbindAll()
+                    cameraProvider.bindToLifecycle(
+                        lifecycleOwner,
+                        viewModel.lensFacing,
+                        preview,
+                        viewModel.imageCapture
+                    )
+                }
+
+
+                //Creates camera preview to allow the user to take a picture
+                AndroidView(
+                    factory = { previewView },
+                    modifier = Modifier.testTag("Camera Preview")
+                )
 
 
 
@@ -231,7 +243,7 @@ class CameraView: ComponentActivity(){
                                 },
                                 modifier = Modifier
                                     .padding(20.dp)
-                                    .size(60.dp)
+                                    .size(100.dp)
 
                             ) {
                                 Icon(

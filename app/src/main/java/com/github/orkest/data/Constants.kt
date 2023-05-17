@@ -9,6 +9,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.core.content.ContextCompat
 import com.github.orkest.R
 import com.github.orkest.domain.DeezerApiIntegration
+import com.github.orkest.domain.deezerApiImplemented
 import java.time.LocalDateTime
 import java.time.ZoneId
 
@@ -21,6 +22,8 @@ class Constants {
         const val SONG_NAME: String = "SONG_NAME"
         const val SONG_ARTIST: String = "SONG_ARTIST"
         const val SONG_ALBUM: String = "SONG_ALBUM"
+
+        const val HTTP_FAIL_CODE = "ORKEST_HTTP_FAIL"
 
         val COLOR_BACKGROUND = Color.hsl(54f, 1f, 0.5f)
 
@@ -55,8 +58,8 @@ class Constants {
                 isPlayed.value = !isPlayed.value
             }
 
-            if (CURRENT_USER_PROVIDER == Providers.DEEZER) {
-                val player = DeezerApiIntegration()
+            if (Constants.CURRENT_USER_PROVIDER == Providers.DEEZER) {
+                val player = DeezerApiIntegration(deezerApiImplemented())
                 ContextCompat.startActivity(context, player.launchDeezerToPlaySong(song.Title)
                                             .get(), null)
                 isPlayed.value = !isPlayed.value

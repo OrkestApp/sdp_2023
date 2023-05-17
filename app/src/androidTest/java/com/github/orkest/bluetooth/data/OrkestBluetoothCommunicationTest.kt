@@ -131,7 +131,6 @@ class OrkestBluetoothCommunicationTest {
         testSocket = TestSocket(ByteArray(0), true)
         msgReceived = ""
         bthCom = OrkestBluetoothCommunication(testSocket, handler)
-        bthCom.start()
 
         bthCom.cancel()
         Thread.sleep(1000)

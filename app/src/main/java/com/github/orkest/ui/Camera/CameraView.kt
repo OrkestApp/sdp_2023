@@ -2,25 +2,16 @@ package com.github.orkest.ui.Camera
 
 
 import android.Manifest
-import android.app.Activity
-import android.content.ContentValues
 import android.content.ContentValues.TAG
 import androidx.compose.ui.viewinterop.AndroidView
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.media.AudioAttributes
-import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
-import android.provider.MediaStore
 import android.util.Log
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.Toast
-import android.widget.VideoView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
@@ -31,7 +22,6 @@ import androidx.camera.video.*
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -39,44 +29,24 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import androidx.lifecycle.LifecycleOwner
 import coil.compose.rememberImagePainter
 import com.github.orkest.R
 import com.github.orkest.data.Constants
 import com.github.orkest.ui.MainActivity
-import java.io.File
 import kotlin.properties.Delegates
 import androidx.camera.core.*
 import androidx.compose.material3.*
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.lifecycle.lifecycleScope
-import androidx.navigation.NavController
-import kotlinx.coroutines.launch
-import okhttp3.Route
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
-import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.Executor
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import androidx.core.util.Consumer
-import kotlin.coroutines.suspendCoroutine
-import kotlin.coroutines.resume
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
@@ -121,8 +91,6 @@ class CameraView: ComponentActivity(){
             }**/
 
 
-
-
             // The state of the captured image is kept in a mutableStateOf variable.
             var capturedImageUri by remember { mutableStateOf<Uri?>(null) }
             var capturedVideoUri by remember { mutableStateOf<Uri?>(null) }
@@ -133,11 +101,13 @@ class CameraView: ComponentActivity(){
                 }
             }
             //If a video has been captured
-            else if(capturedVideoUri != null){
+            if(capturedVideoUri != null){
                 CapturedImage(capturedUri = capturedVideoUri!!, isVideo = true) {
                     capturedVideoUri = null
                 }
-            } else {
+            }
+
+            if(capturedImageUri == null && capturedVideoUri == null) {
                 // If an image or video is not yet captured, a `CameraPreview` composable is displayed.
                 CameraPreview(
                     lifecycleOwner = this,
@@ -148,27 +118,9 @@ class CameraView: ComponentActivity(){
                         capturedVideoUri = uri
                     })
             }
-
-
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.P)
-    @Composable
-    fun MyApp(){
-        var capturedVideoUri by remember { mutableStateOf<Uri?>(null) }
-        if (capturedVideoUri != null) {
-            CapturedImage(
-                capturedUri = capturedVideoUri!!,
-                isVideo = true,
-                onBackClick = { capturedVideoUri = null })
-        } else {
-            VideoCaptureScreen(
-                onVideoCaptured = { uri ->
-                    capturedVideoUri = uri
-                })
-        }
-    }
 
 
     @RequiresApi(Build.VERSION_CODES.P)
@@ -204,15 +156,13 @@ class CameraView: ComponentActivity(){
                 val videoCapture: MutableState<VideoCapture<Recorder>?> = remember { mutableStateOf(null) }
                 val recordingStarted: MutableState<Boolean> = remember { mutableStateOf(false) }
 
-                var selectedMode: MutableState<Boolean> = remember { mutableStateOf(false) }
+                val selectedMode: MutableState<Boolean> = remember { mutableStateOf(false) }
 
                 val recorder = Recorder.Builder()
                     .setExecutor(mainExecutor)
                     .setQualitySelector(qualitySelector)
                     .build()
                 val videoCaptureRecorder = VideoCapture.withOutput(recorder)
-
-
 
 
                 //Creates camera preview to allow the user to take a picture
@@ -240,44 +190,7 @@ class CameraView: ComponentActivity(){
 
 
                 Column(modifier = Modifier.align(Alignment.BottomCenter)) {
-                    Row {
-                        Button(
-                            onClick = {
-                                if (selectedMode.value) {
-                                    selectedMode.value = false
-                                }
-                            },
-                            shape = RoundedCornerShape(16.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color.Transparent,
-                                contentColor = Color.White
-                            ),
-                            modifier = Modifier.padding(8.dp).border(
-                                1.dp,
-                                if (!selectedMode.value) Color.White else Color.Transparent
-                            )
-                        ) {
-                            Text(text = "Photo")
-                        }
-                        Button(
-                            onClick = {
-                                if (!selectedMode.value) {
-                                    selectedMode.value = true
-                                }
-                            },
-                            shape = RoundedCornerShape(16.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color.Transparent,
-                                contentColor = Color.White
-                            ),
-                            modifier = Modifier.padding(8.dp).border(
-                                1.dp,
-                                if (selectedMode.value) Color.White else Color.Transparent
-                            )
-                        ) {
-                            Text(text = "Video")
-                        }
-                    }
+                    Row { SelectCameraMode(selectedMode = selectedMode) }
 
                     Row {
                         if(selectedMode.value){
@@ -317,13 +230,13 @@ class CameraView: ComponentActivity(){
                                     }
                                 },
                                 modifier = Modifier
-                                    .padding(bottom = 32.dp)
+                                    .padding(20.dp)
+                                    .size(60.dp)
+
                             ) {
                                 Icon(
-                                    painter = painterResource(if (recordingStarted.value) R.drawable.powerrangerblue else R.drawable.blank_profile_pic),
-                                    /**TODO TO CHANGE**/
-                                    contentDescription = "",
-                                    modifier = Modifier.padding(20.dp).size(100.dp)
+                                    painter = painterResource(if (recordingStarted.value) R.drawable.stop_recording else R.drawable.start_recording),
+                                    contentDescription = "Recording video button"
                                 )
                             }
                         } else {
@@ -361,7 +274,7 @@ class CameraView: ComponentActivity(){
                             lifecycleOwner,
                             viewModel.lensFacing,
                             preview,
-                            viewModel.imageCapture
+                            if(selectedMode.value) videoCaptureRecorder else viewModel.imageCapture
                         )
                     },
                     modifier = Modifier
@@ -392,6 +305,51 @@ class CameraView: ComponentActivity(){
                     .align(Alignment.TopStart)
                     .testTag("Back Button"))
         }
+    }
+
+    @Composable
+    fun SelectCameraMode(selectedMode: MutableState<Boolean>){
+            Button(
+                onClick = {
+                    if (selectedMode.value) {
+                        selectedMode.value = false
+                    }
+                },
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent,
+                    contentColor = Color.White
+                ),
+                modifier = Modifier
+                    .padding(8.dp)
+                    .border(
+                        1.dp,
+                        if (!selectedMode.value) Color.White else Color.Transparent
+                    )
+            ) {
+                Text(text = "Photo")
+            }
+            Button(
+                onClick = {
+                    if (!selectedMode.value) {
+                        selectedMode.value = true
+                    }
+                },
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent,
+                    contentColor = Color.White
+                ),
+                modifier = Modifier
+                    .padding(8.dp)
+                    .border(
+                        1.dp,
+                        if (selectedMode.value) Color.White else Color.Transparent
+                    )
+            ) {
+                Text(text = "Video")
+            }
+
     }
 
 
@@ -447,7 +405,7 @@ class CameraView: ComponentActivity(){
                                     if (event is VideoRecordEvent.Finalize) {
                                         val uri = event.outputResults.outputUri
                                         if (uri != Uri.EMPTY) {
-                                            /**save the video in database**/
+                                            /**save the video uri in database**/
                                             onVideoCaptured(uri)
                                         } else {
                                             Log.e(TAG, "Could not record the video")
@@ -465,7 +423,7 @@ class CameraView: ComponentActivity(){
                         .align(Alignment.BottomCenter)
                         .padding(bottom = 32.dp)
                 ) {
-                    Icon(
+                    Image(
                         painter = painterResource(if (recordingStarted.value) R.drawable.powerrangerblue else R.drawable.blank_profile_pic), /**TODO TO CHANGE**/
                         contentDescription = "",
                         modifier = Modifier.size(64.dp)

@@ -1,13 +1,12 @@
 package com.github.orkest.ui.feed
 
-import android.content.ContentValues
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.MutableLiveData
 import com.github.orkest.data.*
 import com.github.orkest.data.Constants.Companion.DEFAULT_MAX_RECENT_DAYS
 import com.github.orkest.domain.FireStoreDatabaseAPI
+import com.github.orkest.ui.notification.Notification
 import java.time.LocalDateTime
 import java.util.concurrent.CompletableFuture
 

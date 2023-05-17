@@ -1,8 +1,11 @@
 package com.github.orkest.ui.Camera
 
+import android.Manifest
+import android.app.Activity
 import android.content.ContentValues
 import android.content.ContentValues.TAG
 import android.content.Context
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
@@ -12,6 +15,7 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.video.Quality
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import java.io.File
 
@@ -77,16 +81,10 @@ class CameraViewModel {
             }}
     }
 
-    // A helper function to translate Quality to a string
-    fun Quality.qualityToString() : String {
-        return when (this) {
-            Quality.UHD -> "UHD"
-            Quality.FHD -> "FHD"
-            Quality.HD -> "HD"
-            Quality.SD -> "SD"
-            else -> throw IllegalArgumentException()
-        }
-    }
+
+
+
+
 
 
 }

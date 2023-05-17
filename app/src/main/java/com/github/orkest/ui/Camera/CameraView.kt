@@ -2,12 +2,15 @@ package com.github.orkest.ui.Camera
 
 
 import android.Manifest
+import android.app.Activity
 import android.content.ContentValues
 import android.content.ContentValues.TAG
 import androidx.compose.ui.viewinterop.AndroidView
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.media.AudioAttributes
+import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -17,6 +20,7 @@ import android.util.Log
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import android.widget.VideoView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
@@ -68,10 +72,18 @@ import java.util.concurrent.Executors
 import androidx.core.util.Consumer
 import kotlin.coroutines.suspendCoroutine
 import kotlin.coroutines.resume
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.app.ActivityCompat
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.ui.StyledPlayerView
 
 
 //This class represents a camera component activity
-class CameraView: ComponentActivity() {
+class CameraView: ComponentActivity(){
 
     private val viewModel: CameraViewModel = CameraViewModel()
 
@@ -83,23 +95,30 @@ class CameraView: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
         hasCamera = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)
 
-        setContent {
-            var capturedVidedUri by remember { mutableStateOf<Uri?>(null) }
-            /**if (capturedVideoUri != null){
+        val hasRead = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
+        val hasWrite = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
 
-            } else {
-                VideoCaptureScreen(
-                    onVideoCaptured = {uri ->
-                    capturedVideoUri = uri
-                })
-            }**/
-            VideoCaptureScreen(
-                onVideoCaptured = {uri ->
-                    capturedVidedUri = uri
-                })
+
+        var hasAllPermissions = false
+
+        setContent {
+
+            var permissions by remember{ mutableStateOf(cameraPermissionsGranted(this))}
+
+            if(!permissions){
+                Box{
+                    Text(text= "Permissions need to be given to use the camera", modifier = Modifier
+                        .align(Alignment.Center)
+                        .testTag("No Camera Text"))
+                }
+                askCameraPermissions() }
+            else {
+                MyApp()
+            }
+
+
 
             /**
             // The state of the captured image is kept in a mutableStateOf variable.
@@ -125,6 +144,23 @@ class CameraView: ComponentActivity() {
 
             }**/
 
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.P)
+    @Composable
+    fun MyApp(){
+        var capturedVideoUri by remember { mutableStateOf<Uri?>(null) }
+        if (capturedVideoUri != null) {
+            CapturedImage(
+                capturedUri = capturedVideoUri!!,
+                isVideo = true,
+                onBackClick = { capturedVideoUri = null })
+        } else {
+            VideoCaptureScreen(
+                onVideoCaptured = { uri ->
+                    capturedVideoUri = uri
+                })
         }
     }
 
@@ -264,50 +300,6 @@ class CameraView: ComponentActivity() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.P)
-    suspend fun Context.createVideoCaptureUseCase(
-        lifecycleOwner: LifecycleOwner,
-        cameraSelector: CameraSelector,
-        previewView: PreviewView
-    ): VideoCapture<Recorder> {
-        val preview = Preview.Builder()
-            .build()
-            .apply { setSurfaceProvider(previewView.surfaceProvider) }
-
-        val qualitySelector = QualitySelector.from(
-            Quality.FHD,
-            FallbackStrategy.lowerQualityOrHigherThan(Quality.FHD)
-        )
-        val recorder = Recorder.Builder()
-            .setExecutor(mainExecutor)
-            .setQualitySelector(qualitySelector)
-            .build()
-        val videoCapture = VideoCapture.withOutput(recorder)
-
-        val cameraProvider = getCameraProvider()
-        cameraProvider.unbindAll()
-        cameraProvider.bindToLifecycle(
-            lifecycleOwner,
-            cameraSelector,
-            preview,
-            videoCapture
-        )
-
-        return videoCapture
-    }
-
-    @RequiresApi(Build.VERSION_CODES.P)
-    suspend fun Context.getCameraProvider(): ProcessCameraProvider = suspendCoroutine { continuation ->
-        ProcessCameraProvider.getInstance(this).also { future ->
-            future.addListener(
-                {
-                    continuation.resume(future.get())
-                },
-                mainExecutor
-            )
-        }
-    }
-
 
 
     @RequiresApi(Build.VERSION_CODES.P)
@@ -344,31 +336,29 @@ class CameraView: ComponentActivity() {
                 )
                 IconButton(
                     onClick = {
+                        //Check is recording has not already started
                         if (!recordingStarted.value) {
                             videoCapture.value?.let { videoCapture ->
                                 recordingStarted.value = true
-                                val mediaDir = context.externalCacheDirs.firstOrNull()?.let {
-                                    File(it, context.getString(R.string.app_name)).apply { mkdirs() }
-                                }
+                                val tempDir = context.cacheDir
 
                                 recording = startRecordingVideo(
                                     context = context,
                                     filenameFormat = "yyyy-MM-dd-HH-mm-ss-SSS",
                                     videoCapture = videoCapture,
-                                    outputDirectory = if (mediaDir != null && mediaDir.exists()) mediaDir else context.filesDir,
+                                    outputDirectory = tempDir,
                                     executor = context.mainExecutor,
                                     audioEnabled = audioEnabled.value
                                 ) { event ->
                                     if (event is VideoRecordEvent.Finalize) {
                                         val uri = event.outputResults.outputUri
                                         if (uri != Uri.EMPTY) {
-                                            val uriEncoded = URLEncoder.encode(
-                                                uri.toString(),
-                                                StandardCharsets.UTF_8.toString()
-                                            )
-                                            onVideoCaptured(uri)
                                             /**save the video in database**/
+                                            onVideoCaptured(uri)
+                                        } else {
+                                            Log.e(TAG, "Could not record the video")
                                         }
+
                                     }
                                 }
                             }
@@ -393,26 +383,7 @@ class CameraView: ComponentActivity() {
     }
 
 
-    private fun startRecordingVideo(
-        context: Context,
-        filenameFormat: String,
-        videoCapture: VideoCapture<Recorder>,
-        outputDirectory: File,
-        executor: Executor,
-        audioEnabled: Boolean,
-        consumer: Consumer<VideoRecordEvent>
-    ): Recording {
-        val videoFile = File(
-            outputDirectory,
-            SimpleDateFormat(filenameFormat, Locale.US).format(System.currentTimeMillis()) + ".mp4"
-        )
 
-        val outputOptions = FileOutputOptions.Builder(videoFile).build()
-
-        return videoCapture.output
-            .prepareRecording(context, outputOptions)
-            .start(executor, consumer)
-    }
 
 
 
@@ -436,27 +407,59 @@ class CameraView: ComponentActivity() {
 
     @Composable
     fun CapturedImage(
-        capturedImageUri: Uri,
+        capturedUri: Uri,
+        isVideo: Boolean,
         onBackClick: () -> Unit
     ) {
         val context = LocalContext.current
+        lateinit var exoPlayer: ExoPlayer
 
         Box(modifier = Modifier.fillMaxSize()) {
-            //Displays the captured Image
-            Image(
-                painter = rememberImagePainter(data = capturedImageUri),
-                contentDescription = "Captured Image",
-                modifier = Modifier.fillMaxSize()
-            )
+            if (isVideo){
+                //Displays the taken video
+                exoPlayer = remember(context) {
+                    ExoPlayer.Builder(context).build().apply {
+                        setMediaItem(MediaItem.fromUri(capturedUri))
+                        prepare()
+                    }
+                }
+                AndroidView(
+                    factory = { context ->
+                        StyledPlayerView(context).apply {
+                            player = exoPlayer
+                        }
+                    },
+                    modifier = Modifier.fillMaxSize()
+                )
+
+            } else {
+                //Displays the captured Image
+                Image(
+                    painter = rememberImagePainter(data = capturedUri),
+                    contentDescription = "Captured Image",
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
 
             //Back button to get back to the camera preview
-            BackButton(onBackClick = onBackClick, modifier = Modifier
+            BackButton(onBackClick =
+            {
+                if(isVideo) { exoPlayer.release() }
+                onBackClick()
+            },
+                modifier = Modifier
                 .padding(paddingValue)
                 .align(Alignment.TopStart)
                 .testTag("Back Button"))
 
             // Save button for the taken picture
-            SaveButton(onSaveClick = {viewModel.savePicture(capturedImageUri, context)}, modifier = Modifier
+            SaveButton(onSaveClick = {
+                if (isVideo) {
+
+                } else {
+                    viewModel.savePicture(capturedUri, context)
+                }
+            }, modifier = Modifier
                 .padding(paddingValue)
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
@@ -536,4 +539,43 @@ class CameraView: ComponentActivity() {
     }
 
 
+    /**
+     * Returns true if the app has the necessary permissions for recording.
+     */
+    private fun cameraPermissionsGranted(context: Context): Boolean {
+        val permissions = arrayOf(
+            //Manifest.permission.READ_EXTERNAL_STORAGE,
+            //Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.CAMERA
+        )
+
+        return permissions.all {
+            ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+        }
+    }
+
+    /**
+     * Requests the necessary permissions for recording.
+     * This method shows the permission request dialogs.
+     */
+    private fun askCameraPermissions() {
+        val permissions = arrayOf(
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.CAMERA
+        )
+
+        val ungrantedPermissions = permissions.filter {
+            ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
+        }.toTypedArray()
+
+        if (ungrantedPermissions.isNotEmpty()) {
+            ActivityCompat.requestPermissions(this, ungrantedPermissions, 300)
+        }
+    }
+
+
+
 }
+
+

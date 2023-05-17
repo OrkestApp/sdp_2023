@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture
 /*
     * ViewModel for the PlaylistActivity
 */
-class PlaylistViewModel(private val songDao: AppDao.Companion.SongDao) : ViewModel() {
+open class PlaylistViewModel(private val songDao: AppDao.Companion.SongDao) : ViewModel() {
 
     private val dbAPI = FireStoreDatabaseAPI()
 
@@ -19,7 +19,7 @@ class PlaylistViewModel(private val songDao: AppDao.Companion.SongDao) : ViewMod
     private var songs : List<Song> = listOf()
 
     // method to fetch songs from database
-    fun fetchSongs(sender: String, receiver: String, context: Context) : CompletableFuture<List<Song>>  {
+    open fun fetchSongs(sender: String, receiver: String, context: Context) : CompletableFuture<List<Song>>  {
         // check internet connection
         return if (dbAPI.isOnline(context)){
             dbAPI.fetchSharedSongsFromDataBase(receiver, sender)

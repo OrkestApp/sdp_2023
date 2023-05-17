@@ -18,11 +18,7 @@ import com.github.orkest.bluetooth.domain.BluetoothInterface
 class BluetoothServiceManager : BluetoothInterface {
 
 
-    override val devices: MutableMap<String, String> = mutableMapOf()
-
-    override fun addDevice(name: String, address: String) {
-        devices[name] = address
-    }
+    override var devices: MutableList<BluetoothDevice> = mutableListOf()
 
     override fun discoverDevices(
         context: Context,
@@ -51,12 +47,7 @@ class BluetoothServiceManager : BluetoothInterface {
             bluetoothAdapter.bondedDevices
         }
 
-        pairedDevices?.forEach { device ->
-            val deviceName = device.name
-            val deviceHardwareAddress = device.address // MAC address
-            devices[deviceName] = deviceHardwareAddress
-
-        }
+        devices = pairedDevices?.toMutableList() ?: mutableListOf()
 
         // ------------------
         // Discover devices
@@ -72,13 +63,12 @@ class BluetoothServiceManager : BluetoothInterface {
 
     }
 
-    override fun connectDevice() {
+    override fun connectDevices() {
         TODO("Not yet implemented")
     }
 
-    override fun pairDevice() {
-        TODO("Not yet implemented")
-    }
+
+
 
 
 

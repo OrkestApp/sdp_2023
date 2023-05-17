@@ -3,6 +3,7 @@ package com.github.orkest.bluetooth.domain
 import android.Manifest
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -16,10 +17,7 @@ import androidx.core.content.ContextCompat
 
 interface BluetoothInterface {
 
-    val devices: MutableMap<String, String>
-    fun addDevice(name: String, address: String) {
-        devices[name] = address
-    }
+    val devices: MutableList<BluetoothDevice>
 
     /*
      * Check if bluetooth permissions are granted
@@ -54,9 +52,7 @@ interface BluetoothInterface {
                         requestBluetooth: ActivityResultLauncher<Intent>
     )
 
-    fun connectDevice()
-
-    fun pairDevice()
+    fun connectDevices()
 
 
 }

@@ -6,6 +6,13 @@ import java.net.URL
 
 interface HttpHandler {
 
+    /**
+     * Opens a http connection to the @url
+     * @param url the url of the disered destination of the connection
+     * @param PostOrGET "POST" if you want to do a POST request, GET otherwise
+     *
+     * return the HttpUrlConnection
+     */
      private fun openRequest(url : URL, PostOrGET  : String) : HttpURLConnection{
         val openConnection = url.openConnection() as HttpURLConnection
         openConnection.requestMethod = PostOrGET
@@ -14,10 +21,17 @@ interface HttpHandler {
 
     }
 
+    /**
+     * Open a Post Request
+     */
+
     fun openPostRequest(url : URL) : HttpURLConnection{
         return openRequest(url,"POST")
     }
 
+    /**
+     * Open a Get request
+     */
     fun openGetRequest(url : URL) : HttpURLConnection{
         return openRequest(url,"GET")
     }

@@ -1,60 +1,140 @@
 package com.github.orkest.bluetooth.data
 
-import android.R
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
-import android.widget.Toast
 import com.github.orkest.bluetooth.domain.BluetoothConstants
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
+import java.io.PipedInputStream
+import java.io.PipedOutputStream
 
 
 class OrkestBluetoothCommunicationTest {
 
-    lateinit var bthCom: OrkestBluetoothCommunication
-    lateinit var testSocket: TestSocket
-    lateinit var handler: Handler
+    private lateinit var bthCom: OrkestBluetoothCommunication
+    private lateinit var testSocket: TestSocket
+
     private lateinit var msgReceived: String
 
-    @Before
-    fun setUp() {
-        testSocket = TestSocket()
-        msgReceived = ""
-        handler = object : Handler(Looper.getMainLooper()) {
-            override fun handleMessage(msg: Message) {
-                when (msg.what) {
+    private val handler = object : Handler(Looper.getMainLooper()) {
+        override fun handleMessage(msg: Message) {
+            when (msg.what) {
 
-                    BluetoothConstants.MESSAGE_WRITE -> {
-                        // construct a string from the buffer
-                        msgReceived = String(msg.obj as ByteArray)
-                    }
-                    BluetoothConstants.MESSAGE_READ -> {
-                        // construct a string from the valid bytes in the buffer
-                        msgReceived = String(msg.obj as ByteArray, 0, msg.arg1)
-                    }
-                    BluetoothConstants.MESSAGE_TOAST -> {
-                        msgReceived= msg.data.getString("toast").toString()
-                    }
+                BluetoothConstants.MESSAGE_WRITE -> {
+                    // construct a string from the buffer
+                    println("Message write")
+                    msgReceived = String(msg.obj as ByteArray)
+                }
+                BluetoothConstants.MESSAGE_READ -> {
+                    // construct a string from the valid bytes in the buffer
+                    msgReceived = String(msg.obj as ByteArray, 0, msg.arg1)
+                }
+                BluetoothConstants.MESSAGE_TOAST -> {
+                    msgReceived= msg.data.getString("toast").toString()
                 }
             }
         }
-        bthCom = OrkestBluetoothCommunication(testSocket, handler)
-        bthCom.start()
+    }
+
+    @Before
+    fun setUp() {
+
+
     }
 
     @Test
     fun correctlyReceivesData() {
-        //Add data to the inputStream of the socket
-        testSocket.getInputStream().
+        //Add data :to the inputStream of the socket
+
+        val testMsg:ByteArray = "Username".toByteArray()
+
+        testSocket = TestSocket(testMsg)
+        msgReceived = ""
+        bthCom = OrkestBluetoothCommunication(testSocket, handler)
+        bthCom.start()
+
+        Thread.sleep(1000)
+        assertEquals("Username", msgReceived)
+    }
+
+//
+
+    @Test
+    fun correctlySendsDataToOutputStream() {
+
+
+        testSocket = TestSocket(ByteArray(0))
+        msgReceived = ""
+        bthCom = OrkestBluetoothCommunication(testSocket, handler)
+        bthCom.start()
+
+        val testMsg:ByteArray = "Username".toByteArray()
+        bthCom.sendData(testMsg)
+        Thread.sleep(2000)
+        assertEquals("Username", msgReceived)
     }
 
     @Test
-    fun sendData() {
+    fun errorToastIsSentCorrectly(){
+        testSocket = TestSocket(ByteArray(0))
+        msgReceived = ""
+        bthCom = OrkestBluetoothCommunication(testSocket, handler)
+        bthCom.start()
+
+        bthCom.sendErrorToast("Error")
+        Thread.sleep(2000)
+        assertEquals("Error", msgReceived)
+    }
+
+
+    @Test
+    fun receiveDataAfterStreamClosedFails() {
+        //Add data :to the inputStream of the socket
+        testSocket = TestSocket(ByteArray(0), true)
+        msgReceived = ""
+        bthCom = OrkestBluetoothCommunication(testSocket, handler)
+        bthCom.start()
+        testSocket.getInputStream().close()
+        Thread.sleep(2000)
+        assertEquals("Can't receive data from the other user, please reconnect", msgReceived)
     }
 
     @Test
-    fun cancel() {
+    fun sendDataAfterStreamClosedFails() {
+        testSocket = TestSocket(ByteArray(0), true)
+        msgReceived = ""
+        bthCom = OrkestBluetoothCommunication(testSocket, handler)
+
+        val testMsg:ByteArray = "cantSendTest".toByteArray()
+        testSocket.getOutputStream().close()
+        Thread.sleep(1000)
+        bthCom.sendData(testMsg)
+        Thread.sleep(500)
+        assertEquals("Couldn't send data to the other device", msgReceived)
+    }
+
+    @Test
+    fun cancelCorrectlyClosesTheSocket() {
+        testSocket = TestSocket(ByteArray(0))
+        msgReceived = ""
+        bthCom = OrkestBluetoothCommunication(testSocket, handler)
+        bthCom.start()
+
+        bthCom.cancel()
+        assertFalse(testSocket.isConnected())
+    }
+
+    @Test
+    fun cancelCorrectlyThrowsException() {
+        testSocket = TestSocket(ByteArray(0), true)
+        msgReceived = ""
+        bthCom = OrkestBluetoothCommunication(testSocket, handler)
+        bthCom.start()
+
+        bthCom.cancel()
+        Thread.sleep(1000)
+        assertEquals( "Couldn't close the connection", msgReceived)
     }
 }

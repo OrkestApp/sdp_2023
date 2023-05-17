@@ -1,15 +1,14 @@
 package com.github.orkest.bluetooth.data
 
 import com.github.orkest.bluetooth.domain.Socket
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.InputStream
-import java.io.OutputStream
+import java.io.*
 
-class TestSocket : Socket {
+class TestSocket(byteArray: ByteArray, private val shouldThrow : Boolean = false) : Socket {
 
-    private val inputStream = ByteArrayInputStream(ByteArray(0))
-    private val outputStream = ByteArrayOutputStream()
+
+    private val inputStream = if (shouldThrow) PipedInputStream() else ByteArrayInputStream(byteArray)
+    private val outputStream = if (shouldThrow) PipedOutputStream() else ByteArrayOutputStream()
+    private var connected = true
 
     override fun getInputStream(): InputStream {
         return inputStream
@@ -20,12 +19,23 @@ class TestSocket : Socket {
     }
 
     override fun isConnected(): Boolean {
-        return true
+        return connected
     }
 
     override fun close() {
         //Close the streams
-        inputStream.close()
-        outputStream.close()
+        try {
+            inputStream.close()
+            outputStream.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        connected = false
+
+        if (shouldThrow) {
+            throw IOException("Test exception")
+        }
+
+
     }
 }

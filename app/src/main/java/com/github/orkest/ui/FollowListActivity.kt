@@ -27,11 +27,14 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.github.orkest.data.Profile
 import com.github.orkest.data.User
 import com.github.orkest.ui.profile.ProfileActivity
 import com.github.orkest.ui.theme.OrkestTheme
 import com.github.orkest.R
 
+//Here for preview purposes. Will be deleted.
+val user = User(username = "Philippe", profile = Profile(profilePictureId = R.drawable.blank_profile_pic))
 
 private val paddingValue = 5.dp
 private val titleFontSize = 28.sp
@@ -85,7 +88,6 @@ fun FollowList(activity: ComponentActivity, viewModel: FollowListViewModel){
             }
             Spacer(modifier = Modifier.width(largeSeparator))
 
-            //Title of the section: either "Followers" or "Followings"
             Column(
                 Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.Center){
@@ -102,9 +104,9 @@ fun FollowList(activity: ComponentActivity, viewModel: FollowListViewModel){
         //Display the list of followers or followings
         val userListLiveData = viewModel.retrieveFollowList()
         val userListState by userListLiveData.observeAsState(emptyList())
-        
+
         LazyColumn{
-            items(userListState){user -> 
+            items(userListState){user ->
                 CreateProfilePreview(user = user)
             }
         }

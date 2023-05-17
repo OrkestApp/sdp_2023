@@ -1,47 +1,63 @@
 package com.github.orkest.ui
 
+import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.DrawerValue
+import androidx.compose.material.Scaffold
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.rounded.Menu
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
-import com.github.orkest.R
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.material.Scaffold
-import androidx.compose.material.ScaffoldState
-import androidx.compose.material.icons.rounded.Menu
-import androidx.compose.material.rememberScaffoldState
-import androidx.compose.material.DrawerValue
-import androidx.compose.runtime.*
-import androidx.compose.ui.tooling.preview.Preview
+import com.github.orkest.ui.profile.EditProfileViewModel
+import com.github.orkest.ui.profile.ProfileViewModel
 import com.github.orkest.ui.theme.OrkestTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+
 const val PADDING_FROM_SCREEN_BORDER = 10
 
 class EditProfileActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        val viewModel = EditProfileViewModel()
+        intent.getStringExtra("bio")?.let { viewModel.setBio(it) }
+        intent.getByteArrayExtra("profilePic")?.let { viewModel.setProfilePic(it) }
+
+
         super.onCreate(savedInstanceState)
         setContent {
             EditProfileSetting {
-                EditProfileScreen(this)
+                if (viewModel != null) {
+                    EditProfileScreen(this, viewModel)
+                }
             }
         }
     }
@@ -68,7 +84,7 @@ fun EditProfileSetting(content: @Composable () -> Unit) {
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditProfileScreen(activity: ComponentActivity) {
+fun EditProfileScreen(activity: ComponentActivity, viewModel: EditProfileViewModel) {
 
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
@@ -77,9 +93,9 @@ fun EditProfileScreen(activity: ComponentActivity) {
     Scaffold(
         // keep track of the state of the scaffold (whether it is opened or closed)
         scaffoldState = scaffoldState,
-        topBar = { TopBar(activity, coroutineScope = coroutineScope, scaffoldState = scaffoldState) },
+        topBar = { TopBar(activity, viewModel = viewModel, coroutineScope = coroutineScope, scaffoldState = scaffoldState) },
         // The content displayed inside the drawer when you click on the hamburger menu button
-        drawerContent = { CreateMenuDrawer() },
+        //drawerContent = { CreateMenuDrawer() },
 
         content = { padding ->
             Modifier
@@ -87,7 +103,7 @@ fun EditProfileScreen(activity: ComponentActivity) {
                 .padding(padding)
             Column() {
                 // profile pic and edit button
-                EditProfileImage()
+                EditProfileImage(viewModel)
                 Divider()
                 MainBody()
             }
@@ -101,12 +117,13 @@ fun EditProfileScreen(activity: ComponentActivity) {
 @Composable
 fun NavDrawerButton(coroutineScope: CoroutineScope, scaffoldState: ScaffoldState) {
     IconButton(
-        onClick = { coroutineScope.launch {
-            if (scaffoldState.drawerState.currentValue == DrawerValue.Closed)
-                scaffoldState.drawerState.open()
-            else
-                scaffoldState.drawerState.close()
-        }
+        onClick = {
+            coroutineScope.launch {
+                if (scaffoldState.drawerState.currentValue == DrawerValue.Closed)
+                    scaffoldState.drawerState.open()
+                else
+                    scaffoldState.drawerState.close()
+            }
         }
     ) {
         Icon(imageVector = Icons.Rounded.Menu, contentDescription = "Drawer Icon")
@@ -142,7 +159,7 @@ fun CreateMenuDrawer() {
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(activity: ComponentActivity, coroutineScope: CoroutineScope, scaffoldState: ScaffoldState) {
+fun TopBar(activity: ComponentActivity, viewModel: EditProfileViewModel, coroutineScope: CoroutineScope, scaffoldState: ScaffoldState) {
 
     TopAppBar(
         title = {
@@ -156,14 +173,17 @@ fun TopBar(activity: ComponentActivity, coroutineScope: CoroutineScope, scaffold
                 // "cancel" clickable text (button)
                 Text(
                     text = "Cancel",
-                    modifier = Modifier.clickable {activity.finish() },
+                    modifier = Modifier.clickable { activity.finish() },
                     fontSize = 20.sp
                 )
 
                 // "save" clickable text (button)
                 Text(
                     text = "Save",
-                    modifier = Modifier.clickable { /* TODO */ },
+                    modifier = Modifier.clickable {
+                        saveChanges(viewModel)
+                        activity.finish()
+                    },
                     fontSize = 20.sp
                 )
             }
@@ -174,6 +194,10 @@ fun TopBar(activity: ComponentActivity, coroutineScope: CoroutineScope, scaffold
     )
 }
 
+// TODO update bio in database too
+fun saveChanges(viewModel: EditProfileViewModel) {
+    viewModel.updateStorage()
+}
 
 
 /**
@@ -192,18 +216,35 @@ fun MainBody() {
  */
 @Composable
 @OptIn(coil.annotation.ExperimentalCoilApi::class)
-fun EditProfileImage() {
-    val imageUri = rememberSaveable { mutableStateOf("") }
-    val painter = rememberImagePainter(
-        imageUri.value.ifEmpty { R.drawable.blank_profile_pic }
-    )
+fun EditProfileImage(viewModel: EditProfileViewModel) {
+
+    val picData = viewModel.profilePicture.value
+
+    //TODO create a function for this
+    //transforms ByteArray to BitMap
+    val pic = BitmapFactory.decodeByteArray(picData, 0, picData!!.size).asImageBitmap()
+
+    val bitmap: MutableState<ImageBitmap?> = remember {
+        mutableStateOf(pic)
+    }
+
+    val context = LocalContext.current
 
     // will be used to access the images library on your phone and set a new picture
     val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent())
+        contract = ActivityResultContracts.GetContent()
+    )
     {
-        uri: Uri? -> uri?.let { imageUri.value = it.toString() }
+        uri: Uri? -> uri?.let {
+            bitmap.value = MediaStore.Images.Media.getBitmap(context.contentResolver, it).asImageBitmap();
+
+            // set the new profile picture (fetched by reading bytes of the URI) in the viewmodel
+            context.contentResolver.openInputStream(it)?.readBytes()
+                ?.let { it1 -> viewModel.setProfilePic(it1) }
+        }
     }
+
+
 
     Column(
         modifier = Modifier
@@ -218,21 +259,24 @@ fun EditProfileImage() {
                 .padding(8.dp)
                 .size(100.dp))
         {
-            Image(
-                painter = painter,
-                contentDescription = null,
-                modifier = Modifier.wrapContentSize(),
-                contentScale = ContentScale.Crop)
+            bitmap.value?.let {
+                Image(
+                    bitmap = bitmap.value!!,
+                    contentDescription = "edit_profile_pic",
+                    modifier = Modifier.wrapContentSize(),
+                    contentScale = ContentScale.Crop
+                )
+            }
         }
         // clickable Text offering the possibility to change profile pic
         Text(
             text = "edit picture",
-            modifier = Modifier.clickable { launcher.launch("image/*") }
+            modifier = Modifier.clickable {
+                launcher.launch("image/*")
+            }
         )
     }
 }
-
-
 
 
 /**
@@ -325,10 +369,10 @@ fun MenuDrawer(
 }
 
 
-@Preview(showBackground = true)
+/*@Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
     EditProfileSetting {
-        EditProfileScreen(EditProfileActivity())
+        EditProfileScreen(EditProfileActivity(), )
     }
-}
+}*/

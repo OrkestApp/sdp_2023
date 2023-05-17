@@ -15,6 +15,54 @@
       },
       "oauth_client": [
         {
+          "client_id": "246922870066-0ct147jmpiihi4qsuuglo3pjtm88bjr2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.orkest",
+            "certificate_hash": "0c35983cb9b74ee3ccda497602cdd2df46000e01"
+          }
+        },
+        {
+          "client_id": "246922870066-5srr3gpa6h77b5620qi3el6e2ia9f3a8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.orkest",
+            "certificate_hash": "3b8a8942e29e9525b51d04f8976fee467c49436b"
+          }
+        },
+        {
+          "client_id": "246922870066-5t04746qhvtibrgjjkj43q38pcsq5trm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.orkest",
+            "certificate_hash": "5333717e5ff3f37f2e41430831110e85b697cea3"
+          }
+        },
+        {
+          "client_id": "246922870066-7eee9heg557pcldbjh22vvkq6ldo2dd8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.orkest",
+            "certificate_hash": "3b599fa5fb6658839151250e4ebd5ddf105e5b9c"
+          }
+        },
+        {
+          "client_id": "246922870066-aghqd8oddl53jme2up3sdmrgegdc1c4p.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.orkest",
+            "certificate_hash": "c3bbb4969e05c02c8d005602dffeee171dd756a5"
+          }
+        },
+        {
+          "client_id": "246922870066-e782snhu4j4ms8arsr9es4p5b77od86r.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.orkest",
+            "certificate_hash": "c925e168b1bf32d2a7784b571f8a66c4f05e0675"
+          }
+        },
+        {
           "client_id": "246922870066-gu6rktlblii2dqt2j7o3hcpu53sf2umq.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

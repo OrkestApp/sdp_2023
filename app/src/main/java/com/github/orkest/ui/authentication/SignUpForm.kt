@@ -55,6 +55,9 @@ fun SignUpForm(viewModel: AuthViewModel) {
     // Value used to display an error message if the username already exists
     val userExists = remember { mutableStateOf(false) }
 
+    // Save bio in SharedPreferences
+    val sharedPref = context.getSharedPreferences("user_credentials", Context.MODE_PRIVATE)
+
     // Font used for the title
 
     Scaffold(
@@ -119,6 +122,22 @@ fun SignUpForm(viewModel: AuthViewModel) {
                 ConfirmButton(viewModel, context, userExists)
             }
         })
+}
+
+fun saveUserBio(context: Context, bio: String) {
+    val sharedPref = context.getSharedPreferences("user_profile", Context.MODE_PRIVATE)
+    with(sharedPref.edit()) {
+        putString("bio", bio)
+        apply()
+    }
+}
+
+fun loadUserBio(context: Context): Pair<String?, String?> {
+    val sharedPref = context.getSharedPreferences("user_profile", Context.MODE_PRIVATE)
+    val bio = sharedPref.getString("username", null)
+    val email = sharedPref.getString("email", null)
+    //return Pair(username, email)
+    return Pair(bio, email)
 }
 
 /**

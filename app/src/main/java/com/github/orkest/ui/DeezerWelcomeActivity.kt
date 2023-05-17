@@ -17,8 +17,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import com.github.orkest.data.Constants
+import com.github.orkest.domain.DeezerApi
 import com.github.orkest.domain.DeezerApiIntegration
 import com.github.orkest.domain.FireStoreDatabaseAPI
+import com.github.orkest.domain.deezerApiImplemented
 
 class DeezerWelcomeActivity : AppCompatActivity(){
 
@@ -44,9 +46,9 @@ class DeezerWelcomeActivity : AppCompatActivity(){
                 else { // waits for the access token to be successfully stored in the database
                     db.getUserDeezerInformations(Constants.CURRENT_LOGGED_USER).thenAccept { data ->
                         if(data.access_token != "" && data.access_token != null){
-                            val userIdFuture = DeezerApiIntegration().fetchTheUserIdInTheDeezerDatabase(data.access_token!!)
+                            val userIdFuture = DeezerApiIntegration(deezerApiImplemented()).fetchTheUserIdInTheDeezerDatabase(data.access_token!!)
                             userIdFuture.thenAccept { // waits for the user Id fetch in the database
-                                user -> val playlistIdFuture = DeezerApiIntegration().createANewPlaylistOnTheUserProfile(user.id,data.access_token!!)
+                                user -> val playlistIdFuture = DeezerApiIntegration(deezerApiImplemented()).createANewPlaylistOnTheUserProfile(user.id,data.access_token!!)
                                 playlistIdFuture.thenAccept { // waits for the playlist to be created on the user's profile and then return the playlist ID
                                     playlistId ->
                                     if (playlistId != "" && playlistId !=null){

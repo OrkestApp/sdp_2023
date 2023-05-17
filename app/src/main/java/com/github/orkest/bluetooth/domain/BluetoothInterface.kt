@@ -50,10 +50,12 @@ interface BluetoothInterface {
                         receiver: BroadcastReceiver,
                         requestBluetooth: ActivityResultLauncher<Intent>)
 
-    fun connectToDevice(device: BluetoothDevice, username: ByteArray)
+    fun connectToDevice(device: BluetoothDevice)
 
 
-    fun acceptConnections(username: ByteArray)
+    fun acceptConnections()
+
+    fun cancelConnections()
 
 
 }

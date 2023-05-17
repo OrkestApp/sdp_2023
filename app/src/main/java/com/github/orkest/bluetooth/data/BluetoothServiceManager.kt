@@ -10,15 +10,17 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.os.Handler
 import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.app.ActivityCompat
 import com.github.orkest.bluetooth.domain.BluetoothInterface
 
-class BluetoothServiceManager : BluetoothInterface {
+class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface {
 
 
     override var devices: MutableList<BluetoothDevice> = mutableListOf()
+
 
     override fun discoverDevices(
         context: Context,
@@ -63,8 +65,12 @@ class BluetoothServiceManager : BluetoothInterface {
 
     }
 
-    override fun connectDevices() {
+    override fun connectToDevice(device: BluetoothDevice, username: ByteArray) {
         TODO("Not yet implemented")
+    }
+
+    override fun acceptConnections(username: ByteArray) {
+
     }
 
 

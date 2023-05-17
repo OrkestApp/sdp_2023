@@ -2,15 +2,14 @@ package com.github.orkest.bluetooth.domain
 
 import android.Manifest
 import android.app.Activity
-import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Handler
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -49,10 +48,12 @@ interface BluetoothInterface {
 
     fun discoverDevices(context: Context,
                         receiver: BroadcastReceiver,
-                        requestBluetooth: ActivityResultLauncher<Intent>
-    )
+                        requestBluetooth: ActivityResultLauncher<Intent>)
 
-    fun connectDevices()
+    fun connectToDevice(device: BluetoothDevice, username: ByteArray)
+
+
+    fun acceptConnections(username: ByteArray)
 
 
 }

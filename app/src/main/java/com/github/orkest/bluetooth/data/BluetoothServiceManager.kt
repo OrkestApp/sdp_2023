@@ -12,11 +12,17 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import com.github.orkest.bluetooth.domain.BluetoothInterface
 
 class BluetoothServiceManager : BluetoothInterface {
+
+
+    override val devices: MutableMap<String, String> = mutableMapOf()
+
+    override fun addDevice(name: String, address: String) {
+        devices[name] = address
+    }
 
     override fun discoverDevices(
         context: Context,
@@ -48,8 +54,9 @@ class BluetoothServiceManager : BluetoothInterface {
         pairedDevices?.forEach { device ->
             val deviceName = device.name
             val deviceHardwareAddress = device.address // MAC address
+            devices[deviceName] = deviceHardwareAddress
+
         }
-        Log.d("BluetoothServiceManager", "Paired devices: $pairedDevices")
 
         // ------------------
         // Discover devices
@@ -59,12 +66,8 @@ class BluetoothServiceManager : BluetoothInterface {
         context.registerReceiver(receiver, filter)
 
         if (context.checkSelfPermission("android.permission.ACCESS_COARSE_LOCATION") == PackageManager.PERMISSION_GRANTED) {
-            val bluetoothManager = context.getSystemService(BluetoothManager::class.java);
-            if (bluetoothManager != null) {
-                val mBleAdapter = bluetoothManager.adapter
-                val discoveryStarted = mBleAdapter.startDiscovery()
-                Log.d("BluetoothServiceManager", "Discovery started: $discoveryStarted")
-            }
+            val mBleAdapter = bluetoothManager.adapter
+            mBleAdapter.startDiscovery()
         }
 
     }
@@ -77,9 +80,6 @@ class BluetoothServiceManager : BluetoothInterface {
         TODO("Not yet implemented")
     }
 
-    override fun sendData(data: String) {
-        TODO("Not yet implemented")
-    }
 
 
 }

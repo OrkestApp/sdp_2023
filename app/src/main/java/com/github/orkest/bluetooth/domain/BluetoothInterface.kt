@@ -16,6 +16,11 @@ import androidx.core.content.ContextCompat
 
 interface BluetoothInterface {
 
+    val devices: MutableMap<String, String>
+    fun addDevice(name: String, address: String) {
+        devices[name] = address
+    }
+
     /*
      * Check if bluetooth permissions are granted
      */
@@ -53,5 +58,5 @@ interface BluetoothInterface {
 
     fun pairDevice()
 
-    fun sendData(data: String)
+
 }

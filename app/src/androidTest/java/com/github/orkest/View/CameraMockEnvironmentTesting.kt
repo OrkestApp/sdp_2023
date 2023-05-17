@@ -1,7 +1,11 @@
 package com.github.orkest.View
 
 import android.net.Uri
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.IconButton
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import com.github.orkest.ui.Camera.MockCamera

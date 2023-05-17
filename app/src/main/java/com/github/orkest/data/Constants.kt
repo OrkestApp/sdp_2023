@@ -65,7 +65,5 @@ class Constants {
 
 
         val NOTIFICATION_CHANNEL_ID = "your_channel_id"
-        val MOCK_USER = User("Jacob", profile = Profile(username = "Jacob", profilePictureId = R.drawable.powerrangerblue))
-
     }
 }

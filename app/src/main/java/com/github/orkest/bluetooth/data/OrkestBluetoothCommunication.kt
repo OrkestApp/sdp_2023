@@ -1,25 +1,26 @@
 package com.github.orkest.bluetooth.data
 
-import android.bluetooth.BluetoothSocket
 import android.content.ContentValues.TAG
+import android.os.Bundle
 import android.os.Handler
 import android.util.Log
 import com.github.orkest.bluetooth.domain.BluetoothCommunication
 import com.github.orkest.bluetooth.domain.BluetoothConstants.Companion.MESSAGE_READ
-import com.google.common.primitives.Bytes
+import com.github.orkest.bluetooth.domain.BluetoothConstants.Companion.MESSAGE_TOAST
+import com.github.orkest.bluetooth.domain.BluetoothConstants.Companion.MESSAGE_WRITE
+import com.github.orkest.bluetooth.domain.Socket
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 
-//TODO: think of how to implement dependency injection for the socket
 class OrkestBluetoothCommunication(
-                private val mmSocket: BluetoothSocket,
-                private val handler: Handler
-            ): BluetoothCommunication, Thread(){
+    private val mmSocket: Socket,
+    private val handler: Handler): BluetoothCommunication, Thread(){
 
-    private val mmInStream: InputStream = mmSocket.inputStream
-    private val mmOutStream: OutputStream = mmSocket.outputStream
+    private val mmInStream: InputStream = mmSocket.getInputStream()
+    private val mmOutStream: OutputStream = mmSocket.getOutputStream()
     private val mmBuffer: ByteArray = ByteArray(1024) // mmBuffer store for the stream
+
 
     override fun run() {
         var numBytes: Int // bytes returned from read()
@@ -42,17 +43,34 @@ class OrkestBluetoothCommunication(
         }
     }
 
+    override fun sendData(data: ByteArray) {
+        try {
+            mmOutStream.write(data)
+        } catch (e: IOException) {
+            Log.e(TAG, "Error occurred when sending data", e)
 
-    override fun readData(): Bytes {
-        TODO()
-    }
+            // Send a failure message back to the activity.
+            val writeErrorMsg = handler.obtainMessage(MESSAGE_TOAST)
+            val bundle = Bundle().apply {
+                putString("toast", "Couldn't send data to the other device")
+            }
+            writeErrorMsg.data = bundle
+            handler.sendMessage(writeErrorMsg)
+            return
+        }
 
-    override fun sendData(data: Bytes) {
-        TODO()
+        // Share the sent message with the UI activity.
+        val writtenMsg = handler.obtainMessage(
+            MESSAGE_WRITE, -1, -1, mmBuffer)
+        writtenMsg.sendToTarget()
     }
 
     override fun cancel() {
-        TODO()
+        try {
+            mmSocket.close()
+        } catch (e: IOException) {
+            Log.e(TAG, "Could not close the connect socket", e)
+        }
     }
 
 

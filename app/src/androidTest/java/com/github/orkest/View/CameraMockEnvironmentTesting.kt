@@ -5,6 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.rule.GrantPermissionRule
+import com.github.orkest.ui.Camera.CameraView
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Rule
@@ -17,8 +18,10 @@ import org.junit.Test
  */
 class CameraMockEnvironmentTesting {
 
-    //@get:Rule Enable for testing on local machine
-    //val composeTestRule = createAndroidComposeRule<MockCamera>()
+    private lateinit var cameraView: CameraView
+
+    @get:Rule
+    val composeTestRule = createAndroidComposeRule<CameraView>()
 
     @get:Rule
     var permissionCamera: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.CAMERA)
@@ -38,7 +41,7 @@ class CameraMockEnvironmentTesting {
 
         composeTestRule.setContent {
             // Call the CapturedImage function
-            composeTestRule.activity.cameraView.CapturedImage(
+            cameraView.CapturedImage(
                 capturedImageUri = mockUri,
                 onBackClick = { /* Do nothing in this test */ }
             )
@@ -60,7 +63,7 @@ class CameraMockEnvironmentTesting {
 
         composeTestRule.setContent {
             // Call the TakePictureButton function
-            composeTestRule.activity.cameraView.TakePictureButton(
+            cameraView.TakePictureButton(
                 onTakePictureClick = { pictureTaken = true },
                 modifier = Modifier
             )
@@ -83,11 +86,11 @@ class CameraMockEnvironmentTesting {
     @Test
     fun testCameraPreview() {
 
-        composeTestRule.activity.cameraView.hasCamera = true
+        cameraView.hasCamera = true
 
         composeTestRule.setContent {
             // Call the CameraPreview function
-            composeTestRule.activity.cameraView.CameraPreview(
+            cameraView.CameraPreview(
                 lifecycleOwner = composeTestRule.activity,
                 onImageCaptured = { /* Do nothing in this test */ },
                 true

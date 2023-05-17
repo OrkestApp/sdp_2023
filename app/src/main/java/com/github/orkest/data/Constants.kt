@@ -55,7 +55,7 @@ class Constants {
                 isPlayed.value = !isPlayed.value
             }
 
-            if (Constants.CURRENT_USER_PROVIDER == Providers.DEEZER) {
+            if (CURRENT_USER_PROVIDER == Providers.DEEZER) {
                 val player = DeezerApiIntegration()
                 ContextCompat.startActivity(context, player.launchDeezerToPlaySong(song.Title)
                                             .get(), null)

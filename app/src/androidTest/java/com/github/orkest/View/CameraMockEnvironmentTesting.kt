@@ -1,23 +1,23 @@
 package com.github.orkest.View
 
 import android.net.Uri
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.IconButton
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.test.rule.GrantPermissionRule
 import com.github.orkest.ui.Camera.MockCamera
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+
 
 class CameraMockEnvironmentTesting {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<MockCamera>()
 
+    @get:Rule
+    var permissionCamera: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.CAMERA)
 
     @Before
     fun setUp() {}

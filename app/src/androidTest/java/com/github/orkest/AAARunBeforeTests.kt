@@ -14,7 +14,7 @@ import org.junit.runners.MethodSorters
  */
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-class RunBeforeTests {
+class AAARunBeforeTests {
     companion object {
         @BeforeClass
         @JvmStatic

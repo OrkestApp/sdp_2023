@@ -3,20 +3,29 @@ package com.github.orkest.domain
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import androidx.compose.ui.unit.Constraints
+import com.github.orkest.data.Constants
 import com.github.orkest.data.User
-
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.concurrent.CompletableFuture
 
-class DeezerApiIntegration {
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.decodeFromString
+
+class DeezerApiIntegration(deezerAPi : DeezerApi)  {
+    val x = deezerAPi
+
     companion object {
-        private  val DEEZER_AUTH_URL = "https://connect.deezer.com/oauth/auth.php"
+        private const val DEEZER_AUTH_URL = "https://connect.deezer.com/oauth/auth.php"
         private  val DEEZER_TOKEN_URL = "https://connect.deezer.com/oauth/access_token.php"
-        private  val CLIENT_ID = "592224"
+        private const val CLIENT_ID = "592224"
         private  val CLIENT_SECRET = "7951a1e4171f70af65cae5c55fdd0e51"
-        private  val REDIRECT_URI = "http://172.20.10.3:5000/deezer"
+        private const val REDIRECT_URI = "http://172.20.10.3:5000/deezer"
 
 
         val url = Uri.parse(
@@ -32,22 +41,20 @@ class DeezerApiIntegration {
      */
     fun searchSongInDeezerDatabse(songName: String? , artistName:String = ""): CompletableFuture<ListTrack>{
         val completableFuture = CompletableFuture<ListTrack>()
-
         //Need to be on an other Thread because if on the main Thread would block the UI
         Thread{
-            val connection = URL("https://api.deezer.com/search/track?q=$songName $artistName").openConnection() as HttpURLConnection
-            connection.requestMethod = "GET"
-
-            val responseCode = connection.responseCode
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                val inputStream = connection.inputStream
-                val response = inputStream.bufferedReader().use { it.readText() }
-                val json = Gson()
-                val trackList = json.fromJson(response, ListTrack::class.java)
-                completableFuture.complete(trackList)
-            } else {
-                // TODO  Handle the error case here...
+            var response = ""
+            if (songName != null ) {
+                response = x.searchAsong(songName,artistName)
             }
+            if(response !="" && response!= Constants.HTTP_FAIL_CODE){
+                val trackList =  deserialise<ListTrack>(response)
+                completableFuture.complete(trackList)
+            }
+            else{
+                completableFuture.completeExceptionally(IOException())
+            }
+
         }.start()
 
         return completableFuture
@@ -64,19 +71,15 @@ class DeezerApiIntegration {
     fun fetchTheUserIdInTheDeezerDatabase(access_token:String):CompletableFuture<DeezerModelClasses.UserExtended>{
         val completableFuture = CompletableFuture<DeezerModelClasses.UserExtended>()
         Thread{
-            val connection = URL("https://api.deezer.com/user/me?access_token=$access_token").openConnection() as HttpURLConnection
-            connection.requestMethod = "GET"
-
-            val responseCode = connection.responseCode
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                val inputStream = connection.inputStream
-                val response = inputStream.bufferedReader().use { it.readText() }
-
-                val json = Gson()
-                val user = json.fromJson(response, DeezerModelClasses.UserExtended::class.java)
+            var response = ""
+            if (access_token != "" ){
+                response = x.fetchTheUserId(access_token)
+            }
+            if (response != Constants.HTTP_FAIL_CODE && response != "") {
+                val user = deserialise<DeezerModelClasses.UserExtended>(response)
                 completableFuture.complete(user)
             } else {
-            Log.d("DEEZER_API_FAIL", "Problems fetching the user in the deezer database")
+            completableFuture.completeExceptionally(IllegalArgumentException())
             }
         }.start()
 
@@ -84,28 +87,29 @@ class DeezerApiIntegration {
 
     }
 
-    /**
-     * Finaly,
-     * Need the access token of the user and use it to add a playlist to his Deezer profile, will able Orkest to share the music
-     */
 
+    /**
+     * @param userId the userId of the user, needs to be fetch from deezer DB
+     * @param access_token the private token of the user
+     * @param playlistTitle default is Orkest, else we can choose the name of the playlist
+     *
+     * @return a completable future that completes with the playlist id of the newly created playlist
+     * or complete exeptionaly with an IO exeption
+     */
     fun createANewPlaylistOnTheUserProfile(userId:String,access_token: String,playlistTitle: String="Orkest"):CompletableFuture<String>{
         val completableFuture = CompletableFuture<String>()
         Thread{
-            val connection = URL("https://api.deezer.com/user/$userId/playlists?access_token=$access_token&title=$playlistTitle").openConnection() as HttpURLConnection
-            connection.requestMethod = "POST"
-
-            val responseCode = connection.responseCode
-
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                val inputStream = connection.inputStream
-                val response = inputStream.bufferedReader().use { it.readText() }
+            var responseCode = ""
+            if (userId!= "" && access_token != "" ){
+                responseCode = x.createANewPlaylistOnTheUserProfile(userId,access_token,playlistTitle)
+            }
+            if (responseCode != Constants.HTTP_FAIL_CODE && responseCode != "") {
                 val regex = Regex("\\D+") // Define a regular expression to match non-digit characters
-                val cleared = regex.replace(response, "") // clear the string to a non -json format
-                Log.d("HELLO", response.toString())
+                val cleared = regex.replace(responseCode, "") // clear the string to a non -json format
                 completableFuture.complete(cleared)
             } else {
-                Log.d("DEEZER_API_FAIL", "Problems fetching the user in the deezer database")
+                Log.d("createANewPlaylistOnTheUserProfile","FAILED")
+                completableFuture.completeExceptionally(IOException())
             }
         }.start()
 
@@ -117,18 +121,18 @@ class DeezerApiIntegration {
     /**
      * add a song the Orkest playlist of the User
      */
-    fun addANewSongToOrkestPlayList(access_token: String,playlistId: String="Orkest",trackId:String):CompletableFuture<Boolean>{
+    fun addANewSongToOrkestPlayList(access_token: String,playlistId: String,trackId:String):CompletableFuture<Boolean>{
         val completableFuture = CompletableFuture<Boolean>()
         Thread{
-            val connection = URL("https://api.deezer.com/playlist/$playlistId/tracks?access_token=$access_token&songs=$trackId").openConnection() as HttpURLConnection
-            connection.requestMethod = "POST"
 
-            val responseCode = connection.responseCode
-
-            if (responseCode == HttpURLConnection.HTTP_OK) {
+            var response = ""
+            if(access_token!= "" && playlistId != "" && trackId != "") {
+                response = x.addANewSongToOrkestPlayList(access_token,playlistId,trackId)
+            }
+            if (response != Constants.HTTP_FAIL_CODE && response != "") {
                 completableFuture.complete(true)
             } else {
-                Log.d("DEEZER_API_FAIL", "Problems adding a song to the database")
+                completableFuture.completeExceptionally(IOException())
             }
         }.start()
 
@@ -141,36 +145,12 @@ class DeezerApiIntegration {
      * Generic Function to deserialize JSON
      */
     inline fun <reified T> deserialise(string: String): T {
-        val jsonParser = Gson()
-        return jsonParser.fromJson(string, T::class.java)
+        val gson = GsonBuilder().create()
+        return gson.fromJson(string, T::class.java)
     }
 
 
 
-    /**
-     * We will need this method later when Orkest will add a playlist to the User profile
-     */
-
-    fun searchPlaylistInDatabase(playlistName:String):CompletableFuture<ListPlaylist>{
-        val playlistFuture = CompletableFuture<ListPlaylist>()
-        Thread{
-            val connection = URL("https://api.deezer.com/search/playlist?q=$playlistName").openConnection() as HttpURLConnection
-            connection.requestMethod = "GET"
-
-            val responseCode = connection.responseCode
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                val inputStream = connection.inputStream
-                val response = inputStream.bufferedReader().use { it.readText() }
-                val json = Gson()
-                val playlist = json.fromJson(response, ListPlaylist::class.java)
-                playlistFuture.complete(playlist)
-            } else {
-                // TODO  Handle the error case here...
-            }
-        }.start()
-
-        return playlistFuture
-    }
 
 
         /**

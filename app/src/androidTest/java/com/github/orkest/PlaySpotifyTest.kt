@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.github.orkest.data.*
 import junit.framework.TestCase.assertEquals
+import org.junit.Assert
 import org.junit.Test
 
 class PlaySpotifyTest {

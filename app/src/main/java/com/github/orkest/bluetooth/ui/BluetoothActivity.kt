@@ -9,6 +9,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -21,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
 import com.github.orkest.bluetooth.data.BluetoothServiceManager
+import com.github.orkest.bluetooth.data.OrkestDevice
 import com.github.orkest.bluetooth.domain.BluetoothInterface
 import com.github.orkest.bluetooth.ui.ui.theme.OrkestTheme
 
@@ -65,7 +67,7 @@ class BluetoothActivity() : ComponentActivity() {
                     return
                 } else {
                     if (device != null) {
-                        bluetoothServiceManager?.addDevice(device.name, device.address)
+                        bluetoothServiceManager?.addDevice(OrkestDevice(device))
                     }
                     Log.d("BluetoothActivity", "Device name: ${device?.name}")
                 }
@@ -110,7 +112,9 @@ class BluetoothActivity() : ComponentActivity() {
 
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
-fun BluetoothActivityStart(bluetoothServiceManager : BluetoothInterface = BluetoothServiceManager(), activity: BluetoothActivity){
+fun BluetoothActivityStart(
+    bluetoothServiceManager : BluetoothInterface = BluetoothServiceManager(Handler()),
+    activity: BluetoothActivity){
     // check for permissions
     val permissions = bluetoothServiceManager.checkPermissionGranted(activity)
     if (!permissions) {

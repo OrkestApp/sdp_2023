@@ -8,6 +8,7 @@ import com.github.orkest.bluetooth.domain.BluetoothCommunication
 import com.github.orkest.bluetooth.domain.BluetoothConstants.Companion.MESSAGE_READ
 import com.github.orkest.bluetooth.domain.BluetoothConstants.Companion.MESSAGE_TOAST
 import com.github.orkest.bluetooth.domain.BluetoothConstants.Companion.MESSAGE_WRITE
+import com.github.orkest.bluetooth.domain.BluetoothConstants.Companion.sendErrorToast
 import com.github.orkest.bluetooth.domain.Socket
 import java.io.IOException
 import java.io.InputStream
@@ -22,6 +23,7 @@ class OrkestBluetoothCommunication(
     private val mmBuffer: ByteArray = ByteArray(1024) // mmBuffer store for the stream
 
     private val TAG = "OrkestBluetoothCommunication"
+    private var stop = false
 
 
     override fun run() {
@@ -29,6 +31,10 @@ class OrkestBluetoothCommunication(
 
         // Keep listening to the InputStream until an exception occurs.
         while (true) {
+            if(stop){
+                break
+            }
+
             // Read from the InputStream.
             numBytes = try {
                 mmInStream.read(mmBuffer)
@@ -36,7 +42,7 @@ class OrkestBluetoothCommunication(
                 Log.d(TAG, "Input stream was disconnected", e)
 
                 // Send a failure message back to the activity.
-                sendErrorToast("Can't receive data from the other user, please reconnect")
+                sendErrorToast("Can't receive data from the other user, please reconnect", handler)
                 break
             }
 
@@ -58,7 +64,7 @@ class OrkestBluetoothCommunication(
             Log.e(TAG, "Error occurred when sending data", e)
 
             // Send a failure message back to the activity.
-            return sendErrorToast("Couldn't send data to the other device")
+            return sendErrorToast("Couldn't send data to the other device",handler)
 
         }
 
@@ -70,22 +76,16 @@ class OrkestBluetoothCommunication(
 
     override fun cancel() {
         try {
+            stop = true
+            this.interrupt()
             mmSocket.close()
         } catch (e: IOException) {
             Log.e(TAG, "Could not close the connect socket", e)
-            sendErrorToast("Couldn't close the connection")
+            sendErrorToast("Couldn't close the connection", handler)
         }
     }
 
-    fun sendErrorToast(error: String){
-        // Send a failure message back to the activity.
-        val writeErrorMsg = handler.obtainMessage(MESSAGE_TOAST)
-        val bundle = Bundle().apply {
-            putString("toast", error)
-        }
-        writeErrorMsg.data = bundle
-        handler.sendMessage(writeErrorMsg)
-    }
+
 
 
 }

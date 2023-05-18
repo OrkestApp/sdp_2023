@@ -14,6 +14,7 @@ import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.RequiresPermission
 import androidx.core.app.ActivityCompat
+import com.github.orkest.bluetooth.domain.BluetoothCommunication
 import com.github.orkest.bluetooth.domain.BluetoothConstants.Companion.MY_UUID
 import com.github.orkest.bluetooth.domain.BluetoothConstants.Companion.NAME
 import com.github.orkest.bluetooth.domain.BluetoothInterface
@@ -102,10 +103,8 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
     override fun cancelConnections() {
         clientConnections.forEach {
             it.cancel()
-            it.interrupt()
         }
         serverConnection?.cancel()
-        serverConnection?.interrupt()
     }
 
 
@@ -116,6 +115,8 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
      */
     @SuppressLint("MissingPermission")
     private inner class AcceptThread(private val serverSocket: ServerSocket?) : Thread() {
+
+        private val communications: MutableList<BluetoothCommunication> = mutableListOf()
 
         override fun run() {
             // Keep listening until exception occurs or a socket is returned.
@@ -130,10 +131,11 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
                 }
                 socket?.also {
                     //TODO: handle cancellation of this connection
-                    OrkestBluetoothCommunication(it, handler).apply {
+                    val comm = OrkestBluetoothCommunication(it, handler).apply {
                         start()
                         sendData(username)
                     }
+                    communications.add(comm)
                 }
             }
         }
@@ -142,6 +144,10 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
         fun cancel() {
             try {
                 serverSocket?.close()
+                communications.forEach {
+                    it.cancel()
+                }
+                this.interrupt()
             } catch (e: IOException) {
                 Log.e(TAG, "Could not close the connect socket", e)
             }
@@ -157,7 +163,7 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
     private inner class ConnectThread(private val socket: Socket?) : Thread() {
 
 
-        private lateinit var communication: OrkestBluetoothCommunication
+        private lateinit var communication: BluetoothCommunication
 
         public override fun run() {
             // Cancel discovery because it otherwise slows down the connection.
@@ -183,6 +189,8 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
         fun cancel() {
             try {
                 socket?.close()
+                communication.cancel()
+                this.interrupt()
             } catch (e: IOException) {
                 Log.e(TAG, "Could not close the client socket", e)
             }

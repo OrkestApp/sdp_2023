@@ -71,6 +71,7 @@ class OrkestBluetoothCommunication(
     override fun cancel() {
         try {
             mmSocket.close()
+            this.interrupt()
         } catch (e: IOException) {
             Log.e(TAG, "Could not close the connect socket", e)
             sendErrorToast("Couldn't close the connection")

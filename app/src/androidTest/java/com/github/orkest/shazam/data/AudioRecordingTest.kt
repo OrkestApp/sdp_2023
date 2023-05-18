@@ -27,12 +27,15 @@ class AudioRecordingTest {
             result.collect { audioChunk ->
                 listAudioChunk.add(audioChunk)
                 AudioRecording.stopRecording(this)
+
             }
         }
 
         Thread.sleep(1000)
         assert(listAudioChunk.size > 0)
     }
+
+
 
 
 }

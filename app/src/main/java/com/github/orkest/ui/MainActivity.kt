@@ -14,7 +14,6 @@ import com.github.orkest.data.Constants
 import com.github.orkest.domain.FireStoreDatabaseAPI
 import com.github.orkest.data.PlaySpotify
 import com.github.orkest.data.Providers
-import com.github.orkest.shazam.domain.ShazamConstants
 import com.github.orkest.ui.notification.Notification
 
 
@@ -33,7 +32,8 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-        ShazamConstants.askRecordPermission(this)
+        PermissionConstants.askRecordPermission(this)
+        PermissionConstants.askCameraPermission(this)
         Notification(this,null).createNotificationChannel()
         Notification(this,null).promptUserToEnableNotifications()
     }
@@ -64,18 +64,29 @@ class MainActivity : AppCompatActivity() {
         permissions: Array<String>,
         grantResults: IntArray
     ) {
-        Log.d("ShazamActivity", "onRequestPermissionsResult")
+        Log.d("MainActivity permissions", "onRequestPermissionsResult")
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == ShazamConstants.REQUEST_RECORD_AUDIO_PERMISSION) {
+        if (requestCode == PermissionConstants.AUDIO_PERMISSION_REQUEST_CODE) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission granted
-                Toast.makeText(this, "The permission was succesfully granted! You van now shazam songs!",
+                Toast.makeText(this, "The permission was successfully granted! You can now shazam songs!",
                     Toast.LENGTH_LONG).show()
             } else {
                 // Permission denied
                 //Display a text box dialog to inform user that the app needs the permission to work
                 Toast.makeText(this, "The app needs the microphone access to analyze " +
                         "which song you are listening to", Toast.LENGTH_LONG).show()
+            }
+        }
+        if(requestCode == PermissionConstants.CAMERA_PERMISSION_REQUEST_CODE){
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted
+                Toast.makeText(this, "The permission was successfully granted! " +
+                        "You can now share pictures and videos with your friends",
+                    Toast.LENGTH_LONG).show()
+            } else {
+                // Permission denied
+                Toast.makeText(this, "The app needs the camera access to share songs with your friends", Toast.LENGTH_LONG).show()
             }
         }
     }

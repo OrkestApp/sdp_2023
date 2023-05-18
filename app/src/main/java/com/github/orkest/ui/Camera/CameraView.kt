@@ -43,11 +43,11 @@ import com.github.orkest.ui.MainActivity
 import kotlin.properties.Delegates
 import androidx.camera.core.*
 import androidx.compose.material3.*
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import java.util.*
 import androidx.compose.foundation.border
 import androidx.compose.runtime.Composable
 import androidx.core.app.ActivityCompat
+import com.github.orkest.ui.PermissionConstants
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.ui.StyledPlayerView
@@ -61,48 +61,28 @@ class CameraView: ComponentActivity(){
     private val roundedCornerValue = 20.dp
     private val paddingValue = 16.dp
 
-    var hasCamera by Delegates.notNull<Boolean>()
+    var hasCameraAccess by Delegates.notNull<Boolean>()
+
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        hasCamera = (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)
-
-        val hasRead = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
-        val hasWrite = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
-
-
-        var hasAllPermissions = false
-
         setContent {
 
-            val permissions by remember{ mutableStateOf(cameraPermissionsGranted(this))}
-
-            /**
-            if(!permissions){
-                Box{
-                    Text(text= "Permissions need to be given to use the camera", modifier = Modifier
-                        .align(Alignment.Center)
-                        .testTag("No Camera Text"))
-                }
-                askCameraPermissions() }
-            else {
-                MyApp()
-            }**/
-
+            hasCameraAccess = PermissionConstants.cameraPermissionIsGranted(this)
 
             // The state of the captured image is kept in a mutableStateOf variable.
             var capturedImageUri by remember { mutableStateOf<Uri?>(null) }
             var capturedVideoUri by remember { mutableStateOf<Uri?>(null) }
+
             //If an image has been captured
             if(capturedImageUri != null){
-                CapturedImage(capturedUri = capturedImageUri!!, isVideo = false) {
+                CapturedMedia(capturedUri = capturedImageUri!!, isVideo = false) {
                     capturedImageUri = null
                 }
             }
             //If a video has been captured
             if(capturedVideoUri != null){
-                CapturedImage(capturedUri = capturedVideoUri!!, isVideo = true) {
+                CapturedMedia(capturedUri = capturedVideoUri!!, isVideo = true) {
                     capturedVideoUri = null
                 }
             }
@@ -119,9 +99,8 @@ class CameraView: ComponentActivity(){
                     })
             }
         }
+
     }
-
-
 
     @RequiresApi(Build.VERSION_CODES.P)
     @Composable
@@ -134,37 +113,37 @@ class CameraView: ComponentActivity(){
         Box(modifier = Modifier
             .fillMaxSize()
             .testTag("Camera Preview Box")) {
-            if(hasCamera) {
-                //Selects the quality for the videos
+            val context = LocalContext.current
+            if(hasCameraAccess) {
+                //Instance of the camera provider
+                val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
+                val cameraProvider = cameraProviderFuture.get()
+
+                // Initialize variables for the camera preview and preview view.
+                val preview: Preview?
+                val previewView: PreviewView = remember { PreviewView(context) }
+
+                //Video variables
+                var recording: Recording? = remember { null }
+                val videoCapture: MutableState<VideoCapture<Recorder>?> = remember { mutableStateOf(null) }
+                val recordingStarted: MutableState<Boolean> = remember { mutableStateOf(false) }
+                lateinit var videoCaptureRecorder:  VideoCapture<Recorder>
                 val qualitySelector = QualitySelector.from(
                     Quality.FHD,
                     FallbackStrategy.lowerQualityOrHigherThan(Quality.FHD)
                 )
 
-                // Get the application context and initialize the camera provider and image capture instances.
-                val context = LocalContext.current
-
-                val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
-                //Instance of the camera provider
-                val cameraProvider = cameraProviderFuture.get()
-
-                // Initialize variables for the camera preview and preview view.
-                val preview: Preview?
-
-                var recording: Recording? = remember { null }
-                val previewView: PreviewView = remember { PreviewView(context) }
-                val videoCapture: MutableState<VideoCapture<Recorder>?> = remember { mutableStateOf(null) }
-                val recordingStarted: MutableState<Boolean> = remember { mutableStateOf(false) }
-
+                // We have chosen the following distribution:
+                // selectedMode = true if a video wants to be taken
+                // selectedMode = false if a picture wants to be taken
                 val selectedMode: MutableState<Boolean> = remember { mutableStateOf(false) }
-                lateinit var videoCaptureRecorder:  VideoCapture<Recorder>
 
+                //Initializing basic parameters
                 previewView.layoutParams = ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT
                 )
                 preview = Preview.Builder().build().apply { setSurfaceProvider(previewView.surfaceProvider) }
-
 
                 val recorder = Recorder.Builder()
                     .setExecutor(mainExecutor)
@@ -172,67 +151,50 @@ class CameraView: ComponentActivity(){
                     .build()
                 videoCaptureRecorder = VideoCapture.withOutput(recorder)
 
-                
-                if(selectedMode.value){
-                    cameraProvider.unbindAll()
-                    cameraProvider.bindToLifecycle(
-                        lifecycleOwner,
-                        viewModel.lensFacing,
-                        preview,
-                        videoCaptureRecorder
-                    )
-                } else {
-                    cameraProvider.unbindAll()
-                    cameraProvider.bindToLifecycle(
-                        lifecycleOwner,
-                        viewModel.lensFacing,
-                        preview,
-                        viewModel.imageCapture
-                    )
-                }
+                viewModel.updateCameraPreview(cameraProvider, lifecycleOwner, preview, videoCaptureRecorder, selectedMode)
 
 
-                //Creates camera preview to allow the user to take a picture
+                //Creates camera preview to allow the user to take a picture or video
                 AndroidView(
                     factory = { previewView },
                     modifier = Modifier.testTag("Camera Preview")
                 )
 
-
-
-
                 Column(modifier = Modifier.align(Alignment.BottomCenter)) {
-                    Row { SelectCameraMode(selectedMode = selectedMode) }
+                    Row(modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center) {
+                        //Add button to choose the picture mode
+                        SelectCameraModeButton(selectedMode = selectedMode, isVideo = false)
+                        //Add button to choose the video mode
+                        SelectCameraModeButton(selectedMode = selectedMode, isVideo = true) }
 
-                    Row {
+                    Row(modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center) {
                         if(selectedMode.value){
                             videoCapture.value = videoCaptureRecorder
                             //Add a button to take the video
-                            IconButton(
-                                onClick = {
+                            TakeVideoButton(
+                                onTakeVideoClick = {
                                     //Check is recording has not already started
                                     if (!recordingStarted.value) {
                                         videoCapture.value?.let { videoCapture ->
                                             recordingStarted.value = true
-                                            val tempDir = context.cacheDir
 
                                             recording = startRecordingVideo(
                                                 context = context,
                                                 filenameFormat = "yyyy-MM-dd-HH-mm-ss-SSS",
                                                 videoCapture = videoCapture,
-                                                outputDirectory = tempDir,
+                                                outputDirectory = context.cacheDir,
                                                 executor = context.mainExecutor,
                                                 audioEnabled = true
                                             ) { event ->
                                                 if (event is VideoRecordEvent.Finalize) {
                                                     val uri = event.outputResults.outputUri
                                                     if (uri != Uri.EMPTY) {
-                                                        /**save the video in database**/
                                                         onVideoCaptured(uri)
                                                     } else {
-                                                        Log.e(TAG, "Could not record the video")
+                                                        Log.e(TAG, "Could not record the video", IllegalArgumentException())
                                                     }
-
                                                 }
                                             }
                                         }
@@ -241,16 +203,7 @@ class CameraView: ComponentActivity(){
                                         recording?.stop()
                                     }
                                 },
-                                modifier = Modifier
-                                    .padding(20.dp)
-                                    .size(100.dp)
-
-                            ) {
-                                Icon(
-                                    painter = painterResource(if (recordingStarted.value) R.drawable.stop_recording else R.drawable.start_recording),
-                                    contentDescription = "Recording video button"
-                                )
-                            }
+                                recordingStarted = recordingStarted)
                         } else {
                             // Add a button to take the picture
                             TakePictureButton(
@@ -276,18 +229,9 @@ class CameraView: ComponentActivity(){
                     onClick = {
                         // Toggle the lens facing between front and back camera
                         viewModel.lensFacing =
-                            if (viewModel.lensFacing == CameraSelector.DEFAULT_BACK_CAMERA) {
-                                CameraSelector.DEFAULT_FRONT_CAMERA
-                            } else {
-                                CameraSelector.DEFAULT_BACK_CAMERA
-                            }
-                        cameraProvider.unbindAll()
-                        cameraProvider.bindToLifecycle(
-                            lifecycleOwner,
-                            viewModel.lensFacing,
-                            preview,
-                            if(selectedMode.value) videoCaptureRecorder else viewModel.imageCapture
-                        )
+                            if (viewModel.lensFacing == CameraSelector.DEFAULT_BACK_CAMERA) { CameraSelector.DEFAULT_FRONT_CAMERA }
+                            else { CameraSelector.DEFAULT_BACK_CAMERA }
+                        viewModel.updateCameraPreview(cameraProvider, lifecycleOwner, preview, videoCaptureRecorder, selectedMode)
                     },
                     modifier = Modifier
                         .padding(paddingValue)
@@ -301,12 +245,11 @@ class CameraView: ComponentActivity(){
                     )
                 }
             } else {
-                Text(text= "No camera on this device", modifier = Modifier
+                Text(text= "No camera found on this device. Please allow the app to use the camera in your settings.", modifier = Modifier
                     .align(Alignment.Center)
                     .testTag("No Camera Text"))
             }
 
-            val context = LocalContext.current
             //Add back button to get back to previous activity.
             BackButton({
                 val intent = Intent(context, MainActivity::class.java)
@@ -319,158 +262,9 @@ class CameraView: ComponentActivity(){
         }
     }
 
-    @Composable
-    fun SelectCameraMode(selectedMode: MutableState<Boolean>){
-            Button(
-                onClick = {
-                    if (selectedMode.value) {
-                        selectedMode.value = false
-                    }
-                },
-                shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Transparent,
-                    contentColor = Color.White
-                ),
-                modifier = Modifier
-                    .padding(8.dp)
-                    .border(
-                        1.dp,
-                        if (!selectedMode.value) Color.White else Color.Transparent
-                    )
-            ) {
-                Text(text = "Photo")
-            }
-            Button(
-                onClick = {
-                    if (!selectedMode.value) {
-                        selectedMode.value = true
-                    }
-                },
-                shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Transparent,
-                    contentColor = Color.White
-                ),
-                modifier = Modifier
-                    .padding(8.dp)
-                    .border(
-                        1.dp,
-                        if (selectedMode.value) Color.White else Color.Transparent
-                    )
-            ) {
-                Text(text = "Video")
-            }
-
-    }
-
-
-
-    @RequiresApi(Build.VERSION_CODES.P)
-    @Composable
-    fun VideoCaptureScreen(onVideoCaptured: (Uri) -> Unit) {
-        val context = LocalContext.current
-        val lifecycleOwner = LocalLifecycleOwner.current
-
-        var recording: Recording? = remember { null }
-        val previewView: PreviewView = remember { PreviewView(context) }
-        val videoCapture: MutableState<VideoCapture<Recorder>?> = remember { mutableStateOf(null) }
-        val recordingStarted: MutableState<Boolean> = remember { mutableStateOf(false) }
-
-        val audioEnabled: MutableState<Boolean> = remember { mutableStateOf(false) }
-        val cameraSelector: MutableState<CameraSelector> = remember {
-            mutableStateOf(CameraSelector.DEFAULT_BACK_CAMERA)
-        }
-
-
-        LaunchedEffect(previewView) {
-            videoCapture.value = context.createVideoCaptureUseCase(
-                lifecycleOwner = lifecycleOwner,
-                cameraSelector = cameraSelector.value,
-                previewView = previewView
-            )
-        }
-
-            Box(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                AndroidView(
-                    factory = { previewView },
-                    modifier = Modifier.fillMaxSize()
-                )
-                IconButton(
-                    onClick = {
-                        //Check is recording has not already started
-                        if (!recordingStarted.value) {
-                            videoCapture.value?.let { videoCapture ->
-                                recordingStarted.value = true
-                                val tempDir = context.cacheDir
-
-                                recording = startRecordingVideo(
-                                    context = context,
-                                    filenameFormat = "yyyy-MM-dd-HH-mm-ss-SSS",
-                                    videoCapture = videoCapture,
-                                    outputDirectory = tempDir,
-                                    executor = context.mainExecutor,
-                                    audioEnabled = audioEnabled.value
-                                ) { event ->
-                                    if (event is VideoRecordEvent.Finalize) {
-                                        val uri = event.outputResults.outputUri
-                                        if (uri != Uri.EMPTY) {
-                                            /**save the video uri in database**/
-                                            onVideoCaptured(uri)
-                                        } else {
-                                            Log.e(TAG, "Could not record the video")
-                                        }
-
-                                    }
-                                }
-                            }
-                        } else {
-                            recordingStarted.value = false
-                            recording?.stop()
-                        }
-                    },
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(bottom = 32.dp)
-                ) {
-                    Image(
-                        painter = painterResource(if (recordingStarted.value) R.drawable.powerrangerblue else R.drawable.blank_profile_pic), /**TODO TO CHANGE**/
-                        contentDescription = "",
-                        modifier = Modifier.size(64.dp)
-                    )
-                }
-
-            }
-
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     @Composable
-    fun CapturedImage(
+    fun CapturedMedia(
         capturedUri: Uri,
         isVideo: Boolean,
         onBackClick: () -> Unit
@@ -543,7 +337,7 @@ class CameraView: ComponentActivity(){
                 contentColor = Color.Black
             )
         ) {
-            Text(text = "Save Image", fontWeight = FontWeight.Bold)
+            Text(text = "Publish to post", fontWeight = FontWeight.Bold)
         }
     }
 
@@ -584,11 +378,14 @@ class CameraView: ComponentActivity(){
     @Composable
     fun TakeVideoButton(
         onTakeVideoClick: () -> Unit,
-        modifier: Modifier){
+        recordingStarted:  MutableState<Boolean>){
 
         Button(
             onClick = onTakeVideoClick,
-            modifier = modifier,
+            modifier = Modifier
+                .padding(20.dp)
+                .size(100.dp)
+                .testTag("Take Video Button"),
             shape = CircleShape,
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.White,
@@ -596,49 +393,34 @@ class CameraView: ComponentActivity(){
             ),
             border = BorderStroke(10.dp, Constants.COLOR_BACKGROUND)
         ) {
-            Image(painterResource(id = R.drawable.powerrangerblue),
+            Image(painterResource(if (recordingStarted.value) R.drawable.stop_recording else R.drawable.start_recording),
                 contentDescription = "Take Video Button")
         }
 
     }
 
 
-    /**
-     * Returns true if the app has the necessary permissions for recording.
-     */
-    private fun cameraPermissionsGranted(context: Context): Boolean {
-        val permissions = arrayOf(
-            //Manifest.permission.READ_EXTERNAL_STORAGE,
-            //Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.CAMERA
-        )
-
-        return permissions.all {
-            ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+    @Composable
+    fun SelectCameraModeButton(selectedMode: MutableState<Boolean>, isVideo: Boolean){
+        Button(
+            onClick = {
+                selectedMode.value = !selectedMode.value
+            },
+            shape = RoundedCornerShape(16.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Transparent,
+                contentColor = Color.White
+            ),
+            modifier = Modifier
+                .padding(8.dp)
+                .border(
+                    1.dp,
+                    if (selectedMode.value == isVideo) Color.White else Color.Transparent
+                )
+        ) {
+            Text(text = if(isVideo) "Video" else "Picture")
         }
     }
-
-    /**
-     * Requests the necessary permissions for recording.
-     * This method shows the permission request dialogs.
-     */
-    private fun askCameraPermissions() {
-        val permissions = arrayOf(
-            //Manifest.permission.READ_EXTERNAL_STORAGE,
-            //Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.CAMERA
-        )
-
-        val ungrantedPermissions = permissions.filter {
-            ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
-        }.toTypedArray()
-
-        if (ungrantedPermissions.isNotEmpty()) {
-            ActivityCompat.requestPermissions(this, ungrantedPermissions, 300)
-        }
-    }
-
-
 
 }
 

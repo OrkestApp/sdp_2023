@@ -14,9 +14,15 @@ import android.widget.Toast
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
+import androidx.camera.core.Preview
+import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.Quality
+import androidx.camera.video.Recorder
+import androidx.camera.video.VideoCapture
+import androidx.compose.runtime.MutableState
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleOwner
 import java.io.File
 
 class CameraViewModel {
@@ -81,10 +87,15 @@ class CameraViewModel {
             }}
     }
 
-
-
-
-
+    fun updateCameraPreview(cameraProvider: ProcessCameraProvider, lifecycleOwner: LifecycleOwner, preview: Preview, videoCaptureRecorder: VideoCapture<Recorder>, selectedMode: MutableState<Boolean>){
+        cameraProvider.unbindAll()
+        cameraProvider.bindToLifecycle(
+            lifecycleOwner,
+            lensFacing,
+            preview,
+            if(selectedMode.value) videoCaptureRecorder else imageCapture
+        )
+    }
 
 
 }

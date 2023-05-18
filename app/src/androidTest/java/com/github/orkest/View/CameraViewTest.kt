@@ -27,7 +27,7 @@ class CameraViewTest {
 
     @Test
     fun cameraPreviewIsDisplayed(){
-        if(cameraView.hasCamera){
+        if(cameraView.hasCameraAccess){
             composeTestRule.onNodeWithTag("Camera Preview").assertIsDisplayed()
             composeTestRule.onNodeWithTag("Switch Camera Button").assertIsDisplayed().assertHasClickAction()
             composeTestRule.onNodeWithTag("Take Picture Button").assertIsDisplayed().assertHasClickAction()
@@ -38,7 +38,7 @@ class CameraViewTest {
 
     @Test
     fun capturedImagePreviewIsDisplayed(){
-        if(cameraView.hasCamera) {
+        if(cameraView.hasCameraAccess) {
             //click on take picture button
             composeTestRule.onNodeWithTag("Take Picture Button").performClick()
             Thread.sleep(1000) //Wait for the UI to update

@@ -48,7 +48,7 @@ class CameraViewTest {
             composeTestRule.onNodeWithTag("Take Video Button").assertIsDisplayed().assertHasClickAction().performClick()
             Thread.sleep(1000)
             composeTestRule.onNodeWithTag("Take Video Button").performClick()
-            Thread.sleep(1000)
+            Thread.sleep(3000)
             composeTestRule.onNodeWithTag("Captured Video").assertIsDisplayed()
         }
     }
@@ -61,7 +61,7 @@ class CameraViewTest {
             composeTestRule.onNodeWithTag("Take Picture Button").assertIsDisplayed().assertHasClickAction()
             //click on take picture button
             composeTestRule.onNodeWithTag("Take Picture Button").performClick()
-            Thread.sleep(1000) //Wait for the UI to update
+            Thread.sleep(3000) //Wait for the UI to update
             composeTestRule.onNodeWithContentDescription("Captured Image").assertIsDisplayed()
             composeTestRule.onNodeWithTag("Back Button").assertIsDisplayed().assertHasClickAction()
             composeTestRule.onNodeWithTag("Save Button").assertIsDisplayed().assertHasClickAction()

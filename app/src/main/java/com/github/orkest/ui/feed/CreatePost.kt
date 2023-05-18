@@ -54,8 +54,8 @@ class CreatePost : ComponentActivity() {
                     val viewModel = PostViewModel()
 
                     isVideo = intent.getBooleanExtra("isVideo", false)
-                    val URIstring = intent.getStringExtra("URI")
-                    mediaURI = Uri.parse(URIstring!!)
+                    val URIstring = intent.getStringExtra("URI") ?: "Unknown"
+                    mediaURI = Uri.parse(URIstring)
 
                     viewModel.setPostMedia(URIstring, isVideo)
 

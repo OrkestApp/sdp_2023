@@ -14,6 +14,7 @@ import org.junit.runners.model.MultipleFailureException.assertEmpty
 class BluetoothServiceManagerTest {
 
     private var msgReceived = ""
+    private var msgSent = ""
     private val handler = object : Handler(Looper.getMainLooper()) {
         override fun handleMessage(msg: Message) {
             when (msg.what) {
@@ -21,7 +22,7 @@ class BluetoothServiceManagerTest {
                 BluetoothConstants.MESSAGE_WRITE -> {
                     // construct a string from the buffer
                     println("Message write")
-                    msgReceived = String(msg.obj as ByteArray)
+                    msgSent = String(msg.obj as ByteArray)
                 }
                 BluetoothConstants.MESSAGE_READ -> {
                     // construct a string from the valid bytes in the buffer
@@ -39,11 +40,13 @@ class BluetoothServiceManagerTest {
     fun setup() {
         Constants.CURRENT_LOGGED_USER = "BLUETOOTH_TEST"
         bthServiceManager = BluetoothServiceManager(handler)
+        msgReceived = ""
+        msgSent = ""
     }
 
     //==================TEST-CLIENT-CONNECTION=================
     @Test
-    fun correctlyReceivesData() {
+    fun correctlyReceivesAndSendsData() {
         //Add data :to the inputStream of the socket
 
         val testMsg:ByteArray = "Received".toByteArray()
@@ -53,18 +56,10 @@ class BluetoothServiceManagerTest {
         bthServiceManager.connectToDevice(testDevice)
         Thread.sleep(1000)
         assertEquals("Received", msgReceived)
+        assertEquals(Constants.CURRENT_LOGGED_USER, msgSent)
+        bthServiceManager.cancelConnections()
     }
 
-    @Test
-    fun correctlySendsData() {
-        val testMsg:ByteArray = ByteArray(0)
-        val testDevice = TestDevice(testMsg)
-
-        msgReceived = ""
-        bthServiceManager.connectToDevice(testDevice)
-        Thread.sleep(1000)
-        assertEquals(Constants.CURRENT_LOGGED_USER, msgReceived)
-    }
 
     @Test
     fun cancelCorrectlyClosesSocket() {
@@ -77,17 +72,75 @@ class BluetoothServiceManagerTest {
         bthServiceManager.cancelConnections()
         assertEquals(false, testDevice.socket.isConnected())
         assertTrue(bthServiceManager.clientConnections.isEmpty())
+
     }
 
     //==================TEST-SERVER-CONNECTION=================
 
 
-
     @Test
-    fun acceptConnections() {
+    fun correctlyReceivesAndSendsDataServer() {
+        val testMsg:ByteArray = "Received".toByteArray()
+        val testDevice = TestDevice(testMsg)
+        val socket = TestServer(testMsg)
+
+        msgReceived = ""
+        msgSent = ""
+        val thread = bthServiceManager.AcceptThread(socket)
+        thread.start()
+        Thread.sleep(1000)
+        assertEquals("Received", msgReceived)
+        assertEquals(Constants.CURRENT_LOGGED_USER, msgSent)
+        thread.cancel()
+        thread.interrupt()
     }
 
     @Test
-    fun cancelConnections() {
+    fun cancelCorrectlyClosesServerSocket() {
+        val testMsg:ByteArray = ByteArray(0)
+        val socket = TestServer(testMsg)
+
+        msgReceived = ""
+        val thread = bthServiceManager.AcceptThread(socket)
+        bthServiceManager.serverConnection = thread
+        thread.start()
+        Thread.sleep(1000)
+        bthServiceManager.cancelConnections()
+        assertEquals(false, socket.testSocket.isConnected())
+        assertTrue(bthServiceManager.serverConnection == null)
+        thread.cancel()
+    }
+
+    @Test
+    fun cancelFailsThrows(){
+        val testMsg:ByteArray = ByteArray(0)
+        val socket = TestServer(testMsg,false, true)
+
+        msgReceived = ""
+        val thread = bthServiceManager.AcceptThread(socket)
+        bthServiceManager.serverConnection = thread
+        thread.start()
+        Thread.sleep(500)
+        bthServiceManager.cancelConnections()
+        Thread.sleep(1000)
+        assertEquals(false, socket.testSocket.isConnected())
+        assertTrue(bthServiceManager.serverConnection == null)
+        assertEquals("Could not close the server socket", msgReceived)
+        thread.cancel()
+    }
+
+    @Test
+    fun acceptFailsThrows(){
+
+        val testMsg:ByteArray = ByteArray(0)
+        val socket = TestServer(testMsg,true, false)
+
+        msgReceived = ""
+        val thread = bthServiceManager.AcceptThread(socket)
+        bthServiceManager.serverConnection = thread
+        thread.start()
+        Thread.sleep(1000)
+        assertEquals("Socket's accept method failed", msgReceived)
+        thread.interrupt()
     }
 }

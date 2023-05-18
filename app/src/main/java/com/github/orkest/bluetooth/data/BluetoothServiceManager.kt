@@ -133,13 +133,16 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
                     serverSocket?.accept()
                 } catch (e: IOException) {
                     Log.e(TAG, "Socket's accept() method failed", e)
+                    BluetoothConstants.sendErrorToast("Socket's accept method failed",handler)
                     shouldLoop = false
                     null
                 }
                 socket?.also {
                     val comm = OrkestBluetoothCommunication(it, handler).apply {
+                        Log.d(TAG, "Server socket accepted")
                         start()
                         sendData(username)
+                        Log.d(TAG, "Server socket sent username")
                     }
                     communications.add(comm)
                 }
@@ -156,6 +159,7 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
                 this.interrupt()
             } catch (e: IOException) {
                 Log.e(TAG, "Could not close the connect socket", e)
+                BluetoothConstants.sendErrorToast("Could not close the server socket",handler)
             }
         }
     }
@@ -179,7 +183,6 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
                 // Connect to the remote device through the socket. This call blocks
                 // until it succeeds or throws an exception.
                 socket.connect()
-
                 // The connection attempt succeeded.
                 // Create the connected thread to transfer data
                 communication = OrkestBluetoothCommunication(socket, handler)
@@ -187,6 +190,7 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
                 communication.start()
                 // Send the username of the current device to the other device
                 communication.sendData(username)
+                Log.d(TAG, "Client socket sent username")
             }
         }
 

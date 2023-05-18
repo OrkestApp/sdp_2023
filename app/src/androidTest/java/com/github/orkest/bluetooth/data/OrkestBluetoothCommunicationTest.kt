@@ -4,6 +4,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import com.github.orkest.bluetooth.domain.BluetoothConstants
+import com.github.orkest.bluetooth.domain.BluetoothConstants.Companion.sendErrorToast
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -83,7 +84,7 @@ class OrkestBluetoothCommunicationTest {
         bthCom = OrkestBluetoothCommunication(testSocket, handler)
         bthCom.start()
 
-        bthCom.sendErrorToast("Error")
+        sendErrorToast("Error",handler)
         Thread.sleep(2000)
         assertEquals("Error", msgReceived)
     }

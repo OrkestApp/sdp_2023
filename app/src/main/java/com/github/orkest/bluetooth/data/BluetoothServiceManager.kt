@@ -9,17 +9,15 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Handler
 import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
-import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
 import androidx.core.app.ActivityCompat
-import com.github.orkest.bluetooth.domain.BluetoothCommunication
 import com.github.orkest.bluetooth.domain.BluetoothConstants.Companion.MY_UUID
 import com.github.orkest.bluetooth.domain.BluetoothConstants.Companion.NAME
 import com.github.orkest.bluetooth.domain.BluetoothInterface
+import com.github.orkest.bluetooth.domain.ServerSocket
 import com.github.orkest.bluetooth.domain.Socket
 import com.github.orkest.data.Constants
 import java.io.IOException
@@ -80,17 +78,26 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
 
     }
 
+    @SuppressLint("MissingPermission")
     override fun connectToDevice(device: BluetoothDevice) {
-        val thread = ConnectThread(device)
+        val clientSocket: BluetoothSocket? by lazy(LazyThreadSafetyMode.NONE) {
+            device.createRfcommSocketToServiceRecord(MY_UUID)
+        }
+        val thread = ConnectThread(clientSocket?.let { OrkestClientSocket(it) })
         clientConnections.add(thread)
         thread.start()
     }
 
+    @RequiresPermission(value = "android.permission.BLUETOOTH_CONNECT")
     override fun acceptConnections() {
-        val thread = AcceptThread()
+        val mmServerSocket: BluetoothServerSocket? by lazy(LazyThreadSafetyMode.NONE) {
+            bluetoothAdapter.listenUsingInsecureRfcommWithServiceRecord(NAME, MY_UUID)
+        }
+        val thread = AcceptThread(mmServerSocket?.let { OrkestServerSocket(it) })
         serverConnection = thread
         thread.start()
     }
+
 
     override fun cancelConnections() {
         clientConnections.forEach {
@@ -102,19 +109,20 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
     }
 
 
-    @SuppressLint("MissingPermission")
-    private inner class AcceptThread : Thread() {
+    //=======================================THREADS======================================
 
-        private val mmServerSocket: BluetoothServerSocket? by lazy(LazyThreadSafetyMode.NONE) {
-            bluetoothAdapter.listenUsingInsecureRfcommWithServiceRecord(NAME, MY_UUID)
-        }
+    /**
+     *
+     */
+    @SuppressLint("MissingPermission")
+    private inner class AcceptThread(private val serverSocket: ServerSocket?) : Thread() {
 
         override fun run() {
             // Keep listening until exception occurs or a socket is returned.
             var shouldLoop = true
             while (shouldLoop) {
-                val socket: BluetoothSocket? = try {
-                    mmServerSocket?.accept()
+                val socket: Socket? = try {
+                    serverSocket?.accept()
                 } catch (e: IOException) {
                     Log.e(TAG, "Socket's accept() method failed", e)
                     shouldLoop = false
@@ -122,7 +130,7 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
                 }
                 socket?.also {
                     //TODO: handle cancellation of this connection
-                    OrkestBluetoothCommunication(OrkestSocket(it), handler).apply {
+                    OrkestBluetoothCommunication(it, handler).apply {
                         start()
                         sendData(username)
                     }
@@ -133,25 +141,29 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
         // Closes the connect socket and causes the thread to finish.
         fun cancel() {
             try {
-                mmServerSocket?.close()
+                serverSocket?.close()
             } catch (e: IOException) {
                 Log.e(TAG, "Could not close the connect socket", e)
             }
         }
     }
 
-    @SuppressLint("MissingPermission")
-    private inner class ConnectThread(device: BluetoothDevice) : Thread() {
 
-        private val mmSocket: BluetoothSocket? by lazy(LazyThreadSafetyMode.NONE) {
-            device.createRfcommSocketToServiceRecord(MY_UUID)
-        }
+    /**
+     * Thread class to connect to other server devices
+     * Acts as the client
+     */
+    @SuppressLint("MissingPermission")
+    private inner class ConnectThread(private val socket: Socket?) : Thread() {
+
+
+        private lateinit var communication: OrkestBluetoothCommunication
 
         public override fun run() {
             // Cancel discovery because it otherwise slows down the connection.
             bluetoothAdapter.cancelDiscovery()
 
-            mmSocket?.let { socket ->
+            socket?.let { socket ->
                 // Connect to the remote device through the socket. This call blocks
                 // until it succeeds or throws an exception.
                 socket.connect()
@@ -159,18 +171,18 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
                 // The connection attempt succeeded.
                 // Create the connected thread to transfer data
                 //TODO: handle cancellation of this connection
-                val connection = OrkestBluetoothCommunication(OrkestSocket(socket),
+                communication = OrkestBluetoothCommunication(socket,
                                                                 handler)
                 //Start the connected thread to receive the username of the other device
-                connection.start()
+                communication.start()
                 // Send the username of the current device to the other device
-                connection.sendData(username)
+                communication.sendData(username)
             }
         }
 
         fun cancel() {
             try {
-                mmSocket?.close()
+                socket?.close()
             } catch (e: IOException) {
                 Log.e(TAG, "Could not close the client socket", e)
             }

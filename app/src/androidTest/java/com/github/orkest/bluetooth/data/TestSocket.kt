@@ -8,7 +8,7 @@ class TestSocket(byteArray: ByteArray, private val shouldThrow : Boolean = false
 
     private val inputStream = if (shouldThrow) PipedInputStream() else ByteArrayInputStream(byteArray)
     private val outputStream = if (shouldThrow) PipedOutputStream() else ByteArrayOutputStream()
-    private var connected = true
+    private var connected = false
 
     override fun getInputStream(): InputStream {
         return inputStream
@@ -23,7 +23,7 @@ class TestSocket(byteArray: ByteArray, private val shouldThrow : Boolean = false
     }
 
     override fun connect() {
-        TODO("Not yet implemented")
+        connected = true
     }
 
     override fun close() {

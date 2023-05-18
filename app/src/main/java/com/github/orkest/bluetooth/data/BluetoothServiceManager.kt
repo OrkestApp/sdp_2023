@@ -24,8 +24,8 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
 
 
     override var devices: MutableList<Device> = mutableListOf()
-    private val clientConnections: MutableList<ConnectThread> = mutableListOf()
-    private var serverConnection : AcceptThread? = null
+    val clientConnections: MutableList<ConnectThread> = mutableListOf()
+    var serverConnection : AcceptThread? = null
 
     val username: ByteArray = Constants.CURRENT_LOGGED_USER.toByteArray()
 
@@ -105,7 +105,13 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
         clientConnections.forEach {
             it.cancel()
         }
+        clientConnections.clear()
         serverConnection?.cancel()
+        serverConnection = null
+    }
+
+    override fun addDevice(device: Device) {
+        devices.add(device)
     }
 
 
@@ -167,7 +173,7 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
 
         public override fun run() {
             // Cancel discovery because it otherwise slows down the connection.
-            bluetoothAdapter.cancelDiscovery()
+           // bluetoothAdapter.cancelDiscovery()
 
             socket?.let { socket ->
                 // Connect to the remote device through the socket. This call blocks
@@ -185,13 +191,8 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
         }
 
         fun cancel() {
-            try {
-                socket?.close()
-                communication.cancel()
-                this.interrupt()
-            } catch (e: IOException) {
-                Log.e(TAG, "Could not close the client socket", e)
-            }
+            communication.cancel()
+            this.interrupt()
         }
     }
 }

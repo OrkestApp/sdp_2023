@@ -4,10 +4,12 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import com.github.orkest.bluetooth.domain.BluetoothConstants
+import com.github.orkest.data.Constants
 import org.junit.Assert.*
 import org.junit.Before
 
 import org.junit.Test
+import org.junit.runners.model.MultipleFailureException.assertEmpty
 
 class BluetoothServiceManagerTest {
 
@@ -35,13 +37,51 @@ class BluetoothServiceManagerTest {
 
     @Before
     fun setup() {
+        Constants.CURRENT_LOGGED_USER = "BLUETOOTH_TEST"
         bthServiceManager = BluetoothServiceManager(handler)
     }
 
     //==================TEST-CLIENT-CONNECTION=================
     @Test
-    fun connectToDevice() {
+    fun correctlyReceivesData() {
+        //Add data :to the inputStream of the socket
+
+        val testMsg:ByteArray = "Received".toByteArray()
+        val testDevice = TestDevice(testMsg)
+
+        msgReceived = ""
+        bthServiceManager.connectToDevice(testDevice)
+        Thread.sleep(1000)
+        assertEquals("Received", msgReceived)
     }
+
+    @Test
+    fun correctlySendsData() {
+        val testMsg:ByteArray = ByteArray(0)
+        val testDevice = TestDevice(testMsg)
+
+        msgReceived = ""
+        bthServiceManager.connectToDevice(testDevice)
+        Thread.sleep(1000)
+        assertEquals(Constants.CURRENT_LOGGED_USER, msgReceived)
+    }
+
+    @Test
+    fun cancelCorrectlyClosesSocket() {
+        val testMsg:ByteArray = ByteArray(0)
+        val testDevice = TestDevice(testMsg)
+
+        msgReceived = ""
+        bthServiceManager.connectToDevice(testDevice)
+        Thread.sleep(1000)
+        bthServiceManager.cancelConnections()
+        assertEquals(false, testDevice.socket.isConnected())
+        assertTrue(bthServiceManager.clientConnections.isEmpty())
+    }
+
+    //==================TEST-SERVER-CONNECTION=================
+
+
 
     @Test
     fun acceptConnections() {

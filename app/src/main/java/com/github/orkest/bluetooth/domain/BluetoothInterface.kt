@@ -74,6 +74,7 @@ interface BluetoothInterface {
      * must call this function to close all threads and sockets
      */
     fun cancelConnections()
+    abstract fun addDevice(Device: Device)
 
 
 }

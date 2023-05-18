@@ -403,6 +403,7 @@ class CameraView: ComponentActivity(){
 
     @Composable
     fun SelectCameraModeButton(selectedMode: MutableState<Boolean>, isVideo: Boolean){
+        val modeText = if (isVideo) "Video" else "Picture"
         Button(
             onClick = {
                 selectedMode.value = !selectedMode.value
@@ -418,10 +419,10 @@ class CameraView: ComponentActivity(){
                     1.dp,
                     if (selectedMode.value == isVideo) Color.White else Color.Transparent
                 )
-                .testTag("Select Camera Mode")
+                .testTag(modeText)
         ) {
-            val modeText = if(isVideo) "Video" else "Picture"
-            Text(text = modeText, modifier = Modifier.testTag(modeText))
+
+            Text(text = modeText)
         }
     }
 

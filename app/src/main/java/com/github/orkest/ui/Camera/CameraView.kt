@@ -313,8 +313,9 @@ class CameraView: ComponentActivity(){
             // Save button for the taken picture
             SaveButton(onSaveClick = {
                 if (isVideo) {
-
+                    /**TODO save in database **/
                 } else {
+                    /**TODO replace by saving in database and publishing post**/
                     viewModel.savePicture(capturedUri, context)
                 }
             }, modifier = Modifier

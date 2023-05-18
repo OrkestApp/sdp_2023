@@ -418,8 +418,10 @@ class CameraView: ComponentActivity(){
                     1.dp,
                     if (selectedMode.value == isVideo) Color.White else Color.Transparent
                 )
+                .testTag("Select Camera Mode")
         ) {
-            Text(text = if(isVideo) "Video" else "Picture")
+            val modeText = if(isVideo) "Video" else "Picture"
+            Text(text = modeText, modifier = Modifier.testTag(modeText))
         }
     }
 

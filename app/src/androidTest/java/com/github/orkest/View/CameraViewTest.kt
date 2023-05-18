@@ -29,12 +29,18 @@ class CameraViewTest {
     fun cameraPreviewIsDisplayed(){
         if(cameraView.hasCameraAccess){
             composeTestRule.onNodeWithTag("Camera Preview").assertIsDisplayed()
+            composeTestRule.onNodeWithTag("Select Camera Mode").assertIsDisplayed().assertHasClickAction()
+            composeTestRule.onAllNodesWithTag("Select Camera Mode").assertCountEquals(2)
+            composeTestRule.onNodeWithTag("Video").assertIsDisplayed()
+            composeTestRule.onNodeWithTag("Picture").assertIsDisplayed()
             composeTestRule.onNodeWithTag("Switch Camera Button").assertIsDisplayed().assertHasClickAction()
             composeTestRule.onNodeWithTag("Take Picture Button").assertIsDisplayed().assertHasClickAction()
         } else {
             composeTestRule.onNodeWithTag("No Camera Text").assertIsDisplayed()
         }
     }
+
+
 
     @Test
     fun capturedImagePreviewIsDisplayed(){

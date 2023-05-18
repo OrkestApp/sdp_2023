@@ -36,7 +36,7 @@ class SpotifyMultimediaTest {
             assert(true)
         }else{
             val spotifyMultimedia = SpotifyMultimedia()
-            val albumUri = spotifyMultimedia.getAlbumCoverImageUrl("6QPkyl04rXwTGlGlcYaRoW" , this.accessToken)
+            val albumUri = spotifyMultimedia.getAlbumCoverImageUrl("6QPkyl04rXwTGlGlcYaRoW" , this.accessToken, null)
             assert(albumUri.get() == "https://i.scdn.co/image/ab67616d0000b273346a5742374ab4cf9ed32dee")
         }
 
@@ -51,7 +51,7 @@ class SpotifyMultimediaTest {
             assert(true)
         }else{
             val spotifyMultimedia = SpotifyMultimedia()
-            val artistImage = spotifyMultimedia.getArtistImage("0TnOYISbd1XYRBk9myaseg" , this.accessToken)
+            val artistImage = spotifyMultimedia.getArtistImage("0TnOYISbd1XYRBk9myaseg" , this.accessToken, null)
             assert(artistImage.get() == "https://i.scdn.co/image/ab6761610000e5ebfc9d2abc85b6f4bef77f80ea")
         }
 

@@ -10,12 +10,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.orkest.data.Constants
 import com.github.orkest.View.feed.SongCard
 import com.github.orkest.data.Song
+import com.github.orkest.ui.notification.Notification
 import com.github.orkest.ui.theme.OrkestTheme
 
 
@@ -60,6 +62,8 @@ fun EditPostScreen(viewModel: PostViewModel, activity: ComponentActivity) {
     //Create editable fields for the post
     // Add a button to list songs to choose from
 
+    val context = LocalContext.current
+
     Scaffold(
         topBar = {
             Text(text = "Publish Post")
@@ -99,11 +103,11 @@ fun EditPostScreen(viewModel: PostViewModel, activity: ComponentActivity) {
             //TODO: Add error handling and correctly implemented behavior
             //Confirm button to publish the post
             Button(
-                onClick = { viewModel.addPost().whenComplete{
-                            bool,_ ->
-                                if(bool) activity.finish()
-                        }
-                      },
+                onClick = {
+                    viewModel.addPost().whenComplete{
+                            bool,_ -> if(bool) activity.finish() }
+                    Notification(context,null).sendNotification("New Post", "A new Post was added ;)", "New Post", "New Post", 2)
+                },
                 modifier = Modifier
                     .height(50.dp)
             ) {

@@ -2,27 +2,37 @@ package com.github.orkest.bluetooth.data
 
 
 import android.Manifest
-import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothManager
+import android.annotation.SuppressLint
+import android.bluetooth.*
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
+import androidx.annotation.RequiresPermission
 import androidx.core.app.ActivityCompat
-import com.github.orkest.bluetooth.domain.BluetoothInterface
+import com.github.orkest.bluetooth.domain.*
+import com.github.orkest.bluetooth.domain.BluetoothConstants.Companion.MY_UUID
+import com.github.orkest.bluetooth.domain.BluetoothConstants.Companion.NAME
+import com.github.orkest.data.Constants
+import java.io.IOException
 
-class BluetoothServiceManager : BluetoothInterface {
+class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface {
 
 
-    override val devices: MutableMap<String, String> = mutableMapOf()
+    override var devices: MutableList<Device> = mutableListOf()
+    val clientConnections: MutableList<ConnectThread> = mutableListOf()
+    var serverConnection : AcceptThread? = null
 
-    override fun addDevice(name: String, address: String) {
-        devices[name] = address
-    }
+    val username: ByteArray = Constants.CURRENT_LOGGED_USER.toByteArray()
+
+    lateinit var bluetoothAdapter : BluetoothAdapter
+    val TAG = "BluetoothServiceManager"
+
 
     override fun discoverDevices(
         context: Context,
@@ -33,7 +43,7 @@ class BluetoothServiceManager : BluetoothInterface {
         // -------------------------------------------------------------------------------------
         // setup bluetooth
         val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-        val bluetoothAdapter = bluetoothManager.adapter
+        bluetoothAdapter = bluetoothManager.adapter
 
         if (!bluetoothAdapter.isEnabled) {
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
@@ -51,11 +61,10 @@ class BluetoothServiceManager : BluetoothInterface {
             bluetoothAdapter.bondedDevices
         }
 
-        pairedDevices?.forEach { device ->
-            val deviceName = device.name
-            val deviceHardwareAddress = device.address // MAC address
-            devices[deviceName] = deviceHardwareAddress
-
+        if (pairedDevices != null) {
+            devices = pairedDevices.map {
+                OrkestDevice(it)
+            }.toMutableList()
         }
 
         // ------------------
@@ -72,14 +81,130 @@ class BluetoothServiceManager : BluetoothInterface {
 
     }
 
-    override fun connectDevice() {
-        TODO("Not yet implemented")
+    @SuppressLint("MissingPermission")
+    override fun connectToDevice(device: Device) {
+        val clientSocket: Socket? by lazy(LazyThreadSafetyMode.NONE) {
+            device.createRfcommSocketToServiceRecord(MY_UUID)
+        }
+        val thread = ConnectThread(clientSocket)
+        clientConnections.add(thread)
+        thread.start()
     }
 
-    override fun pairDevice() {
-        TODO("Not yet implemented")
+    @RequiresPermission(value = "android.permission.BLUETOOTH_CONNECT")
+    override fun acceptConnections() {
+        val mmServerSocket: BluetoothServerSocket? by lazy(LazyThreadSafetyMode.NONE) {
+            bluetoothAdapter.listenUsingInsecureRfcommWithServiceRecord(NAME, MY_UUID)
+        }
+        val thread = AcceptThread(mmServerSocket?.let { OrkestServerSocket(it) })
+        serverConnection = thread
+        thread.start()
     }
 
 
+    override fun cancelConnections() {
+        clientConnections.forEach {
+            it.cancel()
+        }
+        clientConnections.clear()
+        serverConnection?.cancel()
+        serverConnection = null
+    }
 
+    override fun addDevice(device: Device) {
+        devices.add(device)
+    }
+
+
+    //=======================================THREADS======================================
+
+    /**
+     *
+     */
+    @SuppressLint("MissingPermission")
+     inner class AcceptThread(private val serverSocket: ServerSocket?) : Thread() {
+
+        private val communications: MutableList<BluetoothCommunication> = mutableListOf()
+        private var stop = false
+
+        override fun run() {
+            // Keep listening until exception occurs or a socket is returned.
+            var shouldLoop = true
+            while (shouldLoop) {
+                if (stop) {
+                    shouldLoop = false
+                }
+                val socket: Socket? = try {
+                    serverSocket?.accept()
+                } catch (e: IOException) {
+                    Log.e(TAG, "Socket's accept() method failed", e)
+                    BluetoothConstants.sendErrorToast("Socket's accept method failed",handler)
+                    shouldLoop = false
+                    null
+                }
+                socket?.also {
+                    val comm = OrkestBluetoothCommunication(it, handler).apply {
+                        Log.d(TAG, "Server socket accepted")
+                        start()
+                        sendData(username)
+                        Log.d(TAG, "Server socket sent username")
+                    }
+                    communications.add(comm)
+                }
+            }
+        }
+
+        // Closes the connect socket and causes the thread to finish.
+        fun cancel() {
+            try {
+                stop = true
+                serverSocket?.close()
+//                communications.forEach {
+//                    it.cancel()
+//                }
+                this.interrupt()
+            } catch (e: IOException) {
+                Log.e(TAG, "Could not close the connect socket", e)
+                BluetoothConstants.sendErrorToast("Could not close the server socket",handler)
+            }
+        }
+    }
+
+
+    /**
+     * Thread class to connect to other server devices
+     * Acts as the client
+     */
+    @SuppressLint("MissingPermission")
+    inner class ConnectThread(private val socket: Socket?) : Thread() {
+
+
+        private lateinit var communication: BluetoothCommunication
+
+        public override fun run() {
+            // Cancel discovery because it otherwise slows down the connection.
+           // bluetoothAdapter.cancelDiscovery()
+
+            socket?.let { socket ->
+                // Connect to the remote device through the socket. This call blocks
+                // until it succeeds or throws an exception.
+                socket.connect()
+                // The connection attempt succeeded.
+                // Create the connected thread to transfer data
+                communication = OrkestBluetoothCommunication(socket, handler)
+                //Start the connected thread to receive the username of the other device
+                communication.start()
+                // Send the username of the current device to the other device
+                communication.sendData(username)
+                Log.d(TAG, "Client socket sent username")
+            }
+        }
+
+        fun cancel() {
+            this.interrupt()
+            communication.cancel()
+            Log.d(TAG, "Client socket cancelled and thread interrupted")
+
+        }
+    }
 }

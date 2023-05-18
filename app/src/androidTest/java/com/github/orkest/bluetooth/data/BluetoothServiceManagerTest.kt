@@ -3,41 +3,44 @@ package com.github.orkest.bluetooth.data
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
+import android.util.Log
 import com.github.orkest.bluetooth.domain.BluetoothConstants
 import com.github.orkest.data.Constants
-import org.junit.Assert.*
+import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
-
 import org.junit.Test
-import org.junit.runners.model.MultipleFailureException.assertEmpty
 
 class BluetoothServiceManagerTest {
 
     private var msgReceived = ""
     private var msgSent = ""
-    private val handler = object : Handler(Looper.getMainLooper()) {
-        override fun handleMessage(msg: Message) {
-            when (msg.what) {
-
-                BluetoothConstants.MESSAGE_WRITE -> {
-                    // construct a string from the buffer
-                    println("Message write")
-                    msgSent = String(msg.obj as ByteArray)
-                }
-                BluetoothConstants.MESSAGE_READ -> {
-                    // construct a string from the valid bytes in the buffer
-                    msgReceived = String(msg.obj as ByteArray, 0, msg.arg1)
-                }
-                BluetoothConstants.MESSAGE_TOAST -> {
-                    msgReceived= msg.data.getString("toast").toString()
-                }
-            }
-        }
-    }
+    private lateinit var handler : Handler
     private lateinit var bthServiceManager: BluetoothServiceManager
 
     @Before
     fun setup() {
+        handler = object : Handler(Looper.getMainLooper()) {
+            override fun handleMessage(msg: Message) {
+                when (msg.what) {
+
+                    BluetoothConstants.MESSAGE_WRITE -> {
+                        // construct a string from the buffer
+                        println("Message write")
+                        msgSent = String(msg.obj as ByteArray)
+                    }
+                    BluetoothConstants.MESSAGE_READ -> {
+                        // construct a string from the valid bytes in the buffer
+                        msgReceived = String(msg.obj as ByteArray, 0, msg.arg1)
+                    }
+                    BluetoothConstants.MESSAGE_TOAST -> {
+                        msgReceived= msg.data.getString("toast").toString()
+                    }
+                }
+            }
+        }
+
         Constants.CURRENT_LOGGED_USER = "BLUETOOTH_TEST"
         bthServiceManager = BluetoothServiceManager(handler)
         msgReceived = ""
@@ -54,12 +57,13 @@ class BluetoothServiceManagerTest {
 
         msgReceived = ""
         bthServiceManager.connectToDevice(testDevice)
-        Thread.sleep(2000)
+        Thread.sleep(1000)
         assertEquals("Received", msgReceived)
         assertEquals(Constants.CURRENT_LOGGED_USER, msgSent)
         bthServiceManager.cancelConnections()
     }
 
+    //I don't know why it fails with : "lateinit property communication has not been initialized (only when run in package)
 
     @Test
     fun cancelCorrectlyClosesSocket() {
@@ -68,7 +72,7 @@ class BluetoothServiceManagerTest {
 
         msgReceived = ""
         bthServiceManager.connectToDevice(testDevice)
-        Thread.sleep(2000)
+        Thread.sleep(1000)
         bthServiceManager.cancelConnections()
         assertEquals(false, testDevice.socket.isConnected())
         assertTrue(bthServiceManager.clientConnections.isEmpty())
@@ -88,7 +92,7 @@ class BluetoothServiceManagerTest {
         msgSent = ""
         val thread = bthServiceManager.AcceptThread(socket)
         thread.start()
-        Thread.sleep(2000)
+        Thread.sleep(1000)
         assertEquals("Received", msgReceived)
         assertEquals(Constants.CURRENT_LOGGED_USER, msgSent)
         thread.cancel()
@@ -104,7 +108,7 @@ class BluetoothServiceManagerTest {
         val thread = bthServiceManager.AcceptThread(socket)
         bthServiceManager.serverConnection = thread
         thread.start()
-        Thread.sleep(2000)
+        Thread.sleep(1000)
         bthServiceManager.cancelConnections()
         assertEquals(false, socket.testSocket.isConnected())
         assertTrue(bthServiceManager.serverConnection == null)
@@ -120,13 +124,13 @@ class BluetoothServiceManagerTest {
         val thread = bthServiceManager.AcceptThread(socket)
         bthServiceManager.serverConnection = thread
         thread.start()
-        Thread.sleep(2000)
+        Thread.sleep(1000)
         bthServiceManager.cancelConnections()
-        Thread.sleep(2000)
+        Thread.sleep(1000)
         assertEquals(false, socket.testSocket.isConnected())
         assertTrue(bthServiceManager.serverConnection == null)
         assertEquals("Could not close the server socket", msgReceived)
-        thread.cancel()
+        thread.interrupt()
     }
 
     @Test
@@ -139,8 +143,18 @@ class BluetoothServiceManagerTest {
         val thread = bthServiceManager.AcceptThread(socket)
         bthServiceManager.serverConnection = thread
         thread.start()
-        Thread.sleep(2000)
+        Thread.sleep(1000)
         assertEquals("Socket's accept method failed", msgReceived)
         thread.interrupt()
     }
+
+    @After
+    fun tearDown() {
+        bthServiceManager.cancelConnections()
+       // handler.looper.quit()
+    }
+
+
+
+
 }

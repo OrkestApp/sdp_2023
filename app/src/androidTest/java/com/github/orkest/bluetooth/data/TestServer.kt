@@ -25,7 +25,7 @@ class TestServer(val msg : ByteArray,val shouldThrow: Boolean = false,
         if (onlyCancelFails) {
             throw IOException("Test exception")
         }
-        else testSocket.close()
+        if (!shouldThrow) testSocket.close()
     }
 
 }

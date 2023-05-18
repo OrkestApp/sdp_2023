@@ -10,6 +10,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.RequiresPermission
@@ -124,11 +125,15 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
      inner class AcceptThread(private val serverSocket: ServerSocket?) : Thread() {
 
         private val communications: MutableList<BluetoothCommunication> = mutableListOf()
+        private var stop = false
 
         override fun run() {
             // Keep listening until exception occurs or a socket is returned.
             var shouldLoop = true
             while (shouldLoop) {
+                if (stop) {
+                    shouldLoop = false
+                }
                 val socket: Socket? = try {
                     serverSocket?.accept()
                 } catch (e: IOException) {
@@ -152,10 +157,11 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
         // Closes the connect socket and causes the thread to finish.
         fun cancel() {
             try {
+                stop = true
                 serverSocket?.close()
-                communications.forEach {
-                    it.cancel()
-                }
+//                communications.forEach {
+//                    it.cancel()
+//                }
                 this.interrupt()
             } catch (e: IOException) {
                 Log.e(TAG, "Could not close the connect socket", e)
@@ -195,8 +201,10 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
         }
 
         fun cancel() {
-            communication.cancel()
             this.interrupt()
+            communication.cancel()
+            Log.d(TAG, "Client socket cancelled and thread interrupted")
+
         }
     }
 }

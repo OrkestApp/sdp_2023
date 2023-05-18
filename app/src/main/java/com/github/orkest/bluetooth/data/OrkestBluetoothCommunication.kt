@@ -23,6 +23,7 @@ class OrkestBluetoothCommunication(
     private val mmBuffer: ByteArray = ByteArray(1024) // mmBuffer store for the stream
 
     private val TAG = "OrkestBluetoothCommunication"
+    private var stop = false
 
 
     override fun run() {
@@ -30,6 +31,10 @@ class OrkestBluetoothCommunication(
 
         // Keep listening to the InputStream until an exception occurs.
         while (true) {
+            if(stop){
+                break
+            }
+
             // Read from the InputStream.
             numBytes = try {
                 mmInStream.read(mmBuffer)
@@ -71,6 +76,7 @@ class OrkestBluetoothCommunication(
 
     override fun cancel() {
         try {
+            stop = true
             this.interrupt()
             mmSocket.close()
         } catch (e: IOException) {

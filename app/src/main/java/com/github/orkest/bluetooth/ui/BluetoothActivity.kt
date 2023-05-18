@@ -28,7 +28,6 @@ class BluetoothActivity() : ComponentActivity() {
 
     private var bluetoothServiceManager: BluetoothInterface? = null
 
-
     private var requestBluetooth = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
             //granted

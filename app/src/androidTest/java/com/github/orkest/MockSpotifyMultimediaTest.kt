@@ -32,6 +32,7 @@ class MockSpotifyMultimediaTest {
                 {
                   "url": "http://example.com/image.jpg"
                 }
+                 }
               ]
             }
             """.trimIndent()
@@ -49,8 +50,13 @@ class MockSpotifyMultimediaTest {
 
 
         val spotifyMultimedia = SpotifyMultimedia()
-        val albumUri = spotifyMultimedia.getAlbumCoverImageUrl("6QPkyl04rXwTGlGlcYaRoW" , accessToken, testResponse)
+        val albumUri = spotifyMultimedia.getAlbumCoverImageUrl(
+            "6QPkyl04rXwTGlGlcYaRoW",
+            accessToken,
+            testResponse
+        )
         assert(albumUri.get() == "http://example.com/image.jpg")
+
     }
 
     /**
@@ -85,3 +91,5 @@ class MockSpotifyMultimediaTest {
         assert(artistImage.get() == "http://example.com/image.jpg")
     }
 }
+
+

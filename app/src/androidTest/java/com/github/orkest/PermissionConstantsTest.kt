@@ -2,8 +2,6 @@ package com.github.orkest
 
 import android.content.Context
 import android.content.pm.PackageManager
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.orkest.ui.PermissionConstants
@@ -12,7 +10,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import android.Manifest
-import android.app.Instrumentation
 import androidx.test.rule.GrantPermissionRule
 import org.junit.Rule
 
@@ -22,8 +19,10 @@ class PermissionConstantsTest {
     private lateinit var context: Context
 
     @Rule
+    @JvmField
     val cameraPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(Manifest.permission.CAMERA)
     @Rule
+    @JvmField
     val audioPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(Manifest.permission.RECORD_AUDIO)
 
     @Before

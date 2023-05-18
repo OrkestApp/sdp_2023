@@ -44,7 +44,7 @@ class PermissionConstants {
         }
 
         /**
-         * Requests the necessary permissions for recording.
+         * Requests the CAMERA permission.
          * This method shows the permission request dialogs.
          */
         fun askCameraPermission(activity: Activity) {

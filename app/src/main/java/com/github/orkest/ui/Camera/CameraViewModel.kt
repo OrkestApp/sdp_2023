@@ -16,14 +16,16 @@ import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.video.Quality
-import androidx.camera.video.Recorder
-import androidx.camera.video.VideoCapture
+import androidx.camera.video.*
 import androidx.compose.runtime.MutableState
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.util.Consumer
 import androidx.lifecycle.LifecycleOwner
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
+import java.util.concurrent.Executor
 
 class CameraViewModel {
 
@@ -95,6 +97,28 @@ class CameraViewModel {
             preview,
             if(selectedMode.value) videoCaptureRecorder else imageCapture
         )
+    }
+
+    fun startRecordingVideo(
+        context: Context,
+        filenameFormat: String,
+        videoCapture: VideoCapture<Recorder>,
+        outputDirectory: File,
+        executor: Executor,
+        audioEnabled: Boolean,
+        consumer: Consumer<VideoRecordEvent>
+    ): Recording {
+        val videoFile = File(
+            outputDirectory,
+            SimpleDateFormat(filenameFormat, Locale.US).format(System.currentTimeMillis()) + ".mp4"
+        )
+
+        val outputOptions = FileOutputOptions.Builder(videoFile).build()
+
+        //Start the recording process with the given executor and consumer
+        return videoCapture.output
+            .prepareRecording(context, outputOptions)
+            .start(executor, consumer)
     }
 
 

@@ -180,7 +180,7 @@ class CameraView: ComponentActivity(){
                                         videoCapture.value?.let { videoCapture ->
                                             recordingStarted.value = true
 
-                                            recording = startRecordingVideo(
+                                            recording = viewModel.startRecordingVideo(
                                                 context = context,
                                                 filenameFormat = "yyyy-MM-dd-HH-mm-ss-SSS",
                                                 videoCapture = videoCapture,

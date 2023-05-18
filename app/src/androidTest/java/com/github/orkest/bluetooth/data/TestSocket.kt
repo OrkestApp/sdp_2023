@@ -22,6 +22,10 @@ class TestSocket(byteArray: ByteArray, private val shouldThrow : Boolean = false
         return connected
     }
 
+    override fun connect() {
+        TODO("Not yet implemented")
+    }
+
     override fun close() {
         //Close the streams
         try {

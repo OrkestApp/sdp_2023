@@ -14,19 +14,16 @@ import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.RequiresPermission
 import androidx.core.app.ActivityCompat
-import com.github.orkest.bluetooth.domain.BluetoothCommunication
+import com.github.orkest.bluetooth.domain.*
 import com.github.orkest.bluetooth.domain.BluetoothConstants.Companion.MY_UUID
 import com.github.orkest.bluetooth.domain.BluetoothConstants.Companion.NAME
-import com.github.orkest.bluetooth.domain.BluetoothInterface
-import com.github.orkest.bluetooth.domain.ServerSocket
-import com.github.orkest.bluetooth.domain.Socket
 import com.github.orkest.data.Constants
 import java.io.IOException
 
 class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface {
 
 
-    override var devices: MutableList<BluetoothDevice> = mutableListOf()
+    override var devices: MutableList<Device> = mutableListOf()
     private val clientConnections: MutableList<ConnectThread> = mutableListOf()
     private var serverConnection : AcceptThread? = null
 
@@ -63,7 +60,11 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
             bluetoothAdapter.bondedDevices
         }
 
-        devices = pairedDevices?.toMutableList() ?: mutableListOf()
+        if (pairedDevices != null) {
+            devices = pairedDevices.map {
+                OrkestDevice(it)
+            }.toMutableList()
+        }
 
         // ------------------
         // Discover devices
@@ -80,11 +81,11 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
     }
 
     @SuppressLint("MissingPermission")
-    override fun connectToDevice(device: BluetoothDevice) {
-        val clientSocket: BluetoothSocket? by lazy(LazyThreadSafetyMode.NONE) {
+    override fun connectToDevice(device: Device) {
+        val clientSocket: Socket? by lazy(LazyThreadSafetyMode.NONE) {
             device.createRfcommSocketToServiceRecord(MY_UUID)
         }
-        val thread = ConnectThread(clientSocket?.let { OrkestClientSocket(it) })
+        val thread = ConnectThread(clientSocket)
         clientConnections.add(thread)
         thread.start()
     }
@@ -114,7 +115,7 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
      *
      */
     @SuppressLint("MissingPermission")
-    private inner class AcceptThread(private val serverSocket: ServerSocket?) : Thread() {
+     inner class AcceptThread(private val serverSocket: ServerSocket?) : Thread() {
 
         private val communications: MutableList<BluetoothCommunication> = mutableListOf()
 
@@ -130,7 +131,6 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
                     null
                 }
                 socket?.also {
-                    //TODO: handle cancellation of this connection
                     val comm = OrkestBluetoothCommunication(it, handler).apply {
                         start()
                         sendData(username)
@@ -160,7 +160,7 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
      * Acts as the client
      */
     @SuppressLint("MissingPermission")
-    private inner class ConnectThread(private val socket: Socket?) : Thread() {
+    inner class ConnectThread(private val socket: Socket?) : Thread() {
 
 
         private lateinit var communication: BluetoothCommunication
@@ -176,9 +176,7 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
 
                 // The connection attempt succeeded.
                 // Create the connected thread to transfer data
-                //TODO: handle cancellation of this connection
-                communication = OrkestBluetoothCommunication(socket,
-                                                                handler)
+                communication = OrkestBluetoothCommunication(socket, handler)
                 //Start the connected thread to receive the username of the other device
                 communication.start()
                 // Send the username of the current device to the other device

@@ -16,7 +16,7 @@ import androidx.core.content.ContextCompat
 
 interface BluetoothInterface {
 
-    val devices: MutableList<BluetoothDevice>
+    val devices: MutableList<Device>
 
     /*
      * Check if bluetooth permissions are granted
@@ -60,7 +60,7 @@ interface BluetoothInterface {
      * Connects to the other server device as a client and sends this user's username
      * and receives and sends back the other device's username to the UI
      */
-    fun connectToDevice(device: BluetoothDevice)
+    fun connectToDevice(device: Device)
 
 
     /**

@@ -2,24 +2,21 @@ package com.github.orkest.bluetooth.domain
 
 import android.Manifest
 import android.app.Activity
-import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Handler
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
 interface BluetoothInterface {
 
-    val devices: MutableMap<String, String>
-    fun addDevice(name: String, address: String) {
-        devices[name] = address
-    }
+    val devices: MutableList<Device>
 
     /*
      * Check if bluetooth permissions are granted
@@ -32,6 +29,9 @@ interface BluetoothInterface {
         ) == PackageManager.PERMISSION_GRANTED
     }
 
+    /**
+     * Asks the user to grant the necessary bluetooth permissions
+     */
     @RequiresApi(Build.VERSION_CODES.S)
     fun askBluetoothPermission(activity: Activity){
         if (ContextCompat.checkSelfPermission(activity, Manifest.permission.BLUETOOTH_CONNECT)
@@ -49,14 +49,32 @@ interface BluetoothInterface {
 
     }
 
+    /**
+     * Scans the neighborhood for bluetooth devices and updates the list devices
+     */
     fun discoverDevices(context: Context,
                         receiver: BroadcastReceiver,
-                        requestBluetooth: ActivityResultLauncher<Intent>
-    )
+                        requestBluetooth: ActivityResultLauncher<Intent>)
 
-    fun connectDevice()
+    /**
+     * Connects to the other server device as a client and sends this user's username
+     * and receives and sends back the other device's username to the UI
+     */
+    fun connectToDevice(device: Device)
 
-    fun pairDevice()
+
+    /**
+     * Starts a server connection waiting for client requests, upon connection, sends this
+     * user's username and receives and sends back the client's username to the UI
+     */
+    fun acceptConnections()
+
+    /**
+     * Once the bluetooth sharing is done,
+     * must call this function to close all threads and sockets
+     */
+    fun cancelConnections()
+    abstract fun addDevice(Device: Device)
 
 
 }

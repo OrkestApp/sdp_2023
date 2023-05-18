@@ -23,7 +23,8 @@ check_android_task:
       -gpu swiftshader_indirect
       -no-snapshot
       -no-window
-      -camera-back none
+      -camera-back webcam0 
+      -camera-front webcam0 
     
   download_firebase_emulator_script: |
     curl -Lo ./firebase_bin https://firebase.tools/bin/linux/latest

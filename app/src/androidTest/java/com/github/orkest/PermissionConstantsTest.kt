@@ -13,11 +13,18 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import android.Manifest
 import android.app.Instrumentation
+import androidx.test.rule.GrantPermissionRule
+import org.junit.Rule
 
 @RunWith(AndroidJUnit4::class)
 class PermissionConstantsTest {
 
     private lateinit var context: Context
+
+    @Rule
+    val cameraPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(Manifest.permission.CAMERA)
+    @Rule
+    val audioPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(Manifest.permission.RECORD_AUDIO)
 
     @Before
     fun setup() {

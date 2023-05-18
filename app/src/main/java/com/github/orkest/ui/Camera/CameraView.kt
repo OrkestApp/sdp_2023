@@ -48,6 +48,7 @@ import androidx.compose.foundation.border
 import androidx.compose.runtime.Composable
 import androidx.core.app.ActivityCompat
 import com.github.orkest.ui.PermissionConstants
+import com.github.orkest.ui.feed.CreatePost
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.ui.StyledPlayerView
@@ -312,12 +313,11 @@ class CameraView: ComponentActivity(){
 
             // Save button for the taken picture
             SaveButton(onSaveClick = {
-                if (isVideo) {
-                    /**TODO save in database **/
-                } else {
-                    /**TODO replace by saving in database and publishing post**/
-                    viewModel.savePicture(capturedUri, context)
-                }
+                val intent = Intent(context, CreatePost::class.java)
+                intent.putExtra("URI", capturedUri.toString())
+                intent.putExtra("isVideo", isVideo)
+                /**TODO save URI in database**/
+                context.startActivity(intent)
             }, modifier = Modifier
                 .padding(paddingValue)
                 .align(Alignment.BottomCenter)

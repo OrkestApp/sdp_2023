@@ -22,4 +22,9 @@ interface BluetoothCommunication: Runnable {
      * Method to cancel the thread
      */
     fun cancel()
+
+    /**
+     * Method to start the thread
+     */
+    fun start()
 }

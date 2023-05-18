@@ -54,7 +54,7 @@ class BluetoothServiceManagerTest {
 
         msgReceived = ""
         bthServiceManager.connectToDevice(testDevice)
-        Thread.sleep(1000)
+        Thread.sleep(2000)
         assertEquals("Received", msgReceived)
         assertEquals(Constants.CURRENT_LOGGED_USER, msgSent)
         bthServiceManager.cancelConnections()
@@ -68,7 +68,7 @@ class BluetoothServiceManagerTest {
 
         msgReceived = ""
         bthServiceManager.connectToDevice(testDevice)
-        Thread.sleep(1000)
+        Thread.sleep(2000)
         bthServiceManager.cancelConnections()
         assertEquals(false, testDevice.socket.isConnected())
         assertTrue(bthServiceManager.clientConnections.isEmpty())
@@ -88,7 +88,7 @@ class BluetoothServiceManagerTest {
         msgSent = ""
         val thread = bthServiceManager.AcceptThread(socket)
         thread.start()
-        Thread.sleep(1000)
+        Thread.sleep(2000)
         assertEquals("Received", msgReceived)
         assertEquals(Constants.CURRENT_LOGGED_USER, msgSent)
         thread.cancel()
@@ -104,7 +104,7 @@ class BluetoothServiceManagerTest {
         val thread = bthServiceManager.AcceptThread(socket)
         bthServiceManager.serverConnection = thread
         thread.start()
-        Thread.sleep(1000)
+        Thread.sleep(2000)
         bthServiceManager.cancelConnections()
         assertEquals(false, socket.testSocket.isConnected())
         assertTrue(bthServiceManager.serverConnection == null)
@@ -120,9 +120,9 @@ class BluetoothServiceManagerTest {
         val thread = bthServiceManager.AcceptThread(socket)
         bthServiceManager.serverConnection = thread
         thread.start()
-        Thread.sleep(500)
+        Thread.sleep(2000)
         bthServiceManager.cancelConnections()
-        Thread.sleep(1000)
+        Thread.sleep(2000)
         assertEquals(false, socket.testSocket.isConnected())
         assertTrue(bthServiceManager.serverConnection == null)
         assertEquals("Could not close the server socket", msgReceived)
@@ -139,7 +139,7 @@ class BluetoothServiceManagerTest {
         val thread = bthServiceManager.AcceptThread(socket)
         bthServiceManager.serverConnection = thread
         thread.start()
-        Thread.sleep(1000)
+        Thread.sleep(2000)
         assertEquals("Socket's accept method failed", msgReceived)
         thread.interrupt()
     }

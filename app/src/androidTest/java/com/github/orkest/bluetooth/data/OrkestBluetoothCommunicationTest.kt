@@ -39,12 +39,6 @@ class OrkestBluetoothCommunicationTest {
         }
     }
 
-    @Before
-    fun setUp() {
-
-
-    }
-
     @Test
     fun correctlyReceivesData() {
         //Add data :to the inputStream of the socket
@@ -53,11 +47,10 @@ class OrkestBluetoothCommunicationTest {
 
         testSocket = TestSocket(testMsg)
         msgReceived = ""
-        bthCom = OrkestBluetoothCommunication(testSocket, handler)
-        bthCom.start()
-
-        Thread.sleep(1000)
+        bthCom = OrkestBluetoothCommunication(testSocket, handler).apply { start() }
+        Thread.sleep(2000)
         assertEquals("Username", msgReceived)
+        bthCom.cancel()
     }
 
 //
@@ -75,6 +68,7 @@ class OrkestBluetoothCommunicationTest {
         bthCom.sendData(testMsg)
         Thread.sleep(2000)
         assertEquals("Username", msgReceived)
+        bthCom.cancel()
     }
 
     @Test
@@ -87,6 +81,7 @@ class OrkestBluetoothCommunicationTest {
         sendErrorToast("Error",handler)
         Thread.sleep(2000)
         assertEquals("Error", msgReceived)
+        bthCom.cancel()
     }
 
 

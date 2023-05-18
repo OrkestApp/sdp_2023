@@ -1,6 +1,7 @@
 package com.github.orkest.ui.Camera
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ContentValues
 import android.content.ContentValues.TAG
@@ -99,6 +100,7 @@ class CameraViewModel {
         )
     }
 
+    @SuppressLint("MissingPermission")
     fun startRecordingVideo(
         context: Context,
         filenameFormat: String,
@@ -118,6 +120,7 @@ class CameraViewModel {
         //Start the recording process with the given executor and consumer
         return videoCapture.output
             .prepareRecording(context, outputOptions)
+            .apply { if (audioEnabled) withAudioEnabled() }
             .start(executor, consumer)
     }
 

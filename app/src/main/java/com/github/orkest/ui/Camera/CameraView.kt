@@ -287,7 +287,7 @@ class CameraView: ComponentActivity(){
                             player = exoPlayer
                         }
                     },
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize().testTag("Captured Video")
                 )
 
             } else {

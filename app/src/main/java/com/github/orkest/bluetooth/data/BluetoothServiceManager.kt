@@ -10,10 +10,10 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.RequiresPermission
+import androidx.compose.runtime.*
 import androidx.core.app.ActivityCompat
 import com.github.orkest.bluetooth.domain.*
 import com.github.orkest.bluetooth.domain.BluetoothConstants.Companion.MY_UUID
@@ -25,6 +25,7 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
 
 
     override var devices: MutableList<Device> = mutableListOf()
+    var list = mutableStateListOf<Device>()
     val clientConnections: MutableList<ConnectThread> = mutableListOf()
     var serverConnection : AcceptThread? = null
 
@@ -86,6 +87,7 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
         val clientSocket: Socket? by lazy(LazyThreadSafetyMode.NONE) {
             device.createRfcommSocketToServiceRecord(MY_UUID)
         }
+        Log.d(TAG,"THis is the socket + ${clientSocket.toString()}")
         val thread = ConnectThread(clientSocket)
         clientConnections.add(thread)
         thread.start()
@@ -112,7 +114,9 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
     }
 
     override fun addDevice(device: Device) {
-        devices.add(device)
+        val newDevices = devices.toMutableList()
+        newDevices.add(device)
+        devices = newDevices
     }
 
 
@@ -122,18 +126,14 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
      *
      */
     @SuppressLint("MissingPermission")
-     inner class AcceptThread(private val serverSocket: ServerSocket?) : Thread() {
+    inner class AcceptThread(private val serverSocket: ServerSocket?) : Thread() {
 
         private val communications: MutableList<BluetoothCommunication> = mutableListOf()
-        private var stop = false
 
         override fun run() {
             // Keep listening until exception occurs or a socket is returned.
             var shouldLoop = true
             while (shouldLoop) {
-                if (stop) {
-                    shouldLoop = false
-                }
                 val socket: Socket? = try {
                     serverSocket?.accept()
                 } catch (e: IOException) {
@@ -157,11 +157,10 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
         // Closes the connect socket and causes the thread to finish.
         fun cancel() {
             try {
-                stop = true
                 serverSocket?.close()
-//                communications.forEach {
-//                    it.cancel()
-//                }
+                communications.forEach {
+                    it.cancel()
+                }
                 this.interrupt()
             } catch (e: IOException) {
                 Log.e(TAG, "Could not close the connect socket", e)
@@ -183,7 +182,7 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
 
         public override fun run() {
             // Cancel discovery because it otherwise slows down the connection.
-           // bluetoothAdapter.cancelDiscovery()
+            // bluetoothAdapter.cancelDiscovery()
 
             socket?.let { socket ->
                 // Connect to the remote device through the socket. This call blocks
@@ -201,10 +200,8 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
         }
 
         fun cancel() {
-            this.interrupt()
             communication.cancel()
-            Log.d(TAG, "Client socket cancelled and thread interrupted")
-
+            this.interrupt()
         }
     }
 }

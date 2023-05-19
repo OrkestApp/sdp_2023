@@ -14,10 +14,12 @@ class OrkestDevice(private val device: BluetoothDevice): Device {
     }
 
     override fun getAddress(): String {
-       return device.address
+        return device.address
     }
 
     override fun getName(): String {
+        if (device.name == null)
+            return ""
         return device.name
     }
 

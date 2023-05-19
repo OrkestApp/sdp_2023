@@ -5,6 +5,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import com.github.orkest.ui.EditProfileActivity
 import com.github.orkest.ui.EditProfileScreen
 import com.github.orkest.ui.authentication.AuthViewModel
+import com.github.orkest.ui.profile.EditProfileViewModel
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -14,11 +15,13 @@ class EditProfileTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private lateinit var viewModel: AuthViewModel
     @Before
     fun setup(){
         composeTestRule.setContent {
-            EditProfileScreen(EditProfileActivity())
+            val viewModel = EditProfileViewModel()
+            viewModel.setProfilePic(byteArrayOf(1,1,1,1,1))
+            viewModel.setBio("two chains")
+            EditProfileScreen(EditProfileActivity(), viewModel)
         }
     }
 

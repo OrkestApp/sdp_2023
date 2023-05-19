@@ -155,7 +155,7 @@ fun DisplayPost(viewModel: PostViewModel, post: Post) {
 
         Column {
             // Display the user profile pic
-            ProfilePic(post.profilePicId)
+            ProfilePic(R.drawable.blank_profile_pic)//post.profilePicId)
             //Display the reaction buttons
             Reaction(viewModel, post)
         }

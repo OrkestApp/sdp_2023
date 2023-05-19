@@ -101,6 +101,7 @@ class CameraViewModel {
     }
 
     
+    @SuppressLint("MissingPermission")
     fun startRecordingVideo(
         context: Context,
         filenameFormat: String,
@@ -120,6 +121,7 @@ class CameraViewModel {
         //Start the recording process with the given executor and consumer
         return videoCapture.output
             .prepareRecording(context, outputOptions)
+            .apply { if(audioEnabled) withAudioEnabled() }
             .start(executor, consumer)
     }
 

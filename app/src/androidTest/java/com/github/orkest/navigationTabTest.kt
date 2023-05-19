@@ -25,7 +25,6 @@ class navigationTabTest {
         val searchTabAccess = composeTestRule.onNodeWithText("Search")
         searchTabAccess.assertIsDisplayed()
         searchTabAccess.performClick()
-        //composeTestRule.onNodeWithText("").assertIsDisplayed()
 
 
         val profileTab = composeTestRule.onNodeWithText("Profile")

@@ -1,5 +1,6 @@
 package com.github.orkest.ui.feed
 
+import android.net.Uri
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.MutableLiveData
@@ -66,6 +67,11 @@ open class PostViewModel {
 
     open fun setPostDate(date: String) {
         post_date = date
+    }
+
+    open fun setPostMedia(media: String, isVideo: Boolean){
+        post.media = media
+        post.isMediaVideo = isVideo
     }
 
 
@@ -162,6 +168,7 @@ open class PostViewModel {
         post.postDescription = postDescription.value.text
         post.date = OrkestDate(LocalDateTime.now())
         post.song = song.value
+
 
         return post
     }

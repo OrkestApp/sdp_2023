@@ -37,7 +37,7 @@ import kotlin.properties.Delegates
 
 //TODO: Implement correctly, this is just a simple version for testing and demo purposes
 
-lateinit var mediaURI: Uri
+var mediaURI: Uri = Uri.EMPTY
 var isVideo by Delegates.notNull<Boolean>()
 class CreatePost : ComponentActivity() {
 

@@ -22,9 +22,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -155,6 +158,7 @@ fun DisplayPost(viewModel: PostViewModel, post: Post) {
 
         Column {
             // Display the user profile pic
+            /**TODO change when fetching from database is possible. For now, it avoids error of vectorized image**/
             ProfilePic(R.drawable.blank_profile_pic)
             //Display the reaction buttons
             Reaction(viewModel, post)
@@ -306,19 +310,25 @@ private fun LikeButton(viewModel: PostViewModel, post: Post) {
                 .height(20.dp)
                 .width(20.dp)
                 .clickable {
-                    viewModel.updatePostLikes(post, !isPostLiked.value).thenApply {
-                        //Updating the isPostLiked value accordingly
-                        isPostLiked.value = !isPostLiked.value
-                        //Updating the value of getNbLikes only after the updatePostLikes future has been completed
-                        viewModel.getNbLikes(post).thenApply { nbLikes.value = it }
-                    }
+                    viewModel
+                        .updatePostLikes(post, !isPostLiked.value)
+                        .thenApply {
+                            //Updating the isPostLiked value accordingly
+                            isPostLiked.value = !isPostLiked.value
+                            //Updating the value of getNbLikes only after the updatePostLikes future has been completed
+                            viewModel
+                                .getNbLikes(post)
+                                .thenApply { nbLikes.value = it }
+                        }
                 },
         )
         //Displaying the number of likes for this post
         Text(
             text = "${nbLikes.value}",
             color = buttonColor,
-            modifier = Modifier.padding(5.dp).testTag("Number of likes")
+            modifier = Modifier
+                .padding(5.dp)
+                .testTag("Number of likes")
         )
     }
 
@@ -379,7 +389,7 @@ private fun ReactionIcon(iconId: Int, contentDescription:String, testTag: String
             .testTag(testTag)
             .height(20.dp)
             .width(20.dp)
-            .clickable { onClick()})
+            .clickable { onClick() })
 }
 
 

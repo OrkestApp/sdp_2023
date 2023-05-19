@@ -96,9 +96,6 @@ class NavigationBar {
                     composable("HomePage") { FeedActivity(PostViewModel()) }
                     composable("SearchPage") { SearchUserView.SearchUi(viewModel = viewModel) }
                     composable("ShazamPage") {
-                    //Launch intent to the shazamActivity
-//                        val intent = Intent(context, ShazamActivity::class.java)
-//                        context.startActivity(intent)
                         ShazamSong(activity)
                         val intent = Intent(context, CameraView::class.java)
                         context.startActivity(intent)

@@ -31,14 +31,12 @@ import com.github.orkest.ui.theme.OrkestTheme
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.ui.StyledPlayerView
-import java.net.URI
-import kotlin.properties.Delegates
 
 
 //TODO: Implement correctly, this is just a simple version for testing and demo purposes
 
 var mediaURI: Uri = Uri.EMPTY
-var isVideo by Delegates.notNull<Boolean>()
+var isVideo : Boolean = false
 class CreatePost : ComponentActivity() {
 
 

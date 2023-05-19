@@ -112,7 +112,9 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
     }
 
     override fun addDevice(device: Device) {
-        devices.add(device)
+        val newDevices = devices.toMutableList()
+        newDevices.add(device)
+        devices = newDevices
     }
 
 
@@ -122,7 +124,7 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
      *
      */
     @SuppressLint("MissingPermission")
-     inner class AcceptThread(private val serverSocket: ServerSocket?) : Thread() {
+    inner class AcceptThread(private val serverSocket: ServerSocket?) : Thread() {
 
         private val communications: MutableList<BluetoothCommunication> = mutableListOf()
         private var stop = false
@@ -183,7 +185,7 @@ class BluetoothServiceManager(private var handler: Handler) : BluetoothInterface
 
         public override fun run() {
             // Cancel discovery because it otherwise slows down the connection.
-           // bluetoothAdapter.cancelDiscovery()
+            // bluetoothAdapter.cancelDiscovery()
 
             socket?.let { socket ->
                 // Connect to the remote device through the socket. This call blocks

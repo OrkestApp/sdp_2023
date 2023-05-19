@@ -40,7 +40,7 @@ class CameraViewModelTest {
         // Create a latch with a count of 1 to synchronize the test with the image preview callback
         val latch = CountDownLatch(1)
 
-        cameraViewModel.imagePreview({ uri ->
+        cameraViewModel.captureImage({ uri ->
             assertNotNull(uri)
             latch.countDown()
         }, context)

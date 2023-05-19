@@ -1,5 +1,8 @@
 package com.github.orkest.ui.Camera
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.ContentValues
 import android.content.ContentValues.TAG
 import android.content.Context
@@ -14,9 +17,16 @@ import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.video.*
+import androidx.compose.runtime.MutableState
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.util.Consumer
 import androidx.lifecycle.LifecycleOwner
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
+import java.util.concurrent.Executor
 
 class CameraViewModel {
 
@@ -30,7 +40,7 @@ class CameraViewModel {
      * saves it to a temporary file,
      * and then converts the file to a URI to display it on the screen.
      */
-    fun imagePreview(onImageCaptured: (Uri) -> Unit, context: Context){
+    fun captureImage(onImageCaptured: (Uri) -> Unit, context: Context){
         // Create a temporary file to store the captured image
         val imageFile = File.createTempFile("image", ".jpg", context.cacheDir)
         val metadata = ImageCapture.Metadata()
@@ -79,5 +89,39 @@ class CameraViewModel {
                 Toast.makeText(context, "Failed to save image", Toast.LENGTH_SHORT).show()
             }}
     }
+
+    fun updateCameraPreview(cameraProvider: ProcessCameraProvider, lifecycleOwner: LifecycleOwner, preview: Preview, videoCaptureRecorder: VideoCapture<Recorder>, selectedMode: MutableState<Boolean>){
+        cameraProvider.unbindAll()
+        cameraProvider.bindToLifecycle(
+            lifecycleOwner,
+            lensFacing,
+            preview,
+            if(selectedMode.value) videoCaptureRecorder else imageCapture
+        )
+    }
+
+    
+    fun startRecordingVideo(
+        context: Context,
+        filenameFormat: String,
+        videoCapture: VideoCapture<Recorder>,
+        outputDirectory: File,
+        executor: Executor,
+        audioEnabled: Boolean,
+        consumer: Consumer<VideoRecordEvent>
+    ): Recording {
+        val videoFile = File(
+            outputDirectory,
+            SimpleDateFormat(filenameFormat, Locale.US).format(System.currentTimeMillis()) + ".mp4"
+        )
+
+        val outputOptions = FileOutputOptions.Builder(videoFile).build()
+
+        //Start the recording process with the given executor and consumer
+        return videoCapture.output
+            .prepareRecording(context, outputOptions)
+            .start(executor, consumer)
+    }
+
 
 }

@@ -13,6 +13,7 @@ import com.github.orkest.data.Song
 import com.github.orkest.shazam.data.AudioRecognition
 import com.github.orkest.shazam.data.AudioRecording
 import com.github.orkest.shazam.domain.ShazamConstants
+import com.github.orkest.ui.PermissionConstants
 import kotlinx.coroutines.launch
 import java.util.concurrent.CompletableFuture
 
@@ -31,10 +32,10 @@ import java.util.concurrent.CompletableFuture
         val futureSong = CompletableFuture<Song>()
         LaunchedEffect(Unit) {
             coroutineScope.launch {
-                val permission = ShazamConstants.recordPermissionGranted(context)
+                val permission = PermissionConstants.recordPermissionGranted(context)
                 //Asks for recording permission if not given
                 if (!permission){
-                    ShazamConstants.askRecordPermission(activity)
+                    PermissionConstants.askRecordPermission(activity)
                 futureSong.completeExceptionally(Exception("No permission to record audio"))
                 }
 

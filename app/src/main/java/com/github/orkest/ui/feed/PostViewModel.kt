@@ -102,7 +102,7 @@ open class PostViewModel {
     /**
      * Updates the value of the song after the user set it on the view
      */
-    fun updateSong(song: Song) {
+    open fun updateSong(song: Song) {
         this.song.value = song
     }
 

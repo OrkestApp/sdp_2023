@@ -17,7 +17,7 @@ import com.github.orkest.data.Providers
 import com.github.orkest.ui.notification.Notification
 
 
-class MainActivity : AppCompatActivity() {
+open class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,31 +64,40 @@ class MainActivity : AppCompatActivity() {
         permissions: Array<String>,
         grantResults: IntArray
     ) {
-        Log.d("MainActivity permissions", "onRequestPermissionsResult")
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        val result = handlePermissionsResult(requestCode, grantResults)
+        when (result) {
+            "AUDIO_PERMISSION_GRANTED" -> Toast.makeText(this, "The permission was successfully granted! You can now shazam songs!",
+                Toast.LENGTH_LONG).show()
+            "AUDIO_PERMISSION_DENIED" -> Toast.makeText(this, "The app needs the microphone access to analyze " +
+                    "which song you are listening to", Toast.LENGTH_LONG).show()
+            "CAMERA_PERMISSION_GRANTED" -> Toast.makeText(this, "The permission was successfully granted! " +
+                    "You can now share pictures and videos with your friends",
+                Toast.LENGTH_LONG).show()
+            "CAMERA_PERMISSION_DENIED" -> Toast.makeText(this, "The app needs the camera access to share songs with your friends", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    open fun handlePermissionsResult(requestCode: Int, grantResults: IntArray): String {
         if (requestCode == PermissionConstants.AUDIO_PERMISSION_REQUEST_CODE) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission granted
-                Toast.makeText(this, "The permission was successfully granted! You can now shazam songs!",
-                    Toast.LENGTH_LONG).show()
+                return "AUDIO_PERMISSION_GRANTED"
             } else {
                 // Permission denied
-                //Display a text box dialog to inform user that the app needs the permission to work
-                Toast.makeText(this, "The app needs the microphone access to analyze " +
-                        "which song you are listening to", Toast.LENGTH_LONG).show()
+                return "AUDIO_PERMISSION_DENIED"
             }
         }
         if(requestCode == PermissionConstants.CAMERA_PERMISSION_REQUEST_CODE){
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission granted
-                Toast.makeText(this, "The permission was successfully granted! " +
-                        "You can now share pictures and videos with your friends",
-                    Toast.LENGTH_LONG).show()
+                return "CAMERA_PERMISSION_GRANTED"
             } else {
                 // Permission denied
-                Toast.makeText(this, "The app needs the camera access to share songs with your friends", Toast.LENGTH_LONG).show()
+                return "CAMERA_PERMISSION_DENIED"
             }
         }
+        return "UNKNOWN_REQUEST_CODE"
     }
 }
 

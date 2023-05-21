@@ -1,13 +1,13 @@
 package com.github.orkest.ui.feed
 
-import android.content.ContentValues
-import android.util.Log
+import android.net.Uri
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.MutableLiveData
 import com.github.orkest.data.*
 import com.github.orkest.data.Constants.Companion.DEFAULT_MAX_RECENT_DAYS
 import com.github.orkest.domain.FireStoreDatabaseAPI
+import com.github.orkest.ui.notification.Notification
 import java.time.LocalDateTime
 import java.util.concurrent.CompletableFuture
 
@@ -67,6 +67,11 @@ open class PostViewModel {
 
     open fun setPostDate(date: String) {
         post_date = date
+    }
+
+    open fun setPostMedia(media: String, isVideo: Boolean){
+        post.media = media
+        post.isMediaVideo = isVideo
     }
 
 
@@ -163,6 +168,7 @@ open class PostViewModel {
         post.postDescription = postDescription.value.text
         post.date = OrkestDate(LocalDateTime.now())
         post.song = song.value
+
 
         return post
     }

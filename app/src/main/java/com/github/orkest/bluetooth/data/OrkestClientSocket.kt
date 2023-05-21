@@ -1,11 +1,12 @@
 package com.github.orkest.bluetooth.data
 
 import android.bluetooth.BluetoothSocket
+import androidx.annotation.RequiresPermission
 import com.github.orkest.bluetooth.domain.Socket
 import java.io.InputStream
 import java.io.OutputStream
 
-class OrkestSocket(private var bluetoothSocket: BluetoothSocket): Socket{
+class OrkestClientSocket(private var bluetoothSocket: BluetoothSocket): Socket{
 
     override fun getInputStream(): InputStream {
         return bluetoothSocket.inputStream
@@ -21,5 +22,10 @@ class OrkestSocket(private var bluetoothSocket: BluetoothSocket): Socket{
 
     override fun close() {
         return bluetoothSocket.close()
+    }
+
+    @RequiresPermission(value = "android.permission.BLUETOOTH_CONNECT")
+    override fun connect() {
+        return bluetoothSocket.connect()
     }
 }

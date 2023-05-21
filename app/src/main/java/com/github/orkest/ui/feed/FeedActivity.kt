@@ -2,6 +2,7 @@ package com.github.orkest.View.feed
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.util.MutableBoolean
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -22,14 +23,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.MutableLiveData
+import coil.compose.rememberImagePainter
 import com.github.orkest.data.Constants
 import com.github.orkest.data.Post
 import com.github.orkest.data.Song
@@ -41,6 +47,9 @@ import com.github.orkest.ui.feed.CreatePost
 import com.github.orkest.ui.sharing.SharingComposeActivity
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.ui.StyledPlayerView
 import kotlinx.coroutines.launch
 
 
@@ -96,26 +105,6 @@ fun FeedActivity(viewModel: PostViewModel) {
     }
 
 
-    val context = LocalContext.current
-
-    //Add a button to create a new post at the top end corner
-    Box(modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.TopEnd) {
-        FloatingActionButton(
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(10.dp)
-                .testTag("addPostButton"),
-            backgroundColor = Color.White,
-            onClick = { launchCreatePostActivity(context) }) {
-            Icon(
-                painter = painterResource(id = R.drawable.add_button),
-                contentDescription = "Add post"
-            )
-        }
-    }
-
-
 }
 
 /**
@@ -130,12 +119,6 @@ private fun refreshData(viewModel: PostViewModel, listPosts: MutableState<List<P
                 listPosts.value = t
             }
         }
-}
-
-
-fun launchCreatePostActivity(context: Context){
-    val intent = Intent(context, CreatePost::class.java)
-    context.startActivity(intent)
 }
 
 /**
@@ -155,7 +138,8 @@ fun DisplayPost(viewModel: PostViewModel, post: Post) {
 
         Column {
             // Display the user profile pic
-            ProfilePic(post.profilePicId)
+            /**TODO change when fetching from database is possible. For now, it avoids error of vectorized image**/
+            ProfilePic(R.drawable.blank_profile_pic)
             //Display the reaction buttons
             Reaction(viewModel, post)
         }
@@ -169,6 +153,51 @@ fun DisplayPost(viewModel: PostViewModel, post: Post) {
             // Display the post's song
             SongCard(post.song)
             Spacer(modifier = Modifier.height(10.dp))
+
+            if(post.media.isNotEmpty()) {
+                val uri = Uri.parse(post.media)
+                CapturedMedia(capturedUri = uri!!, isVideo = post.isMediaVideo)
+            }
+
+        }
+    }
+}
+
+@Composable
+fun CapturedMedia(
+    capturedUri: Uri,
+    isVideo: Boolean
+) {
+    val context = LocalContext.current
+    lateinit var exoPlayer: ExoPlayer
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        if (isVideo){
+            //Displays the taken video
+            exoPlayer = remember(context) {
+                ExoPlayer.Builder(context).build().apply {
+                    setMediaItem(MediaItem.fromUri(capturedUri))
+                    prepare()
+                }
+            }
+            AndroidView(
+                factory = { context ->
+                    StyledPlayerView(context).apply {
+                        player = exoPlayer
+                    }
+                },
+                modifier = Modifier
+                    .size(400.dp)
+                    .testTag("Captured Video")
+            )
+
+        } else {
+            //Displays the captured Image
+            Image(
+                painter = rememberImagePainter(data = capturedUri),
+                contentDescription = "Captured Image",
+                modifier = Modifier.size(400.dp)
+            )
         }
     }
 }
@@ -306,19 +335,25 @@ private fun LikeButton(viewModel: PostViewModel, post: Post) {
                 .height(20.dp)
                 .width(20.dp)
                 .clickable {
-                    viewModel.updatePostLikes(post, !isPostLiked.value).thenApply {
-                        //Updating the isPostLiked value accordingly
-                        isPostLiked.value = !isPostLiked.value
-                        //Updating the value of getNbLikes only after the updatePostLikes future has been completed
-                        viewModel.getNbLikes(post).thenApply { nbLikes.value = it }
-                    }
+                    viewModel
+                        .updatePostLikes(post, !isPostLiked.value)
+                        .thenApply {
+                            //Updating the isPostLiked value accordingly
+                            isPostLiked.value = !isPostLiked.value
+                            //Updating the value of getNbLikes only after the updatePostLikes future has been completed
+                            viewModel
+                                .getNbLikes(post)
+                                .thenApply { nbLikes.value = it }
+                        }
                 },
         )
         //Displaying the number of likes for this post
         Text(
             text = "${nbLikes.value}",
             color = buttonColor,
-            modifier = Modifier.padding(5.dp).testTag("Number of likes")
+            modifier = Modifier
+                .padding(5.dp)
+                .testTag("Number of likes")
         )
     }
 
@@ -379,7 +414,7 @@ private fun ReactionIcon(iconId: Int, contentDescription:String, testTag: String
             .testTag(testTag)
             .height(20.dp)
             .width(20.dp)
-            .clickable { onClick()})
+            .clickable { onClick() })
 }
 
 

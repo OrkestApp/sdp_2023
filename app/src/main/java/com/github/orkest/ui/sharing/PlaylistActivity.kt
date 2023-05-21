@@ -26,13 +26,10 @@ import com.github.orkest.data.Profile
 import com.github.orkest.ui.sharedMusic.sharedMusicPost
 import androidx.room.Room
 import com.github.orkest.R
-import com.github.orkest.View.feed.launchCreatePostActivity
 import com.github.orkest.data.Constants
-import com.github.orkest.domain.DeezerApiIntegration
 import com.github.orkest.data.Song
 import com.github.orkest.domain.persistence.AppDatabase
 import com.github.orkest.ui.MainActivity
-import com.github.orkest.ui.sharedMusic.sharedMusicPost
 import com.github.orkest.ui.theme.OrkestTheme
 import com.spotify.android.appremote.api.SpotifyAppRemote
 

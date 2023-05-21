@@ -7,16 +7,23 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.github.orkest.R
+import com.github.orkest.bluetooth.ui.BluetoothActivity
+
+import com.github.orkest.domain.DeezerApiIntegration
 import com.github.orkest.ui.profile.ProfileActivity
 import java.util.*
 
@@ -26,18 +33,19 @@ class SearchUserView {
         @OptIn(ExperimentalMaterial3Api::class)
         @Composable
 
-        /**
-         * @param viewModel use to communicate with the Backend
-         *
-         *This method display the search bar, and support the drawing of the future users that will
-         * be find in the database
-         *
-         * the viewmodel communicate back to the searchUi view using futures
-         */
+                /**
+                 * @param viewModel use to communicate with the Backend
+                 *
+                 *This method display the search bar, and support the drawing of the future users that will
+                 * be find in the database
+                 *
+                 * the viewmodel communicate back to the searchUi view using futures
+                 */
         fun SearchUi(viewModel: SearchViewModel) {
             //need to use remember because it triggers an action each time
             var text by remember { mutableStateOf("") }
             var list by remember { mutableStateOf(mutableListOf("")) }
+            val context = LocalContext.current
 
             //Each time the text is updated, this is called
             // Need to use future to wait for the asynchronous fetch on the datxabase
@@ -47,6 +55,27 @@ class SearchUserView {
 
             Column(modifier = Modifier.fillMaxSize())
             {
+                Button(
+                    onClick = {
+
+                        val intent = Intent(context,BluetoothActivity::class.java)
+                        context.startActivity(intent)
+
+
+                    },
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.Yellow))
+                {
+                    Text("Search nearby users")
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Image(
+                            painter = painterResource(R.drawable.png_transparent_bluetooth_low_energy_wireless_speaker_mobile_phones_bluetooth_trademark_computer_logo), // Replace with your image resource
+                            contentDescription = "Button Icon",
+                            modifier = Modifier.size(24.dp) // Adjust the size as needed
+                        )
+                        Spacer(modifier = Modifier.width(12.dp)) // Add spacing between image and text
+
+                    }
+                }
                 OutlinedTextField(
                     value = text,
                     onValueChange = {

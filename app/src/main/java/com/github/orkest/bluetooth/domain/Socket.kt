@@ -15,4 +15,6 @@ interface Socket: Closeable {
 
     fun isConnected() : Boolean
 
+    fun connect()
+
 }

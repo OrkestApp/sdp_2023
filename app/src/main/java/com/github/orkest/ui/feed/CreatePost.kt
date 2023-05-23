@@ -51,11 +51,7 @@ class CreatePost : ComponentActivity() {
                 ) {
                     val viewModel = PostViewModel()
 
-                    isVideo = intent.getBooleanExtra("isVideo", false)
-                    val URIstring = intent.getStringExtra("URI") ?: "Unknown"
-                    mediaURI = Uri.parse(URIstring)
 
-                    viewModel.setPostMedia(URIstring, isVideo)
 
                     val song = Song()
                     //Get the song name, artist, and album from the intent
@@ -68,6 +64,12 @@ class CreatePost : ComponentActivity() {
 
                     if (intent.hasExtra(Constants.SONG_ALBUM))
                         song.Album = intent.getStringExtra(Constants.SONG_ALBUM) ?: "Unknown"
+
+                    isVideo = intent.getBooleanExtra("isVideo", false)
+                    val URIstring = intent.getStringExtra("URI") ?: "Unknown"
+                    mediaURI = Uri.parse(URIstring)
+
+                    viewModel.setPostMedia(URIstring, isVideo)
 
                     viewModel.updateSong(song)
 

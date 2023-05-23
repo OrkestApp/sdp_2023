@@ -81,7 +81,6 @@ class PlaylistActivity() : ComponentActivity() {
         }
     }
 
-
     @Composable
     private fun SetContent(){
         // A surface container using the 'background' color from the theme

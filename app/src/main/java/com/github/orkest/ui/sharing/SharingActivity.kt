@@ -1,8 +1,10 @@
 package com.github.orkest.ui.sharing
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
+import android.os.Looper
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -25,9 +27,10 @@ import com.github.orkest.data.Providers
 import com.github.orkest.domain.Authorization.Companion.getLoginActivityTokenIntent
 import com.github.orkest.domain.Authorization.Companion.requestUserAuthorization
 import com.github.orkest.domain.FireStoreDatabaseAPI
+import com.github.orkest.ui.MainActivity
 import com.github.orkest.ui.search.SearchUserView
-import com.github.orkest.ui.theme.OrkestTheme
 import com.github.orkest.ui.search.SearchViewModel
+import com.github.orkest.ui.theme.OrkestTheme
 import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationResponse
 import okhttp3.*
@@ -68,6 +71,29 @@ class SharingComposeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
+
+        // ----------------------------------------------------------------------------------------
+        // Check if device connected to the internet
+        if(!FireStoreDatabaseAPI.isOnline(this)){
+            Log.d("Debug", "No internet connection")
+            // alert the user that the device is not connected to the internet
+            val alertDialogBuilder = AlertDialog.Builder(this)
+            alertDialogBuilder.setTitle("No internet connection")
+            alertDialogBuilder.setMessage("Please connect to the internet to share songs with your friends")
+            alertDialogBuilder.setPositiveButton("OK") { _, _ ->
+                finish()
+            }
+            alertDialogBuilder.show()
+            // wait for the user to press OK
+            try {
+                Looper.loop()
+            } catch (_: RuntimeException) { }
+            
+            // kill this activity
+            return
+
+        }
+
 
         // Get the song name from the intent ----------------- Intent from Orkest -----------------
         if (intent.hasExtra(Constants.SONG_NAME)) {

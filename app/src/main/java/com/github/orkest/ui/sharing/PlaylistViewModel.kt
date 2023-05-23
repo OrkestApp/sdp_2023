@@ -21,7 +21,7 @@ open class PlaylistViewModel(private val songDao: AppDao.Companion.SongDao) : Vi
     // method to fetch songs from database
     fun fetchSongs(sender: String, receiver: String, context: Context) : CompletableFuture<List<Song>>  {
         // check internet connection
-        return if (dbAPI.isOnline(context)){
+        return if (FireStoreDatabaseAPI.isOnline(context)){
             dbAPI.fetchSharedSongsFromDataBase(receiver, sender)
         }else{
             // get songs from cache
@@ -37,7 +37,7 @@ open class PlaylistViewModel(private val songDao: AppDao.Companion.SongDao) : Vi
     // method to store songs in database
     fun storeSong(song: Song, sender: String, receiver: String, context: Context) {
         CompletableFuture.runAsync {
-            if (dbAPI.isOnline(context)){
+            if (FireStoreDatabaseAPI.isOnline(context)){
                 // cache the new song in the database
                 this.songDao.insertAll(AppEntities.Companion.SongEntity(
                     // random id

@@ -19,7 +19,7 @@ class AudioRecordingTest {
     @Test
     fun testGetAudioRecording() {
         val coroutineScope = CoroutineScope(Dispatchers.IO)
-        val result: Flow<AudioChunk> = AudioRecording.recordingFlow(coroutineScope)
+        val result: Flow<AudioChunk> = AudioRecording.recordingFlow()
 
         val listAudioChunk = mutableListOf<AudioChunk>()
 

@@ -89,8 +89,8 @@ class AudioRecording {
 
         /**
          * Stops the collection of the recorded AudioChunks
-         * Must be called in the same coroutineScope as logsRecordedAudio
-         * @param coroutineScope the same coroutineScope as logsRecordedAudio
+         * Must be called in the same coroutineScope as the collecting scope
+         * @param coroutineScope the same coroutineScope as  collecting scope
          */
         fun stopRecording(coroutineScope: CoroutineScope){
             coroutineScope.cancel()

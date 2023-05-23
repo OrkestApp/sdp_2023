@@ -88,23 +88,6 @@ class AudioRecording {
         }
 
         /**
-         * Collects recorded AudioChunks continuously and logs them
-         * @param coroutineScope the same coroutineScope as the streaming session
-         * @throws [SecurityException] if the app does not have the RECORD_AUDIO permission
-         */
-        @RequiresPermission(Manifest.permission.RECORD_AUDIO)
-        fun logsRecordedAudio(coroutineScope: CoroutineScope){
-            coroutineScope.launch {
-                recordingFlow(coroutineScope).collect {
-                    Log.d("HasOnesBuffer", it.buffer.sum().toString())
-                    Log.d("LengthBuffer", it.buffer.size.toString())
-                    Log.d("ShazamActivity", it.timestamp.toString())
-                }
-            }
-
-        }
-
-        /**
          * Stops the collection of the recorded AudioChunks
          * Must be called in the same coroutineScope as logsRecordedAudio
          * @param coroutineScope the same coroutineScope as logsRecordedAudio
@@ -112,6 +95,26 @@ class AudioRecording {
         fun stopRecording(coroutineScope: CoroutineScope){
             coroutineScope.cancel()
         }
+
+        //============================THIS WAS JUST FOR TESTING============================
+//        /**
+//         * Collects recorded AudioChunks continuously and logs them
+//         * @param coroutineScope the same coroutineScope as the streaming session
+//         * @throws [SecurityException] if the app does not have the RECORD_AUDIO permission
+//         */
+//        @RequiresPermission(Manifest.permission.RECORD_AUDIO)
+//        fun logsRecordedAudio(coroutineScope: CoroutineScope){
+//            coroutineScope.launch {
+//                recordingFlow(coroutineScope).collect {
+//                    Log.d("HasOnesBuffer", it.buffer.sum().toString())
+//                    Log.d("LengthBuffer", it.buffer.size.toString())
+//                    Log.d("ShazamActivity", it.timestamp.toString())
+//                }
+//            }
+//
+//        }
+
+
     }
 }
 

@@ -44,7 +44,7 @@ import java.util.concurrent.CompletableFuture
 
                     //Starts the recording and the recognition
                     val title = AudioRecognition.recognizeSong(coroutineScope, activity,
-                        AudioRecording.recordingFlow(coroutineScope)
+                        AudioRecording.recordingFlow()
                     )
 
                     //Handles the result of the recognition
@@ -65,7 +65,7 @@ import java.util.concurrent.CompletableFuture
      * @param error the error
      * @param context the context
      */
-    private fun handleRecognitionResult(song: Song, error: Throwable?, context: Context): Song {
+    fun handleRecognitionResult(song: Song, error: Throwable?, context: Context): Song {
 
         if (error != null) {
             Log.d("ShazamActivity", "Error : $error")
@@ -85,7 +85,6 @@ import java.util.concurrent.CompletableFuture
                     Toast.LENGTH_LONG
                 ).show()
             }
-
             return song
         }
     }

@@ -58,7 +58,7 @@ class AudioRecording {
          * @throws [SecurityException] if the app does not have the RECORD_AUDIO permission
          */
         @RequiresPermission(Manifest.permission.RECORD_AUDIO)
-        fun recordingFlow(coroutineScope: CoroutineScope): Flow<AudioChunk> {
+        fun recordingFlow(): Flow<AudioChunk> {
             //Build the audioRecord object
             val audioRecord = buildAudioRecord()
 
@@ -95,7 +95,7 @@ class AudioRecording {
         @RequiresPermission(Manifest.permission.RECORD_AUDIO)
         fun logsRecordedAudio(coroutineScope: CoroutineScope){
             coroutineScope.launch {
-                recordingFlow(coroutineScope).collect {
+                recordingFlow().collect {
                     Log.d("HasOnesBuffer", it.buffer.sum().toString())
                     Log.d("LengthBuffer", it.buffer.size.toString())
                     Log.d("ShazamActivity", it.timestamp.toString())

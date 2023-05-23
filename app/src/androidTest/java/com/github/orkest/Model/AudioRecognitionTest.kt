@@ -31,7 +31,7 @@ class AudioRecognitionTest{
 
     @Test
     fun audioIsRecorded() {
-        val audio = AudioRecording.recordingFlow(coroutine)
+        val audio = AudioRecording.recordingFlow()
         var counter = 0
         println("Starting test")
         coroutine.launch {
@@ -45,7 +45,7 @@ class AudioRecognitionTest{
 
     @Test
     fun audioIsStopped(){
-        val audio = AudioRecording.recordingFlow(coroutine)
+        val audio = AudioRecording.recordingFlow()
         var counter = 0
         println("Starting test")
         coroutine.launch {

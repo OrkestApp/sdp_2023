@@ -14,7 +14,6 @@ class EditProfileTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private lateinit var viewModel: AuthViewModel
     @Before
     fun setup(){
         composeTestRule.setContent {
@@ -24,12 +23,19 @@ class EditProfileTest {
 
     @Test
     fun componentsDisplayOnScreen(){
-        //composeTestRule.onAllNodesWithText("Create Your Profile").assertAll(isEnabled())
         composeTestRule.onNodeWithText("Cancel").assertIsDisplayed()
         composeTestRule.onNodeWithText("Save").assertIsDisplayed()
         composeTestRule.onNodeWithText("edit picture").assertIsDisplayed()
         composeTestRule.onNodeWithText("Bio:").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Username:").assertIsDisplayed()
     }
 
+    @Test
+    fun cancelIsClickable() {
+        composeTestRule.onNodeWithText("Cancel").assertHasClickAction()
+    }
+
+    @Test
+    fun saveIsClickable() {
+        composeTestRule.onNodeWithText("Save").assertHasClickAction()
+    }
 }

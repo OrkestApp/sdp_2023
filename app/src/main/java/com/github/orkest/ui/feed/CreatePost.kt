@@ -119,7 +119,6 @@ fun EditPostScreen(viewModel: PostViewModel, activity: ComponentActivity) {
 
             //TODO: Add a button to list songs to choose from
             //Field to choose the song to display [dummy, to be correctly implemented later with retrieval from database ..]
-            viewModel.updateSong(Constants.DUMMY_RUDE_BOY_SONG)
             SongCard(song = viewModel.getSong())
 
 
@@ -129,8 +128,10 @@ fun EditPostScreen(viewModel: PostViewModel, activity: ComponentActivity) {
             //Confirm button to publish the post
             Button(
                 onClick = {
-                    viewModel.addPost().whenComplete{
-                            bool,_ -> if(bool) activity.finish() }
+                    viewModel.addPost().whenComplete { bool,_ ->
+                        viewModel.resetFoundShazamSong()
+                        if(bool) activity.finish()
+                    }
 
                     val intent = Intent(context, MainActivity::class.java)
                     context.startActivity(intent)

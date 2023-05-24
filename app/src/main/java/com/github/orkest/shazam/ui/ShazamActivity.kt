@@ -24,7 +24,7 @@ import java.util.concurrent.CompletableFuture
      */
      @SuppressLint("MissingPermission")
      @Composable
-    fun ShazamSong(activity: Activity): CompletableFuture<Song> {
+     fun ShazamSong(activity: Activity): CompletableFuture<Song> {
 
         val context = LocalContext.current
         val coroutineScope = rememberCoroutineScope()
@@ -40,6 +40,7 @@ import java.util.concurrent.CompletableFuture
                 }
 
                 else {
+                    ShazamConstants.SHAZAM_SESSION_ACTIVE.value = true
                     Toast.makeText(context, "Shazaming ...", Toast.LENGTH_LONG).show()
 
                     //Starts the recording and the recognition
@@ -49,12 +50,16 @@ import java.util.concurrent.CompletableFuture
 
                     //Handles the result of the recognition
                     title.whenComplete { song, error ->
-                        futureSong.complete(handleRecognitionResult(song, error, context))
+                        val song_found = handleRecognitionResult(song, error, context)
+                        ShazamConstants.SONG_FOUND = song_found
+                        ShazamConstants.SHAZAM_SESSION_ACTIVE.value = false
+                        futureSong.complete(song_found)
                     }
 
                 }
             }
         }
+
         return futureSong
     }
 

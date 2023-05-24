@@ -21,7 +21,7 @@ import com.github.orkest.data.Constants
 import com.github.orkest.domain.*
 import java.util.concurrent.CompletableFuture
 
-class DeezerWelcomeActivity(private val mock: Boolean) : AppCompatActivity(){
+class DeezerWelcomeActivity(private val mock: Boolean=false) : AppCompatActivity(){
 
     /**
      * This will be used later in the code

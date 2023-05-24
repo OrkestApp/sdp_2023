@@ -39,7 +39,7 @@ import com.github.orkest.ui.profile.ProfileViewModel
 import com.github.orkest.ui.search.SearchUserView
 import java.util.concurrent.CompletableFuture
 
-class BluetoothActivity(private val mock:Boolean) : ComponentActivity() {
+class BluetoothActivity(private val mock:Boolean =false) : ComponentActivity() {
 
     private var bluetoothServiceManager: BluetoothInterface? = null
     private var sender = true

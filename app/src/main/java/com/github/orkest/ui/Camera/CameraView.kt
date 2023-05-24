@@ -12,6 +12,7 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
@@ -47,6 +48,7 @@ import java.util.*
 import androidx.compose.foundation.border
 import androidx.compose.runtime.Composable
 import androidx.core.app.ActivityCompat
+import com.github.orkest.domain.FireStoreDatabaseAPI
 import com.github.orkest.ui.PermissionConstants
 import com.github.orkest.ui.feed.CreatePost
 import com.google.android.exoplayer2.ExoPlayer
@@ -322,15 +324,23 @@ class CameraView: ComponentActivity(){
                 .padding(paddingValue)
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .testTag("Save Button")
-                )
+                .testTag("Save Button"),
+                context = context)
         }
     }
 
     @Composable
-    fun SaveButton(onSaveClick: ()-> Unit, modifier: Modifier){
+    fun SaveButton(onSaveClick: ()-> Unit, modifier: Modifier, context: Context){
         Button(
-            onClick = onSaveClick,
+            onClick = {
+                if(FireStoreDatabaseAPI.isOnline(context)){
+                    onSaveClick()
+                    Log.d(TAG, "Online")
+                } else {
+                    Toast.makeText(context, "No internet connection. Unable to post.", Toast.LENGTH_LONG).show()
+                    Log.d(TAG, "Offline")
+                }
+            },
             modifier = modifier,
             shape = RoundedCornerShape(roundedCornerValue),
             colors = ButtonDefaults.buttonColors(

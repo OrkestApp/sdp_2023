@@ -1,9 +1,10 @@
 package com.github.orkest.View.feed
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.util.MutableBoolean
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,37 +14,30 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.MutableLiveData
 import coil.compose.rememberImagePainter
 import com.github.orkest.data.Constants
 import com.github.orkest.data.Post
 import com.github.orkest.data.Song
 import com.github.orkest.R
-import com.github.orkest.ui.Camera.CameraView
+import com.github.orkest.domain.FireStoreDatabaseAPI
 import com.github.orkest.ui.feed.PostViewModel
 import com.github.orkest.ui.feed.CommentActivity
-import com.github.orkest.ui.feed.CreatePost
 import com.github.orkest.ui.sharing.SharingComposeActivity
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -141,7 +135,7 @@ fun DisplayPost(viewModel: PostViewModel, post: Post) {
             /**TODO change when fetching from database is possible. For now, it avoids error of vectorized image**/
             ProfilePic(R.drawable.blank_profile_pic)
             //Display the reaction buttons
-            Reaction(viewModel, post)
+            Reaction(viewModel, post, context = LocalContext.current)
         }
 
         Column(modifier = Modifier.padding(10.dp, top = 10.dp, end = 10.dp)) {
@@ -312,7 +306,7 @@ private fun PlayButton(song: Song) {
 }
 
 @Composable
-private fun LikeButton(viewModel: PostViewModel, post: Post) {
+private fun LikeButton(viewModel: PostViewModel, post: Post, context: Context) {
 
     //Declaring variables to update the UI
     val isPostLiked = remember{ mutableStateOf(false) }
@@ -335,16 +329,26 @@ private fun LikeButton(viewModel: PostViewModel, post: Post) {
                 .height(20.dp)
                 .width(20.dp)
                 .clickable {
-                    viewModel
-                        .updatePostLikes(post, !isPostLiked.value)
-                        .thenApply {
-                            //Updating the isPostLiked value accordingly
-                            isPostLiked.value = !isPostLiked.value
-                            //Updating the value of getNbLikes only after the updatePostLikes future has been completed
-                            viewModel
-                                .getNbLikes(post)
-                                .thenApply { nbLikes.value = it }
-                        }
+                    if(FireStoreDatabaseAPI.isOnline(context)){
+                        viewModel
+                            .updatePostLikes(post, !isPostLiked.value)
+                            .thenApply {
+                                //Updating the isPostLiked value accordingly
+                                isPostLiked.value = !isPostLiked.value
+                                //Updating the value of getNbLikes only after the updatePostLikes future has been completed
+                                viewModel
+                                    .getNbLikes(post)
+                                    .thenApply { nbLikes.value = it }
+                            }
+                    }
+                    else{
+                        val alertDialog = androidx.appcompat.app.AlertDialog.Builder(context)
+                            .setTitle("Offline Mode")
+                            .setMessage("No multiple likes in offline mode")
+                            .setNegativeButton("Cancel", null)
+                            .create()
+                        alertDialog.show()
+                    }
                 },
         )
         //Displaying the number of likes for this post
@@ -360,12 +364,12 @@ private fun LikeButton(viewModel: PostViewModel, post: Post) {
 }
 
 @Composable
-private fun Reaction(viewModel: PostViewModel, post: Post) {
+private fun Reaction(viewModel: PostViewModel, post: Post, context: Context) {
     //val context = LocalContext.current
     Column(modifier = Modifier.padding(20.dp)) {
 
         // Create the like button
-        LikeButton(viewModel, post = post)
+        LikeButton(viewModel, post = post, context)
         Spacer(modifier = Modifier.height(10.dp))
 
         //Create the comment button

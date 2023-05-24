@@ -39,7 +39,7 @@ import com.github.orkest.ui.profile.ProfileViewModel
 import com.github.orkest.ui.search.SearchUserView
 import java.util.concurrent.CompletableFuture
 
-class BluetoothActivity() : ComponentActivity() {
+class BluetoothActivity(private val mock:Boolean) : ComponentActivity() {
 
     private var bluetoothServiceManager: BluetoothInterface? = null
     private var sender = true
@@ -159,6 +159,7 @@ class BluetoothActivity() : ComponentActivity() {
     fun createUserList(bluetoothServiceManager: BluetoothInterface){
         val recompose by rememberUpdatedState(update)
 
+
         Column() {
             Button(onClick = {bluetoothServiceManager.acceptConnections()}) {
                 Text(text = "RECEIVE")
@@ -205,16 +206,19 @@ class BluetoothActivity() : ComponentActivity() {
         bluetoothServiceManager : BluetoothInterface = BluetoothServiceManager(handler), //REPLACE HANDLER
         activity: BluetoothActivity){
         // check for permissions
-        val permissions = bluetoothServiceManager.checkPermissionGranted(activity)
-        if (!permissions) {
+
+        val permissions = bluetoothServiceManager.checkPermissionGranted(LocalContext.current)
+        if (!permissions && !mock) {
             bluetoothServiceManager.askBluetoothPermission(activity)
         }
+
 
         val discoverableIntent: Intent = Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE).apply {
             putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300)
         }
         activity.setServiceManager(bluetoothServiceManager)
-        activity.discovery.launch(discoverableIntent)
+        if(!mock){
+        activity.discovery.launch(discoverableIntent)}
 
         var deviceList = remember { bluetoothServiceManager.devices }
 

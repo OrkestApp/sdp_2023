@@ -16,13 +16,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.test.platform.app.InstrumentationRegistry
 import com.github.orkest.data.Constants
-import com.github.orkest.domain.DeezerApi
-import com.github.orkest.domain.DeezerApiIntegration
-import com.github.orkest.domain.FireStoreDatabaseAPI
-import com.github.orkest.domain.deezerApiImplemented
+import com.github.orkest.domain.*
+import java.util.concurrent.CompletableFuture
 
-class DeezerWelcomeActivity : AppCompatActivity(){
+class DeezerWelcomeActivity(private val mock: Boolean) : AppCompatActivity(){
 
     /**
      * This will be used later in the code
@@ -32,39 +31,26 @@ class DeezerWelcomeActivity : AppCompatActivity(){
     private val db = FireStoreDatabaseAPI()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val intent: Intent = intent
-        val deepLink: String = intent.data.toString()
-        val uri: Uri = Uri.parse(deepLink)
+        Log.d("HELLO TEST","HELLO")
+        var deezerApi = DeezerApiIntegration(deezerApiImplemented())
+        var codeValue: String? =""
+        if(!mock){
+            val intent: Intent = intent
+            val deepLink: String = intent.data.toString()
+            val uri: Uri = Uri.parse(deepLink)
+             codeValue = uri.getQueryParameter("code")
+
+        }
+
+        if(mock){
+            deezerApi = DeezerApiIntegration(DeezerMockAPi.DeezerMockApiImplemented())
+        }
         //FOLLOWING OPERATIONS NEEDS TO BE DONE SEQUENCIALY BECAUSE THEY ALL NEED PREVIOUS RESULTS
-        val codeValue: String? = uri.getQueryParameter("code")
+        if(codeValue == "" && this.mock){
+            codeValue = "DumbUser"
+        }
         if (codeValue != null) {
-            code = codeValue
-            val future = db.storeDeezerInformationsInDatabase(Constants.CURRENT_LOGGED_USER,codeValue) //store the token in the database
-            future.thenAccept { if ( ! it) {
-                Log.d("DB_OPERATION","Fail to store token in the database")
-            }
-                else { // waits for the access token to be successfully stored in the database
-                    db.getUserDeezerInformations(Constants.CURRENT_LOGGED_USER).thenAccept { data ->
-                        if(data.access_token != "" && data.access_token != null){
-                            val userIdFuture = DeezerApiIntegration(deezerApiImplemented()).fetchTheUserIdInTheDeezerDatabase(data.access_token!!)
-                            userIdFuture.thenAccept { // waits for the user Id fetch in the database
-                                user -> val playlistIdFuture = DeezerApiIntegration(deezerApiImplemented()).createANewPlaylistOnTheUserProfile(user.id,data.access_token!!)
-                                playlistIdFuture.thenAccept { // waits for the playlist to be created on the user's profile and then return the playlist ID
-                                    playlistId ->
-                                    if (playlistId != "" && playlistId !=null){
-                                    db.storeDeezerInformationsInDatabase(Constants.CURRENT_LOGGED_USER,data.access_token!!, user.id,playlistId) // Finaly store all the user's deezer credentials in the database
-                                    }
-                                    else {
-                                        Log.d("DEEZER_OAUTH_FAIL", "Failed to store deezer informations")
-                                    }
-                                }
-                            }
-
-                        }
-                    }
-            }
-
-            }
+            WelcomeOperation(codeValue = codeValue, deezerApi = deezerApi, username = Constants.CURRENT_LOGGED_USER)
         }
         else{
             Log.d("DEEZER_OAUTH_FAIL","token was empty")
@@ -73,6 +59,69 @@ class DeezerWelcomeActivity : AppCompatActivity(){
 
         setContent {
             CreateViewForDeezer()
+        }
+    }
+
+    companion object {
+        /**
+         * 1) Stores the access token along with the userName
+         * 2) Fetch the user Id using the Deezer API
+         * 3) Create a orkest Playlist then waits for the playlist ID
+         * 4) Stores the playlist id back into the database
+         */
+        fun WelcomeOperation(
+            codeValue: String,
+            deezerApi: DeezerApiIntegration,
+            username: String
+        ): CompletableFuture<Boolean> {
+
+            val completableFuture = CompletableFuture<Boolean>()
+            val db = FireStoreDatabaseAPI()
+            val future = db.storeDeezerInformationsInDatabase(
+                username,
+                codeValue
+            ) //store the token in the database
+            future.thenAccept {
+                if (!it) {
+                    Log.d("DB_OPERATION", "Fail to store token in the database")
+                } else { // waits for the access token to be successfully stored in the database
+                    Log.d("CHECKPOINT DEEZER", "12")
+                    db.getUserDeezerInformations(username).thenAccept { data ->
+                        if (data.access_token != "" && data.access_token != null) {
+                            Log.d("CHECKPOINT DEEZER", "1")
+                            val userIdFuture =
+                                deezerApi.fetchTheUserIdInTheDeezerDatabase(data.access_token!!)
+                            userIdFuture.thenAccept { // waits for the user Id fetch in the database
+                                    user ->
+                                val playlistIdFuture = deezerApi.createANewPlaylistOnTheUserProfile(
+                                    user.id,
+                                    data.access_token!!
+                                )
+                                playlistIdFuture.thenAccept { // waits for the playlist to be created on the user's profile and then return the playlist ID
+                                        playlistId ->
+                                    if (playlistId != "" && playlistId != null) {
+                                        db.storeDeezerInformationsInDatabase(
+                                            username,
+                                            data.access_token!!,
+                                            user.id,
+                                            playlistId
+                                        ) // Finaly store all the user's deezer credentials in the database
+                                        completableFuture.complete(true)
+                                    } else {
+                                        Log.d(
+                                            "DEEZER_OAUTH_FAIL",
+                                            "Failed to store deezer informations"
+                                        )
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+
+            }
+            return completableFuture
         }
     }
     @Composable
@@ -88,14 +137,9 @@ class DeezerWelcomeActivity : AppCompatActivity(){
     }
     private fun launchMainActivity(context: Context){
         val intent = Intent(context, MainActivity::class.java)
-        startActivity(intent)
+        context.startActivity(intent)
     }
 
-    @Preview
-    @Composable
-    fun preview_DeezerWelcome(){
-        CreateViewForDeezer()
-    }
 
 
 

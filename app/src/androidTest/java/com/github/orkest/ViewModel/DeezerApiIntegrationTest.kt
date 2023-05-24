@@ -387,8 +387,7 @@ class DeezerApiIntegrationTest {
         db.firestoreSettings = firestoreSettings {
             isPersistenceEnabled = false
         }
-
-         */
+   */
 
 
         DeezerWelcomeActivity.WelcomeOperation("CodeVale",DeezerApiIntegration(DeezerMockAPi.DeezerMockApiImplemented()),"BOB").join()

@@ -342,12 +342,7 @@ private fun LikeButton(viewModel: PostViewModel, post: Post, context: Context) {
                             }
                     }
                     else{
-                        val alertDialog = androidx.appcompat.app.AlertDialog.Builder(context)
-                            .setTitle("Offline Mode")
-                            .setMessage("No multiple likes in offline mode")
-                            .setNegativeButton("Cancel", null)
-                            .create()
-                        alertDialog.show()
+                        Toast.makeText(context, "No internet connection. Unable to like.", Toast.LENGTH_LONG).show()
                     }
                 },
         )

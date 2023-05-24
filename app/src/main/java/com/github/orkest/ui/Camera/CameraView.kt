@@ -333,13 +333,7 @@ class CameraView: ComponentActivity(){
     fun SaveButton(onSaveClick: ()-> Unit, modifier: Modifier, context: Context){
         Button(
             onClick = {
-                if(FireStoreDatabaseAPI.isOnline(context)){
-                    onSaveClick()
-                    Log.d(TAG, "Online")
-                } else {
-                    Toast.makeText(context, "No internet connection. Unable to post.", Toast.LENGTH_LONG).show()
-                    Log.d(TAG, "Offline")
-                }
+                onSaveClick()
             },
             modifier = modifier,
             shape = RoundedCornerShape(roundedCornerValue),

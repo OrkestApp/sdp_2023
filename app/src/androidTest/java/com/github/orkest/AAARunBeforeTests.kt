@@ -19,8 +19,6 @@ import org.junit.runners.MethodSorters
 class AAARunBeforeTests {
 
     //add recording permissions once for all tests
-    @get:Rule
-    var permissionAudio: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.RECORD_AUDIO)
 
     companion object {
         @BeforeClass

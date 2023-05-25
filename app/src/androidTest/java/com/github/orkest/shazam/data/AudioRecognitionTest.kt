@@ -13,12 +13,10 @@ import com.shazam.shazamkit.AudioSampleRateInHz
 import com.shazam.shazamkit.MatchResult
 import com.shazam.shazamkit.ShazamKit
 import com.shazam.shazamkit.ShazamKitResult
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -34,8 +32,11 @@ class AudioRecognitionTest {
     lateinit var coroutineScope: CoroutineScope
 
     @get:Rule
-   val composeTestRule = createComposeRule()
+    var permissionAudio: GrantPermissionRule =
+        GrantPermissionRule.grant(android.Manifest.permission.RECORD_AUDIO)
 
+    @get:Rule
+    val composeTestRule = createComposeRule()
 
     @Before
     fun setup(){
@@ -43,6 +44,25 @@ class AudioRecognitionTest {
         composeTestRule.setContent {
             coroutineScope = rememberCoroutineScope()
         }
+    }
+
+    @Test
+    fun testGetAudioRecording() {
+        val coroutineScope = CoroutineScope(Dispatchers.IO)
+        val result: Flow<AudioChunk> = AudioRecording.recordingFlow()
+
+        val listAudioChunk = mutableListOf<AudioChunk>()
+
+        coroutineScope.launch {
+            result.collect { audioChunk ->
+                listAudioChunk.add(audioChunk)
+                AudioRecording.stopRecording(this)
+
+            }
+        }
+
+        Thread.sleep(1000)
+        assert(listAudioChunk.size > 0)
     }
 
 

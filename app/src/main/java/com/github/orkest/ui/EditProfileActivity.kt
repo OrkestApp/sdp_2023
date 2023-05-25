@@ -78,8 +78,7 @@ fun EditProfileScreen(activity: ComponentActivity) {
         // keep track of the state of the scaffold (whether it is opened or closed)
         scaffoldState = scaffoldState,
         topBar = { TopBar(activity, coroutineScope = coroutineScope, scaffoldState = scaffoldState) },
-        // The content displayed inside the drawer when you click on the hamburger menu button
-        drawerContent = { CreateMenuDrawer() },
+
 
         content = { padding ->
             Modifier
@@ -111,26 +110,6 @@ fun NavDrawerButton(coroutineScope: CoroutineScope, scaffoldState: ScaffoldState
     ) {
         Icon(imageVector = Icons.Rounded.Menu, contentDescription = "Drawer Icon")
     }
-}
-
-@Composable
-fun CreateMenuDrawer() {
-    val notifSettingsItem = MenuItem(id = "notificationSettings", title = "Notifications", icon = Icons.Default.Notifications)
-    val privacyItem = MenuItem(id = "privacySettings", title = "Privacy", icon = Icons.Default.Phone)
-    val helpItem = MenuItem(id = "help", title = "Help", icon = Icons.Default.Info)
-
-    val items = listOf(notifSettingsItem, privacyItem, helpItem)
-
-    MenuDrawer(
-        items = items,
-        onItemClick = {
-            when(it.id) {
-                "notificationSettings" -> { /* TODO */ }
-                "privacySettings" -> { /* TODO */ }
-                "help" -> { /* TODO */ }
-            }
-        }
-    )
 }
 
 /**

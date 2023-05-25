@@ -8,7 +8,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -21,6 +20,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import com.github.orkest.data.Constants
 import com.github.orkest.View.feed.SongCard
@@ -40,7 +40,7 @@ var isVideo : Boolean = false
 class CreatePost : ComponentActivity() {
 
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             OrkestTheme {
@@ -154,9 +154,10 @@ fun EditPostScreen(viewModel: PostViewModel, activity: ComponentActivity) {
     }
 }
 
+@OptIn(ExperimentalCoilApi::class)
 @Composable
 fun CapturedMedia(
-    capturedUri: Uri,
+    capturedUri: Uri?,
     isVideo: Boolean
 ) {
     val context = LocalContext.current
@@ -167,7 +168,7 @@ fun CapturedMedia(
             //Displays the taken video
             exoPlayer = remember(context) {
                 ExoPlayer.Builder(context).build().apply {
-                    setMediaItem(MediaItem.fromUri(capturedUri))
+                    capturedUri?.let { MediaItem.fromUri(it) }?.let { setMediaItem(it) }
                     prepare()
                 }
             }
@@ -192,6 +193,8 @@ fun CapturedMedia(
         }
     }
 }
+
+
 
 
 //@Preview(showBackground = true)

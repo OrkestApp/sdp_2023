@@ -417,10 +417,3 @@ private fun ReactionIcon(iconId: Int, contentDescription:String, testTag: String
             .clickable { onClick() })
 }
 
-
-
-@Preview
-@Composable
-fun PreviewSongCard(){
-    FeedActivity(PostViewModel())
-}

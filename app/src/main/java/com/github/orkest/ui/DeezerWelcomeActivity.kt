@@ -139,8 +139,4 @@ class DeezerWelcomeActivity(private val mock: Boolean=false) : AppCompatActivity
         val intent = Intent(context, MainActivity::class.java)
         context.startActivity(intent)
     }
-
-
-
-
 }

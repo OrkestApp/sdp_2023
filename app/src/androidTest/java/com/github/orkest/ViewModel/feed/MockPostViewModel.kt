@@ -1,16 +1,13 @@
 package com.github.orkest.ViewModel.feed
 
 import androidx.compose.ui.text.input.TextFieldValue
-import com.github.orkest.data.Constants
-import com.github.orkest.data.Comment
-import com.github.orkest.data.OrkestDate
-import com.github.orkest.data.Post
+import com.github.orkest.data.*
 import com.github.orkest.ui.feed.PostViewModel
 import java.time.LocalDateTime
 import java.util.concurrent.CompletableFuture
 
 class MockPostViewModel : PostViewModel() {
-    private val song = Constants.DUMMY_RUDE_BOY_SONG
+    private var song = Constants.DUMMY_RUDE_BOY_SONG
     private val user = "DummyUser"
     private val description = TextFieldValue("DummyDescription")
     private val date = Constants.DUMMY_LAST_CONNECTED_TIME
@@ -23,7 +20,9 @@ class MockPostViewModel : PostViewModel() {
 
     override fun getPostDescription() = description
 
-    fun updateSong(song: String) {}
+    override fun updateSong(song: Song) {
+        this.song = song
+    }
 
     override fun updatePostDescription(description: TextFieldValue) {}
 

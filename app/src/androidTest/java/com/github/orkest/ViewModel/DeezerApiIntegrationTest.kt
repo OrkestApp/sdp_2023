@@ -1,13 +1,29 @@
 package com.github.orkest.ViewModel
 
+import android.content.Intent
 import android.util.Log
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.test.core.app.ActivityScenario
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import com.github.orkest.SearchViewModelTest
 import com.github.orkest.domain.*
+import com.github.orkest.ui.DeezerWelcomeActivity
+import com.github.orkest.ui.search.SearchUserView
 import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.firestoreSettings
 import com.google.firebase.ktx.Firebase
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
+import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 
 class DeezerApiIntegrationTest {
 
@@ -335,6 +351,63 @@ class DeezerApiIntegrationTest {
         val mockDeezerIntegration = DeezerApiIntegration(DeezerMockAPi.DeezerMockApiImplemented())
         assertThrows(java.util.concurrent.CompletionException::class.java){mockDeezerIntegration.addANewSongToOrkestPlayList("dummy","dummy", "").join()}
         assertThrows(java.util.concurrent.CompletionException::class.java){mockDeezerIntegration.addANewSongToOrkestPlayList("dummy","", "").join()}
+    }
+
+    /**
+     * Test for Deezer Welcome Activity
+     *
+     */
+
+    @get:Rule
+    var composeTestRule =  createComposeRule()
+
+
+    @Test
+    fun DeezerUi(){
+        composeTestRule.setContent {
+            DeezerWelcomeActivity(true).CreateViewForDeezer()
+        }
+        val button =composeTestRule.onNodeWithText("Start to use Deezer")
+        button.assertExists()
+        button.performClick()
+        composeTestRule.onNodeWithText("Feed").assertIsDisplayed()
+
+    }
+
+
+
+    @Test
+    fun deezerWelcomeActivityonCreate(){
+        val intent = Intent(ApplicationProvider.getApplicationContext(),DeezerWelcomeActivity::class.java).apply {
+            putExtra("code","dummy token")
+        }
+        val scenario = ActivityScenario.launch<DeezerWelcomeActivity>(intent)
+        scenario.close()
+    }
+    @Test
+    fun testDeezerWelcomeActivity(){
+        composeTestRule.setContent {
+            DeezerWelcomeActivity(true).CreateViewForDeezer()
+        }
+        val button =composeTestRule.onNodeWithText("Start to use Deezer")
+        button.assertExists()
+        button.performClick()
+        /*
+        val db = Firebase.firestore
+        db.useEmulator("10.0.2.2", 8080)
+        db.firestoreSettings = firestoreSettings {
+            isPersistenceEnabled = false
+        }
+   */
+
+
+        DeezerWelcomeActivity.WelcomeOperation("CodeVale",DeezerApiIntegration(DeezerMockAPi.DeezerMockApiImplemented()),"BOB").join()
+
+        val info = FireStoreDatabaseAPI().getUserDeezerInformations("BOB").get()
+        assertEquals(info.access_token,"CodeVale")
+        assertEquals(info.playlistId,"3645740262")
+        assertEquals(info.userId,"2297625024")
+        //
     }
 
 

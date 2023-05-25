@@ -12,14 +12,14 @@ import org.junit.Test
 
 class FirebaseStorageAPITest {
 
-    companion object {
-        @BeforeClass
-        @JvmStatic
-        fun setupEmulator() {
-            val storage = FirebaseStorage.getInstance()
-            storage.useEmulator("10.0.2.2", 9199)
-        }
-    }
+//    companion object {
+//        @BeforeClass
+//        @JvmStatic
+//        fun setupEmulator() {
+//            val storage = FirebaseStorage.getInstance()
+//            storage.useEmulator("10.0.2.2", 9199)
+//        }
+//    }
 
     lateinit var storage: FirebaseStorageAPI
 

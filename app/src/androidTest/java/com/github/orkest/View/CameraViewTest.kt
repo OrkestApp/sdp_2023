@@ -48,8 +48,8 @@ class CameraViewTest {
             composeTestRule.onNodeWithTag("Take Video Button").assertIsDisplayed().assertHasClickAction().performClick()
             Thread.sleep(3000)
             composeTestRule.onNodeWithTag("Take Video Button").performClick()
-            //Thread.sleep(10000)
-            //composeTestRule.onNodeWithTag("Captured Video").assertIsDisplayed()
+            Thread.sleep(10000)
+            composeTestRule.onNodeWithTag("Captured Video").assertIsDisplayed()
         }
     }
     

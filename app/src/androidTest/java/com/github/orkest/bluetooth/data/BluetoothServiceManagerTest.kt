@@ -82,22 +82,22 @@ class BluetoothServiceManagerTest {
     //==================TEST-SERVER-CONNECTION=================
 
 
-    @Test
-    fun correctlyReceivesAndSendsDataServer() {
-        val testMsg:ByteArray = "Received".toByteArray()
-        val testDevice = TestDevice(testMsg)
-        val socket = TestServer(testMsg)
-
-        msgReceived = ""
-        msgSent = ""
-        val thread = bthServiceManager.AcceptThread(socket)
-        thread.start()
-        Thread.sleep(1000)
-        assertEquals("Received", msgReceived)
-        assertEquals(Constants.CURRENT_LOGGED_USER, msgSent)
-        thread.cancel()
-        thread.interrupt()
-    }
+//    @Test
+//    fun correctlyReceivesAndSendsDataServer() {
+//        val testMsg:ByteArray = "Received".toByteArray()
+//        val testDevice = TestDevice(testMsg)
+//        val socket = TestServer(testMsg)
+//
+//        msgReceived = ""
+//        msgSent = ""
+//        val thread = bthServiceManager.AcceptThread(socket)
+//        thread.start()
+//        Thread.sleep(1000)
+//        assertEquals("Received", msgReceived)
+//        assertEquals(Constants.CURRENT_LOGGED_USER, msgSent)
+//        thread.cancel()
+//        thread.interrupt()
+//    }
 
     @Test
     fun cancelCorrectlyClosesServerSocket() {

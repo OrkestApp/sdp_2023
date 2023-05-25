@@ -26,9 +26,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.room.Room
 import com.github.orkest.data.Constants
 
 import com.github.orkest.View.feed.FeedActivity
+import com.github.orkest.domain.persistence.AppDatabase
 import com.github.orkest.shazam.ui.ShazamSong
 import com.github.orkest.ui.Camera.CameraView
 import com.github.orkest.ui.profile.ProfileActivity
@@ -50,6 +52,8 @@ class NavigationBar {
         fun CreateNavigationBar(navController: NavHostController, currentUser: String, activity: MainActivity) {
 
             val context = LocalContext.current
+            val postsDatabase: AppDatabase = Room.databaseBuilder(context, AppDatabase::class.java, "posts-db")
+                .build()
             Scaffold(
                 bottomBar = {
                     BottomNavigation(backgroundColor = Color.White) {
@@ -91,7 +95,7 @@ class NavigationBar {
                     startDestination = "HomePage",
                     Modifier.padding(padding)
                 ) {
-                    composable("HomePage") { FeedActivity(PostViewModel()) }
+                    composable("HomePage") { FeedActivity(postsDatabase, context, PostViewModel()) }
                     composable("SearchPage") { SearchUserView.SearchUi(viewModel = viewModel) }
                     composable("ShazamPage") {
                         ShazamSong(activity)

@@ -374,6 +374,10 @@ class DeezerApiIntegrationTest {
 
 
     @Test
+    fun deezerWelcomeActivityonCreate(){
+
+    }
+    @Test
     fun testDeezerWelcomeActivity(){
         composeTestRule.setContent {
             DeezerWelcomeActivity(true).CreateViewForDeezer()

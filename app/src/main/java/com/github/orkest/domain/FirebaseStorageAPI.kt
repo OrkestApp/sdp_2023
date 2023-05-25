@@ -6,6 +6,7 @@ import com.github.orkest.data.Constants
 import com.google.android.gms.tasks.Task
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
+import java.util.concurrent.CompletableFuture
 
 class FirebaseStorageAPI {
 
@@ -21,30 +22,40 @@ class FirebaseStorageAPI {
      * @param path: path in storage where you want to upload file
      * @param data: the data you want to upload
      */
-    private fun uploadFile(path: String, data: ByteArray): UploadTask {
+    private fun uploadFile(path: String, data: ByteArray): CompletableFuture<Boolean> {
         //val storageRef = FirebaseStorage.getInstance().reference
-        val ref = storageRef.child(path)
-        return ref.putBytes(data)
-    }
+        val completedFuture = CompletableFuture<Boolean>()
+        storageRef.child(path).putBytes(data).addOnSuccessListener(){
+            completedFuture.complete(true)
+        }.addOnFailureListener {
+            completedFuture.complete(false)
+        }
 
-
-    /**
-     * @param data: profile picture you want to upload to storage
-     * will upload the new profile picture to storage at the needed path
-     */
-    fun uploadProfilePic(data: ByteArray): UploadTask {
-        val path = currentUserPath + "profile_pic.jpg"
-        return uploadFile(path, data)
+        return completedFuture
     }
 
     /**
      * @param path: path in storage where you want to upload file
      * @param data: uri of the file you want to upload
      */
-    private fun uploadFile(path: String, uri: Uri): UploadTask {
+    private fun uploadFile(path: String, uri: Uri): CompletableFuture<Boolean> {
+        val completedFuture = CompletableFuture<Boolean>()
         //val storageRef = FirebaseStorage.getInstance().reference
-        val ref = storageRef.child(path)
-        return ref.putFile(uri)
+        storageRef.child(path).putFile(uri).addOnSuccessListener(){
+            completedFuture.complete(true)
+        }.addOnFailureListener {
+            completedFuture.complete(false)
+        }
+        return completedFuture
+    }
+
+    /**
+     * @param data: profile picture you want to upload to storage
+     * will upload the new profile picture to storage at the needed path
+     */
+    fun uploadProfilePic(data: ByteArray): CompletableFuture<Boolean> {
+        val path = currentUserPath + "profile_pic.jpg"
+        return uploadFile(path, data)
     }
 
 
@@ -52,7 +63,7 @@ class FirebaseStorageAPI {
      * @param uri: uri of the profile picture you want to upload to storage
      * will upload the new profile picture to storage at the needed path
      */
-    fun uploadProfilePic(uri: Uri): UploadTask {
+    fun uploadProfilePic(uri: Uri): CompletableFuture<Boolean> {
         val path = currentUserPath + "profile_pic.jpg"
         return uploadFile(path, uri)
     }
@@ -63,7 +74,7 @@ class FirebaseStorageAPI {
      * will upload the picture associated to a given post
      */
     // TODO must still decide how to organize the folder with post pictures in storage
-    fun uploadPostPic(uri: Uri): UploadTask {
+    fun uploadPostPic(uri: Uri): CompletableFuture<Boolean> {
         val path = "User-${Constants.CURRENT_LOGGED_USER[0].uppercase()}/${Constants.CURRENT_LOGGED_USER}/post1.jpg"
         return uploadFile(path, uri)
     }
@@ -72,7 +83,7 @@ class FirebaseStorageAPI {
      * @param uri: uri of the video you want to upload to storage
      * will upload the picture associated to a given post
      */
-    fun uploadVideo(uri: Uri): UploadTask {
+    fun uploadVideo(uri: Uri): CompletableFuture<Boolean> {
         val path = "User-${Constants.CURRENT_LOGGED_USER[0].uppercase()}/${Constants.CURRENT_LOGGED_USER}/post1.jpg"
         return uploadFile("", uri)
     }
@@ -84,11 +95,15 @@ class FirebaseStorageAPI {
      * @param path: path in storage of the file you want to fetch
      * Fetches a picture at a given path in storage
      */
-    private fun fetchPic(path: String): Task<ByteArray> {
+    private fun fetchPic(path: String): CompletableFuture<ByteArray> {
         val ONE_MEGABYTE: Long = 1 * 1024 * 1024
-        //val storageRef = FirebaseStorage.getInstance().reference
-        val ref = storageRef.child(path)
-        return ref.getBytes(ONE_MEGABYTE)
+        val futurePic = CompletableFuture<ByteArray>()
+        storageRef.child(path).getBytes(ONE_MEGABYTE).addOnSuccessListener {
+            futurePic.complete(it)
+        }.addOnFailureListener {
+            Log.e("FirebaseStorageAPI", "Error while fetching picture from storage")
+        }
+        return futurePic
     }
 
 
@@ -96,15 +111,10 @@ class FirebaseStorageAPI {
      * @param username: usr whose profile picture you want to get from storage
      * Fetches a given user's profile picture from storage
      */
-    fun fetchProfilePic(username: String): Task<ByteArray> {
+    fun fetchProfilePic(username: String): CompletableFuture<ByteArray> {
         //path in storage where the picture is located
         val path = "User-${username[0].uppercase()}/${username}/profile_pic.jpg"
         return fetchPic(path)
-    }
-
-    // TODO
-    fun fetchVideo(): Task<ByteArray>? {
-        return null
     }
 
 

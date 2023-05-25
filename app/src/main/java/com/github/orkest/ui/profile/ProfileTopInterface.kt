@@ -145,7 +145,7 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
                         intent.putExtra("bio", viewModel.bio.value)
                         context.startActivity(intent)
                     }*/
-                    fetchPic.addOnSuccessListener {
+                    fetchPic.whenComplete { it, _ ->
                         val intent = Intent(context, EditProfileActivity::class.java)
                         intent.putExtra("profilePic", it)
                         intent.putExtra("bio", viewModel.bio.value)
@@ -327,7 +327,7 @@ fun EditButton(onClick:() -> Unit){
 }
 
 @Composable
-fun ProfilePicture(task: Task<ByteArray>) {//viewModel: ProfileViewModel){
+fun ProfilePicture(futurePic: CompletableFuture<ByteArray>) {//viewModel: ProfileViewModel){
 
 
     //TODO --------------------------------------
@@ -342,8 +342,8 @@ fun ProfilePicture(task: Task<ByteArray>) {//viewModel: ProfileViewModel){
     /*viewModel.fetchProfilePic().addOnSuccessListener {
         bitmap.value = BitmapFactory.decodeByteArray(it, 0, it.size).asImageBitmap()
     }*/
-    task.addOnSuccessListener {
-        bitmap.value = BitmapFactory.decodeByteArray(it, 0, it.size).asImageBitmap()
+    futurePic.whenComplete { bytes, _ ->
+        bitmap.value = BitmapFactory.decodeByteArray(bytes, 0, bytes.size).asImageBitmap()
     }
     //-------------------------------------------
 

@@ -53,7 +53,6 @@ import java.util.concurrent.CompletableFuture
  */
 @Composable
 fun FeedActivity(database: AppDatabase, context: Context, viewModel: PostViewModel) {
-
     //Add a list of posts
     val listPosts = remember {
         mutableStateOf(ArrayList<Post>().toList())
@@ -62,7 +61,6 @@ fun FeedActivity(database: AppDatabase, context: Context, viewModel: PostViewMod
     // Remember the coroutine scope and the lazy list state
     val coroutineScope = rememberCoroutineScope()
     val lazyListState = rememberLazyListState()
-
 
     // Remember the swipe refresh state
     val isRefreshing = remember { mutableStateOf(false) }
@@ -93,20 +91,23 @@ fun FeedActivity(database: AppDatabase, context: Context, viewModel: PostViewMod
         }
     } else {
         //if no internet connection, get posts from the cache
-        val cachedPosts: List<AppEntities.Companion.PostEntity> = database.postsDao().getAllPosts()
-        listPosts.value = cachedPosts.map { postEntity ->
-            Post(
-                username = postEntity.username,
-                date = postEntity.date,
-                profilePicId = postEntity.profilePicId,
-                postDescription = postEntity.postDescription,
-                song = postEntity.song,
-                nbLikes = postEntity.nbLikes,
-                likeList = postEntity.likeList,
-                nbComments = postEntity.nbComments,
-                media = postEntity.media,
-                isMediaVideo = postEntity.isMediaVideo
-            )
+        CompletableFuture.runAsync {
+            val cachedPosts: List<AppEntities.Companion.PostEntity> =
+                database.postsDao().getAllPosts()
+            listPosts.value = cachedPosts.map { postEntity ->
+                Post(
+                    username = postEntity.username,
+                    date = postEntity.date,
+                    profilePicId = postEntity.profilePicId,
+                    postDescription = postEntity.postDescription,
+                    song = postEntity.song,
+                    nbLikes = postEntity.nbLikes,
+                    likeList = postEntity.likeList,
+                    nbComments = postEntity.nbComments,
+                    media = postEntity.media,
+                    isMediaVideo = postEntity.isMediaVideo
+                )
+            }
         }
     }
 
@@ -114,14 +115,16 @@ fun FeedActivity(database: AppDatabase, context: Context, viewModel: PostViewMod
     SwipeRefresh(
         state = swipeRefreshState,
         onRefresh = {
+            if(FireStoreDatabaseAPI.isOnline(context)) {
             coroutineScope.launch {
-                // Update isRefreshing to true
-                isRefreshing.value = true
+                    // Update isRefreshing to true
+                    isRefreshing.value = true
 
-                refreshData(viewModel, listPosts)
+                    refreshData(viewModel, listPosts)
 
-                // Update isRefreshing to false
-                isRefreshing.value = false
+                    // Update isRefreshing to false
+                    isRefreshing.value = false
+                }
             }
         }
     ) {

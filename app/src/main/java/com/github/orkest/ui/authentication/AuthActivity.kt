@@ -67,15 +67,3 @@ fun AuthMain(viewModel: AuthViewModel, navController: NavHostController) {
         composable("signIn") { SignIn(navController,viewModel) }
     }
 }
-
-/**
- * Composable for the default preview of the OrkestTheme
- */
-/**
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    OrkestTheme {
-       // AuthMain(AuthViewModel())
-    }
-}**/

@@ -196,12 +196,3 @@ fun displayProfilePic(/* TODO */) {
         Image(painter = painter, contentDescription = "Profile Picture", modifier = Modifier.testTag("display_pic"))
     }
 }
-
-
-/*@Preview(showBackground = true)
-@Composable
-fun DefaultCommentPreview() {
-    CommentSetting {
-        CommentScreen(CommentActivity(), PostViewModel())
-    }
-}*/

@@ -36,9 +36,6 @@ class AudioRecognitionTest {
     @get:Rule
    val composeTestRule = createComposeRule()
 
-    //add recording permissions
-    @get:Rule
-    val permissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.RECORD_AUDIO)
 
     @Before
     fun setup(){

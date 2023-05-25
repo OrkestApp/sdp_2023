@@ -13,9 +13,6 @@ import org.junit.Test
 
 class AudioRecordingTest {
 
-    @get:Rule
-    var permissionAudio: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.RECORD_AUDIO)
-
     @Test
     fun testGetAudioRecording() {
         val coroutineScope = CoroutineScope(Dispatchers.IO)

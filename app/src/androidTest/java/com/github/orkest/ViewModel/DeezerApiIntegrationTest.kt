@@ -1,10 +1,13 @@
 package com.github.orkest.ViewModel
 
+import android.content.Intent
 import android.util.Log
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.test.core.app.ActivityScenario
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
@@ -375,7 +378,11 @@ class DeezerApiIntegrationTest {
 
     @Test
     fun deezerWelcomeActivityonCreate(){
-
+        val intent = Intent(ApplicationProvider.getApplicationContext(),DeezerWelcomeActivity::class.java).apply {
+            putExtra("code","dummy token")
+        }
+        val scenario = ActivityScenario.launch<DeezerWelcomeActivity>(intent)
+        scenario.close()
     }
     @Test
     fun testDeezerWelcomeActivity(){

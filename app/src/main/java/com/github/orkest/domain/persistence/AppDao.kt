@@ -5,7 +5,6 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import java.nio.charset.CodingErrorAction.REPLACE
 
 
 
@@ -31,5 +30,15 @@ class AppDao {
             @Query("DELETE FROM SongEntity")
             fun clear()
         }
+
+        @Dao
+        interface PostDao {
+            @Query("SELECT * FROM posts")
+            fun getAllPosts(): List<AppEntities.Companion.PostEntity>
+
+            @Insert(onConflict = OnConflictStrategy.REPLACE)
+            fun insertPosts(posts: List<AppEntities.Companion.PostEntity>)
+        }
+
     }
 }

@@ -90,13 +90,4 @@ class DeezerWelcomeActivity : AppCompatActivity(){
         val intent = Intent(context, MainActivity::class.java)
         startActivity(intent)
     }
-
-    @Preview
-    @Composable
-    fun preview_DeezerWelcome(){
-        CreateViewForDeezer()
-    }
-
-
-
 }

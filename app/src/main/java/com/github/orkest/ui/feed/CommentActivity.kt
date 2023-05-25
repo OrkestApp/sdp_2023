@@ -42,6 +42,31 @@ class CommentActivity : ComponentActivity() {
             }
         }
     }
+    companion object{
+    /**
+    * Comment design
+    * @param comment: the comment to display
+    */
+    @Composable
+    fun CommentBox(comment: Comment) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Row {
+                displayProfilePic()
+                Column {
+                    Row(horizontalArrangement = Arrangement.SpaceEvenly){
+                        Text(text = comment.username, fontWeight = FontWeight.Bold, modifier = Modifier.testTag("comment_username"))
+                        Text(modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                            .testTag("comment_date"), fontSize = 10.sp, text = comment.date.toString())
+                    }
+                    Text(text = comment.text, modifier = Modifier.testTag("comment_text"))
+                }
+            }
+        }
+    }}
 }
 
 @Composable
@@ -146,35 +171,12 @@ fun Comments(viewModel: PostViewModel) {
     LazyColumn {
         itemsIndexed(listComments) { _, comment ->
             Divider()
-            CommentBox(comment = comment)
+            CommentActivity.CommentBox(comment = comment)
         }
     }
 }
 
-/**
- * Comment design
- * @param comment: the comment to display
- */
-@Composable
-fun CommentBox(comment: Comment) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-    ) {
-        Row {
-            displayProfilePic()
-            Column {
-                Row(horizontalArrangement = Arrangement.SpaceEvenly){
-                    Text(text = comment.username, fontWeight = FontWeight.Bold, modifier = Modifier.testTag("comment_username"))
-                    Text(modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                        .testTag("comment_date"), fontSize = 10.sp, text = comment.date.toString())
-                }
-                Text(text = comment.text, modifier = Modifier.testTag("comment_text"))
-            }
-        }
-    }
-}
+
 
 /**
  * standardized 'displayer' of profile pics on comments

@@ -6,6 +6,7 @@ import com.github.orkest.data.Comment
 import com.github.orkest.data.OrkestDate
 import com.github.orkest.data.Post
 import com.github.orkest.domain.FireStoreDatabaseAPI
+import com.github.orkest.ui.feed.CommentActivity
 import com.github.orkest.ui.feed.PostViewModel
 import com.google.firebase.firestore.ktx.firestoreSettings
 import org.junit.BeforeClass
@@ -216,4 +217,5 @@ class PostViewModelTest {
         val result = postViewModel.getNbLikes(post).get()
         assert(result == 10)
     }
+
 }

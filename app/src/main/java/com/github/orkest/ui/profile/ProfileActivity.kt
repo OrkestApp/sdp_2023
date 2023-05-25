@@ -174,11 +174,3 @@ fun <T> placeholders (title: String, items: List<T>, select: () -> Unit = { }, v
         }
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultProfilePreview() {
-    ProfileActivitySetting {
-        ProfileActivityScreen(ProfileActivity(), viewModel = ProfileViewModel("JohnDoe"))
-    }
-}

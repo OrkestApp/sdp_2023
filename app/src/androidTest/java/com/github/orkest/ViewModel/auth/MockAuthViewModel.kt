@@ -1,6 +1,8 @@
 package com.github.orkest.ViewModel.auth
 
+import com.github.orkest.data.User
 import com.github.orkest.ui.authentication.AuthViewModel
+import org.junit.Test
 import java.util.concurrent.CompletableFuture
 
 class MockAuthViewModel : AuthViewModel() {
@@ -56,6 +58,10 @@ class MockAuthViewModel : AuthViewModel() {
                         "Please check your Internet connection"))
 
         return future
+    }
+    @Test
+    fun userMailInDatabase(){
+        User("BOB_Test")
     }
 
 }

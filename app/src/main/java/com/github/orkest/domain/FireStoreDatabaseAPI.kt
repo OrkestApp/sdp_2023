@@ -94,9 +94,7 @@ open class FireStoreDatabaseAPI {
         if(username ==""){
             future.complete(mutableListOf(""))
             return future
-
         }
-
 
         getUserDocumentRef(username).get().addOnSuccessListener { document ->
             if(document != null && document.exists()){
@@ -227,9 +225,6 @@ open class FireStoreDatabaseAPI {
 
     private fun getPostCollectionRef(username: String): CollectionReference{
         val firstLetter = username[0].uppercase()
-        //TODO: Discuss other option: "posts/user-$firstLetter/$username"
-        //Chose this for now because easier for group queries
-        // But question: what happens when we get the docRef of one user
         val path = "user/user-$firstLetter/users/$username/posts"
         return db.collection(path)
     }

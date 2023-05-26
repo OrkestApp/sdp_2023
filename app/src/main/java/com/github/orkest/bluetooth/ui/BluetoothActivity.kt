@@ -40,18 +40,12 @@ import com.github.orkest.domain.FireStoreDatabaseAPI
 import com.github.orkest.domain.persistence.AppDatabase
 import com.github.orkest.ui.profile.ProfileActivity
 import com.github.orkest.ui.profile.ProfileViewModel
-import com.github.orkest.ui.search.SearchUserView
-import java.util.concurrent.CompletableFuture
 
 class BluetoothActivity(private val mock:Boolean =false) : ComponentActivity() {
 
     private var bluetoothServiceManager: BluetoothInterface? = null
     private var sender = true
     private var update = mutableStateOf(mutableListOf<Device>())
-
-
-
-
 
 
     private var requestBluetooth = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -245,11 +239,8 @@ class BluetoothActivity(private val mock:Boolean =false) : ComponentActivity() {
                 BluetoothConstants.MESSAGE_READ -> {
                     // construct a string from the valid bytes in the buffer
                     val msgReceived = String(msg.obj as ByteArray, 0, msg.arg1)
-                    val appDatabase: AppDatabase = Room.inMemoryDatabaseBuilder(
-                        InstrumentationRegistry.getInstrumentation().context,
-                        AppDatabase::class.java
-                    ).allowMainThreadQueries().build()
-                    val follow = ProfileViewModel(appDatabase, msgReceived)
+
+                    val follow = ProfileViewModel(Constants.APPLICATION_CONTEXT, msgReceived)
                     follow.updateCurrentUserFollowings(true)
                     follow.updateUserFollowers(true)
                     Toast.makeText(this@BluetoothActivity,"You and $msgReceived are now Friends",Toast.LENGTH_LONG).show()

@@ -58,15 +58,10 @@ private val followColor = Color(0xFFFEE600) // bright yellow
  * username, bio, number of followers, number of followings, profile picture
  */
 @Composable
-fun ProfileTopInterface(appDatabase: AppDatabase, viewModel: ProfileViewModel, scaffoldState: ScaffoldState, coroutineScope: CoroutineScope) {
+fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldState, coroutineScope: CoroutineScope) {
 
     val context = LocalContext.current
     viewModel.setupListener()
-
-    val currentUser = remember {
-        viewModel.username.value
-    }
-
 
     Column(Modifier
         .padding(paddingValue)){

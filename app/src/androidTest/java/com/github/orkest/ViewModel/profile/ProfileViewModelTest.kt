@@ -31,8 +31,8 @@ class ProfileViewModelTest {
 
     private lateinit var user: User
     private lateinit var newUser: User
-    private var viewModel: ProfileViewModel = ProfileViewModel(testUserName)
-    private val newViewModel: ProfileViewModel = ProfileViewModel(newUsername)
+    private var viewModel: ProfileViewModel = ProfileViewModel(Constants.APPLICATION_CONTEXT, testUserName)
+    private val newViewModel: ProfileViewModel = ProfileViewModel(Constants.APPLICATION_CONTEXT, newUsername)
 
     @Before
     fun setUp() {
@@ -154,7 +154,7 @@ class ProfileViewModelTest {
     @Test
     fun onlyUsernameChanges(){
 
-        val newViewModel = ProfileViewModel(newUsername)
+        val newViewModel = ProfileViewModel(Constants.APPLICATION_CONTEXT, newUsername)
         runBlocking {
             user = User(username = newUsername, profile = Profile(newUsername, 2, "New bio", 20, 15))
             withContext(Dispatchers.IO) {
@@ -234,17 +234,4 @@ class ProfileViewModelTest {
         }
     }
 
-    /**@Test
-    fun followThrowsExceptionWhenCalledInCurrentProfile(){
-        try { viewModel.follow() } catch(e: java.lang.IllegalArgumentException){
-            assertEquals("Cannot call this function when visiting the current logged-in user's profile", e.message)
-        }
-    }
-
-    @Test
-    fun unfollowThrowsExceptionWhenCalledInCurrentProfile(){
-        try { viewModel.unfollow() } catch(e: java.lang.IllegalArgumentException){
-            assertEquals("Cannot call this function when visiting the current logged-in user's profile", e.message)
-        }
-    }**/
 }

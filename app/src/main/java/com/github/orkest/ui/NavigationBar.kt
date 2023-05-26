@@ -27,7 +27,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.room.Room
 import com.github.orkest.data.Constants
-
 import com.github.orkest.View.feed.FeedActivity
 import com.github.orkest.domain.FireStoreDatabaseAPI
 import com.github.orkest.domain.persistence.AppDatabase
@@ -52,8 +51,6 @@ class NavigationBar {
         fun CreateNavigationBar(navController: NavHostController, currentUser: String, activity: MainActivity) {
 
             val context = LocalContext.current
-            val appDatabase: AppDatabase = Room.databaseBuilder(context, AppDatabase::class.java, "app-db")
-                .build()
             Scaffold(
                 bottomBar = {
                     BottomNavigation(backgroundColor = Color.White) {
@@ -95,7 +92,7 @@ class NavigationBar {
                     startDestination = "HomePage",
                     Modifier.padding(padding)
                 ) {
-                    composable("HomePage") { FeedActivity(appDatabase, context, PostViewModel()) }
+                    composable("HomePage") { FeedActivity(Constants.CACHING_DATABASE, context, PostViewModel()) }
                     composable("SearchPage") { SearchUserView.SearchUi(viewModel = viewModel) }
                     composable("ShazamPage") {
                         if(FireStoreDatabaseAPI.isOnline(context))
@@ -114,8 +111,8 @@ class NavigationBar {
                         UsersList()
                     }
                     composable("ProfilePage") {
-                            ProfileActivityScreen(appDatabase, ProfileActivity(appDatabase), viewModel = ProfileViewModel(
-                                appDatabase, Constants.CURRENT_LOGGED_USER))
+                            ProfileActivityScreen(ProfileActivity(context), viewModel = ProfileViewModel(
+                                context, Constants.CURRENT_LOGGED_USER))
                     }
                 }
             }

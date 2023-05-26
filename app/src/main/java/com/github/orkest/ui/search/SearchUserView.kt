@@ -18,6 +18,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.modifier.modifierLocalMapOf
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -32,6 +34,7 @@ import com.github.orkest.ui.profile.ProfileActivity
 import java.util.*
 
 class SearchUserView {
+
     companion object {
 
         /**
@@ -99,7 +102,9 @@ class SearchUserView {
                     },
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.Yellow),
                     modifier = Modifier
-                        .align(Alignment.CenterHorizontally))
+                        .align(Alignment.CenterHorizontally)
+                        .testTag("bluetoothButton"))
+
                 {
                     Text("Search nearby users")
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -122,19 +127,47 @@ class SearchUserView {
                     modifier = Modifier
                         .size(300.dp)
                         .align(Alignment.CenterHorizontally)
+                        .testTag("logoOrkest") // Adjust the size as needed
                 )
+
+                //Display copyright
+                Image(painter = painterResource(R.drawable.copyright),
+                    contentDescription = "Copyright",
+                    modifier = Modifier
+                        .size(10.dp)
+                        .align(Alignment.End)
+                        .testTag("copyright")
+                )// Adjust the size as needed
             }
         }
 
         @Composable
         fun StyledOrkest() {
             Row {
-                Text(text = "O", Modifier.testTag("O").padding(25.dp))
-                Text(text = "R", Modifier.testTag("R").padding(25.dp))
-                Text(text = "K", Modifier.testTag("K").padding(25.dp))
-                Text(text = "E", Modifier.testTag("E").padding(25.dp))
-                Text(text = "S", Modifier.testTag("S").padding(25.dp))
-                Text(text = "T", Modifier.testTag("T").padding(25.dp))
+                Text(text = "O",
+                    Modifier
+                        .testTag("O")
+                        .padding(25.dp))
+                Text(text = "R",
+                    Modifier
+                        .testTag("R")
+                        .padding(25.dp))
+                Text(text = "K",
+                    Modifier
+                        .testTag("K")
+                        .padding(25.dp))
+                Text(text = "E",
+                    Modifier
+                        .testTag("E")
+                        .padding(25.dp))
+                Text(text = "S",
+                    Modifier
+                        .testTag("S")
+                        .padding(25.dp))
+                Text(text = "T",
+                    Modifier
+                        .testTag("T")
+                        .padding(25.dp))
             }
         }
         /**

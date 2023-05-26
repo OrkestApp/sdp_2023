@@ -67,7 +67,7 @@ class SearchViewModelTest {
 
 
         val usernameToType = "Alico"
-        composeTestRule.onNodeWithText("").performTextReplacement(usernameToType)
+        composeTestRule.onNodeWithText("Search a user here").performTextReplacement(usernameToType)
         composeTestRule.waitUntil{
             composeTestRule.onAllNodesWithText("Alico").fetchSemanticsNodes().size ==2
         }
@@ -83,7 +83,7 @@ class SearchViewModelTest {
 
 
         var usernameToType = "Al"
-        composeTestRule.onNodeWithText("").performTextReplacement(usernameToType)
+        composeTestRule.onNodeWithText("Search a user here").performTextReplacement(usernameToType)
         composeTestRule.waitUntil{
             composeTestRule.onAllNodesWithText("Alico").fetchSemanticsNodes().size ==1
         } //Timeout after 1s
@@ -108,7 +108,7 @@ class SearchViewModelTest {
 
         val textToType = "dummyString"
 
-        composeTestRule.onNodeWithText("").performTextInput(textToType)
+        composeTestRule.onNodeWithText("Search a user here").performTextInput(textToType)
 
         composeTestRule.onNodeWithText(textToType).assertIsDisplayed()
 

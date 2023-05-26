@@ -13,8 +13,13 @@ class FirebaseStorageAPI {
     /*companion object {
         private val storage = FirebaseStorage.getInstance()
     }*/
-    private val storageRef = FirebaseStorage.getInstance().reference
+    private val storage = FirebaseStorage.getInstance()
     private val currentUserPath = "User-${Constants.CURRENT_LOGGED_USER[0].uppercase()}/${Constants.CURRENT_LOGGED_USER}/"
+
+
+    fun setEmulatorOn() {
+        storage.useEmulator("10.0.2.2", 9199)
+    }
 
     // ============== UPLOADING TO STORAGE ==============
 
@@ -23,7 +28,7 @@ class FirebaseStorageAPI {
      * @param data: the data you want to upload
      */
     private fun uploadFile(path: String, data: ByteArray): CompletableFuture<Boolean> {
-        //val storageRef = FirebaseStorage.getInstance().reference
+        val storageRef = storage.reference
         val completedFuture = CompletableFuture<Boolean>()
         storageRef.child(path).putBytes(data).addOnSuccessListener(){
             completedFuture.complete(true)
@@ -39,6 +44,7 @@ class FirebaseStorageAPI {
      * @param data: uri of the file you want to upload
      */
     private fun uploadFile(path: String, uri: Uri): CompletableFuture<Boolean> {
+        val storageRef = storage.reference
         val completedFuture = CompletableFuture<Boolean>()
         //val storageRef = FirebaseStorage.getInstance().reference
         storageRef.child(path).putFile(uri).addOnSuccessListener(){
@@ -96,6 +102,7 @@ class FirebaseStorageAPI {
      * Fetches a picture at a given path in storage
      */
     private fun fetchPic(path: String): CompletableFuture<ByteArray> {
+        val storageRef = storage.reference
         val ONE_MEGABYTE: Long = 1 * 1024 * 1024
         val futurePic = CompletableFuture<ByteArray>()
         storageRef.child(path).getBytes(ONE_MEGABYTE).addOnSuccessListener {

@@ -143,31 +143,46 @@ class SearchUserView {
 
         @Composable
         fun StyledOrkest() {
-            Row {
-                Text(text = "O",
-                    Modifier
-                        .testTag("O")
-                        .padding(25.dp))
-                Text(text = "R",
-                    Modifier
-                        .testTag("R")
-                        .padding(25.dp))
-                Text(text = "K",
-                    Modifier
-                        .testTag("K")
-                        .padding(25.dp))
-                Text(text = "E",
-                    Modifier
-                        .testTag("E")
-                        .padding(25.dp))
-                Text(text = "S",
-                    Modifier
-                        .testTag("S")
-                        .padding(25.dp))
-                Text(text = "T",
-                    Modifier
-                        .testTag("T")
-                        .padding(25.dp))
+            Box(modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center) {
+                Row() {
+                    Text(
+                        text = "O",
+                        Modifier
+                            .testTag("O")
+                            .padding(20.dp)
+                    )
+                    Text(
+                        text = "R",
+                        Modifier
+                            .testTag("R")
+                            .padding(20.dp)
+                    )
+                    Text(
+                        text = "K",
+                        Modifier
+                            .testTag("K")
+                            .padding(20.dp)
+                    )
+                    Text(
+                        text = "E",
+                        Modifier
+                            .testTag("E")
+                            .padding(20.dp)
+                    )
+                    Text(
+                        text = "S",
+                        Modifier
+                            .testTag("S")
+                            .padding(20.dp)
+                    )
+                    Text(
+                        text = "T",
+                        Modifier
+                            .testTag("T")
+                            .padding(20.dp)
+                    )
+                }
             }
         }
         /**

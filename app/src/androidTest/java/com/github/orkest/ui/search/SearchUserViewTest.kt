@@ -24,12 +24,14 @@ class SearchUserViewTest {
     }
 
     @Test
-    fun UIDisplaysEverything() {
+    fun UIDisplaysSearchBar() {
         composeTestRule.onNodeWithTag("SearchBar").assertIsDisplayed()
         composeTestRule.onNodeWithText("Search a user here").assertIsDisplayed()
         composeTestRule.onNodeWithTag("search_logo").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("bluetoothButton").assertIsDisplayed()
-            .assertHasClickAction()
+    }
+
+    @Test
+    fun UiDisplaysOrkestText() {
         //DISPLAY OF Orkest name
         composeTestRule.onNodeWithTag("O").assertIsDisplayed()
         composeTestRule.onNodeWithTag("R").assertIsDisplayed()
@@ -37,9 +39,19 @@ class SearchUserViewTest {
         composeTestRule.onNodeWithTag("E").assertIsDisplayed()
         composeTestRule.onNodeWithTag("S").assertIsDisplayed()
         composeTestRule.onNodeWithTag("T").assertIsDisplayed()
+    }
 
+    @Test
+    fun UiDisplaysOrkestLogo() {
+        //DISPLAY OF Orkest logo
         composeTestRule.onNodeWithTag("logoOrkest").assertIsDisplayed()
         composeTestRule.onNodeWithTag("copyright").assertIsDisplayed()
+    }
+
+    @Test
+    fun bluetoothButtonDisplayed(){
+        composeTestRule.onNodeWithTag("bluetoothButton").assertIsDisplayed()
+            .assertHasClickAction()
     }
 
     @Test

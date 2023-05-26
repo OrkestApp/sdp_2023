@@ -9,12 +9,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -29,7 +27,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.room.Room
 import com.github.orkest.data.Constants
-
 import com.github.orkest.View.feed.FeedActivity
 import com.github.orkest.domain.FireStoreDatabaseAPI
 import com.github.orkest.domain.persistence.AppDatabase
@@ -54,8 +51,6 @@ class NavigationBar {
         fun CreateNavigationBar(navController: NavHostController, currentUser: String, activity: MainActivity) {
 
             val context = LocalContext.current
-            val postsDatabase: AppDatabase = Room.databaseBuilder(context, AppDatabase::class.java, "posts-db")
-                .build()
             Scaffold(
                 bottomBar = {
                     BottomNavigation(backgroundColor = Color.White) {
@@ -97,14 +92,15 @@ class NavigationBar {
                     startDestination = "HomePage",
                     Modifier.padding(padding)
                 ) {
-                    composable("HomePage") { FeedActivity(postsDatabase, context, PostViewModel()) }
+                    composable("HomePage") { FeedActivity(Constants.CACHING_DATABASE, context, PostViewModel()) }
                     composable("SearchPage") { SearchUserView.SearchUi(viewModel = viewModel) }
                     composable("ShazamPage") {
                         if(FireStoreDatabaseAPI.isOnline(context))
                         {
-                            ShazamSong(activity)
                             val intent = Intent(context, CameraView::class.java)
                             context.startActivity(intent)
+                            ShazamSong(activity)
+
                         }
                         else{
                             Toast.makeText(context, "No internet connection. Unable to post and shazam.", Toast.LENGTH_LONG).show()
@@ -115,8 +111,8 @@ class NavigationBar {
                         UsersList()
                     }
                     composable("ProfilePage") {
-                            ProfileActivityScreen(ProfileActivity(), viewModel = ProfileViewModel(
-                                Constants.CURRENT_LOGGED_USER))
+                            ProfileActivityScreen(ProfileActivity(context), viewModel = ProfileViewModel(
+                                context, Constants.CURRENT_LOGGED_USER))
                     }
                 }
             }

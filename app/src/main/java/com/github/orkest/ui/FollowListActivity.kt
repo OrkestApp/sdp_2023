@@ -31,6 +31,7 @@ import com.github.orkest.data.User
 import com.github.orkest.ui.profile.ProfileActivity
 import com.github.orkest.ui.theme.OrkestTheme
 import com.github.orkest.R
+import com.github.orkest.domain.FireStoreDatabaseAPI
 
 
 private val paddingValue = 5.dp
@@ -120,9 +121,11 @@ fun CreateProfilePreview(user: String, intent: Intent? = null){
             if (intent != null) {
                 context.startActivity(intent)
             } else {
-                val intent = Intent(context, ProfileActivity::class.java)
-                intent.putExtra("username", user)
-                context.startActivity(intent)
+                if(FireStoreDatabaseAPI.isOnline(context)) {
+                    val intent = Intent(context, ProfileActivity::class.java)
+                    intent.putExtra("username", user)
+                    context.startActivity(intent)
+                }
             }
         }
         .fillMaxWidth()

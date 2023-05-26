@@ -1,5 +1,6 @@
 package com.github.orkest.ui.profile
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -34,12 +35,13 @@ import com.github.orkest.data.Constants
 import com.github.orkest.data.Song
 import com.github.orkest.R
 import com.github.orkest.View.*
+import com.github.orkest.domain.persistence.AppDatabase
 import com.github.orkest.ui.MenuDrawer
 import com.github.orkest.ui.MenuItem
 import com.github.orkest.ui.theme.OrkestTheme
 import kotlinx.coroutines.CoroutineScope
 
-class ProfileActivity() : ComponentActivity() {
+class ProfileActivity(val context: Context) : ComponentActivity() {
 
     //TODO create the currentUser's username when signing up
     private lateinit var  currentUser : String
@@ -48,7 +50,7 @@ class ProfileActivity() : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         currentUser = intent.getStringExtra("username").toString()
-        val viewModel = ProfileViewModel(currentUser)
+        val viewModel = ProfileViewModel(context, currentUser)
         setContent {
             ProfileActivitySetting {
                 ProfileActivityScreen(this, viewModel = viewModel)
@@ -111,7 +113,7 @@ fun ProfileActivityScreen(activity: ComponentActivity, viewModel: ProfileViewMod
 
 @Composable
 fun TopProfile(viewModel: ProfileViewModel, scaffoldState: ScaffoldState, coroutineScope: CoroutineScope) {
-    ProfileTopInterface(viewModel = viewModel, scaffoldState, coroutineScope)
+    ProfileTopInterface(viewModel, scaffoldState, coroutineScope)
 }
 
 @Composable

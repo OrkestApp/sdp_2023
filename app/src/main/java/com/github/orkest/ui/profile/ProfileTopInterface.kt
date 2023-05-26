@@ -31,6 +31,8 @@ import kotlinx.coroutines.CoroutineScope
 import androidx.compose.ui.graphics.Color
 import com.github.orkest.ui.FollowListActivity
 import com.github.orkest.domain.DeezerApiIntegration
+import com.github.orkest.domain.FireStoreDatabaseAPI
+import com.github.orkest.domain.persistence.AppDatabase
 import com.github.orkest.ui.authentication.AuthActivity
 import com.github.orkest.ui.notification.Notification
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -60,11 +62,6 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
 
     val context = LocalContext.current
     viewModel.setupListener()
-
-    val currentUser = remember {
-        viewModel.username.value
-    }
-
 
     Column(Modifier
         .padding(paddingValue)){
@@ -125,19 +122,12 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
                         GoogleSignIn.getClient(context, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut()
                         context.startActivity(intent)
 
-                        //
                         cleanSigningCache(context)
-
-
                     }
-                    //
                     Button(
                         onClick = {
-
                             val intent = Intent(Intent.ACTION_VIEW, DeezerApiIntegration.url)
                             context.startActivity(intent)
-
-
                         },
                         colors = ButtonDefaults.buttonColors(backgroundColor = Color.Yellow))
                     {
@@ -148,15 +138,9 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
                 FollowButton(viewModel, viewModel.isUserFollowed.observeAsState().value)
             }
         }
-
-
     }
 }
 
-
-private fun launchDeezerAuth(){
-
-}
 
 /**
  * remove caching credentials
@@ -185,6 +169,7 @@ fun SignOutButton(onClick:() -> Unit) {
 
 @Composable
 fun FollowButton(viewModel: ProfileViewModel, isUserFollowed: Boolean?){
+    val context = LocalContext.current
     if(isUserFollowed == null){ Text(text="") } //Empty body, here waiting for the future that fetch isUserFollowed to complete
     else {
         //Adapts the UI to the Follow or Unfollow button
@@ -192,7 +177,10 @@ fun FollowButton(viewModel: ProfileViewModel, isUserFollowed: Boolean?){
         val backGroundColor = if (isUserFollowed) Color.White else followColor
         val contentColor = if (isUserFollowed) followColor else Color.White
         Button(
-            onClick = { followOrUnfollow(viewModel, isUserFollowed) },
+            onClick = {
+                if(FireStoreDatabaseAPI.isOnline(context)) {
+                    followOrUnfollow(viewModel, isUserFollowed)
+                }},
             shape = RoundedCornerShape(20.dp),
             colors = ButtonDefaults.buttonColors(backgroundColor = backGroundColor, contentColor = contentColor),
             border = BorderStroke(2.dp, followColor),
@@ -237,10 +225,12 @@ fun NbFollowers(nb: Int, username: String){
     ClickableText(
         text = AnnotatedString(if (nb > 1) "$nb\nfollowers" else "$nb\nfollower"),
         onClick = {
-            val intent = Intent(context, FollowListActivity::class.java)
-            intent.putExtra("username", username)
-            intent.putExtra("isFollowers", true)
-            context.startActivity(intent)
+            if(FireStoreDatabaseAPI.isOnline(context)) {
+                val intent = Intent(context, FollowListActivity::class.java)
+                intent.putExtra("username", username)
+                intent.putExtra("isFollowers", true)
+                context.startActivity(intent)
+            }
         },
         style = TextStyle( fontSize = fontSize )
     )
@@ -252,22 +242,15 @@ fun NbFollowings(nb: Int, username: String){
     ClickableText(
         text = AnnotatedString(if (nb > 1) "$nb\nfollowings" else "$nb\nfollowing"),
         onClick = {
-            val intent = Intent(context, FollowListActivity::class.java)
-            intent.putExtra("username", username)
-            intent.putExtra("isFollowers", false)
-            context.startActivity(intent)
+            if(FireStoreDatabaseAPI.isOnline(context)) {
+                val intent = Intent(context, FollowListActivity::class.java)
+                intent.putExtra("username", username)
+                intent.putExtra("isFollowers", false)
+                context.startActivity(intent)
+            }
         },
         style = TextStyle( fontSize = fontSize )
     )
-}
-
-fun launchFollowListActivity(context: Context, isFollowers: Boolean){
-
-    val intent = Intent(context, FollowListActivity::class.java)
-    //intent.putExtra("username", username)
-    intent.putExtra("isFollowers", false)
-    context.startActivity(intent)
-
 }
 
 @Composable

@@ -117,6 +117,7 @@ class FirebaseStorageAPI {
             storageRef.child(path).downloadUrl.addOnSuccessListener {
                 futurePic.complete(it)
             }.addOnFailureListener {
+                Log.d("FirebaseStorageAPI", "path: $path")
                 Log.e("FirebaseStorageAPI", "Error while fetching picture from storage")
             }
             return futurePic

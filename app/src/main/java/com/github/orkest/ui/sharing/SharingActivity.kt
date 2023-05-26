@@ -12,25 +12,19 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.core.os.bundleOf
 import com.github.orkest.data.Constants
 import com.github.orkest.data.Providers
 import com.github.orkest.domain.Authorization.Companion.getLoginActivityTokenIntent
 import com.github.orkest.domain.Authorization.Companion.requestUserAuthorization
 import com.github.orkest.domain.FireStoreDatabaseAPI
-import com.github.orkest.ui.CreateProfilePreview
-import com.github.orkest.ui.MainActivity
-import com.github.orkest.ui.search.SearchUserView
-import com.github.orkest.ui.search.SearchViewModel
+import com.github.orkest.ui.feed.CreatePost
 import com.github.orkest.ui.theme.OrkestTheme
 import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationResponse
@@ -147,11 +141,34 @@ class SharingComposeActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    UserSelection()
+                    // ask the user if he wants to share with a friend of publish a post
+                    Column {
+                        Text(text = "Share with a friend or publish a post?")
+                        val context = LocalContext.current
+                        Button(onClick = {
+                            // share with a friend
+
+                            val intent = Intent(context, Share::class.java)
+                            intent.putExtra("songID", spotifySongID)
+                            startActivity(intent)
+                            finish()
+                        }) {
+                            Text(text = "Share with a friend")
+                        }
+                        Button(onClick = {
+                            // publish a post
+                            val intent = Intent(context, CreatePost::class.java)
+                            startActivity(intent)
+                            finish()
+                        }) {
+                            Text(text = "Publish a post")
+                        }
+                    }
                 }
             }
         }
     }
+
 
     /**
      * This function is used to connect to the Spotify API and get the song name
@@ -272,53 +289,58 @@ class SharingComposeActivity : ComponentActivity() {
 }
 
 
-@Composable
-fun UserSelection(){
-    val viewModel = SearchViewModel()
-    var text by remember { mutableStateOf("search User") }
-    var list by remember { mutableStateOf(mutableListOf("")) }
-    /*
-    viewModel.searchUserInDatabase(text).thenAccept {
-        list = it.map { user -> user.username }.toMutableList()
-    }
 
-     */
-    //Show all the followers of the CURRENT_LOGGED_USER
-    FireStoreDatabaseAPI().fetchFollowList(Constants.CURRENT_LOGGED_USER,false).thenAccept {
-        list = it
-    }
-    Column(modifier = Modifier.fillMaxSize())
-    {
-        Text("Select a user to share with")
-        // search bar
-        OutlinedTextField(
-            value = text ,
-            onValueChange = {
-                text = it
-            } )
-        // list of users
-        LazyColumn{
-            items(list){ username ->
-                // create an intent
-                val context = LocalContext.current
-
-                // send username and name of the song
-                Log.d("STORING", "Song name: $songName")
-                val intent = Intent(context, PlaylistActivity::class.java)
-                intent.putExtras(
-                    bundleOf(
-                        "songName" to songName,
-                        "songArtist" to songArtist,
-                        "songID" to spotifySongID,
-                        "senderUsername" to Constants.CURRENT_LOGGED_USER,
-                        "receiverUsername" to username
-                    )
-                )
-                CreateProfilePreview(username, intent)
-
-                }
-            }
-        }
-    }
+//@Composable
+//fun UserSelection(){
+//    val viewModel = SearchViewModel()
+//    var text by remember { mutableStateOf("search User") }
+//    var list by remember { mutableStateOf(mutableListOf("")) }
+//    /*
+//    viewModel.searchUserInDatabase(text).thenAccept {
+//        list = it.map { user -> user.username }.toMutableList()
+//    }
+//
+//     */
+//    //Show all the followers of the CURRENT_LOGGED_USER
+//    FireStoreDatabaseAPI().fetchFollowList(Constants.CURRENT_LOGGED_USER,false).thenAccept {
+//        list = it
+//    }
+//
+//
+//
+//    Column(modifier = Modifier.fillMaxSize())
+//    {
+//        Text("Select a user to share with")
+//        // search bar
+//        OutlinedTextField(
+//            value = text ,
+//            onValueChange = {
+//                text = it
+//            } )
+//        // list of users
+//        LazyColumn{
+//            items(list){ username ->
+//                // create an intent
+//                val context = LocalContext.current
+//
+//                // send username and name of the song
+//                Log.d("STORING", "Song name: $songName")
+//                val intent = Intent(context, PlaylistActivity::class.java)
+//                intent.putExtras(
+//                    bundleOf(
+//                        "songName" to songName,
+//                        "songArtist" to songArtist,
+//                        "songID" to spotifySongID,
+//                        "senderUsername" to Constants.CURRENT_LOGGED_USER,
+//                        "receiverUsername" to username
+//                    )
+//                )
+//                CreateProfilePreview(username, intent)
+//
+//            }
+//        }
+//    }
+//    }
+//
 }
 

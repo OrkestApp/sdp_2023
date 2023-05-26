@@ -50,6 +50,9 @@ class ProfileActivity() : ComponentActivity() {
     }
 }
 
+/**
+ * Function generating the screen, takes as function the Composable modeling the screen
+ */
 @Composable
 fun ProfileActivitySetting(content: @Composable () -> Unit) {
     OrkestTheme {

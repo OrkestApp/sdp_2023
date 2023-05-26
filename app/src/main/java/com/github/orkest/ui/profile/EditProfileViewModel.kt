@@ -7,8 +7,6 @@ import com.github.orkest.domain.FirebaseStorageAPI
 
 class EditProfileViewModel {
 
-    private val dbAPI = FireStoreDatabaseAPI()
-    private val storageAPI = FirebaseStorageAPI()
 
     open var profilePicture = MutableLiveData<ByteArray?>()
     open var bio = MutableLiveData<String>()

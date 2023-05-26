@@ -49,7 +49,13 @@ class EditProfileActivity : ComponentActivity() {
 
         val viewModel = EditProfileViewModel()
         intent.getStringExtra("bio")?.let { viewModel.setBio(it) }
-        intent.getByteArrayExtra("profilePic")?.let { viewModel.setProfilePic(it) }
+        //intent.getByteArrayExtra("profilePic")?.let { viewModel.setProfilePic(it) }
+        val pic = intent.getByteArrayExtra("profilePic")
+        if(pic == null) {
+            viewModel.setProfilePic(byteArrayOf(1))
+        } else {
+            viewModel.setProfilePic(pic)
+        }
 
 
         super.onCreate(savedInstanceState)
@@ -197,15 +203,19 @@ fun MainBody() {
 @OptIn(coil.annotation.ExperimentalCoilApi::class)
 fun EditProfileImage(viewModel: EditProfileViewModel) {
 
-    val picData = viewModel.profilePicture.value
+    val picData = remember { mutableStateOf( viewModel.getProfilePic())}
+    lateinit var pic: ImageBitmap
 
     //TODO create a function for this
     //transforms ByteArray to BitMap
-    val pic = BitmapFactory.decodeByteArray(picData, 0, picData!!.size).asImageBitmap()
+    if(picData.value != null) {
+         pic = BitmapFactory.decodeByteArray(picData.value, 0, picData.value!!.size).asImageBitmap()
+    }
 
     val bitmap: MutableState<ImageBitmap?> = remember {
         mutableStateOf(pic)
     }
+
 
     val context = LocalContext.current
 

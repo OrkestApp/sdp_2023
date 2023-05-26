@@ -1,22 +1,24 @@
 package com.github.orkest.View
 
-import android.content.res.Resources
-import android.content.res.Resources.Theme
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
-import android.widget.Toast
+import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import com.github.orkest.bluetooth.data.BluetoothServiceManager
+import com.github.orkest.bluetooth.data.TestDevice
+import com.github.orkest.bluetooth.data.TestDeviceUI
 import com.github.orkest.bluetooth.domain.BluetoothConstants
+import com.github.orkest.bluetooth.domain.Device
 import com.github.orkest.bluetooth.ui.BluetoothActivity
 import com.github.orkest.ui.profile.ProfileViewModel
 import org.junit.Rule
 import org.junit.Test
 
-class bluetoothUI {
+class bluetoothUITest {
 
     @get:Rule
     var composeTestRule =  createComposeRule()
@@ -57,7 +59,24 @@ class bluetoothUI {
             )
         }
 
-        composeTestRule.onNodeWithText("RECEIVE").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("RECEIVE").assertIsDisplayed()
 
+    }
+    
+    @Test
+    fun devicesDisplayedCorrectly() {
+        val devices = mutableListOf<Device>( TestDeviceUI("test1"),
+            TestDeviceUI("test2"))
+        composeTestRule.setContent {
+            BluetoothActivity(true,devices).BluetoothActivityStart(BluetoothServiceManager(handler),
+                BluetoothActivity(true, devices)
+            )
+        }
+
+        composeTestRule.onNodeWithText("START RECEIVING").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Follow Nearby Users").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Click on a user to follow them").assertIsDisplayed()
+       // composeTestRule.onNodeWithTag("Device Pic").assertIsDisplayed().assertHasClickAction()
+        composeTestRule.onNodeWithText("test1").assertIsDisplayed().assertHasClickAction()
     }
 }

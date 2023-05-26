@@ -62,5 +62,10 @@ class SearchUserViewTest {
         Intents.release()
     }
 
+    @Test
+    fun titleDisplay() {
+        composeTestRule.onNodeWithTag("searchTitle").assertIsDisplayed()
+    }
+
 
 }

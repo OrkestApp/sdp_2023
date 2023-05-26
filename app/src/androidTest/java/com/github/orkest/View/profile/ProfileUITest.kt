@@ -62,7 +62,7 @@ class ProfileUITest {
         composeTestRule.onNodeWithText("Favorite Artists").assertIsDisplayed()
     }
 
-    /*@Test
+    @Test
     fun navigationDrawerComponentsDisplayOnScreen() {
         composeTestRule.setContent {
             ProfileActivitySetting {
@@ -81,7 +81,7 @@ class ProfileUITest {
         composeTestRule.onNodeWithText("Notifications").assertIsNotDisplayed()
         composeTestRule.onNodeWithText("Privacy").assertIsNotDisplayed()
         composeTestRule.onNodeWithText("Help").assertIsNotDisplayed()
-    }*/
+    }
 
     @Test
     fun addFavoriteSongsAndArtistsButtonsAreDisplayedAndClickable() {

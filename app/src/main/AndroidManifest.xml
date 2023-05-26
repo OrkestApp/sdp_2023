@@ -105,6 +105,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ui.sharing.Share"
+            android:exported="true"
+            android:label="@string/title_activity_edit_profile"
+            android:theme="@style/Theme.Orkest"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

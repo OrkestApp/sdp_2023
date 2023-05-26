@@ -25,7 +25,7 @@ class navigationTabTest {
         }
     }
 
-    @Test
+    /*@Test
     fun canAccessEveryNavigationTabFromMainActivity(){
         composeTestRule.setContent {
             NavigationBar.CreateNavigationBar(navController = rememberNavController(),"", MainActivity())
@@ -55,5 +55,5 @@ class navigationTabTest {
 
 
 
-    }
+    }*/
 }

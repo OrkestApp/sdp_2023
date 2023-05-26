@@ -1,11 +1,8 @@
 package com.github.orkest.View
 
-import android.content.res.Resources
-import android.content.res.Resources.Theme
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
-import android.widget.Toast
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -16,7 +13,7 @@ import com.github.orkest.ui.profile.ProfileViewModel
 import org.junit.Rule
 import org.junit.Test
 
-class bluetoothUI {
+class bluetoothUITest {
 
     @get:Rule
     var composeTestRule =  createComposeRule()

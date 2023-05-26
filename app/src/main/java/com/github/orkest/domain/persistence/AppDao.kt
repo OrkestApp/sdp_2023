@@ -40,5 +40,14 @@ class AppDao {
             fun insertPosts(posts: List<AppEntities.Companion.PostEntity>)
         }
 
+        @Dao
+        interface ProfileDao {
+            @Query("SELECT * FROM profile WHERE id = 1")
+            fun getProfile(): AppEntities.Companion.ProfileEntity?
+
+            @Insert(onConflict = OnConflictStrategy.REPLACE)
+            fun insertProfile(profile: AppEntities.Companion.ProfileEntity)
+        }
+
     }
 }

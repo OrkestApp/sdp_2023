@@ -18,6 +18,7 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.firestoreSettings
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import java.time.LocalDateTime
@@ -25,14 +26,21 @@ import java.util.concurrent.CompletableFuture
 
 open class FireStoreDatabaseAPI {
 
+    val db = Firebase.firestore
+
     companion object{
-        val db = Firebase.firestore
+
         fun isOnline(context: Context): Boolean {
             val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             val network = connectivityManager.activeNetwork ?: return false
             val networkCapabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
             return networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
         }
+    }
+
+    init {
+        db.clearPersistence()
+        db.firestoreSettings = firestoreSettings { isPersistenceEnabled = false }
     }
 
 

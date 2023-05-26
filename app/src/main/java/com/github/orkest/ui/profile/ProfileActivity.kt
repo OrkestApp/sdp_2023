@@ -29,10 +29,11 @@ import com.github.orkest.data.Constants
 import com.github.orkest.data.Song
 import com.github.orkest.R
 import com.github.orkest.View.*
+import com.github.orkest.domain.persistence.AppDatabase
 import com.github.orkest.ui.theme.OrkestTheme
 import kotlinx.coroutines.CoroutineScope
 
-class ProfileActivity() : ComponentActivity() {
+class ProfileActivity(private val appDatabase: AppDatabase) : ComponentActivity() {
 
     //TODO create the currentUser's username when signing up
     private lateinit var  currentUser : String
@@ -41,10 +42,10 @@ class ProfileActivity() : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         currentUser = intent.getStringExtra("username").toString()
-        val viewModel = ProfileViewModel(currentUser)
+        val viewModel = ProfileViewModel(appDatabase ,currentUser)
         setContent {
             ProfileActivitySetting {
-                ProfileActivityScreen(this, viewModel = viewModel)
+                ProfileActivityScreen(appDatabase, this, viewModel = viewModel)
             }
         }
     }
@@ -69,7 +70,7 @@ fun ProfileActivitySetting(content: @Composable () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileActivityScreen(activity: ComponentActivity, viewModel: ProfileViewModel) {
+fun ProfileActivityScreen(appDatabase: AppDatabase, activity: ComponentActivity, viewModel: ProfileViewModel) {
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
 
@@ -91,7 +92,7 @@ fun ProfileActivityScreen(activity: ComponentActivity, viewModel: ProfileViewMod
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    TopProfile(viewModel = viewModel, scaffoldState, coroutineScope)
+                    TopProfile(appDatabase, viewModel = viewModel, scaffoldState, coroutineScope)
                 }
                 MainBody(viewModel)
             }
@@ -102,8 +103,8 @@ fun ProfileActivityScreen(activity: ComponentActivity, viewModel: ProfileViewMod
 }
 
 @Composable
-fun TopProfile(viewModel: ProfileViewModel, scaffoldState: ScaffoldState, coroutineScope: CoroutineScope) {
-    ProfileTopInterface(viewModel = viewModel, scaffoldState, coroutineScope)
+fun TopProfile(appDatabase: AppDatabase, viewModel: ProfileViewModel, scaffoldState: ScaffoldState, coroutineScope: CoroutineScope) {
+    ProfileTopInterface(appDatabase, viewModel, scaffoldState, coroutineScope)
 }
 
 @Composable

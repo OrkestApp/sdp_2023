@@ -1,6 +1,7 @@
 package com.github.orkest.bluetooth.ui
 
 import android.Manifest
+import android.app.Application
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver
@@ -26,6 +27,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
+import androidx.room.Room
+import androidx.test.platform.app.InstrumentationRegistry
 import com.github.orkest.bluetooth.data.BluetoothServiceManager
 import com.github.orkest.bluetooth.data.OrkestDevice
 import com.github.orkest.bluetooth.domain.BluetoothConstants
@@ -34,6 +37,7 @@ import com.github.orkest.bluetooth.domain.Device
 import com.github.orkest.bluetooth.ui.ui.theme.OrkestTheme
 import com.github.orkest.data.Constants
 import com.github.orkest.domain.FireStoreDatabaseAPI
+import com.github.orkest.domain.persistence.AppDatabase
 import com.github.orkest.ui.profile.ProfileActivity
 import com.github.orkest.ui.profile.ProfileViewModel
 import com.github.orkest.ui.search.SearchUserView
@@ -241,7 +245,11 @@ class BluetoothActivity(private val mock:Boolean =false) : ComponentActivity() {
                 BluetoothConstants.MESSAGE_READ -> {
                     // construct a string from the valid bytes in the buffer
                     val msgReceived = String(msg.obj as ByteArray, 0, msg.arg1)
-                    val follow = ProfileViewModel(msgReceived)
+                    val appDatabase: AppDatabase = Room.inMemoryDatabaseBuilder(
+                        InstrumentationRegistry.getInstrumentation().context,
+                        AppDatabase::class.java
+                    ).allowMainThreadQueries().build()
+                    val follow = ProfileViewModel(appDatabase, msgReceived)
                     follow.updateCurrentUserFollowings(true)
                     follow.updateUserFollowers(true)
                     Toast.makeText(this@BluetoothActivity,"You and $msgReceived are now Friends",Toast.LENGTH_LONG).show()

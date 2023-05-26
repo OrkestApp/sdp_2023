@@ -5,11 +5,14 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.github.orkest.data.Constants
+import com.github.orkest.data.Profile
 import com.github.orkest.domain.FireStoreDatabaseAPI
 import com.github.orkest.data.User
+import com.github.orkest.domain.persistence.AppDatabase
+import com.github.orkest.domain.persistence.AppEntities
 import java.util.concurrent.CompletableFuture
 
-open class ProfileViewModel(val user: String) : ViewModel() {
+open class ProfileViewModel(val appDatabase: AppDatabase, val user: String) : ViewModel() {
 
     private val dbAPI = FireStoreDatabaseAPI()
     private var userProfile = User()

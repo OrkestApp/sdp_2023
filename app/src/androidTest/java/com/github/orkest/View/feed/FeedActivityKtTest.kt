@@ -1,8 +1,11 @@
 package com.github.orkest.View.feed
 
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.room.Room
 import com.github.orkest.ViewModel.feed.MockPostViewModel
+import com.github.orkest.domain.persistence.AppDatabase
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -15,9 +18,14 @@ internal class FeedActivityKtTest {
     @Before
     fun setup(){
         // Start the app
+
+
         val viewModel = MockPostViewModel()
         composeTestRule.setContent {
-            FeedActivity(viewModel = viewModel)
+            val context = LocalContext.current
+            val database = Room.databaseBuilder(context, AppDatabase::class.java, "test-database")
+                .build()
+            FeedActivity(database, context, viewModel)
         }
     }
 

@@ -16,7 +16,7 @@ import java.util.concurrent.CompletableFuture
 open class ProfileViewModel(val user: String) : ViewModel(), Serializable {
 
     private val dbAPI = FireStoreDatabaseAPI()
-    private val firebaseStorage = FirebaseStorageAPI()
+    private val firebaseStorage = FirebaseStorageAPI
     private var userProfile = User()
 
     val storageAPI = FirebaseStorageAPI()

@@ -7,26 +7,47 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build
-import android.os.Bundle
+import android.os.*
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import com.github.orkest.bluetooth.data.BluetoothServiceManager
+import com.github.orkest.bluetooth.data.OrkestDevice
+import com.github.orkest.bluetooth.domain.BluetoothConstants
 import com.github.orkest.bluetooth.domain.BluetoothInterface
+import com.github.orkest.bluetooth.domain.Device
 import com.github.orkest.bluetooth.ui.ui.theme.OrkestTheme
+import com.github.orkest.data.Constants
+import com.github.orkest.domain.FireStoreDatabaseAPI
+import com.github.orkest.ui.profile.ProfileActivity
+import com.github.orkest.ui.profile.ProfileViewModel
+import com.github.orkest.ui.search.SearchUserView
+import java.util.concurrent.CompletableFuture
 
-class BluetoothActivity() : ComponentActivity() {
+class BluetoothActivity(private val mock:Boolean =false) : ComponentActivity() {
 
     private var bluetoothServiceManager: BluetoothInterface? = null
+    private var sender = true
+    private var update = mutableStateOf(mutableListOf<Device>())
+
+
+
+
 
 
     private var requestBluetooth = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -40,7 +61,6 @@ class BluetoothActivity() : ComponentActivity() {
     }
 
     var discovery = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { _ ->
-
         // discoverable
         bluetoothServiceManager?.discoverDevices(this, receiver, requestBluetooth)
     }
@@ -64,10 +84,18 @@ class BluetoothActivity() : ComponentActivity() {
 
                     return
                 } else {
-                    if (device != null) {
-                        bluetoothServiceManager?.addDevice(device.name, device.address)
+                    if (device != null && device.name != "") {
+                        bluetoothServiceManager?.addDevice(OrkestDevice(device))
+                        Log.d("BluetoothActivity", "Device name: ${device?.name}")
+                        if (bluetoothServiceManager != null ) {
+                            update.value = bluetoothServiceManager.devices
+                        }
+                        if (bluetoothServiceManager != null) {
+                            Log.d("LIST", bluetoothServiceManager.devices.toString())
+                        }
                     }
-                    Log.d("BluetoothActivity", "Device name: ${device?.name}")
+                    Log.d("BluetoothActivity", "nothing")
+
                 }
             }
         }
@@ -83,8 +111,8 @@ class BluetoothActivity() : ComponentActivity() {
 
             intent.action?.let { Log.d("BluetoothActivity", it) }
             onReceiveHandle(intent)
-            }
         }
+    }
 
 
     @RequiresApi(Build.VERSION_CODES.S)
@@ -106,22 +134,143 @@ class BluetoothActivity() : ComponentActivity() {
             }
         }
     }
+
+
+
+    @Composable
+    fun createSwitch(){
+        var switchCheckedState by remember { mutableStateOf(true) }
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Row() {
+                Text("Sender")
+                Switch(
+                    checked = switchCheckedState,
+                    onCheckedChange = { switchCheckedState = it ; sender =it; Log.d("Sender",sender.toString())}
+                )
+            }
+
+        }
+    }
+
+    @Composable
+    fun createUserList(bluetoothServiceManager: BluetoothInterface){
+        val recompose by rememberUpdatedState(update)
+
+
+        Column() {
+            Button(onClick = {bluetoothServiceManager.acceptConnections()}) {
+                Text(text = "RECEIVE")
+            }
+            LazyColumn {
+                items(update.value) { device ->
+                    if (device.getName()!= ""){
+                        Button(onClick = { if(sender){
+                            bluetoothServiceManager.connectToDevice(device)
+                        }}) {
+                            Text(text = device.getName())
+                        }
+
+                    }
+
+                }
+
+
+
+
+
+
+                /*
+
+            IF SENDER :
+                        SCAN AVAILABLE DEVICE -> deviceList
+                        AFICHE DEVICE
+                        connectTodDevice(Device)
+                        cancel()
+
+            IF RECEIVER :
+                    SCAN
+                    WAIT FOR CONNECTION ? acceptConnections
+                    cancel()
+
+                 */
+
+            }
+        }
+    }
+    @RequiresApi(Build.VERSION_CODES.S)
+    @Composable
+    fun BluetoothActivityStart(
+        bluetoothServiceManager : BluetoothInterface = BluetoothServiceManager(handler), //REPLACE HANDLER
+        activity: BluetoothActivity){
+        // check for permissions
+
+        val permissions = bluetoothServiceManager.checkPermissionGranted(LocalContext.current)
+        if (!permissions && !mock) {
+            bluetoothServiceManager.askBluetoothPermission(activity)
+        }
+
+
+        val discoverableIntent: Intent = Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE).apply {
+            putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300)
+        }
+        activity.setServiceManager(bluetoothServiceManager)
+        if(!mock){
+        activity.discovery.launch(discoverableIntent)}
+
+        var deviceList = remember { bluetoothServiceManager.devices }
+
+        Log.d("HELLO LIST", deviceList.toString() )
+
+
+        createUserList(bluetoothServiceManager)
+        createSwitch()
+
+
+    }
+    private val handler = object : Handler(Looper.getMainLooper()) {
+        override fun handleMessage(msg: Message) {
+            when (msg.what) {
+
+                BluetoothConstants.MESSAGE_WRITE -> {
+                    // construct a string from the buffer
+
+                }
+                BluetoothConstants.MESSAGE_READ -> {
+                    // construct a string from the valid bytes in the buffer
+                    val msgReceived = String(msg.obj as ByteArray, 0, msg.arg1)
+                    val follow = ProfileViewModel(msgReceived)
+                    follow.updateCurrentUserFollowings(true)
+                    follow.updateUserFollowers(true)
+                    Toast.makeText(this@BluetoothActivity,"You and $msgReceived are now Friends",Toast.LENGTH_LONG).show()
+
+
+
+                }
+                BluetoothConstants.MESSAGE_TOAST -> {
+                    val msgReceived= msg.data.getString("toast").toString()
+                }
+            }
+        }
+    }
+    @Composable
+    fun toastinette(){
+        Toast.makeText(LocalContext.current,"You",Toast.LENGTH_SHORT).show()
+    }
 }
 
-@RequiresApi(Build.VERSION_CODES.S)
-@Composable
-fun BluetoothActivityStart(bluetoothServiceManager : BluetoothInterface = BluetoothServiceManager(), activity: BluetoothActivity){
-    // check for permissions
-    val permissions = bluetoothServiceManager.checkPermissionGranted(activity)
-    if (!permissions) {
-        bluetoothServiceManager.askBluetoothPermission(activity)
-    }
-    val discoverableIntent: Intent = Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE).apply {
-        putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300)
-    }
-    activity.setServiceManager(bluetoothServiceManager)
-    activity.discovery.launch(discoverableIntent)
-}
+
+
+
+
+
+
+
+
+
+
 
 
 

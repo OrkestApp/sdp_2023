@@ -30,7 +30,6 @@ import com.github.orkest.data.Song
 import com.github.orkest.R
 import com.github.orkest.View.*
 import com.github.orkest.ui.theme.OrkestTheme
-import com.github.orkest.ui.CreateMenuDrawer
 import kotlinx.coroutines.CoroutineScope
 
 class ProfileActivity() : ComponentActivity() {
@@ -51,6 +50,9 @@ class ProfileActivity() : ComponentActivity() {
     }
 }
 
+/**
+ * Function generating the screen, takes as function the Composable modeling the screen
+ */
 @Composable
 fun ProfileActivitySetting(content: @Composable () -> Unit) {
     OrkestTheme {
@@ -75,8 +77,6 @@ fun ProfileActivityScreen(activity: ComponentActivity, viewModel: ProfileViewMod
     androidx.compose.material.Scaffold(
         // keep track of the state of the scaffold (whether it is opened or closed)
         scaffoldState = scaffoldState,
-        // The content displayed inside the drawer when you click on the hamburger menu button
-        drawerContent = { CreateMenuDrawer() },
         // main screen content
         content = { padding ->
             Modifier
@@ -172,13 +172,5 @@ fun <T> placeholders (title: String, items: List<T>, select: () -> Unit = { }, v
                 }
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultProfilePreview() {
-    ProfileActivitySetting {
-        ProfileActivityScreen(ProfileActivity(), viewModel = ProfileViewModel("JohnDoe"))
     }
 }

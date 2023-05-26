@@ -130,26 +130,6 @@ fun NavDrawerButton(coroutineScope: CoroutineScope, scaffoldState: ScaffoldState
     }
 }
 
-@Composable
-fun CreateMenuDrawer() {
-    val notifSettingsItem = MenuItem(id = "notificationSettings", title = "Notifications", icon = Icons.Default.Notifications)
-    val privacyItem = MenuItem(id = "privacySettings", title = "Privacy", icon = Icons.Default.Phone)
-    val helpItem = MenuItem(id = "help", title = "Help", icon = Icons.Default.Info)
-
-    val items = listOf(notifSettingsItem, privacyItem, helpItem)
-
-    MenuDrawer(
-        items = items,
-        onItemClick = {
-            when(it.id) {
-                "notificationSettings" -> { /* TODO */ }
-                "privacySettings" -> { /* TODO */ }
-                "help" -> { /* TODO */ }
-            }
-        }
-    )
-}
-
 /**
  * Top part of the screen, containing:
  * - "cancel" button on the top left to stop editing changes and returning to profile screen
@@ -206,7 +186,6 @@ fun saveChanges(viewModel: EditProfileViewModel) {
 @Composable
 fun MainBody() {
     Column() {
-        EditNameSection(name = "Username", default = "default username")
         EditBio()
     }
 }
@@ -274,32 +253,6 @@ fun EditProfileImage(viewModel: EditProfileViewModel) {
             modifier = Modifier.clickable {
                 launcher.launch("image/*")
             }
-        )
-    }
-}
-
-
-/**
- * fields to modify small text data such as name and username
- */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun EditNameSection(name: String, default: String) {
-    var modifyName by rememberSaveable { mutableStateOf(default) }
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = PADDING_FROM_SCREEN_BORDER.dp, end = PADDING_FROM_SCREEN_BORDER.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(text = "$name:", modifier = Modifier.width(100.dp))
-        TextField(
-            value = modifyName,
-            onValueChange = { modifyName = it },
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = Color.Transparent,
-                //textColor = Color.Gray
-            )
         )
     }
 }

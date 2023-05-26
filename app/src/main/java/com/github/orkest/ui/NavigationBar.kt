@@ -3,6 +3,7 @@ package com.github.orkest.ui
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -26,17 +27,18 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.room.Room
 import com.github.orkest.data.Constants
 
 import com.github.orkest.View.feed.FeedActivity
+import com.github.orkest.domain.FireStoreDatabaseAPI
+import com.github.orkest.domain.persistence.AppDatabase
 import com.github.orkest.shazam.ui.ShazamSong
 import com.github.orkest.ui.Camera.CameraView
-import com.github.orkest.ui.feed.CreatePost
 import com.github.orkest.ui.profile.ProfileActivity
 import com.github.orkest.ui.profile.ProfileActivityScreen
 import com.github.orkest.ui.search.SearchUserView
 import com.github.orkest.ui.sharing.UsersList
-import com.github.orkest.ui.sharing.PlaylistViewModel
 import com.github.orkest.ui.feed.PostViewModel
 import com.github.orkest.ui.profile.ProfileViewModel
 import com.github.orkest.ui.search.SearchViewModel
@@ -52,6 +54,8 @@ class NavigationBar {
         fun CreateNavigationBar(navController: NavHostController, currentUser: String, activity: MainActivity) {
 
             val context = LocalContext.current
+            val postsDatabase: AppDatabase = Room.databaseBuilder(context, AppDatabase::class.java, "posts-db")
+                .build()
             Scaffold(
                 bottomBar = {
                     BottomNavigation(backgroundColor = Color.White) {
@@ -93,15 +97,19 @@ class NavigationBar {
                     startDestination = "HomePage",
                     Modifier.padding(padding)
                 ) {
-                    composable("HomePage") { FeedActivity(PostViewModel()) }
+                    composable("HomePage") { FeedActivity(postsDatabase, context, PostViewModel()) }
                     composable("SearchPage") { SearchUserView.SearchUi(viewModel = viewModel) }
                     composable("ShazamPage") {
-                    //Launch intent to the shazamActivity
-//                        val intent = Intent(context, ShazamActivity::class.java)
-//                        context.startActivity(intent)
-                        ShazamSong(activity)
-                        val intent = Intent(context, CameraView::class.java)
-                        context.startActivity(intent)
+                        if(FireStoreDatabaseAPI.isOnline(context))
+                        {
+                            ShazamSong(activity)
+                            val intent = Intent(context, CameraView::class.java)
+                            context.startActivity(intent)
+                        }
+                        else{
+                            Toast.makeText(context, "No internet connection. Unable to post and shazam.", Toast.LENGTH_LONG).show()
+                        }
+
                     }
                     composable("PlaylistPage") {
                         UsersList()

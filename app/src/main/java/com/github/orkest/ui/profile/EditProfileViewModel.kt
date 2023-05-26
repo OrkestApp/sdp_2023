@@ -18,7 +18,7 @@ class EditProfileViewModel {
      * Updates the firestore DB and the firebase storage with the new data
      */
     fun updateStorage() {
-        profilePicture.value?.let { storageAPI.uploadProfilePic(it) }
+        profilePicture.value?.let {FirebaseStorageAPI.uploadProfilePic(it) }
         // TODO save new bio in db
     }
 

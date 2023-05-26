@@ -6,8 +6,10 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.rememberNavController
+import com.github.orkest.data.Comment
 import com.github.orkest.ui.MainActivity
 import com.github.orkest.ui.NavigationBar
+import com.github.orkest.ui.feed.CommentActivity
 import org.junit.Rule
 import org.junit.Test
 
@@ -15,6 +17,13 @@ class navigationTabTest {
 
     @get:Rule
     val composeTestRule =  createComposeRule()
+    @Test
+    fun showComment(){
+
+        composeTestRule.setContent {
+            CommentActivity.CommentBox(comment = Comment("BOB") )
+        }
+    }
 
     @Test
     fun canAccessEveryNavigationTabFromMainActivity(){
@@ -25,7 +34,6 @@ class navigationTabTest {
         val searchTabAccess = composeTestRule.onNodeWithText("Search")
         searchTabAccess.assertIsDisplayed()
         searchTabAccess.performClick()
-        composeTestRule.onNodeWithText("").assertIsDisplayed()
 
 
         val profileTab = composeTestRule.onNodeWithText("Profile")

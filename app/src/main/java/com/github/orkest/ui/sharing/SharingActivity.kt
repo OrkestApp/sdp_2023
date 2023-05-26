@@ -27,6 +27,7 @@ import com.github.orkest.data.Providers
 import com.github.orkest.domain.Authorization.Companion.getLoginActivityTokenIntent
 import com.github.orkest.domain.Authorization.Companion.requestUserAuthorization
 import com.github.orkest.domain.FireStoreDatabaseAPI
+import com.github.orkest.ui.CreateProfilePreview
 import com.github.orkest.ui.MainActivity
 import com.github.orkest.ui.search.SearchUserView
 import com.github.orkest.ui.search.SearchViewModel
@@ -106,8 +107,6 @@ class SharingComposeActivity : ComponentActivity() {
 
             // ----------------- Intent handling from spotify or Deezer for songID -----------------
 
-            //Log.d("DEEZER" , intent.getStringExtra(Intent.EXTRA_TEXT)!!)
-
             try {
                 val deezerStringText = intent.getStringExtra(Intent.EXTRA_TEXT)!!
                 if (deezerStringText.contains("Deezer") && Constants.CURRENT_USER_PROVIDER == Providers.DEEZER) {
@@ -118,8 +117,6 @@ class SharingComposeActivity : ComponentActivity() {
                     songName = songNameWithArtist.substringBefore(" by ")
                     songArtist = songNameWithArtist.substringAfterLast(" by ")
 
-
-                    Log.d("Deezer debug", songNameWithArtist)
                 }
             } catch (e: java.lang.NullPointerException) {
 
@@ -128,7 +125,6 @@ class SharingComposeActivity : ComponentActivity() {
             when (intent?.action) {
                 Intent.ACTION_SEND -> {
                     if ("text/plain" == intent.type) {
-                        Log.d("Debug", "got text")
                         handleSendText(intent) // Handle text being sent
                     }
                 }
@@ -137,7 +133,6 @@ class SharingComposeActivity : ComponentActivity() {
             // ----------------- Spotify API -----------------
 
             if (Constants.CURRENT_USER_PROVIDER == Providers.SPOTIFY) {
-                Log.d("TEST DEEZER", "ENTER WRONG LOOP")
                 spotifyAuthorization()
             }
         }
@@ -217,8 +212,6 @@ class SharingComposeActivity : ComponentActivity() {
 
         // retrieve the song name from the future
         completableFutureSong.get()
-
-
     }
 
     /**
@@ -321,8 +314,7 @@ fun UserSelection(){
                         "receiverUsername" to username
                     )
                 )
-
-                SearchUserView.CreateUser(name = username, intent)
+                CreateProfilePreview(username, intent)
 
                 }
             }

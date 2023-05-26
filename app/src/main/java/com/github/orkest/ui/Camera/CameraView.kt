@@ -51,6 +51,7 @@ import androidx.compose.runtime.Composable
 import androidx.core.app.ActivityCompat
 import com.github.orkest.shazam.domain.ShazamConstants
 import com.github.orkest.shazam.ui.ShazamSong
+import com.github.orkest.domain.FireStoreDatabaseAPI
 import com.github.orkest.ui.PermissionConstants
 import com.github.orkest.ui.feed.CreatePost
 import com.google.android.exoplayer2.ExoPlayer
@@ -364,15 +365,17 @@ class CameraView: ComponentActivity(){
                 .padding(paddingValue)
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .testTag("Save Button")
-                )
+                .testTag("Save Button"),
+                context = context)
         }
     }
 
     @Composable
-    fun SaveButton(onSaveClick: ()-> Unit, modifier: Modifier){
+    fun SaveButton(onSaveClick: ()-> Unit, modifier: Modifier, context: Context){
         Button(
-            onClick = onSaveClick,
+            onClick = {
+                onSaveClick()
+            },
             modifier = modifier,
             shape = RoundedCornerShape(roundedCornerValue),
             colors = ButtonDefaults.buttonColors(

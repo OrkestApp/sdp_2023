@@ -76,6 +76,7 @@ class PlaylistActivityTest {
         Constants.CURRENT_USER_PROVIDER = Providers.DEEZER
         val scenario = ActivityScenario.launch<SharingComposeActivity>(intent)
         scenario.close()
+        Constants.CURRENT_USER_PROVIDER = Providers.SPOTIFY
     }
 
     /**

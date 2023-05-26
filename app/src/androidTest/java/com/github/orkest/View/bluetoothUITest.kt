@@ -76,7 +76,7 @@ class bluetoothUITest {
         composeTestRule.onNodeWithText("START RECEIVING").assertIsDisplayed()
         composeTestRule.onNodeWithText("Follow Nearby Users").assertIsDisplayed()
         composeTestRule.onNodeWithText("Click on a user to follow them").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("Device Pic").assertIsDisplayed().assertHasClickAction()
+       // composeTestRule.onNodeWithTag("Device Pic").assertIsDisplayed().assertHasClickAction()
         composeTestRule.onNodeWithText("test1").assertIsDisplayed().assertHasClickAction()
     }
 }

@@ -62,6 +62,9 @@ class ProfileUITest {
         composeTestRule.onNodeWithText("Favorite Artists").assertIsDisplayed()
     }
 
+    /**
+     * Test if the profile screen is updated when the user changes
+     */
     @Test
     fun navigationDrawerComponentsDisplayOnScreen() {
         composeTestRule.setContent {

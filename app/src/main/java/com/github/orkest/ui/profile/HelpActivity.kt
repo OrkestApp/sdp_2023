@@ -17,10 +17,6 @@ import androidx.compose.ui.unit.sp
 
 class HelpActivity: ComponentActivity() {
 
-    //TODO create the currentUser's username when signing up
-    private lateinit var  currentUser : String
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

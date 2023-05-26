@@ -233,12 +233,13 @@ class BluetoothActivity(private val mock:Boolean =false, devices: MutableList<De
                                 }
                             }) {
                                 Image(
-                                    painter = painterResource(R.drawable.blank_profile_pic), //TODO: to change when we will be able to fetch the profile pictures from the database
-                                    contentDescription = "Contact profile picture",
+                                    painter = painterResource(R.drawable.blank_profile_pic),
+                                    contentDescription = "Device Pic",
                                     modifier = Modifier
                                         .size(50.dp)
                                         .clip(CircleShape)
                                         .padding(start = 10.dp)
+                                        .testTag("Device Pic")
                                 )
                                 Spacer(modifier = Modifier.width(20.dp))
                                 Text(text = device.getName())

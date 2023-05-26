@@ -197,7 +197,7 @@ fun DisplayPost(viewModel: PostViewModel, post: Post) {
             Spacer(modifier = Modifier.height(10.dp))
 
             if(post.media.isNotEmpty()) {
-                var uri = Uri.parse(post.media)
+                var uri by remember { mutableStateOf( Uri.parse(post.media))}
                 if(isVideo) {
                     FirebaseStorageAPI.fetchPostVideo(post).thenApply { uri = it }
                 } else {

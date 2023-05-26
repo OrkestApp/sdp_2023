@@ -116,6 +116,7 @@ class FirebaseStorageAPI {
             val futurePic = CompletableFuture<Uri>()
             storageRef.child(path).downloadUrl.addOnSuccessListener {
                 futurePic.complete(it)
+                Log.d("FirebaseStorageAPI", it.toString())
             }.addOnFailureListener {
                 Log.d("FirebaseStorageAPI", "path: $path")
                 Log.e("FirebaseStorageAPI", "Error while fetching picture from storage")
@@ -127,6 +128,7 @@ class FirebaseStorageAPI {
             val storageRef = storage.reference
             val futureVid = CompletableFuture<Uri>()
             storageRef.child(path).downloadUrl.addOnSuccessListener {
+
                 futureVid.complete(it)
             }.addOnFailureListener {
                 Log.e("FirebaseStorageAPI", "Error while fetching picture from storage")

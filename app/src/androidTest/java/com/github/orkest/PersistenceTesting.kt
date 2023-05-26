@@ -29,6 +29,7 @@ class PersistenceTesting {
     private lateinit var userDao: MockUserDao
     private lateinit var songDao: MockSongDao
     private lateinit var postDao: MockPostDao
+    private lateinit var sharedSongsDao: MockSharedSongsDao
 
     @Before
     fun setup() {
@@ -40,6 +41,7 @@ class PersistenceTesting {
         userDao = MockUserDao()
         songDao = MockSongDao()
         postDao = MockPostDao()
+        sharedSongsDao = MockSharedSongsDao()
     }
 
     @After
@@ -96,6 +98,17 @@ class PersistenceTesting {
         val allPosts = postDao.getAllPosts()
         assertEquals(posts, allPosts)
     }
+
+    @Test
+    fun testSharedSongDao() = runBlocking {
+        val sharers = listOf(
+            AppEntities.Companion.SharedSongEntity("user1")
+        )
+
+        sharedSongsDao.insertSharedSongs(sharers)
+        val allSharers = sharedSongsDao.getAllSharedSongs()
+        assertEquals(sharers, allSharers)
+    }
 }
 
 /**
@@ -141,5 +154,17 @@ class MockPostDao: AppDao.Companion.PostDao{
 
     override fun insertPosts(posts: List<AppEntities.Companion.PostEntity>) {
         postList.addAll(posts)
+    }
+}
+
+class MockSharedSongsDao: AppDao.Companion.SharedSongsDao{
+    private val sharedSongsList = mutableListOf<AppEntities.Companion.SharedSongEntity>()
+
+    override fun getAllSharedSongs(): List<AppEntities.Companion.SharedSongEntity> {
+        return sharedSongsList
+    }
+
+    override fun insertSharedSongs(sharedSongs: List<AppEntities.Companion.SharedSongEntity>) {
+        sharedSongsList.addAll(sharedSongs)
     }
 }

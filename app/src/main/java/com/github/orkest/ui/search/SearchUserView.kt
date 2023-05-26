@@ -1,7 +1,6 @@
 package com.github.orkest.ui.search
 
 import android.content.Intent
-import androidx.camera.core.Preview
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*

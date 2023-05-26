@@ -24,10 +24,14 @@ open class PlaylistViewModel(private val songDao: AppDao.Companion.SongDao) : Vi
         return if (FireStoreDatabaseAPI.isOnline(context)){
             dbAPI.fetchSharedSongsFromDataBase(receiver, sender)
         }else{
+            var songList: List<Song> = listOf()
             // get songs from cache
-            val songList = this.songDao.getAllSongs().map {song ->
-                Song(song.name, song.Artist, song.Album, song.URL)
-            }.plus(songs)
+            CompletableFuture.runAsync {
+                songList = this.songDao.getAllSongs().map {song ->
+                    Song(song.name, song.Artist, song.Album, song.URL)
+                }.plus(songs)
+            }
+
             CompletableFuture.completedFuture(songList)
         }
     }

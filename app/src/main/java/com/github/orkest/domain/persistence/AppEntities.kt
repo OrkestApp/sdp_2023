@@ -44,6 +44,11 @@ class AppEntities {
             val media: String,
             val isMediaVideo: Boolean
         )
+
+        @Entity(tableName = "shared_songs")
+        data class SharedSongEntity(
+            @PrimaryKey val sharerName: String
+        )
     }
 }
 

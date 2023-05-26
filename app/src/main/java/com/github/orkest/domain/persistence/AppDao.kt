@@ -40,5 +40,14 @@ class AppDao {
             fun insertPosts(posts: List<AppEntities.Companion.PostEntity>)
         }
 
+        @Dao
+        interface SharedSongsDao {
+            @Query("SELECT * FROM shared_songs")
+            fun getAllSharedSongs(): List<AppEntities.Companion.SharedSongEntity>
+
+            @Insert(onConflict = OnConflictStrategy.REPLACE)
+            fun insertSharedSongs(sharedSongs: List<AppEntities.Companion.SharedSongEntity>)
+        }
+
     }
 }

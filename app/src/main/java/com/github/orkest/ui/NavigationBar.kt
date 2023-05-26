@@ -9,12 +9,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -55,6 +53,8 @@ class NavigationBar {
 
             val context = LocalContext.current
             val postsDatabase: AppDatabase = Room.databaseBuilder(context, AppDatabase::class.java, "posts-db")
+                .build()
+            val sharedPlaylistDB: AppDatabase = Room.databaseBuilder(context, AppDatabase::class.java, "sharedPlaylist-db")
                 .build()
             Scaffold(
                 bottomBar = {
@@ -112,7 +112,7 @@ class NavigationBar {
 
                     }
                     composable("PlaylistPage") {
-                        UsersList()
+                        UsersList(sharedPlaylistDB, context)
                     }
                     composable("ProfilePage") {
                             ProfileActivityScreen(ProfileActivity(), viewModel = ProfileViewModel(

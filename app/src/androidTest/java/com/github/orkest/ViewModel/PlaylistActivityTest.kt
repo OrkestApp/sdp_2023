@@ -1,6 +1,7 @@
 package com.github.orkest
 
 import android.content.Intent
+import android.util.Log
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.core.app.ActivityScenario
@@ -72,11 +73,15 @@ class PlaylistActivityTest {
             ApplicationProvider.getApplicationContext(),
             SharingComposeActivity::class.java).apply {
             putExtra("code","dummy token")
+            this.putExtra(Intent.EXTRA_TEXT,"I've found a song for you... Il nous faut by Elisa Tovati 🔥 Listen now on #Deezer https://deezer.page.link/qXgZb8DkHHuHZBet5")
+
+            Log.d("intent test", this.getStringExtra(Intent.EXTRA_TEXT).toString())
         }
+        val sauvegarde = Constants.CURRENT_USER_PROVIDER
         Constants.CURRENT_USER_PROVIDER = Providers.DEEZER
         val scenario = ActivityScenario.launch<SharingComposeActivity>(intent)
         scenario.close()
-        Constants.CURRENT_USER_PROVIDER = Providers.SPOTIFY
+        Constants.CURRENT_USER_PROVIDER =sauvegarde
     }
 
     /**

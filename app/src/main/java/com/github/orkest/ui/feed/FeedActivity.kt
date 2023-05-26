@@ -197,13 +197,15 @@ fun DisplayPost(viewModel: PostViewModel, post: Post) {
             Spacer(modifier = Modifier.height(10.dp))
 
             if(post.media.isNotEmpty()) {
-                var uri by remember { mutableStateOf( Uri.parse(post.media))}
+                var uri by remember { mutableStateOf( Uri.EMPTY)}
                 if(isVideo) {
                     FirebaseStorageAPI.fetchPostVideo(post).thenApply { uri = it }
                 } else {
                     FirebaseStorageAPI.fetchPostPic(post).thenApply { uri = it }
                 }
-                CapturedMedia(capturedUri = uri!!, isVideo = post.isMediaVideo)
+                if (uri != Uri.EMPTY) {
+                    CapturedMedia(capturedUri = uri!!, isVideo = post.isMediaVideo)
+                }
             }
 
         }

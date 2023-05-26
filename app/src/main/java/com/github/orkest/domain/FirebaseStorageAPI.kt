@@ -88,7 +88,7 @@ class FirebaseStorageAPI {
          * will upload the picture associated to a given post
          */
         fun uploadVideo(uri: Uri, post: Post): CompletableFuture<Boolean> {
-            val path = "User-${Constants.CURRENT_LOGGED_USER[0].uppercase()}/${Constants.CURRENT_LOGGED_USER}/post${post.date}.jpg"
+            val path = "User-${Constants.CURRENT_LOGGED_USER[0].uppercase()}/${Constants.CURRENT_LOGGED_USER}/post${post.date}.mp4"
             return uploadFile(path, uri)
         }
 
@@ -153,7 +153,7 @@ class FirebaseStorageAPI {
         }
 
         fun fetchPostVideo(post: Post): CompletableFuture<Uri> {
-            val path = "User-${post.username[0].uppercase()}/${post.username}/post${post.date}.jpg"
+            val path = "User-${post.username[0].uppercase()}/${post.username}/post${post.date}.mp4"
             return fetchVideo(path)
         }
 

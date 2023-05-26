@@ -86,6 +86,7 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
                 Row(modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween) {
                     UserName(viewModel.username.observeAsState().value)
+
                     NavDrawerButton(coroutineScope, scaffoldState)
                 }
                 Row (

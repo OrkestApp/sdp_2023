@@ -38,7 +38,6 @@ class PlaylistActivityTest {
                     playlistViewModel = testPlaylistViewModel,
                     senderUsername = "Test Sender",
                     receiverUsername = "Test Receiver",
-                    spotifySongId = "Test Spotify Song ID"
                 )
             }
         }

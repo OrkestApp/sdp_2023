@@ -1,8 +1,10 @@
 package com.github.orkest.View.feed
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -178,7 +180,7 @@ fun DisplayPost(viewModel: PostViewModel, post: Post) {
             /**TODO change when fetching from database is possible. For now, it avoids error of vectorized image**/
             ProfilePic(R.drawable.blank_profile_pic)
             //Display the reaction buttons
-            Reaction(viewModel, post)
+            Reaction(viewModel, post, context = LocalContext.current)
         }
 
         Column(modifier = Modifier.padding(10.dp, top = 10.dp, end = 10.dp)) {
@@ -349,7 +351,7 @@ private fun PlayButton(song: Song) {
 }
 
 @Composable
-private fun LikeButton(viewModel: PostViewModel, post: Post) {
+private fun LikeButton(viewModel: PostViewModel, post: Post, context: Context) {
 
     //Declaring variables to update the UI
     val isPostLiked = remember{ mutableStateOf(false) }
@@ -372,16 +374,21 @@ private fun LikeButton(viewModel: PostViewModel, post: Post) {
                 .height(20.dp)
                 .width(20.dp)
                 .clickable {
-                    viewModel
-                        .updatePostLikes(post, !isPostLiked.value)
-                        .thenApply {
-                            //Updating the isPostLiked value accordingly
-                            isPostLiked.value = !isPostLiked.value
-                            //Updating the value of getNbLikes only after the updatePostLikes future has been completed
-                            viewModel
-                                .getNbLikes(post)
-                                .thenApply { nbLikes.value = it }
-                        }
+                    if(FireStoreDatabaseAPI.isOnline(context)){
+                        viewModel
+                            .updatePostLikes(post, !isPostLiked.value)
+                            .thenApply {
+                                //Updating the isPostLiked value accordingly
+                                isPostLiked.value = !isPostLiked.value
+                                //Updating the value of getNbLikes only after the updatePostLikes future has been completed
+                                viewModel
+                                    .getNbLikes(post)
+                                    .thenApply { nbLikes.value = it }
+                            }
+                    }
+                    else{
+                        Toast.makeText(context, "No internet connection. Unable to like.", Toast.LENGTH_LONG).show()
+                    }
                 },
         )
         //Displaying the number of likes for this post
@@ -397,12 +404,12 @@ private fun LikeButton(viewModel: PostViewModel, post: Post) {
 }
 
 @Composable
-private fun Reaction(viewModel: PostViewModel, post: Post) {
+private fun Reaction(viewModel: PostViewModel, post: Post, context: Context) {
     //val context = LocalContext.current
     Column(modifier = Modifier.padding(20.dp)) {
 
         // Create the like button
-        LikeButton(viewModel, post = post)
+        LikeButton(viewModel, post = post, context)
         Spacer(modifier = Modifier.height(10.dp))
 
         //Create the comment button

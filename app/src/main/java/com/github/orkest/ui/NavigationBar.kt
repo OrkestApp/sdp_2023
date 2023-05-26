@@ -3,6 +3,7 @@ package com.github.orkest.ui
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -30,6 +31,7 @@ import androidx.room.Room
 import com.github.orkest.data.Constants
 
 import com.github.orkest.View.feed.FeedActivity
+import com.github.orkest.domain.FireStoreDatabaseAPI
 import com.github.orkest.domain.persistence.AppDatabase
 import com.github.orkest.shazam.ui.ShazamSong
 import com.github.orkest.ui.Camera.CameraView
@@ -98,9 +100,16 @@ class NavigationBar {
                     composable("HomePage") { FeedActivity(postsDatabase, context, PostViewModel()) }
                     composable("SearchPage") { SearchUserView.SearchUi(viewModel = viewModel) }
                     composable("ShazamPage") {
-                        ShazamSong(activity)
-                        val intent = Intent(context, CameraView::class.java)
-                        context.startActivity(intent)
+                        if(FireStoreDatabaseAPI.isOnline(context))
+                        {
+                            ShazamSong(activity)
+                            val intent = Intent(context, CameraView::class.java)
+                            context.startActivity(intent)
+                        }
+                        else{
+                            Toast.makeText(context, "No internet connection. Unable to post and shazam.", Toast.LENGTH_LONG).show()
+                        }
+
                     }
                     composable("PlaylistPage") {
                         UsersList()

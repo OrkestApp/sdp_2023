@@ -1,13 +1,20 @@
 package com.github.orkest
 
+import android.content.Intent
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.test.core.app.ActivityScenario
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.orkest.data.Constants
+import com.github.orkest.data.Providers
 import com.github.orkest.data.Song
 import com.github.orkest.domain.persistence.AppDao
 import com.github.orkest.domain.persistence.AppEntities
+import com.github.orkest.ui.DeezerWelcomeActivity
 import com.github.orkest.ui.sharing.Playlist
 import com.github.orkest.ui.sharing.PlaylistViewModel
+import com.github.orkest.ui.sharing.SharingComposeActivity
 import com.github.orkest.ui.theme.OrkestTheme
 import org.junit.Before
 import org.junit.Rule
@@ -57,6 +64,18 @@ class PlaylistActivityTest {
     fun testHomeButtonDisplay() {
         // Check that the home button is displayed
         composeTestRule.onNodeWithTag("addPostButton").assertIsDisplayed()
+    }
+
+    @Test
+    fun testOnCreate(){
+        val intent = Intent(
+            ApplicationProvider.getApplicationContext(),
+            SharingComposeActivity::class.java).apply {
+            putExtra("code","dummy token")
+        }
+        Constants.CURRENT_USER_PROVIDER = Providers.DEEZER
+        val scenario = ActivityScenario.launch<SharingComposeActivity>(intent)
+        scenario.close()
     }
 
     /**

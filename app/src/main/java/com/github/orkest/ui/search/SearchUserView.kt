@@ -125,7 +125,7 @@ class SearchUserView {
                     painter = painterResource(R.drawable.logo), // Replace with your image resource
                     contentDescription = "Orkest Logo",
                     modifier = Modifier
-                        .size(300.dp)
+                        .size(200.dp)
                         .align(Alignment.CenterHorizontally)
                         .testTag("logoOrkest") // Adjust the size as needed
                 )
@@ -199,5 +199,13 @@ class SearchUserView {
 //                }
 //            }
 //        }
+
+
+    }
+
+    @androidx.compose.ui.tooling.preview.Preview
+    @Composable
+    fun Preview() {
+        SearchUi(SearchViewModel())
     }
 }

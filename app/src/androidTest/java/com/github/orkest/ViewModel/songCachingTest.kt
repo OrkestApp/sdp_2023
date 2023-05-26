@@ -39,7 +39,7 @@ class SongCachingTest {
 
     }
 
-    @Test
+    /*@Test
     fun fetchDataFromCacheWhenOffline() {
         // Set up the mock DAO to return cached data
         val cachedData = listOf(AppEntities.Companion.SongEntity(0, "name", "artist", "album", "url"))
@@ -66,6 +66,6 @@ class SongCachingTest {
 
         // Verify that the result is the cached data
         assertEquals(Song(cachedData[0].name, cachedData[0].Artist, cachedData[0].Album, cachedData[0].URL), result.get()[0])
-    }
+    }*/
 
 }

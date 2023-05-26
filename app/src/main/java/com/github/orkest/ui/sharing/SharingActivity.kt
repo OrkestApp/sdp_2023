@@ -27,6 +27,7 @@ import com.github.orkest.data.Providers
 import com.github.orkest.domain.Authorization.Companion.getLoginActivityTokenIntent
 import com.github.orkest.domain.Authorization.Companion.requestUserAuthorization
 import com.github.orkest.domain.FireStoreDatabaseAPI
+import com.github.orkest.ui.CreateProfilePreview
 import com.github.orkest.ui.MainActivity
 import com.github.orkest.ui.search.SearchUserView
 import com.github.orkest.ui.search.SearchViewModel
@@ -321,8 +322,7 @@ fun UserSelection(){
                         "receiverUsername" to username
                     )
                 )
-
-                SearchUserView.CreateUser(name = username, intent)
+                CreateProfilePreview(username, intent)
 
                 }
             }

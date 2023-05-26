@@ -6,7 +6,8 @@ import androidx.room.RoomDatabase
 @Database(
     entities = [AppEntities.Companion.UserEntity::class,
                 AppEntities.Companion.SongEntity::class,
-                AppEntities.Companion.PostEntity::class], // add more entities here
+                AppEntities.Companion.PostEntity::class,
+                AppEntities.Companion.SharedSongEntity::class], // add more entities here
     version = 1,
     exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
@@ -14,5 +15,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun songsDao(): AppDao.Companion.SongDao
 
     abstract fun postsDao(): AppDao.Companion.PostDao
+
+    abstract fun sharedSongsDao(): AppDao.Companion.SharedSongsDao
 
 }

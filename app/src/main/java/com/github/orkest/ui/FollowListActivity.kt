@@ -119,10 +119,6 @@ fun CreateProfilePreview(user: String, intent: Intent? = null){
         .clickable {
             if (intent != null) {
                 context.startActivity(intent)
-            } else {
-                val intent = Intent(context, ProfileActivity::class.java)
-                intent.putExtra("username", user)
-                context.startActivity(intent)
             }
         }
         .fillMaxWidth()

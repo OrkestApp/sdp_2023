@@ -34,15 +34,13 @@ import com.github.orkest.ui.theme.OrkestTheme
 import com.spotify.android.appremote.api.SpotifyAppRemote
 
 /*
-    * This class is used to display the list of songs that the user share with other users.
+ * This class is used to display the list of songs that the user share with other users.
  */
 class PlaylistActivity() : ComponentActivity() {
 
 
 
     private lateinit var playlistViewModel : PlaylistViewModel
-    private var spotifySongId = ""
-    private var mSpotifyAppRemote: SpotifyAppRemote? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,8 +92,7 @@ class PlaylistActivity() : ComponentActivity() {
                 intent
                     .getStringExtra("senderUsername") ?: "sender1",
                 intent
-                    .getStringExtra("receiverUsername") ?: "receiver1",
-                spotifySongId
+                    .getStringExtra("receiverUsername") ?: "receiver1"
             )
 
         }
@@ -109,7 +106,6 @@ class PlaylistActivity() : ComponentActivity() {
 fun Playlist(playlistViewModel: PlaylistViewModel,
              senderUsername: String,
              receiverUsername: String,
-             spotifySongId: String
 ) {
     val context = LocalContext.current
 

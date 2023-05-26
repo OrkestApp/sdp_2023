@@ -9,6 +9,7 @@ import com.github.orkest.data.Constants
 import com.github.orkest.data.Profile
 import com.github.orkest.data.User
 import com.github.orkest.domain.FireStoreDatabaseAPI
+import com.github.orkest.ui.CreateProfilePreview
 import com.github.orkest.ui.search.SearchUserView
 
 /**
@@ -28,7 +29,7 @@ fun UsersList() {
             val intent : Intent = Intent(LocalContext.current, PlaylistActivity::class.java)
             intent.putExtra("senderUsername", Constants.CURRENT_LOGGED_USER)
             intent.putExtra("receiverUsername", user)
-            SearchUserView.CreateUser(user, intent)
+            CreateProfilePreview(user, intent)
         }
     }
 }

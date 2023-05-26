@@ -108,7 +108,7 @@ class SearchViewModelTest {
 
         val textToType = "dummyString"
 
-        composeTestRule.onNodeWithText("Search a user here").performTextInput(textToType)
+        composeTestRule.onNodeWithText("Search a user here").performTextReplacement(textToType)
 
         composeTestRule.onNodeWithText(textToType).assertIsDisplayed()
 

@@ -15,14 +15,18 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -220,17 +224,25 @@ class BluetoothActivity(private val mock:Boolean =false, devices: MutableList<De
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                
-
-                LazyColumn {
+                LazyColumn( ) {
                     items(update.value) { device ->
                         if (device.getName() != "") {
-                            Button(onClick = {
+                            Row(Modifier.clickable {
                                 if (sender) {
                                     bluetoothServiceManager.connectToDevice(device)
                                 }
                             }) {
+                                Image(
+                                    painter = painterResource(R.drawable.blank_profile_pic), //TODO: to change when we will be able to fetch the profile pictures from the database
+                                    contentDescription = "Contact profile picture",
+                                    modifier = Modifier
+                                        .size(50.dp)
+                                        .clip(CircleShape)
+                                        .padding(start = 10.dp)
+                                )
+                                Spacer(modifier = Modifier.width(20.dp))
                                 Text(text = device.getName())
+
                             }
                         }
                     }
@@ -241,8 +253,10 @@ class BluetoothActivity(private val mock:Boolean =false, devices: MutableList<De
 
             //Button to start Receiving -------
 
-            Column(Modifier.align(Alignment.BottomCenter)
-                .padding(20.dp)) {
+            Column(
+                Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(20.dp)) {
                 FloatingActionButton(
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)

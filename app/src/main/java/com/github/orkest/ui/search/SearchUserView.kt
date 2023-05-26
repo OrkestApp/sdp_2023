@@ -23,9 +23,12 @@ import androidx.compose.ui.modifier.modifierLocalMapOf
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.github.orkest.R
 import com.github.orkest.bluetooth.ui.BluetoothActivity
+import com.github.orkest.data.Constants
 import com.github.orkest.data.User
 
 import com.github.orkest.domain.DeezerApiIntegration
@@ -61,6 +64,20 @@ class SearchUserView {
 
             Column(modifier = Modifier.padding(20.dp))
             {
+
+                //Title of the page
+                Text(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(start = 20.dp)
+                        .testTag("searchTitle"),
+                    text = "Search A Friend",
+
+                    style = TextStyle(fontSize = 35.sp, fontFamily = Constants.FONT_MARKER),
+                    color = Color.Black
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
 
                 //This is the search bar
                 Box(

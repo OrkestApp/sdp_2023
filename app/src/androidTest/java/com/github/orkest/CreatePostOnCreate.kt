@@ -20,6 +20,7 @@ class CreatePostTest {
         // Define your intent data
         val intent = Intent(ApplicationProvider.getApplicationContext(), CreatePost::class.java).apply {
             putExtra("isVideo", true)
+            putExtra("iTest", true)
             putExtra("URI", "your_uri")
             putExtra(Constants.SONG_NAME, "song_name")
             putExtra(Constants.SONG_ARTIST, "song_artist")

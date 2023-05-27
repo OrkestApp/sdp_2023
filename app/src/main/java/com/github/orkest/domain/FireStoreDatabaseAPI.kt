@@ -24,9 +24,10 @@ import java.time.LocalDateTime
 import java.util.concurrent.CompletableFuture
 
 open class FireStoreDatabaseAPI {
+    val db = Firebase.firestore
+
 
     companion object{
-        val db = Firebase.firestore
         fun isOnline(context: Context): Boolean {
             val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             val network = connectivityManager.activeNetwork ?: return false

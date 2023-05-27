@@ -157,7 +157,7 @@ open class PostViewModel {
     /**
      * Returns the post object
      */
-    fun getPost(): Post {
+    open fun getPost(): Post {
         return post
     }
 

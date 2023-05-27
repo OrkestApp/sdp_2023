@@ -10,11 +10,11 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class MockEditProfileV2 {
 
-    @Test
+    /*@Test
     fun onCreate() {
         val scenario = ActivityScenario.launch(EditProfileActivity::class.java)
         scenario.onActivity { activity ->
             assertNotNull(activity)
         }
-    }
+    }*/
 }

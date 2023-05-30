@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.util.Log
 import androidx.annotation.RequiresPermission
+import androidx.compose.runtime.rememberCoroutineScope
 import com.github.orkest.R
 import com.github.orkest.data.Song
 import com.github.orkest.shazam.domain.AudioChunk
@@ -36,6 +37,8 @@ class AudioRecognition {
          */
         @RequiresPermission(Manifest.permission.RECORD_AUDIO)
         fun recognizeSong(coroutineScope: CoroutineScope, context: Context, recording: Flow<AudioChunk>): CompletableFuture<Song> {
+
+            //create a coroutineScope
             val song = CompletableFuture<Song>()
             coroutineScope.launch {
 
@@ -49,14 +52,14 @@ class AudioRecognition {
 
                 // records audio and flows it to the StreamingSession for recognition
                 coroutineScope.launch {
+
                     recording.collect { audioChunk ->
-                       recognizeAudioChunk(audioChunk)
+                        recognizeAudioChunk(audioChunk)
                     }
                 }
 
                 // collect the results
                 coroutineScope.launch {
-                    Log.d("AudioRecognition", "waiting for results")
                     currentSession.recognitionResults().collect { matchResult ->
                         collectMatchResult(matchResult, song)
                         AudioRecording.stopRecording(coroutineScope)

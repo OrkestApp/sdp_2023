@@ -1,10 +1,12 @@
 package com.github.orkest
 
+import androidx.test.rule.GrantPermissionRule
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.firestoreSettings
 import com.google.firebase.ktx.Firebase
 import org.junit.BeforeClass
 import org.junit.FixMethodOrder
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runners.MethodSorters
 
@@ -15,6 +17,9 @@ import org.junit.runners.MethodSorters
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class AAARunBeforeTests {
+
+    //add recording permissions once for all tests
+
     companion object {
         @BeforeClass
         @JvmStatic

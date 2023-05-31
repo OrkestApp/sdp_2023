@@ -117,17 +117,17 @@ fun MainBody(viewModel: ProfileViewModel) {
 // creates the row displaying the user's favorite songs
 @Composable
 fun favoriteSongs(viewModel: ProfileViewModel) {
-    placeholders("Favorite Songs", items = ArrayList<Song>(), viewModel = viewModel)
+    placeholders("Favorite Songs", viewModel = viewModel, true)
 }
 
 // creates the row displaying the user's favorite artists
 @Composable
 fun favoriteArtists(viewModel: ProfileViewModel) {
-    placeholders(title = "Favorite Artists", items = ArrayList<String>(), viewModel = viewModel)
+    placeholders(title = "Favorite Artists", viewModel = viewModel, false)
 }
 
 @Composable
-fun <T> placeholders (title: String, items: List<T>, select: () -> Unit = { }, viewModel: ProfileViewModel){
+fun placeholders(title: String, viewModel: ProfileViewModel, isSong: Boolean) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -142,20 +142,34 @@ fun <T> placeholders (title: String, items: List<T>, select: () -> Unit = { }, v
             }
         }
     }
-    // replace with your items...
-    val items = (1..10).map { "Item $it" }
-    val imageUri = rememberSaveable { mutableStateOf("") }
-    val painter = rememberImagePainter(
-        imageUri.value.ifEmpty { R.drawable.blank_profile_pic }
-    )
-    // This constitutes the scrollable row with the elements to display
+
+    val drawableIds : List<Int>
+    val items : List<Pair<String, Int>>
+
+    // Replace with the actual ids of your drawables
+    if(isSong){
+        drawableIds = listOf(R.drawable.a, R.drawable.b, R.drawable.c, R.drawable.d)
+        items = (1..4).map { index -> "Item $index" to drawableIds[index-1] }
+    } else {
+        drawableIds = listOf(R.drawable.drake, R.drawable.megan, R.drawable.nicki, R.drawable.cardi)
+        items = (1..4).map { index -> "Item $index" to drawableIds[index-1] }
+    }
+
+
     BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
         // LazyRow to display your items horizontally
         LazyRow(
             modifier = Modifier.fillMaxWidth(),
             state = rememberLazyListState()
         ) {
-            itemsIndexed(items) { _, item ->
+            itemsIndexed(items) { _, pair ->
+                val item = pair.first
+                val imageId = pair.second
+
+                val painter = rememberImagePainter(
+                    imageId
+                )
+
                 Box(
                     modifier = Modifier
                         .height(120.dp)

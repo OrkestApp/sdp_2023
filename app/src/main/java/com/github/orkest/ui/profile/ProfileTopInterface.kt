@@ -2,6 +2,7 @@ package com.github.orkest.ui.profile
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.Image
 import android.util.Log
@@ -36,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.github.orkest.ui.FollowListActivity
@@ -48,6 +50,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
+import java.io.ByteArrayOutputStream
 
 import java.util.concurrent.CompletableFuture
 
@@ -147,18 +150,32 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
                         intent.putExtra("bio", viewModel.bio.value)
                         context.startActivity(intent)
                     }*/
+                    var ok = false
                     fetchPic.whenComplete { it, _ ->
+                        ok = true
                         val intent = Intent(context, EditProfileActivity::class.java)
                         intent.putExtra("profilePic", it)
                         intent.putExtra("bio", viewModel.bio.value)
                         context.startActivity(intent)
-                    }.exceptionally {it ->
+                    }
+                    if(!ok) {
+                        val d = context.getDrawable(R.drawable.blank_profile_pic)
+                        val stream = ByteArrayOutputStream()
+                        d?.toBitmap()?.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+                        val bitmapdata: ByteArray = stream.toByteArray()
+                        val intent = Intent(context, EditProfileActivity::class.java)
+                        intent.putExtra("profilePic", bitmapdata)
+                        intent.putExtra("bio", viewModel.bio.value)
+                        context.startActivity(intent)
+                    }
+                /*.exceptionally {it ->
                         val intent = Intent(context, EditProfileActivity::class.java)
                         intent.putExtra("profilePic", byteArrayOf(0))
                         intent.putExtra("bio", viewModel.bio.value)
                         context.startActivity(intent)
                         byteArrayOf(0)
-                    }
+                    }*/
+
                 }
                 Spacer(modifier = Modifier.width(separator))
                 Row(){
@@ -177,6 +194,7 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
 
                         cleanSigningCache(context)
                     }
+                    /**
                     Button(
                         onClick = {
                             val intent = Intent(Intent.ACTION_VIEW, DeezerApiIntegration.url)
@@ -185,7 +203,7 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
                         colors = ButtonDefaults.buttonColors(backgroundColor = Color.Yellow))
                     {
                         Text("Link Deezer Account")
-                    }
+                    }**/
                 }
             } else {
                 FollowButton(viewModel, viewModel.isUserFollowed.observeAsState().value)

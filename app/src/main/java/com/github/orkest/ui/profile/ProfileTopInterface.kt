@@ -2,6 +2,9 @@ package com.github.orkest.ui.profile
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
+import android.media.Image
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -12,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,6 +33,11 @@ import com.github.orkest.ui.EditProfileActivity
 import com.github.orkest.ui.NavDrawerButton
 import kotlinx.coroutines.CoroutineScope
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import com.github.orkest.ui.FollowListActivity
 import com.github.orkest.domain.DeezerApiIntegration
 import com.github.orkest.domain.FireStoreDatabaseAPI
@@ -37,6 +46,7 @@ import com.github.orkest.ui.authentication.AuthActivity
 import com.github.orkest.ui.notification.Notification
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 
 import java.util.concurrent.CompletableFuture
@@ -53,6 +63,10 @@ private val buttonSettings = Modifier
     .width((3 * topInterfaceHeight) / 4)
 private val followColor = Color(0xFFFEE600) // bright yellow
 
+//val storageRef = FireStoreDatabaseAPI().storageRef
+
+
+
 /**
  * The top interface of the user's profile displaying the user's information
  * username, bio, number of followers, number of followings, profile picture
@@ -63,6 +77,25 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
     val context = LocalContext.current
     viewModel.setupListener()
 
+    val currentUser = remember {
+        viewModel.username.value
+    }
+
+    /*
+    variable forcing the EditButton composable to wait for picture from database to be fetched
+    before allowing user to enter EditProfileActivity
+     */
+    var fetched = false
+
+    // get user's profile picture
+    //var profilePic = MutableLiveData<ByteArray?>()
+    /*viewModel.fetchProfilePic().addOnSuccessListener {
+        profilePic.value = it
+        fetched = true
+    }*/
+    val fetchPic = viewModel.fetchProfilePic()
+
+
     Column(Modifier
         .padding(paddingValue)){
         Row(Modifier.height(IntrinsicSize.Min)){//allows to make fillMaxHeight relatively
@@ -70,7 +103,7 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                ProfilePicture(viewModel.profilePictureId.observeAsState().value)
+                ProfilePicture(fetchPic)//viewModel)
             }
 
             //Add a horizontal space between the image and the user's info
@@ -104,8 +137,22 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
 
             if(viewModel.username.value == Constants.CURRENT_LOGGED_USER) {
                 EditButton {
-                    val intent = Intent(context, EditProfileActivity::class.java)
-                    context.startActivity(intent)
+                    /*
+                    if profile picture has been fetched from database then allow to enter
+                    the EditProfileActivity
+                    */
+                    /*if (fetched) {
+                        val intent = Intent(context, EditProfileActivity::class.java)
+                        intent.putExtra("profilePic", profilePic.value)
+                        intent.putExtra("bio", viewModel.bio.value)
+                        context.startActivity(intent)
+                    }*/
+                    fetchPic.whenComplete { it, _ ->
+                        val intent = Intent(context, EditProfileActivity::class.java)
+                        intent.putExtra("profilePic", it)
+                        intent.putExtra("bio", viewModel.bio.value)
+                        context.startActivity(intent)
+                    }
                 }
                 Spacer(modifier = Modifier.width(separator))
                 Row(){
@@ -116,7 +163,7 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
 
                         //notification
 
-                        Notification(context,null).sendNotification("Sign Out", "You have been signed out", "Sign Out", "Sign Out", 1)
+                        Notification(context, null).sendNotification("Sign Out", "You have been signed out", "Sign Out", "Sign Out", 1)
 
                         //uncomment if un-caching is needed
                         GoogleSignIn.getClient(context, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut()
@@ -268,13 +315,43 @@ fun EditButton(onClick:() -> Unit){
 }
 
 @Composable
-fun ProfilePicture(profilePictureId: Int?){
-    val picture = profilePictureId ?: R.drawable.profile_picture
-    Image(
-        painter = painterResource(id = picture),
-        contentDescription = "$picture",
+fun ProfilePicture(futurePic: CompletableFuture<ByteArray>) {//viewModel: ProfileViewModel){
+
+
+    //TODO --------------------------------------
+    // the following block of code is analogous to the one on line ~80
+    // what I would like to achieve is to have a bitmap which observes the state of the profilePic
+    // in the profileviewmodel so that it updates the image when the profile pic has been fetched
+    // from the storage. I do not know how to do that yet.
+    val bitmap: MutableState<ImageBitmap?> = remember {
+        mutableStateOf(null)
+    }
+
+    /*viewModel.fetchProfilePic().addOnSuccessListener {
+        bitmap.value = BitmapFactory.decodeByteArray(it, 0, it.size).asImageBitmap()
+    }*/
+    futurePic.whenComplete { bytes, _ ->
+        bitmap.value = BitmapFactory.decodeByteArray(bytes, 0, bytes.size).asImageBitmap()
+    }
+    //-------------------------------------------
+
+
+    androidx.compose.material3.Card(
+        shape = CircleShape,
         modifier = Modifier
-            .width((3 * topInterfaceHeight) / 4)
-            .clip(CircleShape)
+            .padding(8.dp)
+            .size(100.dp)
     )
+    {
+        bitmap.value?.let {
+            Image(
+                //painter = painter,
+                bitmap = bitmap.value!!,
+                contentDescription = "profile_picture",
+                modifier = Modifier.wrapContentSize(),
+                contentScale = ContentScale.Crop
+            )
+        }
+
+    }
 }

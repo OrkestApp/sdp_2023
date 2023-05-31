@@ -268,7 +268,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:4.9.0'
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
-    
+
     // Room components
     var room_version = "2.5.1"
 
@@ -312,6 +312,18 @@ dependencies {
 
 
 
+
+
+    // Import the BoM for the Firebase platform
+    implementation platform('com.google.firebase:firebase-bom:31.5.0')
+
+    // Add the dependency for the Cloud Storage library
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation 'com.google.firebase:firebase-storage-ktx'
+
+    // FirebaseUI Storage only
+    implementation 'com.firebaseui:firebase-ui-storage:7.2.0'
+
     //refreshing
     implementation 'com.google.accompanist:accompanist-swiperefresh:0.25.1'
 }
@@ -353,4 +365,3 @@ connectedCheck {
 configurations.all {
     resolutionStrategy.force 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.10'
 }
-

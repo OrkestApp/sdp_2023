@@ -6,10 +6,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.*
 import androidx.compose.foundation.lazy.items
@@ -20,7 +17,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.startActivity
 import com.github.orkest.data.Profile
 import com.github.orkest.ui.sharedMusic.sharedMusicPost
@@ -121,27 +120,40 @@ fun Playlist(playlistViewModel: PlaylistViewModel,
             }
         }
 
-    //Add a title to the page
-    Text(text = "Songs Shared With You by $receiverUsername")
+    Column() {
+        //Add a title to the page
+        androidx.compose.material3.Text(
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(start = 20.dp),
+            text = "Songs Shared With You by $receiverUsername",
 
-    LazyColumn {
+            style = TextStyle(fontSize = 20.sp, fontFamily = Constants.FONT_MARKER),
+            color = Color.Black
+        )
 
-        items(songList) { song ->
-            // TODO enhance UI
-            Row(modifier =
-            Modifier
-                .clickable {
-                   Constants.playMusicButtonClicked(song, mutableStateOf(false), context)
+        LazyColumn {
+
+            items(songList) { song ->
+                // TODO enhance UI
+                Row(modifier =
+                Modifier
+                    .clickable {
+                        Constants.playMusicButtonClicked(song, mutableStateOf(false), context)
+                    }
+                    .fillMaxSize()
+                )
+                {
+                    sharedMusicPost(
+                        profile = Profile(
+                            username = receiverUsername
+                        ),
+                        song = song,
+                        message = "Dummy"
+                    )
                 }
-                .fillMaxSize()
-            )
-            {
-                sharedMusicPost(profile = Profile(
-                    username = receiverUsername ),
-                    song = song,
-                    message = "Dummy")
-            }
 
+            }
         }
     }
 

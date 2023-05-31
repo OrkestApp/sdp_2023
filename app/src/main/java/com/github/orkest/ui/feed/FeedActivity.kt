@@ -330,6 +330,9 @@ private fun SongInfo(song: Song) {
     else if (song.Title.toLowerCase().contains("hips") || song.Title.toLowerCase().contains("lie") ){
         drawable = R.drawable.hips
     }
+    else if (song.Title.toLowerCase().contains("real") || song.Title.toLowerCase().contains("gone")){
+        drawable = R.drawable.cars
+    }
     Row(Modifier.padding(10.dp)) {
         //Add the song's picture at the left of the card
         Image(

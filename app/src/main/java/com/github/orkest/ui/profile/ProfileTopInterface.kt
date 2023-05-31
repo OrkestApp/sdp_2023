@@ -152,6 +152,12 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
                         intent.putExtra("profilePic", it)
                         intent.putExtra("bio", viewModel.bio.value)
                         context.startActivity(intent)
+                    }.exceptionally {it ->
+                        val intent = Intent(context, EditProfileActivity::class.java)
+                        intent.putExtra("profilePic", byteArrayOf(0))
+                        intent.putExtra("bio", viewModel.bio.value)
+                        context.startActivity(intent)
+                        byteArrayOf(0)
                     }
                 }
                 Spacer(modifier = Modifier.width(separator))

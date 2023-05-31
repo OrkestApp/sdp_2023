@@ -10,6 +10,7 @@ import com.github.orkest.data.Constants
 import com.github.orkest.data.Profile
 import com.github.orkest.domain.FireStoreDatabaseAPI
 import com.github.orkest.data.User
+import com.github.orkest.domain.FirebaseStorageAPI
 import com.google.android.gms.tasks.Task
 import java.io.Serializable
 import com.github.orkest.domain.persistence.AppDatabase

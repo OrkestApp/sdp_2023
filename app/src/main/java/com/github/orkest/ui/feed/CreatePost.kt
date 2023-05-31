@@ -51,7 +51,7 @@ class CreatePost : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    val viewModel = PostViewModel()
+
 
 
 

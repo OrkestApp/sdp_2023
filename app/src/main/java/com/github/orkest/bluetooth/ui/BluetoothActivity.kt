@@ -1,6 +1,7 @@
 package com.github.orkest.bluetooth.ui
 
 import android.Manifest
+import android.app.Application
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver
@@ -39,6 +40,8 @@ import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.github.orkest.R
+import androidx.room.Room
+import androidx.test.platform.app.InstrumentationRegistry
 import com.github.orkest.bluetooth.data.BluetoothServiceManager
 import com.github.orkest.bluetooth.data.OrkestDevice
 import com.github.orkest.bluetooth.domain.BluetoothConstants
@@ -48,16 +51,16 @@ import com.github.orkest.bluetooth.ui.ui.theme.OrkestTheme
 import com.github.orkest.data.Constants
 import com.github.orkest.domain.FireStoreDatabaseAPI
 import com.github.orkest.ui.MainActivity
+import com.github.orkest.domain.persistence.AppDatabase
 import com.github.orkest.ui.profile.ProfileActivity
 import com.github.orkest.ui.profile.ProfileViewModel
-import com.github.orkest.ui.search.SearchUserView
-import java.util.concurrent.CompletableFuture
 
 class BluetoothActivity(private val mock:Boolean =false, devices: MutableList<Device> = mutableListOf()) : ComponentActivity() {
 
     private var bluetoothServiceManager: BluetoothInterface? = null
     private var sender = true
-    private var update = mutableStateOf(devices)
+    private var update = mutableStateOf(mutableListOf<Device>())
+
 
     private var requestBluetooth = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
@@ -156,7 +159,8 @@ class BluetoothActivity(private val mock:Boolean =false, devices: MutableList<De
                 BluetoothConstants.MESSAGE_READ -> {
                     // construct a string from the valid bytes in the buffer
                     val msgReceived = String(msg.obj as ByteArray, 0, msg.arg1)
-                    val follow = ProfileViewModel(msgReceived)
+
+                    val follow = ProfileViewModel(Constants.APPLICATION_CONTEXT, msgReceived)
                     follow.updateCurrentUserFollowings(true)
                     follow.updateUserFollowers(true)
                     Toast.makeText(this@BluetoothActivity,

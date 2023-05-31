@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat
 import com.github.orkest.R
 import com.github.orkest.domain.DeezerApiIntegration
 import com.github.orkest.domain.deezerApiImplemented
+import com.github.orkest.domain.persistence.AppDatabase
 import java.time.LocalDateTime
 import java.time.ZoneId
 
@@ -34,6 +35,16 @@ class Constants {
         var CURRENT_LOGGED_USER: String
             get() = currentLoggedUser
             set(value) { currentLoggedUser = value }
+
+        private lateinit var myApplicationContext: Context
+        var APPLICATION_CONTEXT: Context
+            get() = myApplicationContext
+            set(value) { myApplicationContext = value }
+
+        private lateinit var database: AppDatabase
+        var CACHING_DATABASE: AppDatabase
+            get() = database
+            set(value) { database = value }
 
         val DB_ZONE_ID: ZoneId = ZoneId.of("Europe/Paris")
 

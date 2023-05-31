@@ -30,3 +30,6 @@ local.properties
 .idea/workspace.xml
 .idea/inspectionProfiles/Project_Default.xml
 .idea/workspace.xml
+build/kotlin/sessions/kotlin-compiler-9187513308918579892.salive
+build/kotlin/sessions/kotlin-compiler-16924947301388127734.salive
+*.salive

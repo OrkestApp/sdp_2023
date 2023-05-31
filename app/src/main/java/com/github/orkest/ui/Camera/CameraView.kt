@@ -52,11 +52,13 @@ import androidx.core.app.ActivityCompat
 import com.github.orkest.shazam.domain.ShazamConstants
 import com.github.orkest.shazam.ui.ShazamSong
 import com.github.orkest.domain.FireStoreDatabaseAPI
+import com.github.orkest.domain.FirebaseStorageAPI
 import com.github.orkest.ui.PermissionConstants
 import com.github.orkest.ui.feed.CreatePost
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.ui.StyledPlayerView
+import com.google.firebase.ktx.Firebase
 
 
 //This class represents a camera component activity
@@ -359,8 +361,6 @@ class CameraView: ComponentActivity(){
                         "Please wait for Shazam to find a song",
                         Toast.LENGTH_SHORT).show()
                 }
-
-
             }, modifier = Modifier
                 .padding(paddingValue)
                 .align(Alignment.BottomCenter)

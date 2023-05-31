@@ -3,6 +3,7 @@ package com.github.orkest.domain.persistence
 import androidx.room.*
 import com.github.orkest.data.OrkestDate
 import com.github.orkest.data.Song
+import com.google.common.reflect.TypeToken
 import com.google.gson.Gson
 
 class AppEntities {
@@ -44,6 +45,20 @@ class AppEntities {
             val media: String,
             val isMediaVideo: Boolean
         )
+
+        @Entity(tableName = "profile")
+        @TypeConverters(SongListConverter::class)
+        data class ProfileEntity(
+            @PrimaryKey val id: Int = 1,
+            val username: String,
+            val profilePictureId: Int,
+            val bio: String,
+            val nbFollowers: Int,
+            val nbFollowings: Int,
+            val favoriteSongs: List<Song>,
+            val sharedMusic: List<Song>
+        )
+
     }
 }
 
@@ -63,15 +78,14 @@ class StringListConverter {
 
 // Define a type converter for the Song class
 class SongConverter {
+    private val gson = Gson()
     @TypeConverter
     fun fromSong(song: Song?): String? {
-        val gson = Gson()
         return gson.toJson(song)
     }
 
     @TypeConverter
     fun toSong(songJson: String?): Song? {
-        val gson = Gson()
         return gson.fromJson(songJson, Song::class.java)
     }
 }
@@ -79,16 +93,31 @@ class SongConverter {
 
 // Define a type converter for the OrkestDate class
 class OrkestDateConverter {
+    private val gson = Gson()
     @TypeConverter
     fun fromOrkestDate(date: OrkestDate?): String? {
-        val gson = Gson()
         return gson.toJson(date)
     }
 
     @TypeConverter
     fun toOrkestDate(dateJson: String?): OrkestDate? {
-        val gson = Gson()
         return gson.fromJson(dateJson, OrkestDate::class.java)
+    }
+}
+
+// Define a type converter for the List<Song> class
+class SongListConverter {
+    private val gson = Gson()
+
+    @TypeConverter
+    fun fromSongList(songList: List<Song>?): String? {
+        return gson.toJson(songList)
+    }
+
+    @TypeConverter
+    fun toSongList(songListJson: String?): List<Song>? {
+        val type = object : TypeToken<List<Song>?>() {}.type
+        return gson.fromJson(songListJson, type)
     }
 }
 

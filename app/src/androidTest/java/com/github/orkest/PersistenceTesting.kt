@@ -1,11 +1,15 @@
 package com.github.orkest
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.orkest.data.OrkestDate
+import com.github.orkest.data.Profile
+import com.github.orkest.data.Song
 import com.github.orkest.domain.persistence.AppDao
 import com.github.orkest.domain.persistence.AppDatabase
 import com.github.orkest.domain.persistence.AppEntities
@@ -26,6 +30,8 @@ class PersistenceTesting {
     private lateinit var db: AppDatabase
     private lateinit var userDao: MockUserDao
     private lateinit var songDao: MockSongDao
+    private lateinit var postDao: MockPostDao
+    private lateinit var profileDao: MockProfileDao
 
     @Before
     fun setup() {
@@ -36,6 +42,8 @@ class PersistenceTesting {
 
         userDao = MockUserDao()
         songDao = MockSongDao()
+        postDao = MockPostDao()
+        profileDao = MockProfileDao()
     }
 
     @After
@@ -80,6 +88,27 @@ class PersistenceTesting {
         val allSongsAfterClear = songDao.getAllSongs()
         assertEquals(emptyList<AppEntities.Companion.SongEntity>(), allSongsAfterClear)
     }
+
+    @Test
+    fun testPostDao() = runBlocking {
+        val posts = listOf(
+            AppEntities.Companion.PostEntity(1, "user1", OrkestDate(1992,2,27), 0, "bio1", Song(), 14, mutableListOf("user1"), 2, "video", true ),
+            AppEntities.Companion.PostEntity(2, "user2", OrkestDate(2003,3,28), 1, "bio2", Song("title1"), 2, mutableListOf("user2"), 0, "picture", false )
+        )
+
+        postDao.insertPosts(posts)
+        val allPosts = postDao.getAllPosts()
+        assertEquals(posts, allPosts)
+    }
+
+    @Test
+    fun testProfileDao() = runBlocking{
+        val profile = AppEntities.Companion.ProfileEntity(1,"Yas", -1, "Bio", 23, 1, ArrayList(), ArrayList())
+
+        profileDao.insertProfile(profile)
+        val currentProfile = profileDao.getProfile()
+        assertEquals(profile, currentProfile)
+    }
 }
 
 /**
@@ -113,5 +142,29 @@ class MockSongDao: AppDao.Companion.SongDao {
 
     override fun clear() {
         songList.clear()
+    }
+}
+
+class MockPostDao: AppDao.Companion.PostDao{
+    private val postList = mutableListOf<AppEntities.Companion.PostEntity>()
+
+    override fun getAllPosts(): List<AppEntities.Companion.PostEntity> {
+        return postList
+    }
+
+    override fun insertPosts(posts: List<AppEntities.Companion.PostEntity>) {
+        postList.addAll(posts)
+    }
+}
+
+class MockProfileDao: AppDao.Companion.ProfileDao{
+    private val profile = MutableLiveData<AppEntities.Companion.ProfileEntity>()
+
+    override fun getProfile(): AppEntities.Companion.ProfileEntity? {
+        return profile.value
+    }
+
+    override fun insertProfile(currentProfile: AppEntities.Companion.ProfileEntity) {
+        profile.value = currentProfile
     }
 }

@@ -1,6 +1,7 @@
 package com.github.orkest.ui.search
 
 import android.content.Intent
+import androidx.camera.core.Preview
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -17,53 +18,110 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.modifier.modifierLocalMapOf
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.github.orkest.R
 import com.github.orkest.bluetooth.ui.BluetoothActivity
+import com.github.orkest.data.Constants
+import com.github.orkest.data.User
 
 import com.github.orkest.domain.DeezerApiIntegration
+import com.github.orkest.ui.CreateProfilePreview
 import com.github.orkest.ui.profile.ProfileActivity
 import java.util.*
 
 class SearchUserView {
+
     companion object {
 
+        /**
+         * @param viewModel use to communicate with the Backend
+         *
+         *This method display the search bar, and support the drawing of the future users that will
+         * be find in the database
+         *
+         * the viewmodel communicate back to the searchUi view using futures
+         */
         @OptIn(ExperimentalMaterial3Api::class)
         @Composable
-
-                /**
-                 * @param viewModel use to communicate with the Backend
-                 *
-                 *This method display the search bar, and support the drawing of the future users that will
-                 * be find in the database
-                 *
-                 * the viewmodel communicate back to the searchUi view using futures
-                 */
         fun SearchUi(viewModel: SearchViewModel) {
             //need to use remember because it triggers an action each time
-            var text by remember { mutableStateOf("") }
+            var text by remember { mutableStateOf("Search a user here") }
             var list by remember { mutableStateOf(mutableListOf("")) }
             val context = LocalContext.current
 
             //Each time the text is updated, this is called
-            // Need to use future to wait for the asynchronous fetch on the datxabase
+            // Need to use future to wait for the asynchronous fetch on the database
             viewModel.searchUserInDatabase(text).thenAccept {
                 list = it.map{x -> x.profile.username} as MutableList<String>
             }
 
-            Column(modifier = Modifier.fillMaxSize())
+            Column(modifier = Modifier.padding(20.dp))
             {
+
+                //Title of the page
+                Text(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(start = 20.dp)
+                        .testTag("searchTitle"),
+                    text = "Search A Friend",
+
+                    style = TextStyle(fontSize = 35.sp, fontFamily = Constants.FONT_MARKER),
+                    color = Color.Black
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                //This is the search bar
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    OutlinedTextField(
+                        value = text,
+                        onValueChange = {
+                            text = it
+                        },
+                        Modifier
+                            .testTag("SearchBar")
+                            .fillMaxWidth()
+                            .align(Alignment.Center))
+
+                    Image(
+                        painter = painterResource(R.drawable.lens_image), // Replace with your lens image resource
+                        contentDescription = "Lens",
+                        modifier = Modifier
+                            .size(40.dp)
+                            .align(Alignment.CenterEnd)
+                            .padding(end = 10.dp)
+                            .testTag("search_logo")// Adjust the size as needed
+                    )
+                }
+                // This draw the found users each time the list is updated
+                LazyColumn {
+                    items(list) { username ->
+                        CreateProfilePreview(username)
+                    }
+                }
+
+                //This is the button to search users via bluetooth
                 Button(
                     onClick = {
-
                         val intent = Intent(context,BluetoothActivity::class.java)
                         context.startActivity(intent)
-
-
                     },
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.Yellow))
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.Yellow),
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .testTag("bluetoothButton"))
+
                 {
                     Text("Search nearby users")
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -76,57 +134,110 @@ class SearchUserView {
 
                     }
                 }
-                OutlinedTextField(
-                    value = text,
-                    onValueChange = {
-                        text = it
 
+                //DISPLAY ORKEST
+                StyledOrkest()
+                //DISPLAY ORKEST LOGO
+                Image(
+                    painter = painterResource(R.drawable.logo), // Replace with your image resource
+                    contentDescription = "Orkest Logo",
+                    modifier = Modifier
+                        .size(200.dp)
+                        .align(Alignment.CenterHorizontally)
+                        .testTag("logoOrkest") // Adjust the size as needed
+                )
 
-                    }) //This is the search bar
-
-                // This draw the found users each time the list is updated
-                LazyColumn {
-                    items(list) { userName ->
-                        val context = LocalContext.current
-                        val intent = Intent(context,ProfileActivity::class.java)
-                        intent.putExtra("username",userName)
-                        CreateUser(name = userName, intent = intent)
-                    }
-                }
+                //Display copyright
+                Image(painter = painterResource(R.drawable.copyright),
+                    contentDescription = "Copyright",
+                    modifier = Modifier
+                        .size(10.dp)
+                        .align(Alignment.End)
+                        .testTag("copyright")
+                )// Adjust the size as needed
             }
         }
 
+        @Composable
+        fun StyledOrkest() {
+            Box(modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center) {
+                Row() {
+                    Text(
+                        text = "O",
+                        Modifier
+                            .testTag("O")
+                            .padding(20.dp)
+                    )
+                    Text(
+                        text = "R",
+                        Modifier
+                            .testTag("R")
+                            .padding(20.dp)
+                    )
+                    Text(
+                        text = "K",
+                        Modifier
+                            .testTag("K")
+                            .padding(20.dp)
+                    )
+                    Text(
+                        text = "E",
+                        Modifier
+                            .testTag("E")
+                            .padding(20.dp)
+                    )
+                    Text(
+                        text = "S",
+                        Modifier
+                            .testTag("S")
+                            .padding(20.dp)
+                    )
+                    Text(
+                        text = "T",
+                        Modifier
+                            .testTag("T")
+                            .padding(20.dp)
+                    )
+                }
+            }
+        }
         /**
          * This encapsulate the drawing of a single user with name @param user
          */
-        @Composable
-        fun CreateUser(name: String, intent: Intent) {
-            val context = LocalContext.current
-            Row(modifier = Modifier
-                .padding(all = 8.dp)
-                .clickable {
-                    context.startActivity(intent)
-                } //TODO the empty brackets need to be replaced by the composable function or fires an intent to the desired profiles
-                .fillMaxSize()) {
-                Image(
-                    painter = painterResource(R.drawable.powerrangerblue),
-                    contentDescription = "Contact profile picture",
-                    modifier = Modifier
-                        // Set image size to 40 dp
-                        .size(40.dp)
-                        // Clip image to be shaped as a circle
-                        .clip(CircleShape)
-                )
+//        @Composable
+//        fun CreateUser(name: String, intent: Intent) {
+//            val context = LocalContext.current
+//            Row(modifier = Modifier
+//                .padding(all = 8.dp)
+//                .clickable {
+//                    context.startActivity(intent)
+//                } //TODO the empty brackets need to be replaced by the composable function or fires an intent to the desired profiles
+//                .fillMaxSize()) {
+//                Image(
+//                    painter = painterResource(R.drawable.powerrangerblue),
+//                    contentDescription = "Contact profile picture",
+//                    modifier = Modifier
+//                        // Set image size to 40 dp
+//                        .size(40.dp)
+//                        // Clip image to be shaped as a circle
+//                        .clip(CircleShape)
+//                )
+//                // Add a horizontal space between the image and the column
+//                Spacer(modifier = Modifier.width(8.dp))
+//
+//                Column {
+//                    Text(text = name)
+//                }
+//            }
+//        }
 
-                // Add a horizontal space between the image and the column
-                Spacer(modifier = Modifier.width(8.dp))
 
-                Column {
-                    Text(text = name)
+    }
 
-                }
-            }
-
-        }
+    @androidx.compose.ui.tooling.preview.Preview
+    @Composable
+    fun Preview() {
+        SearchUi(SearchViewModel())
     }
 }

@@ -3,7 +3,7 @@ package com.github.orkest.View.feed
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.util.MutableBoolean
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,37 +13,34 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.MutableLiveData
 import coil.compose.rememberImagePainter
 import com.github.orkest.data.Constants
 import com.github.orkest.data.Post
 import com.github.orkest.data.Song
 import com.github.orkest.R
-import com.github.orkest.ui.Camera.CameraView
+import com.github.orkest.domain.FireStoreDatabaseAPI
+import com.github.orkest.domain.FirebaseStorageAPI
+import com.github.orkest.domain.persistence.AppDatabase
+import com.github.orkest.domain.persistence.AppEntities
 import com.github.orkest.ui.feed.PostViewModel
 import com.github.orkest.ui.feed.CommentActivity
-import com.github.orkest.ui.feed.CreatePost
+import com.github.orkest.ui.feed.mediaURI
 import com.github.orkest.ui.sharing.SharingComposeActivity
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -51,16 +48,15 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import kotlinx.coroutines.launch
+import java.util.concurrent.CompletableFuture
 
 
 /**
  * Composable function for the feed screen
  * Represents the view of the MVVM pattern
  */
-
 @Composable
-fun FeedActivity(viewModel: PostViewModel) {
-
+fun FeedActivity(database: AppDatabase, context: Context, viewModel: PostViewModel) {
     //Add a list of posts
     val listPosts = remember {
         mutableStateOf(ArrayList<Post>().toList())
@@ -74,20 +70,65 @@ fun FeedActivity(viewModel: PostViewModel) {
     val isRefreshing = remember { mutableStateOf(false) }
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isRefreshing.value)
 
-    refreshData(viewModel, listPosts)
+    if(FireStoreDatabaseAPI.isOnline(context)) {
+        //if there is internet connexion, get posts from the firestore database and update the cache
+        refreshData(viewModel, listPosts)
+
+        CompletableFuture.runAsync{
+            val postEntities = listPosts.value.map { post ->
+                AppEntities.Companion.PostEntity(
+                    id = (0..100000).random(),
+                    username = post.username,
+                    date = post.date,
+                    profilePicId = post.profilePicId,
+                    postDescription = post.postDescription,
+                    song = post.song,
+                    nbLikes = post.nbLikes,
+                    likeList = post.likeList,
+                    nbComments = post.nbComments,
+                    media = post.media,
+                    isMediaVideo = post.isMediaVideo
+                )
+            }
+
+            database.postsDao().insertPosts(postEntities)
+        }
+    } else {
+        //if no internet connection, get posts from the cache
+        CompletableFuture.runAsync {
+            val cachedPosts: List<AppEntities.Companion.PostEntity> =
+                database.postsDao().getAllPosts()
+            listPosts.value = cachedPosts.map { postEntity ->
+                Post(
+                    username = postEntity.username,
+                    date = postEntity.date,
+                    profilePicId = postEntity.profilePicId,
+                    postDescription = postEntity.postDescription,
+                    song = postEntity.song,
+                    nbLikes = postEntity.nbLikes,
+                    likeList = postEntity.likeList,
+                    nbComments = postEntity.nbComments,
+                    media = postEntity.media,
+                    isMediaVideo = postEntity.isMediaVideo
+                )
+            }
+        }
+    }
 
     // Wrap the LazyColumn with SwipeRefresh
     SwipeRefresh(
         state = swipeRefreshState,
         onRefresh = {
+            if(FireStoreDatabaseAPI.isOnline(context)) {
             coroutineScope.launch {
-                // Update isRefreshing to true
-                isRefreshing.value = true
+                    // Update isRefreshing to true
+                    isRefreshing.value = true
 
-                refreshData(viewModel, listPosts)
+                    refreshData(viewModel, listPosts)
 
-                // Update isRefreshing to false
-                isRefreshing.value = false
+                    // Update isRefreshing to false
+                    isRefreshing.value = false
+                }
             }
         }
     ) {
@@ -141,7 +182,7 @@ fun DisplayPost(viewModel: PostViewModel, post: Post) {
             /**TODO change when fetching from database is possible. For now, it avoids error of vectorized image**/
             ProfilePic(R.drawable.blank_profile_pic)
             //Display the reaction buttons
-            Reaction(viewModel, post)
+            Reaction(viewModel, post, context = LocalContext.current)
         }
 
         Column(modifier = Modifier.padding(10.dp, top = 10.dp, end = 10.dp)) {
@@ -155,8 +196,15 @@ fun DisplayPost(viewModel: PostViewModel, post: Post) {
             Spacer(modifier = Modifier.height(10.dp))
 
             if(post.media.isNotEmpty()) {
-                val uri = Uri.parse(post.media)
-                CapturedMedia(capturedUri = uri!!, isVideo = post.isMediaVideo)
+                var uri by remember { mutableStateOf( Uri.EMPTY)}
+                if(post.isMediaVideo) {
+                    FirebaseStorageAPI.fetchPostVideo(post).thenApply { uri = it }
+                } else {
+                    FirebaseStorageAPI.fetchPostPic(post).thenApply { uri = it }
+                }
+                if (uri != Uri.EMPTY) {
+                    CapturedMedia(capturedUri = uri!!, isVideo = post.isMediaVideo)
+                }
             }
 
         }
@@ -271,10 +319,24 @@ fun SongCard(song: Song) {
 @Composable
 private fun SongInfo(song: Song) {
 
+
+    var drawable = R.drawable.album_cover
+    if(song.Title.contains("Never") || song.Title.contains("Gonna")){
+        drawable = R.drawable.nevergonnagiveyouup
+    }
+    else if (song.Title.toLowerCase().contains("pettite") || song.Title.toLowerCase().contains("fille")){
+        drawable = R.drawable.booba
+    }
+    else if (song.Title.toLowerCase().contains("hips") || song.Title.toLowerCase().contains("lie") ){
+        drawable = R.drawable.hips
+    }
+    else if (song.Title.toLowerCase().contains("real") || song.Title.toLowerCase().contains("gone")){
+        drawable = R.drawable.cars
+    }
     Row(Modifier.padding(10.dp)) {
         //Add the song's picture at the left of the card
         Image(
-            painter = painterResource(id = R.drawable.album_cover),
+            painter = painterResource(id = drawable),
             contentDescription = "Cover of the album of the song Rude Boy by Rihanna",
             modifier = Modifier
                 .height(80.dp)
@@ -312,7 +374,7 @@ private fun PlayButton(song: Song) {
 }
 
 @Composable
-private fun LikeButton(viewModel: PostViewModel, post: Post) {
+private fun LikeButton(viewModel: PostViewModel, post: Post, context: Context) {
 
     //Declaring variables to update the UI
     val isPostLiked = remember{ mutableStateOf(false) }
@@ -335,16 +397,21 @@ private fun LikeButton(viewModel: PostViewModel, post: Post) {
                 .height(20.dp)
                 .width(20.dp)
                 .clickable {
-                    viewModel
-                        .updatePostLikes(post, !isPostLiked.value)
-                        .thenApply {
-                            //Updating the isPostLiked value accordingly
-                            isPostLiked.value = !isPostLiked.value
-                            //Updating the value of getNbLikes only after the updatePostLikes future has been completed
-                            viewModel
-                                .getNbLikes(post)
-                                .thenApply { nbLikes.value = it }
-                        }
+                    if(FireStoreDatabaseAPI.isOnline(context)){
+                        viewModel
+                            .updatePostLikes(post, !isPostLiked.value)
+                            .thenApply {
+                                //Updating the isPostLiked value accordingly
+                                isPostLiked.value = !isPostLiked.value
+                                //Updating the value of getNbLikes only after the updatePostLikes future has been completed
+                                viewModel
+                                    .getNbLikes(post)
+                                    .thenApply { nbLikes.value = it }
+                            }
+                    }
+                    else{
+                        Toast.makeText(context, "No internet connection. Unable to like.", Toast.LENGTH_LONG).show()
+                    }
                 },
         )
         //Displaying the number of likes for this post
@@ -360,12 +427,12 @@ private fun LikeButton(viewModel: PostViewModel, post: Post) {
 }
 
 @Composable
-private fun Reaction(viewModel: PostViewModel, post: Post) {
+private fun Reaction(viewModel: PostViewModel, post: Post, context: Context) {
     //val context = LocalContext.current
     Column(modifier = Modifier.padding(20.dp)) {
 
         // Create the like button
-        LikeButton(viewModel, post = post)
+        LikeButton(viewModel, post = post, context)
         Spacer(modifier = Modifier.height(10.dp))
 
         //Create the comment button
@@ -416,4 +483,3 @@ private fun ReactionIcon(iconId: Int, contentDescription:String, testTag: String
             .width(20.dp)
             .clickable { onClick() })
 }
-

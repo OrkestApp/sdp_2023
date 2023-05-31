@@ -1,6 +1,7 @@
 package com.github.orkest.bluetooth.ui
 
 import android.Manifest
+import android.app.Application
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver
@@ -14,18 +15,33 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.github.orkest.R
+import androidx.room.Room
+import androidx.test.platform.app.InstrumentationRegistry
 import com.github.orkest.bluetooth.data.BluetoothServiceManager
 import com.github.orkest.bluetooth.data.OrkestDevice
 import com.github.orkest.bluetooth.domain.BluetoothConstants
@@ -34,20 +50,16 @@ import com.github.orkest.bluetooth.domain.Device
 import com.github.orkest.bluetooth.ui.ui.theme.OrkestTheme
 import com.github.orkest.data.Constants
 import com.github.orkest.domain.FireStoreDatabaseAPI
+import com.github.orkest.ui.MainActivity
+import com.github.orkest.domain.persistence.AppDatabase
 import com.github.orkest.ui.profile.ProfileActivity
 import com.github.orkest.ui.profile.ProfileViewModel
-import com.github.orkest.ui.search.SearchUserView
-import java.util.concurrent.CompletableFuture
 
-class BluetoothActivity(private val mock:Boolean =false) : ComponentActivity() {
+class BluetoothActivity(private val mock:Boolean =false, devices: MutableList<Device> = mutableListOf()) : ComponentActivity() {
 
     private var bluetoothServiceManager: BluetoothInterface? = null
     private var sender = true
     private var update = mutableStateOf(mutableListOf<Device>())
-
-
-
-
 
 
     private var requestBluetooth = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -135,118 +147,24 @@ class BluetoothActivity(private val mock:Boolean =false) : ComponentActivity() {
         }
     }
 
+    //----------------------------------------UI-------------------------------------------
 
-
-    @Composable
-    fun createSwitch(){
-        var switchCheckedState by remember { mutableStateOf(true) }
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Row() {
-                Text("Sender")
-                Switch(
-                    checked = switchCheckedState,
-                    onCheckedChange = { switchCheckedState = it ; sender =it; Log.d("Sender",sender.toString())}
-                )
-            }
-
-        }
-    }
-
-    @Composable
-    fun createUserList(bluetoothServiceManager: BluetoothInterface){
-        val recompose by rememberUpdatedState(update)
-
-
-        Column() {
-            Button(onClick = {bluetoothServiceManager.acceptConnections()}) {
-                Text(text = "RECEIVE")
-            }
-            LazyColumn {
-                items(update.value) { device ->
-                    if (device.getName()!= ""){
-                        Button(onClick = { if(sender){
-                            bluetoothServiceManager.connectToDevice(device)
-                        }}) {
-                            Text(text = device.getName())
-                        }
-
-                    }
-
-                }
-
-
-
-
-
-
-                /*
-
-            IF SENDER :
-                        SCAN AVAILABLE DEVICE -> deviceList
-                        AFICHE DEVICE
-                        connectTodDevice(Device)
-                        cancel()
-
-            IF RECEIVER :
-                    SCAN
-                    WAIT FOR CONNECTION ? acceptConnections
-                    cancel()
-
-                 */
-
-            }
-        }
-    }
-    @RequiresApi(Build.VERSION_CODES.S)
-    @Composable
-    fun BluetoothActivityStart(
-        bluetoothServiceManager : BluetoothInterface = BluetoothServiceManager(handler), //REPLACE HANDLER
-        activity: BluetoothActivity){
-        // check for permissions
-
-        val permissions = bluetoothServiceManager.checkPermissionGranted(LocalContext.current)
-        if (!permissions && !mock) {
-            bluetoothServiceManager.askBluetoothPermission(activity)
-        }
-
-
-        val discoverableIntent: Intent = Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE).apply {
-            putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300)
-        }
-        activity.setServiceManager(bluetoothServiceManager)
-        if(!mock){
-        activity.discovery.launch(discoverableIntent)}
-
-        var deviceList = remember { bluetoothServiceManager.devices }
-
-        Log.d("HELLO LIST", deviceList.toString() )
-
-
-        createUserList(bluetoothServiceManager)
-        createSwitch()
-
-
-    }
     private val handler = object : Handler(Looper.getMainLooper()) {
         override fun handleMessage(msg: Message) {
             when (msg.what) {
 
                 BluetoothConstants.MESSAGE_WRITE -> {
                     // construct a string from the buffer
-
                 }
                 BluetoothConstants.MESSAGE_READ -> {
                     // construct a string from the valid bytes in the buffer
                     val msgReceived = String(msg.obj as ByteArray, 0, msg.arg1)
-                    val follow = ProfileViewModel(msgReceived)
+
+                    val follow = ProfileViewModel(Constants.APPLICATION_CONTEXT, msgReceived)
                     follow.updateCurrentUserFollowings(true)
                     follow.updateUserFollowers(true)
-                    Toast.makeText(this@BluetoothActivity,"You and $msgReceived are now Friends",Toast.LENGTH_LONG).show()
-
-
+                    Toast.makeText(this@BluetoothActivity,
+                        "You and $msgReceived are now Friends",Toast.LENGTH_LONG).show()
 
                 }
                 BluetoothConstants.MESSAGE_TOAST -> {
@@ -255,10 +173,133 @@ class BluetoothActivity(private val mock:Boolean =false) : ComponentActivity() {
             }
         }
     }
+
+    @RequiresApi(Build.VERSION_CODES.S)
+    @Composable
+    fun BluetoothActivityStart(
+        bluetoothServiceManager : BluetoothInterface = BluetoothServiceManager(handler),
+        activity: BluetoothActivity){
+        // check for permissions
+        val permissions = bluetoothServiceManager.checkPermissionGranted(LocalContext.current)
+        if (!permissions && !mock) {
+            bluetoothServiceManager.askBluetoothPermission(activity)
+        }
+        val discoverableIntent: Intent = Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE).apply {
+            putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300)
+        }
+        activity.setServiceManager(bluetoothServiceManager)
+        if(!mock){
+        activity.discovery.launch(discoverableIntent)}
+
+
+
+        createUI(bluetoothServiceManager)
+    }
+
+
+    @Composable
+    fun createUI(bluetoothServiceManager: BluetoothInterface) {
+        val recompose by rememberUpdatedState(update)
+
+        //bluetoothServiceManager.acceptConnections()
+        Box() {
+            Column {
+                //Title of the page
+                Text(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(start = 20.dp),
+                    text = "Follow Nearby Users",
+                    style = TextStyle(fontSize = 35.sp, fontFamily = Constants.FONT_MARKER),
+                    color = Color.Black
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                //List of nearby users
+                Text(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(start = 20.dp),
+                    text = "Click on a user to follow them",
+                    style = TextStyle(fontSize = 20.sp, fontFamily = Constants.FONT_MARKER),
+                    color = Color.Black
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                LazyColumn( ) {
+                    items(update.value) { device ->
+                        if (device.getName() != "") {
+                            Row(Modifier.clickable {
+                                if (sender) {
+                                    bluetoothServiceManager.connectToDevice(device)
+                                }
+                            }) {
+                                Image(
+                                    painter = painterResource(R.drawable.blank_profile_pic),
+                                    contentDescription = "Device Pic",
+                                    modifier = Modifier
+                                        .size(50.dp)
+                                        .clip(CircleShape)
+                                        .padding(start = 10.dp)
+                                        .testTag("Device Pic")
+                                )
+                                Spacer(modifier = Modifier.width(20.dp))
+                                Text(text = device.getName())
+
+                            }
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            //Button to start Receiving -------
+
+            Column(
+                Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(20.dp)) {
+                FloatingActionButton(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(10.dp)
+                        .testTag("RECEIVE"),
+                    backgroundColor = Color.White,
+                    onClick = {
+                        bluetoothServiceManager.acceptConnections()
+                    }) {
+                    Column() {
+                        Image(
+                            painter = painterResource(id = R.drawable.bluetooth),
+                            contentDescription = "RECEIVE"
+                        )
+                    }
+                }
+                Text(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    text = "START RECEIVING",
+                    style = TextStyle(fontSize = 20.sp),
+                    color = Color.Black
+                )
+            }
+                //End button Receiving -------------
+
+
+        }
+    }
+
+
     @Composable
     fun toastinette(){
         Toast.makeText(LocalContext.current,"You",Toast.LENGTH_SHORT).show()
     }
+
+
+
+
 }
 
 

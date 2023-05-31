@@ -8,12 +8,15 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import androidx.navigation.compose.rememberNavController
+import androidx.room.Room
 import com.github.orkest.data.Constants
 import com.github.orkest.domain.FireStoreDatabaseAPI
 import com.github.orkest.data.PlaySpotify
 import com.github.orkest.data.Providers
+import com.github.orkest.domain.persistence.AppDatabase
 import com.github.orkest.ui.notification.Notification
 
 
@@ -22,6 +25,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            val context = LocalContext.current
+            Constants.APPLICATION_CONTEXT = LocalContext.current
+            Constants.CACHING_DATABASE = Room.databaseBuilder(context, AppDatabase::class.java, "app-db").build()
             if(Constants.CURRENT_LOGGED_USER == ""){
                 Log.e(TAG, "currentLoggedUser is empty", IllegalArgumentException())
             }

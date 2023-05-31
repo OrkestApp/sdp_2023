@@ -146,6 +146,7 @@ open class PostViewModel {
      */
     open fun getRecentPosts(lastConnected: LocalDateTime,
                             maxDaysNb: Long = DEFAULT_MAX_RECENT_DAYS ): CompletableFuture<List<Post>>{
+
         return dbAPI.getRecentPostsFromDataBase(lastConnected, maxDaysNb)
     }
 
@@ -160,7 +161,7 @@ open class PostViewModel {
     /**
      * Returns the post object
      */
-    fun getPost(): Post {
+    open fun getPost(): Post {
         return post
     }
 

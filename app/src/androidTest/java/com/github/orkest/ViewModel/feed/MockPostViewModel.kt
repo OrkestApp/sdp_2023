@@ -18,6 +18,8 @@ class MockPostViewModel : PostViewModel() {
 
     override fun getSong() = song
 
+    override fun getPost() = post
+
     override fun getPostDescription() = description
 
     override fun updateSong(song: Song) {

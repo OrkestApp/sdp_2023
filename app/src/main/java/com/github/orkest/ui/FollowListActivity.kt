@@ -31,6 +31,7 @@ import com.github.orkest.data.User
 import com.github.orkest.ui.profile.ProfileActivity
 import com.github.orkest.ui.theme.OrkestTheme
 import com.github.orkest.R
+import com.github.orkest.domain.FireStoreDatabaseAPI
 
 
 private val paddingValue = 5.dp
@@ -105,21 +106,27 @@ fun FollowList(activity: ComponentActivity, viewModel: FollowListViewModel){
         
         LazyColumn{
             items(userListState){user -> 
-                CreateProfilePreview(user = user)
+                CreateProfilePreview(user = user.username)
             }
         }
     }
 }
 
 @Composable
-fun CreateProfilePreview(user: User){
+fun CreateProfilePreview(user: String, intent: Intent? = null){
     val context = LocalContext.current
     Row(modifier = Modifier
         .padding(all = paddingValue)
         .clickable {
-            val intent = Intent(context, ProfileActivity::class.java)
-            intent.putExtra("username", user.username)
-            context.startActivity(intent)
+            if (intent != null) {
+                context.startActivity(intent)
+            } else {
+                if(FireStoreDatabaseAPI.isOnline(context)) {
+                    val intent = Intent(context, ProfileActivity::class.java)
+                    intent.putExtra("username", user)
+                    context.startActivity(intent)
+                }
+            }
         }
         .fillMaxWidth()
         .clip(shape = RoundedCornerShape(roundedCornerValue))
@@ -142,7 +149,7 @@ fun CreateProfilePreview(user: User){
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.Center) {
             Text(
-                text = user.username,
+                text = user,
                 style = TextStyle(fontSize = textFontSize, fontWeight = FontWeight.Bold),
                 modifier = Modifier.testTag("Username")
             )

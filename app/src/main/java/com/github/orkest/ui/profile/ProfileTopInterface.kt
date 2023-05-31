@@ -2,6 +2,10 @@ package com.github.orkest.ui.profile
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.media.Image
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -12,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,13 +34,23 @@ import com.github.orkest.ui.EditProfileActivity
 import com.github.orkest.ui.NavDrawerButton
 import kotlinx.coroutines.CoroutineScope
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.core.graphics.drawable.toBitmap
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import com.github.orkest.ui.FollowListActivity
 import com.github.orkest.domain.DeezerApiIntegration
+import com.github.orkest.domain.FireStoreDatabaseAPI
+import com.github.orkest.domain.persistence.AppDatabase
 import com.github.orkest.ui.authentication.AuthActivity
 import com.github.orkest.ui.notification.Notification
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
+import java.io.ByteArrayOutputStream
 
 import java.util.concurrent.CompletableFuture
 
@@ -51,6 +66,10 @@ private val buttonSettings = Modifier
     .width((3 * topInterfaceHeight) / 4)
 private val followColor = Color(0xFFFEE600) // bright yellow
 
+//val storageRef = FireStoreDatabaseAPI().storageRef
+
+
+
 /**
  * The top interface of the user's profile displaying the user's information
  * username, bio, number of followers, number of followings, profile picture
@@ -65,6 +84,20 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
         viewModel.username.value
     }
 
+    /*
+    variable forcing the EditButton composable to wait for picture from database to be fetched
+    before allowing user to enter EditProfileActivity
+     */
+    var fetched = false
+
+    // get user's profile picture
+    //var profilePic = MutableLiveData<ByteArray?>()
+    /*viewModel.fetchProfilePic().addOnSuccessListener {
+        profilePic.value = it
+        fetched = true
+    }*/
+    val fetchPic = viewModel.fetchProfilePic()
+
 
     Column(Modifier
         .padding(paddingValue)){
@@ -73,7 +106,7 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                ProfilePicture(viewModel.profilePictureId.observeAsState().value)
+                ProfilePicture(fetchPic)//viewModel)
             }
 
             //Add a horizontal space between the image and the user's info
@@ -86,6 +119,7 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
                 Row(modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween) {
                     UserName(viewModel.username.observeAsState().value)
+
                     NavDrawerButton(coroutineScope, scaffoldState)
                 }
                 Row (
@@ -106,8 +140,42 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
 
             if(viewModel.username.value == Constants.CURRENT_LOGGED_USER) {
                 EditButton {
-                    val intent = Intent(context, EditProfileActivity::class.java)
-                    context.startActivity(intent)
+                    /*
+                    if profile picture has been fetched from database then allow to enter
+                    the EditProfileActivity
+                    */
+                    /*if (fetched) {
+                        val intent = Intent(context, EditProfileActivity::class.java)
+                        intent.putExtra("profilePic", profilePic.value)
+                        intent.putExtra("bio", viewModel.bio.value)
+                        context.startActivity(intent)
+                    }*/
+                    var ok = false
+                    fetchPic.whenComplete { it, _ ->
+                        ok = true
+                        val intent = Intent(context, EditProfileActivity::class.java)
+                        intent.putExtra("profilePic", it)
+                        intent.putExtra("bio", viewModel.bio.value)
+                        context.startActivity(intent)
+                    }
+                    if(!ok) {
+                        val d = context.getDrawable(R.drawable.blank_profile_pic)
+                        val stream = ByteArrayOutputStream()
+                        d?.toBitmap()?.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+                        val bitmapdata: ByteArray = stream.toByteArray()
+                        val intent = Intent(context, EditProfileActivity::class.java)
+                        intent.putExtra("profilePic", bitmapdata)
+                        intent.putExtra("bio", viewModel.bio.value)
+                        context.startActivity(intent)
+                    }
+                /*.exceptionally {it ->
+                        val intent = Intent(context, EditProfileActivity::class.java)
+                        intent.putExtra("profilePic", byteArrayOf(0))
+                        intent.putExtra("bio", viewModel.bio.value)
+                        context.startActivity(intent)
+                        byteArrayOf(0)
+                    }*/
+
                 }
                 Spacer(modifier = Modifier.width(separator))
                 Row(){
@@ -118,44 +186,32 @@ fun ProfileTopInterface(viewModel: ProfileViewModel, scaffoldState: ScaffoldStat
 
                         //notification
 
-                        Notification(context,null).sendNotification("Sign Out", "You have been signed out", "Sign Out", "Sign Out", 1)
+                        Notification(context, null).sendNotification("Sign Out", "You have been signed out", "Sign Out", "Sign Out", 1)
 
                         //uncomment if un-caching is needed
                         GoogleSignIn.getClient(context, GoogleSignInOptions.DEFAULT_SIGN_IN).signOut()
                         context.startActivity(intent)
 
-                        //
                         cleanSigningCache(context)
-
-
                     }
-                    //
+                    /**
                     Button(
                         onClick = {
-
                             val intent = Intent(Intent.ACTION_VIEW, DeezerApiIntegration.url)
                             context.startActivity(intent)
-
-
                         },
                         colors = ButtonDefaults.buttonColors(backgroundColor = Color.Yellow))
                     {
                         Text("Link Deezer Account")
-                    }
+                    }**/
                 }
             } else {
                 FollowButton(viewModel, viewModel.isUserFollowed.observeAsState().value)
             }
         }
-
-
     }
 }
 
-
-private fun launchDeezerAuth(){
-
-}
 
 /**
  * remove caching credentials
@@ -184,6 +240,7 @@ fun SignOutButton(onClick:() -> Unit) {
 
 @Composable
 fun FollowButton(viewModel: ProfileViewModel, isUserFollowed: Boolean?){
+    val context = LocalContext.current
     if(isUserFollowed == null){ Text(text="") } //Empty body, here waiting for the future that fetch isUserFollowed to complete
     else {
         //Adapts the UI to the Follow or Unfollow button
@@ -191,7 +248,10 @@ fun FollowButton(viewModel: ProfileViewModel, isUserFollowed: Boolean?){
         val backGroundColor = if (isUserFollowed) Color.White else followColor
         val contentColor = if (isUserFollowed) followColor else Color.White
         Button(
-            onClick = { followOrUnfollow(viewModel, isUserFollowed) },
+            onClick = {
+                if(FireStoreDatabaseAPI.isOnline(context)) {
+                    followOrUnfollow(viewModel, isUserFollowed)
+                }},
             shape = RoundedCornerShape(20.dp),
             colors = ButtonDefaults.buttonColors(backgroundColor = backGroundColor, contentColor = contentColor),
             border = BorderStroke(2.dp, followColor),
@@ -236,10 +296,12 @@ fun NbFollowers(nb: Int, username: String){
     ClickableText(
         text = AnnotatedString(if (nb > 1) "$nb\nfollowers" else "$nb\nfollower"),
         onClick = {
-            val intent = Intent(context, FollowListActivity::class.java)
-            intent.putExtra("username", username)
-            intent.putExtra("isFollowers", true)
-            context.startActivity(intent)
+            if(FireStoreDatabaseAPI.isOnline(context)) {
+                val intent = Intent(context, FollowListActivity::class.java)
+                intent.putExtra("username", username)
+                intent.putExtra("isFollowers", true)
+                context.startActivity(intent)
+            }
         },
         style = TextStyle( fontSize = fontSize )
     )
@@ -251,22 +313,15 @@ fun NbFollowings(nb: Int, username: String){
     ClickableText(
         text = AnnotatedString(if (nb > 1) "$nb\nfollowings" else "$nb\nfollowing"),
         onClick = {
-            val intent = Intent(context, FollowListActivity::class.java)
-            intent.putExtra("username", username)
-            intent.putExtra("isFollowers", false)
-            context.startActivity(intent)
+            if(FireStoreDatabaseAPI.isOnline(context)) {
+                val intent = Intent(context, FollowListActivity::class.java)
+                intent.putExtra("username", username)
+                intent.putExtra("isFollowers", false)
+                context.startActivity(intent)
+            }
         },
         style = TextStyle( fontSize = fontSize )
     )
-}
-
-fun launchFollowListActivity(context: Context, isFollowers: Boolean){
-
-    val intent = Intent(context, FollowListActivity::class.java)
-    //intent.putExtra("username", username)
-    intent.putExtra("isFollowers", false)
-    context.startActivity(intent)
-
 }
 
 @Composable
@@ -284,13 +339,43 @@ fun EditButton(onClick:() -> Unit){
 }
 
 @Composable
-fun ProfilePicture(profilePictureId: Int?){
-    val picture = profilePictureId ?: R.drawable.profile_picture
-    Image(
-        painter = painterResource(id = picture),
-        contentDescription = "$picture",
+fun ProfilePicture(futurePic: CompletableFuture<ByteArray>) {//viewModel: ProfileViewModel){
+
+
+    //TODO --------------------------------------
+    // the following block of code is analogous to the one on line ~80
+    // what I would like to achieve is to have a bitmap which observes the state of the profilePic
+    // in the profileviewmodel so that it updates the image when the profile pic has been fetched
+    // from the storage. I do not know how to do that yet.
+    val bitmap: MutableState<ImageBitmap?> = remember {
+        mutableStateOf(null)
+    }
+
+    /*viewModel.fetchProfilePic().addOnSuccessListener {
+        bitmap.value = BitmapFactory.decodeByteArray(it, 0, it.size).asImageBitmap()
+    }*/
+    futurePic.whenComplete { bytes, _ ->
+        bitmap.value = BitmapFactory.decodeByteArray(bytes, 0, bytes.size).asImageBitmap()
+    }
+    //-------------------------------------------
+
+
+    androidx.compose.material3.Card(
+        shape = CircleShape,
         modifier = Modifier
-            .width((3 * topInterfaceHeight) / 4)
-            .clip(CircleShape)
+            .padding(8.dp)
+            .size(100.dp)
     )
+    {
+        bitmap.value?.let {
+            Image(
+                //painter = painter,
+                bitmap = bitmap.value!!,
+                contentDescription = "profile_picture",
+                modifier = Modifier.wrapContentSize(),
+                contentScale = ContentScale.Crop
+            )
+        }
+
+    }
 }

@@ -12,6 +12,7 @@ import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.orkest.data.Constants
 import com.github.orkest.data.User
 import com.github.orkest.ui.FollowList
 import com.github.orkest.ui.profile.ProfileActivity
@@ -52,7 +53,7 @@ class FollowListActivityTest{
     @Test
     fun backButton_navigatesBack() {
         composeTestRule.setContent {
-            OrkestTheme { FollowList(ProfileActivity(), viewModel = viewModel) }
+            OrkestTheme { FollowList(ProfileActivity(Constants.APPLICATION_CONTEXT), viewModel = viewModel) }
         }
         val activityScenario = launchActivity<FollowListActivity>(intent)
         activityScenario.moveToState(Lifecycle.State.RESUMED)
@@ -67,7 +68,7 @@ class FollowListActivityTest{
     @Test
     fun profileRowNavigatesToUserProfile(){
         composeTestRule.setContent {
-            OrkestTheme { FollowList(ProfileActivity(), viewModel = viewModel) }
+            OrkestTheme { FollowList(ProfileActivity(Constants.APPLICATION_CONTEXT), viewModel = viewModel) }
         }
         Intents.init()
         composeTestRule.onNodeWithTag("Profile Row", useUnmergedTree = true).performClick()
@@ -79,7 +80,7 @@ class FollowListActivityTest{
     @Test
     fun profilePictureIsDisplayed(){
         composeTestRule.setContent {
-            OrkestTheme { FollowList(ProfileActivity(), viewModel = viewModel) }
+            OrkestTheme { FollowList(ProfileActivity(Constants.APPLICATION_CONTEXT), viewModel = viewModel) }
         }
         composeTestRule.onNodeWithContentDescription("Contact profile picture").assertIsDisplayed()
     }
@@ -87,7 +88,7 @@ class FollowListActivityTest{
     @Test
     fun usernameIsDisplayed(){
         composeTestRule.setContent {
-            OrkestTheme { FollowList(ProfileActivity(), viewModel = viewModel) }
+            OrkestTheme { FollowList(ProfileActivity(Constants.APPLICATION_CONTEXT), viewModel = viewModel) }
         }
         composeTestRule.onNodeWithTag("Username", useUnmergedTree = true).assertIsDisplayed()
     }
@@ -95,7 +96,7 @@ class FollowListActivityTest{
     @Test
     fun displayFollowersList() {
         composeTestRule.setContent {
-            OrkestTheme { FollowList(ProfileActivity(), viewModel = viewModel) }
+            OrkestTheme { FollowList(ProfileActivity(Constants.APPLICATION_CONTEXT), viewModel = viewModel) }
         }
         // Launch the activity with the followers parameter
         intent.putExtra("isFollowers", true)
@@ -109,7 +110,7 @@ class FollowListActivityTest{
     @Test
     fun displayFollowingsList() {
         composeTestRule.setContent {
-            OrkestTheme { FollowList(ProfileActivity(), viewModel = viewModel) }
+            OrkestTheme { FollowList(ProfileActivity(Constants.APPLICATION_CONTEXT), viewModel = viewModel) }
         }
         // Launch the activity with the followings parameter
         intent.putExtra("isFollowers", false)

@@ -407,6 +407,17 @@ class DeezerApiIntegrationTest {
         assertEquals(info.access_token,"CodeVale")
         assertEquals(info.playlistId,"3645740262")
         assertEquals(info.userId,"2297625024")
+
+        info.playlistId?.let {
+            DeezerApiIntegration(DeezerMockAPi.DeezerMockApiImplemented()).launchDeezerToPlayAPlaylist(
+                it
+            )
+        }
+        val intent = DeezerApiIntegration(DeezerMockAPi.DeezerMockApiImplemented()).launchDeezerToPlaySong("pettite fille", "booba").get()
+        Log.d("Intent check",intent.data.toString())
+
+        assertEquals(intent.data.toString().substringAfterLast("/"),"434591652")
+
         //
     }
 

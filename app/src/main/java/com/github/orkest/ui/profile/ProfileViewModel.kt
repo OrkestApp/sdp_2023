@@ -2,24 +2,32 @@ package com.github.orkest.ui.profile
 
 import android.content.ContentValues.TAG
 import android.util.Log
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.github.orkest.data.Constants
 import com.github.orkest.domain.FireStoreDatabaseAPI
 import com.github.orkest.data.User
+import com.github.orkest.domain.FirebaseStorageAPI
+import com.google.android.gms.tasks.Task
+import java.io.Serializable
 import java.util.concurrent.CompletableFuture
 
-open class ProfileViewModel(val user: String) : ViewModel() {
+open class ProfileViewModel(val user: String) : ViewModel(), Serializable {
 
     private val dbAPI = FireStoreDatabaseAPI()
+    private val firebaseStorage = FirebaseStorageAPI
     private var userProfile = User()
+
+    val storageAPI = FirebaseStorageAPI()
 
     open var username = MutableLiveData(user)
     open var bio = MutableLiveData<String>()
     open var nbFollowers = MutableLiveData<Int>()
     open var nbFollowings = MutableLiveData<Int>()
-    open var profilePictureId = MutableLiveData<Int>()
     open val isUserFollowed = MutableLiveData<Boolean>()
+    open var profilePictureId = MutableLiveData<Int>()
+    open var profilePic = MutableLiveData<ByteArray?>()
 
     private lateinit var future: CompletableFuture<User>
 
@@ -43,11 +51,20 @@ open class ProfileViewModel(val user: String) : ViewModel() {
             //profilePictureId.value = it.profilePictureId
         }
 
+
+
         listenToUserData()
 
         isUserFollowed().thenAccept {
             isUserFollowed.value = it
         }
+    }
+
+    /**
+     * Get profile picture of the user whose profile you're currently visiting
+     */
+    fun fetchProfilePic(): CompletableFuture<ByteArray> {
+        return firebaseStorage.fetchProfilePic(user)
     }
 
 
@@ -191,5 +208,4 @@ open class ProfileViewModel(val user: String) : ViewModel() {
         return future
     }
 }
-
 

@@ -76,7 +76,7 @@ fun ProfileActivitySetting(content: @Composable () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileActivityScreen(activity: ComponentActivity, viewModel: ProfileViewModel) {
+fun ProfileActivityScreen(activity: ComponentActivity, viewModel: ProfileViewModel, isTest : Boolean = false) {
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
 

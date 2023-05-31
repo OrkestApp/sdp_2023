@@ -49,11 +49,13 @@ import androidx.compose.foundation.border
 import androidx.compose.runtime.Composable
 import androidx.core.app.ActivityCompat
 import com.github.orkest.domain.FireStoreDatabaseAPI
+import com.github.orkest.domain.FirebaseStorageAPI
 import com.github.orkest.ui.PermissionConstants
 import com.github.orkest.ui.feed.CreatePost
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.ui.StyledPlayerView
+import com.google.firebase.ktx.Firebase
 
 
 //This class represents a camera component activity
@@ -318,7 +320,6 @@ class CameraView: ComponentActivity(){
                 val intent = Intent(context, CreatePost::class.java)
                 intent.putExtra("URI", capturedUri.toString())
                 intent.putExtra("isVideo", isVideo)
-                /**TODO save URI in database**/
                 context.startActivity(intent)
             }, modifier = Modifier
                 .padding(paddingValue)

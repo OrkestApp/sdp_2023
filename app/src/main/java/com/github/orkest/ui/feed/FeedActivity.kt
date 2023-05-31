@@ -35,10 +35,13 @@ import com.github.orkest.data.Post
 import com.github.orkest.data.Song
 import com.github.orkest.R
 import com.github.orkest.domain.FireStoreDatabaseAPI
+import com.github.orkest.domain.FirebaseStorageAPI
 import com.github.orkest.domain.persistence.AppDatabase
 import com.github.orkest.domain.persistence.AppEntities
 import com.github.orkest.ui.feed.PostViewModel
 import com.github.orkest.ui.feed.CommentActivity
+import com.github.orkest.ui.feed.isVideo
+import com.github.orkest.ui.feed.mediaURI
 import com.github.orkest.ui.sharing.SharingComposeActivity
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -194,8 +197,15 @@ fun DisplayPost(viewModel: PostViewModel, post: Post) {
             Spacer(modifier = Modifier.height(10.dp))
 
             if(post.media.isNotEmpty()) {
-                val uri = Uri.parse(post.media)
-                CapturedMedia(capturedUri = uri!!, isVideo = post.isMediaVideo)
+                var uri by remember { mutableStateOf( Uri.EMPTY)}
+                if(isVideo) {
+                    FirebaseStorageAPI.fetchPostVideo(post).thenApply { uri = it }
+                } else {
+                    FirebaseStorageAPI.fetchPostPic(post).thenApply { uri = it }
+                }
+                if (uri != Uri.EMPTY) {
+                    CapturedMedia(capturedUri = uri!!, isVideo = post.isMediaVideo)
+                }
             }
 
         }

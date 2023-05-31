@@ -3,6 +3,7 @@ package com.github.orkest
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.firestoreSettings
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 import org.junit.BeforeClass
 import org.junit.FixMethodOrder
 import org.junit.Test
@@ -21,10 +22,15 @@ class AAARunBeforeTests {
         fun setupEmulator() {
 
             val db = Firebase.firestore
-            db.useEmulator("10.0.2.2", 8080)
+            db.useEmulator("10.0.2.2", 8181)
             db.firestoreSettings = firestoreSettings {
                 isPersistenceEnabled = false
             }
+
+            val storage = FirebaseStorage.getInstance()
+            storage.useEmulator("10.0.2.2", 9199)
+
+
 
         }
     }

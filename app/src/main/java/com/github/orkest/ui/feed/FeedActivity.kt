@@ -25,6 +25,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -319,10 +320,21 @@ fun SongCard(song: Song) {
 @Composable
 private fun SongInfo(song: Song) {
 
+
+    var drawable = R.drawable.album_cover
+    if(song.Title.contains("Never") || song.Title.contains("Gonna")){
+        drawable = R.drawable.nevergonnagiveyouup
+    }
+    else if (song.Title.toLowerCase().contains("pettite") || song.Title.toLowerCase().contains("fille")){
+        drawable = R.drawable.booba
+    }
+    else if (song.Title.toLowerCase().contains("hips") || song.Title.toLowerCase().contains("lie") ){
+        drawable = R.drawable.hips
+    }
     Row(Modifier.padding(10.dp)) {
         //Add the song's picture at the left of the card
         Image(
-            painter = painterResource(id = R.drawable.album_cover),
+            painter = painterResource(id = drawable),
             contentDescription = "Cover of the album of the song Rude Boy by Rihanna",
             modifier = Modifier
                 .height(80.dp)

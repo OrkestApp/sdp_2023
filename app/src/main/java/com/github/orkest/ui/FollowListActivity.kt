@@ -147,7 +147,7 @@ fun CreateProfilePreview(user: String, intent: Intent? = null){
             verticalArrangement = Arrangement.Center) {
             Text(
                 text = user,
-                style = TextStyle(fontSize = textFontSize, fontWeight = FontWeight.Bold),
+                style = TextStyle(fontSize = textFontSize, fontWeight = FontWeight.Bold, color = Color.White),
                 modifier = Modifier.testTag("Username")
             )
         }

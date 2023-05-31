@@ -40,7 +40,6 @@ import com.github.orkest.domain.persistence.AppDatabase
 import com.github.orkest.domain.persistence.AppEntities
 import com.github.orkest.ui.feed.PostViewModel
 import com.github.orkest.ui.feed.CommentActivity
-import com.github.orkest.ui.feed.isVideo
 import com.github.orkest.ui.feed.mediaURI
 import com.github.orkest.ui.sharing.SharingComposeActivity
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -198,7 +197,7 @@ fun DisplayPost(viewModel: PostViewModel, post: Post) {
 
             if(post.media.isNotEmpty()) {
                 var uri by remember { mutableStateOf( Uri.EMPTY)}
-                if(isVideo) {
+                if(post.isMediaVideo) {
                     FirebaseStorageAPI.fetchPostVideo(post).thenApply { uri = it }
                 } else {
                     FirebaseStorageAPI.fetchPostPic(post).thenApply { uri = it }

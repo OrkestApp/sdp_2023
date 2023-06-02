@@ -1,53 +1,102 @@
 package com.github.orkest.ui.profile
 
 import android.content.ContentValues.TAG
+import android.content.Context
 import android.util.Log
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.github.orkest.data.Constants
+import com.github.orkest.data.Profile
 import com.github.orkest.domain.FireStoreDatabaseAPI
 import com.github.orkest.data.User
+import com.github.orkest.domain.FirebaseStorageAPI
+import com.google.android.gms.tasks.Task
+import java.io.Serializable
+import com.github.orkest.domain.persistence.AppDatabase
+import com.github.orkest.domain.persistence.AppEntities
 import java.util.concurrent.CompletableFuture
 
-open class ProfileViewModel(val user: String) : ViewModel() {
+open class ProfileViewModel(val context: Context, val user: String) : ViewModel(), Serializable {
 
     private val dbAPI = FireStoreDatabaseAPI()
+    private val firebaseStorage = FirebaseStorageAPI
     private var userProfile = User()
+
+    val storageAPI = FirebaseStorageAPI()
 
     open var username = MutableLiveData(user)
     open var bio = MutableLiveData<String>()
     open var nbFollowers = MutableLiveData<Int>()
     open var nbFollowings = MutableLiveData<Int>()
-    open var profilePictureId = MutableLiveData<Int>()
     open val isUserFollowed = MutableLiveData<Boolean>()
+    open var profilePictureId = MutableLiveData<Int>()
+    open var profilePic = MutableLiveData<ByteArray?>()
 
     private lateinit var future: CompletableFuture<User>
 
 
-    init {
-        setupListener()
-    }
+    init { setupListener() }
 
     /**
      * To call everytime an instance of ProfileViewModel() is created
      */
     fun setupListener() {
 
-        //future= loadUserData()
-        future = dbAPI.searchUserInDatabase(user)
-        future.thenAccept {
-            username.value = it.username
-            bio.value = it.profile.bio
-            nbFollowers.value = it.profile.nbFollowers
-            nbFollowings.value = it.profile.nbFollowings
-            //profilePictureId.value = it.profilePictureId
+        if(FireStoreDatabaseAPI.isOnline(context)){
+            //future= loadUserData()
+            future = dbAPI.searchUserInDatabase(user)
+            future.thenAccept {
+                username.value = it.username
+                bio.value = it.profile.bio
+                nbFollowers.value = it.profile.nbFollowers
+                nbFollowings.value = it.profile.nbFollowings
+                //profilePictureId.value = it.profilePictureId
+
+                if(user == Constants.CURRENT_LOGGED_USER) {
+                    // Insert/update the user profile in the cache
+                    val profileEntity = AppEntities.Companion.ProfileEntity(
+                        id = 1,
+                        username = it.username,
+                        profilePictureId = it.profile.profilePictureId,
+                        bio = it.profile.bio,
+                        nbFollowers = it.profile.nbFollowers,
+                        nbFollowings = it.profile.nbFollowings,
+                        favoriteSongs = it.profile.favoriteSongs,
+                        sharedMusic = it.profile.sharedMusic
+                    )
+                    Constants.CACHING_DATABASE.profileDao().insertProfile(profileEntity)
+                }
+            }
+
+        } else {
+            if(user == Constants.CURRENT_LOGGED_USER){
+                CompletableFuture.runAsync {
+                    val profileEntity = Constants.CACHING_DATABASE.profileDao().getProfile()
+                    if (profileEntity != null) {
+                        username.value = profileEntity.username
+                        bio.value = profileEntity.bio
+                        nbFollowers.value = profileEntity.nbFollowers
+                        nbFollowings.value = profileEntity.nbFollowings
+                        profilePictureId.value = profileEntity.profilePictureId
+                    }
+                }
+            }
         }
+
 
         listenToUserData()
 
         isUserFollowed().thenAccept {
             isUserFollowed.value = it
         }
+    }
+
+    /**
+     * Get profile picture of the user whose profile you're currently visiting
+     */
+    fun fetchProfilePic(): CompletableFuture<ByteArray> {
+        return firebaseStorage.fetchProfilePic(user)
     }
 
 
@@ -191,5 +240,4 @@ open class ProfileViewModel(val user: String) : ViewModel() {
         return future
     }
 }
-
 

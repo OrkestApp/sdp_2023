@@ -3,6 +3,7 @@ package com.github.orkest.View.feed
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import com.github.orkest.ViewModel.feed.MockPostViewModel
+import com.github.orkest.data.Song
 import com.github.orkest.ui.feed.CreatePost
 import com.github.orkest.ui.feed.EditPostScreen
 import org.junit.Assert.*
@@ -15,11 +16,13 @@ class CreatePostTest{
 
     @get:Rule
     val composeTestRule = createComposeRule()
+    lateinit var viewModel: MockPostViewModel
 
     @Before
     fun setup(){
         // Start the app
-        val viewModel = MockPostViewModel()
+        viewModel = MockPostViewModel()
+        viewModel.updateSong(Song("TestTitle","TestArtist"))
         composeTestRule.setContent {
             EditPostScreen(viewModel = viewModel, activity = CreatePost())
         }
@@ -45,6 +48,13 @@ class CreatePostTest{
     @Test
     fun descriptionFieldIsDisplayed(){
         composeTestRule.onNodeWithText("Post Description").assertIsDisplayed()
+    }
+
+    @Test
+    fun songPostUpdatesBasedOnSong() {
+        assertEquals(viewModel.getSong(), Song("TestTitle","TestArtist"))
+        composeTestRule.onNodeWithText("TestTitle").assertIsDisplayed()
+        composeTestRule.onNodeWithText("TestArtist").assertIsDisplayed()
     }
 
     //Not necessary to test the other, since this is just a demo activity

@@ -14,6 +14,7 @@ import com.github.orkest.bluetooth.data.TestDeviceUI
 import com.github.orkest.bluetooth.domain.BluetoothConstants
 import com.github.orkest.bluetooth.domain.Device
 import com.github.orkest.bluetooth.ui.BluetoothActivity
+import com.github.orkest.data.Constants
 import com.github.orkest.ui.profile.ProfileViewModel
 import org.junit.Rule
 import org.junit.Test
@@ -40,7 +41,7 @@ class bluetoothUITest {
                 BluetoothConstants.MESSAGE_READ -> {
                     // construct a string from the valid bytes in the buffer
                     val msgReceived = String(msg.obj as ByteArray, 0, msg.arg1)
-                    val follow = ProfileViewModel(msgReceived)
+                    val follow = ProfileViewModel(Constants.APPLICATION_CONTEXT, msgReceived)
                     follow.updateCurrentUserFollowings(true)
                     follow.updateUserFollowers(true)
 

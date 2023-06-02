@@ -25,6 +25,7 @@ import coil.compose.rememberImagePainter
 import com.github.orkest.data.Constants
 import com.github.orkest.View.feed.SongCard
 import com.github.orkest.data.Song
+import com.github.orkest.domain.FirebaseStorageAPI
 import com.github.orkest.ui.MainActivity
 import com.github.orkest.ui.notification.Notification
 import com.github.orkest.ui.theme.OrkestTheme
@@ -37,6 +38,7 @@ import com.google.android.exoplayer2.ui.StyledPlayerView
 
 var mediaURI: Uri = Uri.EMPTY
 var isVideo : Boolean = false
+var isTest : Boolean = false
 class CreatePost : ComponentActivity() {
 
 
@@ -49,16 +51,11 @@ class CreatePost : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    val viewModel = PostViewModel()
 
-                    isVideo = intent.getBooleanExtra("isVideo", false)
-                    val URIstring = intent.getStringExtra("URI") ?: "Unknown"
-                    mediaURI = Uri.parse(URIstring)
 
-                    viewModel.setPostMedia(URIstring, isVideo)
+
 
                     val song = Song()
-                    //Get the song name, artist, and album from the intent
                     //--------------Intent handling------------------
                     if (intent.hasExtra(Constants.SONG_NAME))
                         song.Title = intent.getStringExtra(Constants.SONG_NAME) ?: "Unknown"
@@ -68,6 +65,25 @@ class CreatePost : ComponentActivity() {
 
                     if (intent.hasExtra(Constants.SONG_ALBUM))
                         song.Album = intent.getStringExtra(Constants.SONG_ALBUM) ?: "Unknown"
+
+                    isTest = intent.getBooleanExtra("iTest", false)
+
+                    isVideo = intent.getBooleanExtra("isVideo", false)
+                    val URIstring = intent.getStringExtra("URI") ?: "Unknown"
+
+                    val viewModel = PostViewModel()
+                    mediaURI = Uri.parse(URIstring)
+
+                    if(isVideo && !isTest) {
+                        FirebaseStorageAPI.uploadVideo(mediaURI, viewModel.getPost())
+                    } else {
+                        if (!isTest)
+                            FirebaseStorageAPI.uploadPostPic(mediaURI, viewModel.getPost())
+                    }
+
+                    viewModel.setPostMedia(URIstring, isVideo)
+
+                    //Get the song name, artist, and album from the intent
 
                     viewModel.updateSong(song)
 
@@ -117,7 +133,6 @@ fun EditPostScreen(viewModel: PostViewModel, activity: ComponentActivity) {
 
             //TODO: Add a button to list songs to choose from
             //Field to choose the song to display [dummy, to be correctly implemented later with retrieval from database ..]
-            viewModel.updateSong(Constants.DUMMY_RUDE_BOY_SONG)
             SongCard(song = viewModel.getSong())
 
 
@@ -127,8 +142,10 @@ fun EditPostScreen(viewModel: PostViewModel, activity: ComponentActivity) {
             //Confirm button to publish the post
             Button(
                 onClick = {
-                    viewModel.addPost().whenComplete{
-                            bool,_ -> if(bool) activity.finish() }
+                    viewModel.addPost().whenComplete { bool,_ ->
+                        viewModel.resetFoundShazamSong()
+                        if(bool) activity.finish()
+                    }
 
                     val intent = Intent(context, MainActivity::class.java)
                     context.startActivity(intent)

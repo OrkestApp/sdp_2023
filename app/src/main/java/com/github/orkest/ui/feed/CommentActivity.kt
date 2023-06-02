@@ -1,6 +1,8 @@
 package com.github.orkest.ui.feed
 
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -17,15 +19,24 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.drawable.toBitmap
 import coil.compose.rememberImagePainter
 import com.github.orkest.data.Comment
 import com.github.orkest.R
+import com.github.orkest.data.Constants
+import com.github.orkest.domain.FirebaseStorageAPI
 import com.github.orkest.ui.theme.OrkestTheme
+import okio.utf8Size
+import java.io.ByteArrayOutputStream
 
 
 class CommentActivity : ComponentActivity() {
@@ -54,7 +65,7 @@ class CommentActivity : ComponentActivity() {
                 .fillMaxWidth()
         ) {
             Row {
-                displayProfilePic()
+                displayProfilePic(comment.username)
                 Column {
                     Row(horizontalArrangement = Arrangement.SpaceEvenly){
                         Text(text = comment.username, fontWeight = FontWeight.Bold, modifier = Modifier.testTag("comment_username"))
@@ -110,7 +121,7 @@ fun CommentScreen(activity: ComponentActivity, viewModel: PostViewModel) {
                 colors = TextFieldDefaults.textFieldColors(
                     containerColor = Color.Transparent,
                 ),
-                leadingIcon = { displayProfilePic() },
+                leadingIcon = { displayProfilePic(Constants.CURRENT_LOGGED_USER) },
                 /* publish button */
                 trailingIcon = {
                     Icon(Icons.Default.Send,
@@ -183,18 +194,73 @@ fun Comments(viewModel: PostViewModel) {
  * TODO: need to decide on how to reference people's profile pictures
  */
 @Composable
-fun displayProfilePic(/* TODO */) {
-    Card(
+fun displayProfilePic(username: String) {
+    val context = LocalContext.current
+    val d = context.getDrawable(R.drawable.blank_profile_pic)
+    val stream = ByteArrayOutputStream()
+    d?.toBitmap()?.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+    val bytearray = stream.toByteArray()
+    val bitmapdata = BitmapFactory.decodeByteArray(bytearray, 0, bytearray.size);
+
+    val bitmap: MutableState<ImageBitmap?> = remember {
+        mutableStateOf(bitmapdata.asImageBitmap())
+    }
+
+    /*viewModel.fetchProfilePic().addOnSuccessListener {
+        bitmap.value = BitmapFactory.decodeByteArray(it, 0, it.size).asImageBitmap()
+    }*/
+    FirebaseStorageAPI.fetchProfilePic(username).whenComplete { bytes, _ ->
+        bitmap.value = BitmapFactory.decodeByteArray(bytes, 0, bytes.size).asImageBitmap()
+    }
+
+    bitmap.value?.let {
+        Image(
+            bitmap = bitmap.value!!,
+            contentDescription = "Profile Picture of the user",
+            modifier = Modifier
+                .padding(start = 10.dp, top = 10.dp)
+                .height(40.dp)
+                .width(40.dp)
+                .clip(shape = CircleShape)
+                .clickable { }
+        )
+    }
+    /*Card(
         shape = CircleShape,
         modifier = Modifier
             .padding(8.dp)
             .size(40.dp)
             .testTag("display_pic")
     ) {
-        val imageUri = rememberSaveable { mutableStateOf("") }
-        val painter = rememberImagePainter(
-            imageUri.value.ifEmpty { R.drawable.blank_profile_pic }
-        )
-        Image(painter = painter, contentDescription = "Profile Picture", modifier = Modifier.testTag("display_pic"))
-    }
+        val context = LocalContext.current
+        val d = context.getDrawable(R.drawable.blank_profile_pic)
+        val stream = ByteArrayOutputStream()
+        d?.toBitmap()?.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+        val bytearray = stream.toByteArray()
+        val bitmapdata = BitmapFactory.decodeByteArray(bytearray, 0, bytearray.size);
+
+        val bitmap: MutableState<ImageBitmap?> = remember {
+            mutableStateOf(bitmapdata.asImageBitmap())
+        }
+
+        /*viewModel.fetchProfilePic().addOnSuccessListener {
+            bitmap.value = BitmapFactory.decodeByteArray(it, 0, it.size).asImageBitmap()
+        }*/
+        FirebaseStorageAPI.fetchProfilePic(username).whenComplete { bytes, _ ->
+            bitmap.value = BitmapFactory.decodeByteArray(bytes, 0, bytes.size).asImageBitmap()
+        }
+        /*{ bytes, _ ->
+            bitmap.value = BitmapFactory.decodeByteArray(bytes, 0, bytes.size).asImageBitmap()
+        }*/
+        //-------------------------------------------
+
+        //Add the user's profile pic
+        bitmap.value?.let {
+            Image(
+                bitmap = bitmap.value!!,
+                contentDescription = "Profile Picture of the user"
+            )
+        }
+        //Image(painter = painter, contentDescription = "Profile Picture", modifier = Modifier.testTag("display_pic"))
+    }*/
 }

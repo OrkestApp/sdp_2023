@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import com.github.orkest.data.*
 import com.github.orkest.data.Constants.Companion.DEFAULT_MAX_RECENT_DAYS
 import com.github.orkest.domain.FireStoreDatabaseAPI
+import com.github.orkest.shazam.domain.ShazamConstants
 import com.github.orkest.ui.notification.Notification
 import java.time.LocalDateTime
 import java.util.concurrent.CompletableFuture
@@ -102,7 +103,7 @@ open class PostViewModel {
     /**
      * Updates the value of the song after the user set it on the view
      */
-    fun updateSong(song: Song) {
+    open fun updateSong(song: Song) {
         this.song.value = song
     }
 
@@ -122,6 +123,9 @@ open class PostViewModel {
 
     /**===============================================*/
 
+    open fun resetFoundShazamSong() {
+        ShazamConstants.SONG_FOUND = ShazamConstants.SONG_NO_MATCH
+    }
 
     /**
      * Adds a post to the database
@@ -157,7 +161,7 @@ open class PostViewModel {
     /**
      * Returns the post object
      */
-    fun getPost(): Post {
+    open fun getPost(): Post {
         return post
     }
 

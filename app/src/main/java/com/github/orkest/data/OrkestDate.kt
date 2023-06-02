@@ -26,7 +26,9 @@ data class OrkestDate (var year:Int = 0,
      * Converts an OrkestDate to a String representation, same as the LocalDateTime string representation
      */
     override fun toString(): String {
-        return toLocalDateTime().toString()
+        val time = toLocalDateTime()
+        val dateTime = LocalDateTime.of(time.year,time.month,time.dayOfMonth, time.hour, time.minute)
+        return dateTime.toString()
     }
 
     /**

@@ -2,6 +2,7 @@ package com.github.orkest.ui.Camera
 
 
 import android.Manifest
+import android.app.Activity
 import android.content.ContentValues.TAG
 import androidx.compose.ui.viewinterop.AndroidView
 import android.content.Context
@@ -48,12 +49,16 @@ import java.util.*
 import androidx.compose.foundation.border
 import androidx.compose.runtime.Composable
 import androidx.core.app.ActivityCompat
+import com.github.orkest.shazam.domain.ShazamConstants
+import com.github.orkest.shazam.ui.ShazamSong
 import com.github.orkest.domain.FireStoreDatabaseAPI
+import com.github.orkest.domain.FirebaseStorageAPI
 import com.github.orkest.ui.PermissionConstants
 import com.github.orkest.ui.feed.CreatePost
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.ui.StyledPlayerView
+import com.google.firebase.ktx.Firebase
 
 
 //This class represents a camera component activity
@@ -69,23 +74,32 @@ class CameraView: ComponentActivity(){
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
         setContent {
 
             hasCameraAccess = PermissionConstants.cameraPermissionIsGranted(this)
-
+            val context = LocalContext.current
             // The state of the captured image is kept in a mutableStateOf variable.
             var capturedImageUri by remember { mutableStateOf<Uri?>(null) }
             var capturedVideoUri by remember { mutableStateOf<Uri?>(null) }
+            val isShazamActive by remember { ShazamConstants.SHAZAM_SESSION_ACTIVE }
+            val retakeImage = remember { mutableStateOf(false) }
 
+            if (!isShazamActive && retakeImage.value) {
+                //Launch SHazam and reset the found song
+                ShazamSong(this)
+                ShazamConstants.SONG_FOUND = ShazamConstants.SHAZAMING
+            }
             //If an image has been captured
             if(capturedImageUri != null){
-                CapturedMedia(capturedUri = capturedImageUri!!, isVideo = false) {
+                CapturedMedia(capturedUri = capturedImageUri!!, isVideo = false, retakeImage) {
                     capturedImageUri = null
                 }
             }
             //If a video has been captured
             if(capturedVideoUri != null){
-                CapturedMedia(capturedUri = capturedVideoUri!!, isVideo = true) {
+                CapturedMedia(capturedUri = capturedVideoUri!!, isVideo = true, retakeImage) {
                     capturedVideoUri = null
                 }
             }
@@ -94,6 +108,7 @@ class CameraView: ComponentActivity(){
                 // If an image or video is not yet captured, a `CameraPreview` composable is displayed.
                 CameraPreview(
                     lifecycleOwner = this,
+                    retakeImage = retakeImage,
                     onImageCaptured = { uri ->
                         capturedImageUri = uri
                     },
@@ -109,9 +124,12 @@ class CameraView: ComponentActivity(){
     @Composable
     fun CameraPreview(
         lifecycleOwner: LifecycleOwner,
+        retakeImage: MutableState<Boolean>,
         onImageCaptured: (Uri) -> Unit,
         onVideoCaptured: (Uri) -> Unit
     ) {
+
+        retakeImage.value = false
 
         Box(modifier = Modifier
             .fillMaxSize()
@@ -257,7 +275,7 @@ class CameraView: ComponentActivity(){
             BackButton({
                 val intent = Intent(context, MainActivity::class.java)
                 context.startActivity(intent)
-                       },
+                (context as Activity).finish() },
                 Modifier
                     .padding(paddingValue)
                     .align(Alignment.TopStart)
@@ -270,6 +288,7 @@ class CameraView: ComponentActivity(){
     fun CapturedMedia(
         capturedUri: Uri,
         isVideo: Boolean,
+        retakeImage: MutableState<Boolean>,
         onBackClick: () -> Unit
     ) {
         val context = LocalContext.current
@@ -290,7 +309,9 @@ class CameraView: ComponentActivity(){
                             player = exoPlayer
                         }
                     },
-                    modifier = Modifier.fillMaxSize().testTag("Captured Video")
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .testTag("Captured Video")
                 )
 
             } else {
@@ -306,6 +327,11 @@ class CameraView: ComponentActivity(){
             BackButton(onBackClick =
             {
                 if(isVideo) { exoPlayer.release() }
+                //If Shazam is not active, the song found is reset to the default value
+                if (!ShazamConstants.SHAZAM_SESSION_ACTIVE.value) {
+                    ShazamConstants.SONG_FOUND = ShazamConstants.SHAZAMING
+                }
+                retakeImage.value = true
                 onBackClick()
             },
                 modifier = Modifier
@@ -315,11 +341,26 @@ class CameraView: ComponentActivity(){
 
             // Save button for the taken picture
             SaveButton(onSaveClick = {
-                val intent = Intent(context, CreatePost::class.java)
-                intent.putExtra("URI", capturedUri.toString())
-                intent.putExtra("isVideo", isVideo)
-                /**TODO save URI in database**/
-                context.startActivity(intent)
+                //Send an intent to the CreatePost activity with the URI of the captured image
+                // and the song found by Shazam
+                if (ShazamConstants.SONG_FOUND != ShazamConstants.SHAZAMING) {
+                    val intent = Intent(context, CreatePost::class.java)
+                    intent.putExtra("URI", capturedUri.toString())
+                    intent.putExtra("isVideo", isVideo)
+                    /**TODO save URI in database**/
+                    //Send the song as an intent extra
+                    intent.putExtra(Constants.SONG_NAME, ShazamConstants.SONG_FOUND.Title)
+                    intent.putExtra(Constants.SONG_ARTIST, ShazamConstants.SONG_FOUND.Artist)
+                    //Reset the song found by Shazam
+                    ShazamConstants.SONG_FOUND = ShazamConstants.SHAZAMING
+                    context.startActivity(intent)
+                    (context as Activity).finish()
+                } // else if song is not found, display a message to the user
+                else {
+                    Toast.makeText(context,
+                        "Please wait for Shazam to find a song",
+                        Toast.LENGTH_SHORT).show()
+                }
             }, modifier = Modifier
                 .padding(paddingValue)
                 .align(Alignment.BottomCenter)

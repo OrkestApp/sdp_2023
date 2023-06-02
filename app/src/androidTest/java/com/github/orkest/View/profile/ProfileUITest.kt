@@ -49,7 +49,7 @@ class ProfileUITest {
     fun profileScreen_displaysRightValues() {
         composeTestRule.setContent {
             ProfileActivitySetting {
-                ProfileActivityScreen(ProfileActivity(), viewModel = viewModel)
+                ProfileActivityScreen(ProfileActivity(Constants.APPLICATION_CONTEXT), viewModel = viewModel)
             }
         }
         composeTestRule.onNodeWithText(John.username).assertIsDisplayed()
@@ -87,7 +87,7 @@ class ProfileUITest {
     fun addFavoriteSongsAndArtistsButtonsAreDisplayedAndClickable() {
          composeTestRule.setContent {
             ProfileActivitySetting {
-                ProfileActivityScreen(ProfileActivity(), viewModel = viewModel)
+                ProfileActivityScreen(ProfileActivity(Constants.APPLICATION_CONTEXT), viewModel = viewModel)
             }
         }
 

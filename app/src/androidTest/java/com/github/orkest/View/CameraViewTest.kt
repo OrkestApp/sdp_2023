@@ -2,7 +2,12 @@ package com.github.orkest.View
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.matcher.IntentMatchers.*
+import com.github.orkest.data.Constants
+import com.github.orkest.shazam.domain.ShazamConstants
 import com.github.orkest.ui.Camera.CameraView
+import com.github.orkest.ui.feed.CreatePost
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -66,5 +71,24 @@ class CameraViewTest {
             composeTestRule.onNodeWithTag("Save Button").assertIsDisplayed().assertHasClickAction()
         }
     }
+
+    @Test
+    fun takePictureSendsIntentToPostCreationWithShazamSong() {
+        Intents.init()
+        //Set the song to be found
+        ShazamConstants.SONG_FOUND = Constants.DUMMY_RUDE_BOY_SONG
+        //click on take picture button
+        composeTestRule.onNodeWithTag("Take Picture Button").performClick()
+        Thread.sleep(3000) //Wait for the UI to update
+        //Click on save button
+        composeTestRule.onNodeWithTag("Save Button").performClick()
+        //Check if the intent was sent to the post creation activity
+        Intents.intended(hasComponent(CreatePost::class.java.name))
+        //Check if the intent was sent to the post creation activity with correct extras
+        Intents.intended(hasExtra(Constants.SONG_NAME, Constants.DUMMY_RUDE_BOY_SONG.Title))
+        Intents.intended(hasExtra(Constants.SONG_ARTIST, Constants.DUMMY_RUDE_BOY_SONG.Artist))
+        Intents.release()
+    }
+
 
 }
